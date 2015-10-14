@@ -31,7 +31,7 @@ import cn.nukkit.plugin.JarPluginLoader;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.plugin.PluginLoadOrder;
 import cn.nukkit.plugin.PluginManager;
-import cn.nukkit.scheduler.ServerScheduler;
+import cn.nukkit.scheduler.Scheduler;
 import cn.nukkit.utils.*;
 
 import java.io.File;
@@ -65,7 +65,7 @@ public class Server {
 
     private int profilingTickrate = 20;
 
-    private ServerScheduler scheduler = null;
+    private Scheduler scheduler = null;
 
     private int tickCounter;
 
@@ -212,8 +212,6 @@ public class Server {
             }
         }
 
-        ServerScheduler.WORKERS = (int) poolSize;
-
         Object threshold = this.getConfig("network.batch-threshold", 256);
         if (!(threshold instanceof Integer)) {
             try {
@@ -229,7 +227,7 @@ public class Server {
         this.networkCompressionLevel = (int) this.getConfig("network.compression-level", 7);
         this.networkCompressionAsync = (boolean) this.getConfig("network.async-compression", true);
         //todo Tick配置
-        this.scheduler = new ServerScheduler();
+        this.scheduler = new Scheduler();
 
         this.entityMetadata = new EntityMetadataStore();
         this.playerMetadata = new PlayerMetadataStore();
@@ -367,7 +365,7 @@ public class Server {
         }
 
         if (!forceSync && this.networkCompressionAsync) {
-            this.getScheduler().scheduleAsyncTask(new CompressBatchedTask(data, targets, this.networkCompressionLevel, channel));
+            this.getScheduler().scheduleAsync(new CompressBatchedTask(data, targets, this.networkCompressionLevel, channel));
         } else {
             try {
                 this.broadcastPacketsCallback(Zlib.deflate(data, this.networkCompressionLevel), targets, channel);
@@ -469,7 +467,7 @@ public class Server {
             HandlerList.unregisterAll();
 
             this.getLogger().debug("Stopping all tasks");
-            this.scheduler.cancelAllTasks();
+            this.scheduler.cancel();
             this.scheduler.mainThreadHeartbeat(Integer.MAX_VALUE);
 
             this.getLogger().debug("Saving properties");
@@ -834,7 +832,7 @@ public class Server {
         return craftingManager;
     }
 
-    public ServerScheduler getScheduler() {
+    public Scheduler getScheduler() {
         return scheduler;
     }
 

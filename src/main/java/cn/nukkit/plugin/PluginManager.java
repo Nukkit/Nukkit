@@ -512,7 +512,7 @@ public class PluginManager {
                 }
             }
 
-            this.server.getScheduler().cancelTask(plugin);
+            this.server.getScheduler().cancel(plugin);
             HandlerList.unregisterAll(plugin);
             for (Permission permission : plugin.getDescription().getPermissions()) {
                 this.removePermission(permission);
