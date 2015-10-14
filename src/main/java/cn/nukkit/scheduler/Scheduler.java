@@ -113,7 +113,7 @@ public class Scheduler {
     }
 
     private void pending(ScheduledTask task) {
-        if (task.getNextTick() != 0) {
+        if (!task.isCancelled()) {
             execute(task);
             if (task.getDaily() > 0) {
                 task.reLoop(currentTick);

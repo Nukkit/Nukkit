@@ -20,6 +20,8 @@ public class ScheduledTask {
     private int nextTick;
     private int daily;
 
+    private boolean cancelled;
+
     public int getTaskId() {
         return taskId;
     }
@@ -53,7 +55,7 @@ public class ScheduledTask {
     }
 
     public void cancel() {
-        nextTick = 0;
+        cancelled = true;
     }
 
     public void insert(List<ScheduledTask> list) {
@@ -82,6 +84,10 @@ public class ScheduledTask {
 
     public void offerInto(PriorityQueue<ScheduledTask> pending) {
         pending.offer(this);
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
     }
 
 }
