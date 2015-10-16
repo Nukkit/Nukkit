@@ -312,19 +312,12 @@ public class Server {
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
-        packet.encode();
-        packet.isEncoded = true;
-        if (Network.BATCH_THRESHOLD >= 0 && packet.buffer.length >= Network.BATCH_THRESHOLD) {
-            Server.getInstance().batchPackets(players, new byte[][]{packet.buffer}, false, packet.getChannel());
+        if (Network.BATCH_THRESHOLD >= 0 && packet.getSize() >= Network.BATCH_THRESHOLD) {
+            Server.getInstance().batchPackets(players, new byte[][]{packet.toByteArray()}, false, packet.getChannel());
             return;
         }
-
         for (Player player : players) {
             player.dataPacket(packet);
-        }
-
-        if (packet.encapsulatedPacket != null) {
-            packet.encapsulatedPacket = null;
         }
     }
 
@@ -339,11 +332,7 @@ public class Server {
     public void batchPackets(Player[] players, DataPacket[] packets, boolean forceSync, int channel) {
         byte[][] payload = new byte[packets.length][];
         for (int i = 0; i < packets.length; i++) {
-            DataPacket p = packets[i];
-            if (!p.isEncoded) {
-                p.encode();
-            }
-            payload[i] = p.buffer;
+            payload[i] = packets[i].toByteArray();
         }
         this.batchPackets(players, payload, forceSync, channel);
     }
@@ -385,9 +374,6 @@ public class Server {
         BatchPacket pk = new BatchPacket();
         pk.setChannel(channel);
         pk.payload = data;
-        pk.encode();
-        pk.isEncoded = true;
-
         for (String i : identifiers) {
             if (this.players.containsKey(i)) {
                 this.players.get(i).dataPacket(pk);

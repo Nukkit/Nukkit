@@ -1,22 +1,17 @@
 package cn.nukkit.network.protocol;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * @author Nukkit Project Team
  */
 public class LevelEventPacket extends DataPacket {
+
     public static final byte NETWORK_ID = Info.LEVEL_EVENT_PACKET;
 
-    public short evid;
+    public short eventId;
     public float x;
     public float y;
     public float z;
     public int data;
-
-    @Override
-    public byte pid() {
-        return 0;
-    }
 
     @Override
     public void decode() {
@@ -25,11 +20,16 @@ public class LevelEventPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
-        this.putShort(this.evid);
+        this.putShort(this.eventId);
         this.putFloat(this.x);
         this.putFloat(this.y);
         this.putFloat(this.z);
         this.putInt(this.data);
     }
+
+    @Override
+    public byte getNetworkId() {
+        return NETWORK_ID;
+    }
+
 }

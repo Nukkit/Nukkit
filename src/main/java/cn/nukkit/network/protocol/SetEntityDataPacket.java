@@ -5,14 +5,13 @@ import cn.nukkit.utils.Binary;
 import java.util.Map;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * @author Nukkit Project Team
  */
 public class SetEntityDataPacket extends DataPacket {
     public static final byte NETWORK_ID = Info.SET_ENTITY_DATA_PACKET;
 
     @Override
-    public byte pid() {
+    public byte getNetworkId() {
         return NETWORK_ID;
     }
 
@@ -26,7 +25,6 @@ public class SetEntityDataPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
         this.putLong(this.eid);
         this.put(Binary.writeMetadata(this.metadata));
     }

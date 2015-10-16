@@ -21,7 +21,6 @@ public class AddPaintingPacket extends DataPacket {
 
     @Override
     public void encode() {
-        reset();
         putLong(eid);
         putInt(x);
         putInt(y);
@@ -31,7 +30,7 @@ public class AddPaintingPacket extends DataPacket {
     }
 
     @Override
-    public byte pid() {
+    public byte getNetworkId() {
         return NETWORK_ID;
     }
 

@@ -7,11 +7,6 @@ public class PlayStatusPacket extends DataPacket {
 
     public static final byte NETWORK_ID = Info.PLAY_STATUS_PACKET;
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public static final int LOGIN_SUCCESS = 0;
     public static final int LOGIN_FAILED_CLIENT = 1;
     public static final int LOGIN_FAILED_SERVER = 2;
@@ -26,8 +21,12 @@ public class PlayStatusPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
         this.putInt(status);
+    }
+
+    @Override
+    public byte getNetworkId() {
+        return NETWORK_ID;
     }
 
 }

@@ -1,10 +1,10 @@
 package cn.nukkit.network.protocol;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * @author Nukkit Project Team
  */
 public class UpdateBlockPacket extends DataPacket {
+
     public static final byte NETWORK_ID = Info.UPDATE_BLOCK_PACKET;
 
     public static final int FLAG_NONE = 0b0000;
@@ -19,7 +19,7 @@ public class UpdateBlockPacket extends DataPacket {
     public int[][] records = new int[0][6];
 
     @Override
-    public byte pid() {
+    public byte getNetworkId() {
         return NETWORK_ID;
     }
 
@@ -30,14 +30,13 @@ public class UpdateBlockPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
-        this.putInt(this.records.length);
-        for (int[] r : this.records) {
-            this.putInt(r[0]);
-            this.putInt(r[1]);
-            this.putByte((byte) (r[2] & 0xff));
-            this.putByte((byte) (r[3] & 0xff));
-            this.putByte((byte) (((r[5] << 4) | r[4]) & 0xff));
+        putInt(records.length);
+        for (int[] r : records) {
+            putInt(r[0]);
+            putInt(r[1]);
+            putByte(r[2] & 0xff);
+            putByte(r[3] & 0xff);
+            putByte((((r[5] << 4) | r[4]) & 0xff));
         }
     }
 

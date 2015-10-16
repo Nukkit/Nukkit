@@ -1,15 +1,16 @@
 package cn.nukkit.network.protocol;
 
 /**
- * Created by on 15-10-12.
+ * @author Nukkit Project Team
  */
 public class DisconnectPacket extends DataPacket {
+
     public static final byte NETWORK_ID = Info.DISCONNECT_PACKET;
 
     public String message;
 
     @Override
-    public byte pid() {
+    public byte getNetworkId() {
         return NETWORK_ID;
     }
 
@@ -20,9 +21,7 @@ public class DisconnectPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
         this.putString(this.message);
     }
-
 
 }

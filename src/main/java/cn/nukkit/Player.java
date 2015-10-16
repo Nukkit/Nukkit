@@ -459,7 +459,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         if (!connected) {
             return;
         }
-        if (packet.pid() == Info.BATCH_PACKET) {
+        if (packet.getNetworkId() == Info.BATCH_PACKET) {
             /** @var BatchPacket packet */
             this.server.getNetwork().processBatch((BatchPacket) packet, this);
             return;
@@ -470,7 +470,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
             return;
         }
 
-        switch (packet.pid()) {
+        switch (packet.getNetworkId()) {
             //todo alot
             default:
                 break;
@@ -613,17 +613,13 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         pk.chunkX = chunkX;
         pk.chunkZ = chunkZ;
         pk.data = payload;
-        pk.encode();
-
         BatchPacket batch = new BatchPacket();
         try {
-            batch.payload = Zlib.deflate(pk.getBuffer(), Server.getInstance().networkCompressionLevel);
+            batch.payload = Zlib.deflate(pk.toByteArray(), Server.getInstance().networkCompressionLevel);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         batch.setChannel(Network.CHANNEL_WORLD_CHUNKS);
-        batch.encode();
-        batch.isEncoded = true;
         return batch;
     }
 }

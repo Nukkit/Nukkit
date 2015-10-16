@@ -215,39 +215,38 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         if (this.identifiers.containsKey(player)) {
             String identifier = this.identifiers.get(player);
             EncapsulatedPacket pk = null;
-            if (!packet.isEncoded) {
-                packet.encode();
-            } else if (!needACK) {
-                if (packet.encapsulatedPacket == null) {
-                    packet.encapsulatedPacket = new CacheEncapsulatedPacket();
-                    packet.encapsulatedPacket.identifierACK = null;
-                    packet.encapsulatedPacket.buffer = packet.buffer;
+            if (!needACK) {
+                if (packet.getEncapsulatedPacket() == null) {
+                    packet.setEncapsulatedPacket(new CacheEncapsulatedPacket());
+                    packet.getEncapsulatedPacket().identifierACK = null;
+                    packet.getEncapsulatedPacket().buffer = packet.toByteArray();
                     if (packet.getChannel() != 0) {
-                        packet.encapsulatedPacket.reliability = 3;
-                        packet.encapsulatedPacket.orderChannel = packet.getChannel();
-                        packet.encapsulatedPacket.orderIndex = 0;
+                        packet.getEncapsulatedPacket().reliability  = 3;
+                        packet.getEncapsulatedPacket().orderChannel = packet.getChannel();
+                        packet.getEncapsulatedPacket().orderIndex   = 0;
                     } else {
-                        packet.encapsulatedPacket.reliability = 2;
+                        packet.getEncapsulatedPacket().reliability  = 2;
                     }
                 }
-                pk = packet.encapsulatedPacket;
+                pk = packet.getEncapsulatedPacket();
             }
 
-            if (!immediate && !needACK && packet.pid() != Info.BATCH_PACKET && Network.BATCH_THRESHOLD >= 0 && packet.buffer != null && packet.buffer.length >= Network.BATCH_THRESHOLD) {
+            if (!immediate && !needACK && packet.getNetworkId() != Info.BATCH_PACKET && Network.BATCH_THRESHOLD >= 0 && packet.getSize() >= Network.BATCH_THRESHOLD) {
                 this.server.batchPackets(new Player[]{player}, new DataPacket[]{packet}, true, packet.getChannel());
                 return null;
             }
 
             if (pk == null) {
                 pk = new EncapsulatedPacket();
-                pk.buffer = packet.buffer;
-                if (packet.getChannel() != 0) {
-                    packet.reliability = 3;
-                    packet.orderChannel = packet.getChannel();
-                    packet.orderIndex = 0;
-                } else {
-                    packet.reliability = 2;
-                }
+                pk.buffer = packet.toByteArray();
+                // TODO Channel may deprecated at 0.12.
+//                if (packet.getChannel() != 0) {
+//                    packet.reliability = 3;
+//                    packet.orderChannel = packet.getChannel();
+//                    packet.orderIndex = 0;
+//                } else {
+//                    packet.reliability = 2;
+//                }
 
                 if (needACK) {
                     int iack = this.identifiersACK.get(identifier);
@@ -268,14 +267,15 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     private DataPacket getPacket(byte[] buffer) {
         byte pid = buffer[0];
 
-        DataPacket data = this.network.getPacket(pid);
+        DataPacket packet = this.network.getPacket(pid);
 
-        if (data == null) {
+        if (packet == null) {
             return null;
         }
 
-        data.setBuffer(buffer, 1);
+        packet.setBuffer(buffer);
+        packet.setOffset(1);
 
-        return data;
+        return packet;
     }
 }

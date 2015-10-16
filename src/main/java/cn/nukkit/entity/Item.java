@@ -214,7 +214,9 @@ public class Item extends Entity {
         pk.speedY = (float) this.motionY;
         pk.speedZ = (float) this.motionZ;
         pk.item = this.getItem();
-        player.dataPacket(pk.setChannel(Network.CHANNEL_ENTITY_SPAWNING));
+        pk.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
+
+        player.dataPacket(pk);
 
         this.sendData(player);
 
