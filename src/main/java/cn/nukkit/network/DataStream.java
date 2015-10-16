@@ -160,10 +160,15 @@ public class DataStream {
 
     /**
      * @param value The <code>String</code> value to be written.
+     * @throws IllegalArgumentException If <code>String</code> value too long.
      */
     public void put(String value) {
         byte[] array = value.getBytes(StandardCharsets.UTF_8);
-        put((short) array.length);
+        int length = array.length;
+        if (length > Short.MAX_VALUE) {
+            throw new IllegalArgumentException("String value too long!");
+        }
+        put((short) length);
         put((array));
     }
 
