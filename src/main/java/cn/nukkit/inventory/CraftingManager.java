@@ -41,6 +41,7 @@ public class CraftingManager {
     }
 
     protected void registerStonecutter() {
+        /*
         this.registerRecipe((new StonecutterShapedRecipe(Item.get(Item.QUARTZ_BLOCK, 0, 1))).addIngredient(Item.get(Item.QUARTZ, 0, 4)));
         this.registerRecipe((new StonecutterShapedRecipe(Item.get(Item.BRICK_STAIRS, 0, 4))).addIngredient(Item.get(Item.BRICKS_BLOCK, 0, 6)));
         this.registerRecipe((new StonecutterShapedRecipe(Item.get(Item.BRICKS_BLOCK, 0, 1))).addIngredient(Item.get(Item.BRICK, 0, 4)));
@@ -72,6 +73,7 @@ public class CraftingManager {
         this.registerRecipe((new StonecutterShapedRecipe(Item.get(Item.STONE, Stone.GRANITE, 1))).addIngredient(Item.get(Item.STONE, Stone.DIORITE, 1)).addIngredient(Item.get(Item.QUARTZ, 0, 1)));
         this.registerRecipe((new StonecutterShapedRecipe(Item.get(Item.STONE, Stone.DIORITE, 2))).addIngredient(Item.get(Item.COBBLESTONE, 0, 2)).addIngredient(Item.get(Item.QUARTZ, 0, 2)));
         this.registerRecipe((new StonecutterShapedRecipe(Item.get(Item.STONE, Stone.ANDESITE, 2))).addIngredient(Item.get(Item.COBBLESTONE, 0, 1)).addIngredient(Item.get(Item.STONE, Stone.DIORITE, 1)));
+        */
     }
 
     protected void registerFood() {

@@ -23,6 +23,7 @@ import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
 import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.network.protocol.PlayerListPacket;
 import cn.nukkit.network.query.QueryHandler;
 import cn.nukkit.permission.BanEntry;
 import cn.nukkit.permission.BanList;
@@ -541,6 +542,22 @@ public class Server {
     public void addPlayer(String identifier, Player player) {
         this.players.put(identifier, player);
         this.identifier.put(player, identifier);
+    }
+
+    public void updatePlayerListData(UUID uuid, long id, String name, boolean isSlim, byte[] skin, Player[] players) {
+        PlayerListPacket pk = new PlayerListPacket();
+        pk.type = PlayerListPacket.TYPE_ADD;
+        pk.entries = new PlayerListPacket.Entry[] {new PlayerListPacket.Entry(uuid, id, name, isSlim, skin)};
+        //Server.broadcastPacket(players == null ? this.playerList : players, pk);
+        Server.broadcastPacket(players, pk);
+    }
+
+    public void removePlayerListData(UUID uuid, Player[] players) {
+        PlayerListPacket pk = new PlayerListPacket();
+        pk.type = PlayerListPacket.TYPE_ADD;
+        pk.entries = new PlayerListPacket.Entry[] {new PlayerListPacket.Entry(uuid)};
+        //Server.broadcastPacket(players == null ? this.playerList : players, pk);
+        Server.broadcastPacket(players, pk);
     }
 
     private boolean tick() {
@@ -1141,5 +1158,4 @@ public class Server {
     public static Server getInstance() {
         return instance;
     }
-
 }

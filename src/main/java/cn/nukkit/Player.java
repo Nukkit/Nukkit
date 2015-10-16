@@ -164,6 +164,18 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         }
     }
 
+    public void kick() {
+        this.kick("Kicked by admin.", true);
+    }
+
+    public void kick(String reason) {
+        this.kick(reason, true);
+    }
+
+    public void kick(String reason, boolean isAdmin) {
+        //TODO: kick players
+    }
+
     @Override
     public boolean isWhitelisted() {
         return this.server.isWhitelisted(this.getName().toLowerCase());
@@ -212,6 +224,10 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         this.sendSettings();
     }
 
+    private void sendSettings() {
+        //TODO: send adventure settings packet
+    }
+
     public boolean hasAutoJump() {
         return autoJump;
     }
@@ -221,6 +237,16 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         if (this.spawned && player.spawned && this.isAlive() && player.isAlive() && player.getLevel().equals(this.level) && player.canSee(this) && !this.isSpectator()) {
             super.spawnTo(player);
         }
+    }
+
+    @Override
+    public void sendMessage(String message) {
+        //TODO: send messages
+    }
+
+    @Override
+    public void sendMessage(TextContainer message) {
+        //TODO: send messages (translations)
     }
 
     @Override
