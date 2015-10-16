@@ -7,12 +7,8 @@ import cn.nukkit.item.Item;
  * Nukkit Project
  */
 public class AddItemEntityPacket extends DataPacket {
-    public static final byte NETWORK_ID = Info.ADD_ITEM_ENTITY_PACKET;
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
+    public static final byte NETWORK_ID = Info.ADD_ITEM_ENTITY_PACKET;
 
     public long eid;
     public Item item;
@@ -30,9 +26,8 @@ public class AddItemEntityPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
         this.putLong(this.eid);
-        this.putSlot(this.item);
+        this.putItem(this.item);
         this.putFloat(this.x);
         this.putFloat(this.y);
         this.putFloat(this.z);
@@ -40,4 +35,10 @@ public class AddItemEntityPacket extends DataPacket {
         this.putFloat(this.speedY);
         this.putFloat(this.speedZ);
     }
+
+    @Override
+    public byte getNetworkId() {
+        return NETWORK_ID;
+    }
+
 }

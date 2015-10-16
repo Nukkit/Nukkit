@@ -446,8 +446,8 @@ public class Level implements ChunkManager, Metadatable {
         SetTimePacket pk = new SetTimePacket();
         pk.time = (int) this.time;
         pk.started = !this.stopTime;
-
-        Server.broadcastPacket(this.players.values().stream().toArray(Player[]::new), pk.setChannel(Network.CHANNEL_WORLD_EVENTS));
+        pk.setChannel(Network.CHANNEL_WORLD_EVENTS);
+        Server.broadcastPacket(this.players.values().stream().toArray(Player[]::new), pk);
     }
 
     public void doTick(int currentTick) {
@@ -520,7 +520,8 @@ public class Level implements ChunkManager, Metadatable {
             int chunkZ = (int) v.getY();
             MoveEntityPacket pk = new MoveEntityPacket();
             pk.entities = entry.getValue().values().stream().toArray(double[][]::new);
-            this.addChunkPacket(chunkX, chunkZ, pk.setChannel(Network.CHANNEL_MOVEMENT));
+            pk.setChannel(Network.CHANNEL_MOVEMENT);
+            this.addChunkPacket(chunkX, chunkZ, pk);
         }
         this.moveToSend = new HashMap<>();
 
@@ -530,7 +531,8 @@ public class Level implements ChunkManager, Metadatable {
             int chunkZ = (int) v.getY();
             SetEntityMotionPacket pk = new SetEntityMotionPacket();
             pk.entities = entry.getValue().values().stream().toArray(double[][]::new);
-            this.addChunkPacket(chunkX, chunkZ, pk.setChannel(Network.CHANNEL_MOVEMENT));
+            pk.setChannel(Network.CHANNEL_MOVEMENT);
+            this.addChunkPacket(chunkX, chunkZ, pk);
         }
         this.motionToSend = new HashMap<>();
 
@@ -1215,12 +1217,13 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             LevelEventPacket pk = new LevelEventPacket();
-            pk.evid = 2001;
+            pk.eventId = 2001;
             pk.x = (float) (target.x + 0.5);
             pk.y = (float) (target.y + 0.5);
             pk.z = (float) (target.z + 0.5);
             pk.data = target.getId() + (target.getDamage() << 12);
-            Server.broadcastPacket(players.values().stream().toArray(Player[]::new), pk.setChannel(Network.CHANNEL_WORLD_EVENTS));
+            pk.setChannel(Network.CHANNEL_WORLD_EVENTS);
+            Server.broadcastPacket(players.values().stream().toArray(Player[]::new), pk);
         }
 
         target.onBreak(item);

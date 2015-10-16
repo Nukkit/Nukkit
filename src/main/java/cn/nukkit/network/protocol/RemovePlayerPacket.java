@@ -3,8 +3,7 @@ package cn.nukkit.network.protocol;
 import java.util.UUID;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * @author Nukkit Project Team
  */
 public class RemovePlayerPacket extends DataPacket {
     public final static byte NETWORK_ID = Info.REMOVE_PLAYER_PACKET;
@@ -13,7 +12,7 @@ public class RemovePlayerPacket extends DataPacket {
     public UUID uuid;
 
     @Override
-    public byte pid() {
+    public byte getNetworkId() {
         return NETWORK_ID;
     }
 
@@ -24,7 +23,6 @@ public class RemovePlayerPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
         this.putLong(this.eid);
         this.putUUID(this.uuid);
     }

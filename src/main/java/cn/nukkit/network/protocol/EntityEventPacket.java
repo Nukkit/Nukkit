@@ -1,10 +1,10 @@
 package cn.nukkit.network.protocol;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * @author Nukkit Project Team
  */
 public class EntityEventPacket extends DataPacket {
+    
     public static final byte NETWORK_ID = Info.ENTITY_EVENT_PACKET;
 
 
@@ -24,24 +24,24 @@ public class EntityEventPacket extends DataPacket {
     public static final byte AMBIENT_SOUND = 16;
     public static final byte RESPAWN = 17;
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public long eid;
     public byte event;
-
+    
     @Override
     public void decode() {
-        this.eid = this.getLong();
-        this.event = this.getByte();
+        eid = getLong();
+        event = getByte();
     }
 
     @Override
     public void encode() {
-        this.reset();
-        this.putLong(this.eid);
-        this.putByte(event);
+        putLong(eid);
+        putByte(event);
     }
+
+    @Override
+    public byte getNetworkId() {
+        return NETWORK_ID;
+    }
+
 }

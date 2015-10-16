@@ -1,6 +1,9 @@
 package cn.nukkit.network;
 
+import cn.nukkit.item.Item;
+
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.copyOf;
@@ -48,13 +51,23 @@ public class DataStream {
     }
 
     /**
+     * Bounding a bew buffer and reset cursor and offset.
+     *
+     * @param buffer The buffer to be set.
+     */
+    public void setBuffer(byte[] buffer) {
+        this.buffer = buffer;
+        this.cursor = this.offset = 0;
+    }
+
+    /**
      * Creates a newly allocated byte array. Its size is the current
      * size of this output stream and the valid contents of the buffer
      * have been copied into it.
      *
      * @return  the current contents of this output stream.
      */
-    public byte[] getByteArray() {
+    public byte[] toByteArray() {
         return copyOf(buffer, cursor);
     }
 
@@ -73,21 +86,21 @@ public class DataStream {
     }
 
     /**
-     * @param cursor The value add on write cursor.
+     * @param cursor The value add on putByte cursor.
      */
     public void addCursor(int cursor) {
         this.cursor += cursor;
     }
 
     /**
-     * @return The value of write cursor.
+     * @return The value of putByte cursor.
      */
     public int getCursor() {
         return cursor;
     }
 
     /**
-     * @param cursor The value set as write cursor.
+     * @param cursor The value set as putByte cursor.
      */
     public void setCursor(int cursor) {
         this.cursor = cursor;
@@ -105,71 +118,108 @@ public class DataStream {
     }
 
     /**
+     * putByte a byte into this stream.
+     *
+     * @param b The byte value.
+     */
+    public void putByte(int b) {
+        if (cursor == buffer.length) {
+            grow(8); /** 8 bit at least.*/
+        }
+        buffer[cursor++] = ((byte) b);
+    }
+
+    /**
      * @param value The <code>char</code> to be written.
      */
-    public void put(char value) {
-        write(value >>> 8 & 0xFF);
-        write(value       & 0xFF);
+    public void putChar(int value) {
+        putByte(value >>> 8 & 0xFF);
+        putByte(value & 0xFF);
     }
 
     /**
      * @param value The <code>short</code> to be written.
      */
-    public void put(short value) {
-        write(value >>> 8 & 0xFF);
-        write(value       & 0xFF);
+    public void putShort(int value) {
+        putByte(value >>> 8 & 0xFF);
+        putByte(value & 0xFF);
     }
 
     /**
      * @param value The <code>int</code> to be written.
      */
-    public void put(int value) {
-        write((value >>> 24 & 0xFF));
-        write((value >>> 16 & 0xFF));
-        write((value >>> 8 & 0xFF));
-        write((value & 0xFF));
+    public void putInt(int value) {
+        putByte((value >>> 24 & 0xFF));
+        putByte((value >>> 16 & 0xFF));
+        putByte((value >>> 8 & 0xFF));
+        putByte((value & 0xFF));
     }
 
     /**
      * @param value The <code>float</code> to be written.
      */
-    public void put(float value) {
-        put(Float.floatToIntBits(value));
+    public void putFloat(float value) {
+        putInt(Float.floatToIntBits(value));
     }
 
     /**
      * @param value The <code>double</code> to be written.
      */
-    public void put(double value) {
-        put(Double.doubleToLongBits(value));
+    public void putDouble(double value) {
+        putLong(Double.doubleToLongBits(value));
     }
 
     /**
      * @param value The <code>int</code> value to be written.
      */
-    public void put(long value) {
-        write((byte) (value >>> 56));
-        write((byte) (value >>> 48));
-        write((byte) (value >>> 40));
-        write((byte) (value >>> 32));
-        write((byte) (value >>> 24));
-        write((byte) (value >>> 16));
-        write((byte) (value >>> 8));
-        write((byte) (value));
+    public void putLong(long value) {
+        putByte((int) (value >>> 56));
+        putByte((int) (value >>> 48));
+        putByte((int) (value >>> 40));
+        putByte((int) (value >>> 32));
+        putByte((int) (value >>> 24));
+        putByte((int) (value >>> 16));
+        putByte((int) (value >>> 8));
+        putByte((int) (value));
     }
 
     /**
      * @param value The <code>String</code> value to be written.
      * @throws IllegalArgumentException If <code>String</code> value too long.
      */
-    public void put(String value) {
+    public void putString(String value) {
         byte[] array = value.getBytes(StandardCharsets.UTF_8);
         int length = array.length;
         if (length > Short.MAX_VALUE) {
             throw new IllegalArgumentException("String value too long!");
         }
-        put((short) length);
-        put((array));
+        putShort(array.length);
+        put(array);
+    }
+
+    public void putUUID(UUID uuid) {
+        putLong(uuid.getMostSignificantBits());
+        putLong(uuid.getLeastSignificantBits());
+    }
+
+    /**
+     * @param item The <code>Item</code> value to be written.
+     */
+    public void putItem(Item item) {
+        if (item.getId() == 0) {
+            putShort(0);
+        } else {
+            putShort(item.getId());
+            putByte(item.getCount());
+            putShort(item.getDamage() == null ? -1 : item.getDamage());
+            byte[] tag = item.getCompoundTag();
+            if (tag == null) {
+                putShort(0);
+            } else {
+                putShort(tag.length);
+                put(tag);
+            }
+        }
     }
 
     /**
@@ -183,6 +233,10 @@ public class DataStream {
             return copyOfRange(buffer, offset, offset += size);
         }
         throw new ArrayIndexOutOfBoundsException(offset + size);
+    }
+
+    public byte getByte() {
+        return ((byte) read());
     }
 
     public char getChar() {
@@ -207,13 +261,13 @@ public class DataStream {
      * @return The <code>float</code> value.
      */
     public float getFloat() {
-        return Float.intBitsToFloat(getInteger());
+        return Float.intBitsToFloat(getInt());
     }
 
     /**
      * @return The <code>int</code> value.
      */
-    public int getInteger() {
+    public int getInt() {
         return (read() << 24) + (read() << 16) + (read() << 8) + read();
     }
 
@@ -233,22 +287,33 @@ public class DataStream {
     }
 
     /**
-     * @return The <code>String</code> value to be written.
+     * @return Return a <code>String</code> value from this stream.
      */
     public String getString() {
         return new String(get(getShort()), StandardCharsets.UTF_8);
     }
 
     /**
-     * Write a byte into this stream.
-     *
-     * @param b The byte value.
+     * @return Return a <code>UUID</code> value from this stream.
      */
-    public void write(int b) {
-        if (cursor == buffer.length) {
-            grow(8); /** 8 bit at least.*/
+    public UUID getUUID() {
+        return new UUID(getLong(), getLong());
+    }
+
+    public Item getItem() {
+        int id = getShort();
+        if (  id < 1  ) {
+            return new Item(0, 0, 0);
         }
-        buffer[cursor++] = ((byte) b);
+        int count = getByte();
+        int meta = getShort();
+        int length = getShort();
+        byte[] tagCompound = length > 0 ? get(length) : new byte[]{};
+        return Item.get(id, meta, count, tagCompound);
+    }
+
+    public boolean hasRemain() {
+        return cursor > offset;
     }
 
     /**

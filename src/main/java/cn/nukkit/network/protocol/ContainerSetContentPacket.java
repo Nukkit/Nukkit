@@ -3,75 +3,76 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.item.Item;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * @author Nukkit Project Team
  */
 public class ContainerSetContentPacket extends DataPacket {
+
     public static final byte NETWORK_ID = Info.CONTAINER_SET_CONTENT_PACKET;
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public static final byte SPECIAL_INVENTORY = 0;
+
     public static final byte SPECIAL_ARMOR = 0x78;
     public static final byte SPECIAL_CREATIVE = 0x79;
     public static final byte SPECIAL_CRAFTING = 0x7a;
 
-    public byte windowid;
-    public Item[] slots = new Item[0];
-    public int[] hotbar = new int[0];
+    public Item[] slots  = new Item[0];
+    public int[]  hotBar = new int[0];
+    public byte   windowId;
 
     @Override
-    public DataPacket clean() {
-        this.slots = new Item[0];
-        this.hotbar = new int[0];
-        return super.clean();
+    public void clean() {
+        slots  = new Item[0];
+        hotBar = new int [0];
+        super.clean();
     }
 
     @Override
     public void decode() {
-        this.windowid = this.getByte();
-        int count = this.getShort();
-        this.slots = new Item[count];
+        windowId  = getByte();
+        int count = getShort();
+        slots = new Item[count];
 
-        for (int s = 0; s < count && !this.feof(); ++s) {
-            this.slots[s] = this.getSlot();
+        for (int s = 0; s < count && hasRemain(); ++s) {
+            slots[s] = getItem();
         }
 
-        if (this.windowid == SPECIAL_INVENTORY) {
-            count = this.getShort();
-            this.hotbar = new int[count];
-            for (int s = 0; s < count && !this.feof(); ++s) {
-                this.hotbar[s] = this.getInt();
+        if (windowId == SPECIAL_INVENTORY) {
+            count = getShort();
+            hotBar = new int[count];
+            for (int s = 0; s < count && hasRemain(); ++s) {
+                hotBar[s] = getInt();
             }
         }
     }
 
     @Override
     public void encode() {
-        this.reset();
-        this.putByte(this.windowid);
-        this.putShort((short) this.slots.length);
-        for (Item slot : this.slots) {
-            this.putSlot(slot);
+        putByte(windowId);
+        putShort((short) slots.length);
+        for (Item slot : slots) {
+            putItem(slot);
         }
 
-        if (this.windowid == SPECIAL_INVENTORY && this.hotbar.length > 0) {
-            this.putShort((short) this.hotbar.length);
-            for (int slot : this.hotbar) {
-                this.putInt(slot);
+        if (windowId == SPECIAL_INVENTORY && hotBar.length > 0) {
+            putShort((short) hotBar.length);
+            for (int slot : hotBar) {
+                putInt(slot);
             }
         } else {
-            this.putShort((short) 0);
+            putShort((short) 0);
         }
     }
 
     @Override
     public ContainerSetContentPacket clone() {
         ContainerSetContentPacket pk = (ContainerSetContentPacket) super.clone();
-        pk.slots = this.slots.clone();
+        pk.slots = slots.clone();
         return pk;
     }
+
+    @Override
+    public byte getNetworkId() {
+        return NETWORK_ID;
+    }
+
 }

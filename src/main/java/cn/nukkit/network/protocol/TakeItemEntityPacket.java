@@ -17,13 +17,12 @@ public class TakeItemEntityPacket extends DataPacket {
 
     @Override
     public void encode() {
-        reset();
         putLong(entityId);
         putLong(target);
     }
 
     @Override
-    public byte pid() {
+    public byte getNetworkId() {
         return NETWORK_ID;
     }
 

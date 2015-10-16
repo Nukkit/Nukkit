@@ -1,14 +1,14 @@
 package cn.nukkit.network.protocol;
 
 /**
- * Created on 15-10-13.
+ * @author Nukkit Project Team
  */
 public class StartGamePacket extends DataPacket {
 
     public static final byte NETWORK_ID = Info.START_GAME_PACKET;
 
     @Override
-    public byte pid() {
+    public byte getNetworkId() {
         return NETWORK_ID;
     }
 
@@ -16,7 +16,7 @@ public class StartGamePacket extends DataPacket {
 
     private byte dimension;
     private int generator;
-    private int gamemode;
+    private int gameMode;
 
     private long eid;
 
@@ -35,11 +35,10 @@ public class StartGamePacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
         this.putInt(seed);
         this.putByte(dimension);
         this.putInt(generator);
-        this.putInt(gamemode);
+        this.putInt(gameMode);
         this.putLong(eid);
         this.putInt(spawnX);
         this.putInt(spawnY);
@@ -47,7 +46,7 @@ public class StartGamePacket extends DataPacket {
         this.putFloat(x);
         this.putFloat(y);
         this.putFloat(z);
-        this.putByte((byte) 0);
+        this.putByte(0);
     }
 
 }

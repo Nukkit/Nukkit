@@ -36,7 +36,8 @@ public abstract class Spawnable extends Tile {
         } catch (IOException e) {
             //ignore
         }
-        player.dataPacket(pk.setChannel(Network.CHANNEL_WORLD_EVENTS));
+        pk.setChannel(Network.CHANNEL_WORLD_EVENTS);
+        player.dataPacket(pk);
     }
 
     public void spawnToAll() {

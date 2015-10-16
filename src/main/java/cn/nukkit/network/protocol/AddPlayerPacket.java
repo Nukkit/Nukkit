@@ -7,14 +7,14 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * @author Nukkit Project Team
  */
 public class AddPlayerPacket extends DataPacket {
+
     public static final byte NETWORK_ID = Info.ADD_PLAYER_PACKET;
 
     @Override
-    public byte pid() {
+    public byte getNetworkId() {
         return NETWORK_ID;
     }
 
@@ -39,7 +39,6 @@ public class AddPlayerPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
         this.putUUID(this.uuid);
         this.putString(this.username);
         this.putLong(this.eid);
@@ -50,10 +49,9 @@ public class AddPlayerPacket extends DataPacket {
         this.putFloat(this.speedY);
         this.putFloat(this.speedZ);
         this.putFloat(this.yaw);
-        this.putFloat(this.yaw); //TODO headrot
+        this.putFloat(this.yaw);
         this.putFloat(this.pitch);
-        this.putSlot(this.item);
-
+        this.putItem(this.item);
         this.put(Binary.writeMetadata(this.metadata));
     }
 }

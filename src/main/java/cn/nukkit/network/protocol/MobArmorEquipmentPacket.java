@@ -3,37 +3,37 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.item.Item;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * @author Nukkit Project Team
  */
 public class MobArmorEquipmentPacket extends DataPacket {
+    
     public static final byte NETWORK_ID = Info.MOB_ARMOR_EQUIPMENT_PACKET;
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    public long eid;
-    public Item[] slots = new Item[4];
+    public long   eid;
+    public Item[] items = new Item[4];
 
     @Override
     public void decode() {
-        this.eid = this.getLong();
-        this.slots = new Item[4];
-        this.slots[0] = this.getSlot();
-        this.slots[1] = this.getSlot();
-        this.slots[2] = this.getSlot();
-        this.slots[3] = this.getSlot();
+        eid = getLong();
+        items    = new Item[4];
+        items[0] = getItem();
+        items[1] = getItem();
+        items[2] = getItem();
+        items[3] = getItem();
     }
 
     @Override
     public void encode() {
-        this.reset();
-        this.putLong(this.eid);
-        this.putSlot(this.slots[0]);
-        this.putSlot(this.slots[1]);
-        this.putSlot(this.slots[2]);
-        this.putSlot(this.slots[3]);
+        putLong(eid);
+        putItem(items[0]);
+        putItem(items[1]);
+        putItem(items[2]);
+        putItem(items[3]);
     }
+
+    @Override
+    public byte getNetworkId() {
+        return NETWORK_ID;
+    }
+    
 }

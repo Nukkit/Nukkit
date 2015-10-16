@@ -3,33 +3,34 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.item.Item;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * @author Nukkit Project Team
  */
 public class ContainerSetSlotPacket extends DataPacket {
+
     public static final byte NETWORK_ID = Info.CONTAINER_SET_SLOT_PACKET;
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    public byte windowid;
+    public byte  windowId;
     public short slot;
-    public Item item;
+
+    public Item  item;
 
     @Override
     public void decode() {
-        this.windowid = this.getByte();
-        this.slot = this.getShort();
-        this.item = this.getSlot();
+        windowId = getByte();
+        slot     = getShort();
+        item     = getItem();
     }
 
     @Override
     public void encode() {
-        this.reset();
-        this.putByte(this.windowid);
-        this.putShort(this.slot);
-        this.putSlot(this.item);
+        putByte(windowId);
+        putShort(slot);
+        putItem(item);
     }
+
+    @Override
+    public byte getNetworkId() {
+        return NETWORK_ID;
+    }
+
 }

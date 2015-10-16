@@ -1,16 +1,11 @@
 package cn.nukkit.network.protocol;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * @author Nukkit Project Team
  */
 public class FullChunkDataPacket extends DataPacket {
-    public static final byte NETWORK_ID = Info.FULL_CHUNK_DATA_PACKET;
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
+    public static final byte NETWORK_ID = Info.FULL_CHUNK_DATA_PACKET;
 
     public int chunkX;
     public int chunkZ;
@@ -23,10 +18,15 @@ public class FullChunkDataPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
         this.putInt(this.chunkX);
         this.putInt(this.chunkZ);
         this.putInt(this.data.length);
         this.put(this.data);
     }
+
+    @Override
+    public byte getNetworkId() {
+        return NETWORK_ID;
+    }
+
 }

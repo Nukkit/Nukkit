@@ -36,7 +36,6 @@ public class MovePlayerPacket extends DataPacket {
 
     @Override
     public void encode() {
-        reset();
         putLong(eid);
         putFloat(x);
         putFloat(y);
@@ -49,7 +48,7 @@ public class MovePlayerPacket extends DataPacket {
     }
 
     @Override
-    public byte pid() {
+    public byte getNetworkId() {
         return NETWORK_ID;
     }
 

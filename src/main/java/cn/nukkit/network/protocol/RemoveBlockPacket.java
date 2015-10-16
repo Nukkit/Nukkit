@@ -15,18 +15,17 @@ public class RemoveBlockPacket extends DataPacket {
     @Override
     public void decode() {
         eid = getLong();
-        x = getInt();
-        y = getInt();
-        z = getByte();
+        x   = getInt();
+        y   = getInt();
+        z   = getByte();
     }
 
     @Override
     public void encode() {
-        ;
     }
 
     @Override
-    public byte pid() {
+    public byte getNetworkId() {
         return NETWORK_ID;
     }
 

@@ -8,7 +8,7 @@ public class TextPacket extends DataPacket {
     public static final byte NETWORK_ID = Info.TEXT_PACKET;
 
     @Override
-    public byte pid() {
+    public byte getNetworkId() {
         return NETWORK_ID;
     }
 
@@ -49,7 +49,6 @@ public class TextPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
         this.putByte(this.type);
         switch (this.type) {
             case TYPE_POPUP:

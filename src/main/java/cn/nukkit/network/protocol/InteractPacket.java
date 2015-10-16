@@ -1,7 +1,7 @@
 package cn.nukkit.network.protocol;
 
 /**
- * Created on 15-10-15.
+ * @author Nukkit Project Team
  */
 public class InteractPacket extends DataPacket {
 
@@ -19,13 +19,12 @@ public class InteractPacket extends DataPacket {
 
     @Override
     public void encode() {
-        reset();
         putByte(action);
         putLong(target);
     }
 
     @Override
-    public byte pid() {
+    public byte getNetworkId() {
         return NETWORK_ID;
     }
 
