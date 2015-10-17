@@ -48,61 +48,37 @@ public class Server {
     public static final String BROADCAST_CHANNEL_USERS = "nukkit.broadcast.user";
 
     private static Server instance = null;
-
     private BanList banByName = null;
-
     private BanList banByIP = null;
-
     private Config operators = null;
-
     private Config whitelist = null;
-
-    private boolean isRunning = true;
-
-    private boolean hasStopped = false;
-
-    private PluginManager pluginManager = null;
-
     private int profilingTickrate = 20;
-
-    private ServerScheduler scheduler = null;
-
     private int tickCounter;
-
     private long nextTick;
-
     private float[] tickAverage = {20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20};
-
     private float[] useAverage = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
     private float maxTick = 20;
-
     private float maxUse = 0;
-
     private int sendUsageTicker = 0;
-
     private boolean dispatchSignals = false;
 
+    private boolean isRunning = true;
+    private boolean hasStopped = false;
+
     private MainLogger logger;
-
     private CommandReader console;
-
     private SimpleCommandMap commandMap;
-
     private CraftingManager craftingManager;
-
     private ConsoleCommandSender consoleSender;
+    private PluginManager pluginManager = null;
+    private ServerScheduler scheduler = null;
 
     private int maxPlayers;
-
     private boolean autoSave;
 
     private EntityMetadataStore entityMetadata;
-
     private PlayerMetadataStore playerMetadata;
-
     private LevelMetadataStore levelMetadata;
-
     private Network network;
 
     private boolean networkCompressionAsync = true;
@@ -119,20 +95,15 @@ public class Server {
     private String pluginPath;
 
     private Map<String, String> uniquePlayers = new HashMap<>();
-
     private QueryHandler queryHandler;
-
     private QueryRegenerateEvent queryRegenerateEvent;
 
     private Config properties;
     private Config config;
 
     private Map<String, Player> players = new HashMap<>();
-
     private Map<Player, String> identifier = new HashMap<>();
-
     private Map<Integer, Level> levels = new HashMap<>();
-
     private Level defaultLevel = null;
 
     public Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
@@ -194,7 +165,7 @@ public class Server {
                 put("enable-query", true);
                 put("enable-rcon", false);
                 put("rcon.password", Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(3, 13));
-                put("auto-save", false);
+                put("auto-save", true);
             }
         });
 
@@ -272,13 +243,9 @@ public class Server {
         this.pluginManager.subscribeToPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE, this.consoleSender);
 
         this.pluginManager.registerInterface(JarPluginLoader.class);
-
         this.queryRegenerateEvent = new QueryRegenerateEvent(this, 5);
-
         this.network.registerInterface(new RakNetInterface(this));
-
         this.pluginManager.loadPlugins(this.pluginPath);
-
         this.enablePlugins(PluginLoadOrder.STARTUP);
 
         LevelProviderManager.addProvider(this, Anvil.class);
@@ -301,9 +268,7 @@ public class Server {
         //do a lot thing
 
         this.properties.save(true);
-
         this.enablePlugins(PluginLoadOrder.POSTWORLD);
-
         this.start();
     }
 
@@ -426,17 +391,16 @@ public class Server {
         }
 
         sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.notFound"));
-
         return false;
     }
 
-    //todo: remove this 测试用
-    @Deprecated
+    @Deprecated //TODO remove
     public ConsoleCommandSender getConsoleSender() {
         return consoleSender;
     }
 
-    //todo: public void reload
+    public void reload(){}
+    //TODO
 
     public void shutdown() {
         if (this.isRunning) {
@@ -453,38 +417,35 @@ public class Server {
 
         try {
             if (!this.isRunning) {
-                //todo sendUsage
+                //TODO send usage
             }
 
             this.hasStopped = true;
-
             this.shutdown();
 
-            this.getLogger().debug("Disabling all plugins");
+            this.getLogger().debug("Disabling all plugins...");
             this.pluginManager.disablePlugins();
 
-            //todo alot
-
-            this.getLogger().debug("Removing event handlers");
+            this.getLogger().debug("Removing event handlers...");
             HandlerList.unregisterAll();
 
-            this.getLogger().debug("Stopping all tasks");
+            this.getLogger().debug("Stopping all tasks...");
             this.scheduler.cancelAllTasks();
             this.scheduler.mainThreadHeartbeat(Integer.MAX_VALUE);
 
-            this.getLogger().debug("Saving properties");
+            this.getLogger().debug("Saving properties...");
             this.properties.save();
 
-            this.getLogger().debug("Closing console");
+            this.getLogger().debug("Closing console...");
             this.console.interrupt();
 
-            this.getLogger().debug("Stopping network interfaces");
+            this.getLogger().debug("Stopping network interfaces...");
             for (SourceInterface interfaz : this.network.getInterfaces().values()) {
                 interfaz.shutdown();
                 this.network.unregisterInterface(interfaz);
             }
 
-            //todo other things
+            //TODO close other things
         } catch (Exception e) {
             this.logger.emergency("Exception happened while shutting down, exit the process");
             System.exit(1);
@@ -495,12 +456,9 @@ public class Server {
         if (this.getPropertyBoolean("enable-query", true)) {
             this.queryHandler = new QueryHandler();
         }
-        //todo a lot
         for (BanEntry entry : this.getIPBans().getEntires()) {
             this.network.blockAddress(entry.getName(), -1);
         }
-
-        //todo alot
 
         this.logger.info(this.getLanguage().translateString("nukkit.server.defaultGameMode", getGamemodeString(this.getGamemode())));
         this.logger.info(this.getLanguage().translateString("nukkit.server.startFinished", String.valueOf((double) (System.currentTimeMillis() - Nukkit.START_TIME) / 1000)));
@@ -515,7 +473,6 @@ public class Server {
             }
         } catch (Exception e) {
             this.logger.logException(e);
-
             this.getNetwork().blockAddress(address, 600);
         }
     }
@@ -555,8 +512,6 @@ public class Server {
 
         this.scheduler.mainThreadHeartbeat(this.tickCounter);
 
-        //todo a lot
-
         if ((this.tickCounter & 0b1111) == 0) {
             this.titleTick();
             this.maxTick = 20;
@@ -576,10 +531,8 @@ public class Server {
             this.getNetwork().updateName();
         }
 
-        //todo a lot
-
         if (this.tickCounter % 100 == 0) {
-            //todo clearCache
+            //TODO clear the cache
             if (this.getTicksPerSecondAverage() < 12) {
                 this.logger.warning(this.getLanguage().translateString("nukkit.server.tickOverload"));
             }
@@ -872,6 +825,7 @@ public class Server {
         return commandMap;
     }
 
+    //TODO change - can be done simpler
     public Map<String, Player> getOnlinePlayers() {
         return players;
     }
