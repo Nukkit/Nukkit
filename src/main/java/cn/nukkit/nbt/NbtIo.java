@@ -3,6 +3,7 @@ package cn.nukkit.nbt;
 import cn.nukkit.item.Item;
 
 import java.io.*;
+import java.util.Collection;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -90,6 +91,15 @@ public class NbtIo {
         return baos.toByteArray();
     }
 
+    public static byte[] write(Collection<CompoundTag> tags) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream stream = new DataOutputStream(baos);
+        for (CompoundTag tag : tags) {
+            Tag.writeNamedTag(tag, stream);
+        }
+        return baos.toByteArray();
+    }
+
     public static void write(CompoundTag tag, File file) throws IOException {
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(file))) {
             write(tag, dos);
@@ -107,6 +117,12 @@ public class NbtIo {
         Tag tag = Tag.readNamedTag(dis);
         if (tag instanceof CompoundTag) return (CompoundTag) tag;
         throw new IOException("Root tag must be a named compound tag");
+    }
+
+    public static CompoundTag read(byte[] data) throws IOException {
+        ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        DataInputStream stream = new DataInputStream(bais);
+        return read(stream);
     }
 
     public static void write(CompoundTag tag, DataOutput dos) throws IOException {
