@@ -5,6 +5,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
 import cn.nukkit.level.Level;
+import cn.nukkit.nbt.CompoundTag;
 
 import java.util.ArrayList;
 
@@ -380,6 +381,8 @@ public class Item implements Cloneable {
     protected Block block = null;
     protected int id;
     protected Short meta;
+    private String tags = "";
+	private CompoundTag cachedNBT = null;
     public int count;
     protected int durability = 0;
     protected String name;
@@ -593,6 +596,9 @@ public class Item implements Cloneable {
         }
         return items;
     }
+    
+    
+	//TODO add methods related to NBT
 
     public int getCount() {
         return count;

@@ -23,6 +23,8 @@ import cn.nukkit.permission.PermissionAttachmentInfo;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Utils;
+import cn.nukkit.network.protocol.Info;
+import cn.nukkit.event.Timings;
 
 import java.util.HashMap;
 import java.util.List;
@@ -446,8 +448,8 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
     }
 
     public void handleDataPacket(DataPacket packet) {
-        //todo
-    }
+    	
+	}
 
     @Override
     public void close() {
