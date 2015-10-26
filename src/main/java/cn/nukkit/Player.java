@@ -18,14 +18,8 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.SourceInterface;
-import cn.nukkit.network.protocol.BatchPacket;
-import cn.nukkit.network.protocol.DataPacket;
-import cn.nukkit.network.protocol.FullChunkDataPacket;
-import cn.nukkit.network.protocol.Info;
-import cn.nukkit.permission.PermissibleBase;
-import cn.nukkit.permission.Permission;
-import cn.nukkit.permission.PermissionAttachment;
-import cn.nukkit.permission.PermissionAttachmentInfo;
+import cn.nukkit.network.protocol.*;
+import cn.nukkit.permission.*
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Utils;
@@ -75,7 +69,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
 
     public boolean blocked = false;
 
-    //todo achievement and crafting
+    //TODO achievements and crafting
 
     public long creationTime = 0;
 
@@ -210,6 +204,9 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         this.autoJump = value;
         this.sendSettings();
     }
+
+    public void sendSettings(){}
+    //TODO
 
     public boolean hasAutoJump() {
         return autoJump;
@@ -402,9 +399,6 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         return this.ip;
     }
 
-    //todo alot
-
-
     /**
      * 0 is true
      * -1 is false
@@ -470,11 +464,19 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         }
 
         switch (packet.pid()) {
-            //todo alot
+            //TODO handle packets
             default:
                 break;
         }
 
+    }
+
+    public void kick(String message){
+        this.kick(message, true);
+    }
+
+    public void kick(String message, boolean admin){
+        //TODO use close method and send disconnect packet
     }
 
     @Override
@@ -631,4 +633,12 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         batch.isEncoded = true;
         return batch;
     }
+
+    public void sendMessage(String message){
+        TextPacket pk = new TextPacket();
+        pk.type = TextPacket.TYPE_RAW;
+        pk.message = message;
+        //TODO send packet
+    }
+
 }

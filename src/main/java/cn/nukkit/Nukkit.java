@@ -28,14 +28,10 @@ public class Nukkit {
     public static int DEBUG = 1;
 
     public static void main(String[] args) {
-
-        //启动参数
         for (String arg : args) {
             if (arg.equals("disable-ansi")) ANSI = false;
         }
-
         MainLogger logger = new MainLogger(DATA_PATH + "server.log");
-
         try {
             if (ANSI) {
                 System.out.print((char) 0x1b + "]0;Starting Nukkit Server For Minecraft: PE" + (char) 0x07);
