@@ -11,14 +11,13 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.Network;
 import cn.nukkit.network.protocol.ContainerSetDataPacket;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
-public class Furnace extends Tile implements InventoryHolder, Container {
+public class Furnace extends Tile implements InventoryHolder, Container, Nameable {
 
     protected FurnaceInventory inventory;
 
@@ -50,6 +49,26 @@ public class Furnace extends Tile implements InventoryHolder, Container {
         if (this.namedTag.getShort("BurnTime") > 0) {
             this.scheduleUpdate();
         }
+    }
+
+    @Override
+    public String getName() {
+        return this.hasName() ? this.namedTag.getString("CustomName") : "Furnace";
+    }
+
+    @Override
+    public boolean hasName() {
+        return this.namedTag.contains("CustomName");
+    }
+
+    @Override
+    public void setName(String name) {
+        if (name == null || name.equals("")) {
+            this.namedTag.remove("CustomName");
+            return;
+        }
+
+        this.namedTag.putString("CustomName", name);
     }
 
     @Override
@@ -212,13 +231,13 @@ public class Furnace extends Tile implements InventoryHolder, Container {
                 pk.windowid = (byte) windowId;
                 pk.property = 0;
                 pk.value = this.namedTag.getShort("CookTime");
-                player.dataPacket(pk.setChannel(Network.CHANNEL_WORLD_EVENTS));
+                player.dataPacket(pk);
 
                 pk = new ContainerSetDataPacket();
                 pk.windowid = (byte) windowId;
                 pk.property = 1;
                 pk.value = this.namedTag.getShort("BurnTicks");
-                player.dataPacket(pk.setChannel(Network.CHANNEL_WORLD_EVENTS));
+                player.dataPacket(pk);
             }
         }
 
