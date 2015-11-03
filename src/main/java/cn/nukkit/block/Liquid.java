@@ -8,6 +8,7 @@ import cn.nukkit.math.Vector3;
  * Nukkit Project
  */
 public abstract class Liquid extends Transparent {
+
     private Vector3 temporalVector = null;
 
     public Liquid(int id) {
@@ -47,5 +48,16 @@ public abstract class Liquid extends Transparent {
         return (d + 1) / 9f;
     }
 
-    //todo !
+    public int tickRate(){
+        if(this instanceof Water){
+            return 5;
+        }else if(this instanceof Lava){
+            return 30;
+        }
+
+        return 0;
+    }
+
+    // TODO
+
 }
