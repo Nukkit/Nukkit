@@ -110,7 +110,6 @@ public class PlayerInventory extends BaseInventory {
         MobEquipmentPacket pk = new MobEquipmentPacket();
         pk.eid = player.equals(this.getHolder()) ? 0 : this.getHolder().getId();
         pk.item = item;
-        int damage = item.getDamage();
         pk.slot = (byte) this.getHeldItemSlot();
         pk.selectedSlot = (byte) this.getHeldItemIndex();
 
@@ -126,7 +125,6 @@ public class PlayerInventory extends BaseInventory {
         MobEquipmentPacket pk = new MobEquipmentPacket();
         pk.eid = 0;
         pk.item = item;
-        int damage = item.getDamage();
         pk.slot = (byte) this.getHeldItemSlot();
         pk.selectedSlot = (byte) this.getHeldItemIndex();
 
@@ -362,7 +360,7 @@ public class PlayerInventory extends BaseInventory {
             if (player.equals(this.getHolder())) {
                 ContainerSetSlotPacket pk2 = new ContainerSetSlotPacket();
                 pk2.windowid = ContainerSetContentPacket.SPECIAL_ARMOR;
-                pk2.slot = (short) (index - this.getSize());
+                pk2.slot = index - this.getSize();
                 pk2.item = this.getItem(index);
                 player.dataPacket(pk2);
             } else {
@@ -433,7 +431,7 @@ public class PlayerInventory extends BaseInventory {
     @Override
     public void sendSlot(int index, Player[] players) {
         ContainerSetSlotPacket pk = new ContainerSetSlotPacket();
-        pk.slot = (short) index;
+        pk.slot = index;
         pk.item = this.getItem(index).clone();
 
         for (Player player : players) {
