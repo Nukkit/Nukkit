@@ -99,7 +99,7 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public Item getItem(int index) {
-        return this.slots.containsKey(index) ? ((Item) this.slots.get(index)).clone() : Item.get(Item.AIR, null, 0);
+        return this.slots.containsKey(index) ? this.slots.get(index).clone() : Item.get(Item.AIR, null, 0);
     }
 
     @Override
@@ -171,7 +171,7 @@ public abstract class BaseInventory implements Inventory {
     @Override
     public boolean contains(Item item) {
         int count = Math.max(1, item.getCount());
-        boolean checkDamage = item.getDamage() != null;
+        boolean checkDamage = item.hasMeta();
         boolean checkTag = item.getCompoundTag() != null;
         for (Item i : this.getContents().values()) {
             if (item.equals(i, checkDamage, checkTag)) {
@@ -188,7 +188,7 @@ public abstract class BaseInventory implements Inventory {
     @Override
     public Map<Integer, Item> all(Item item) {
         Map<Integer, Item> slots = new HashMap<>();
-        boolean checkDamage = item.getDamage() != null;
+        boolean checkDamage = item.hasMeta();
         boolean checkTag = item.getCompoundTag() != null;
         for (Map.Entry<Integer, Item> entry : this.getContents().entrySet()) {
             if (item.equals(entry.getValue(), checkDamage, checkTag)) {
@@ -201,7 +201,7 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public void remove(Item item) {
-        boolean checkDamage = item.getDamage() != null;
+        boolean checkDamage = item.hasMeta();
         boolean checkTag = item.getCompoundTag() != null;
         for (Map.Entry<Integer, Item> entry : this.getContents().entrySet()) {
             if (item.equals(entry.getValue(), checkDamage, checkTag)) {
@@ -213,7 +213,7 @@ public abstract class BaseInventory implements Inventory {
     @Override
     public int first(Item item) {
         int count = Math.max(1, item.getCount());
-        boolean checkDamage = item.getDamage() != null;
+        boolean checkDamage = item.hasMeta();
         boolean checkTag = item.getCompoundTag() != null;
         for (Map.Entry<Integer, Item> entry : this.getContents().entrySet()) {
             if (item.equals(entry.getValue(), checkDamage, checkTag) && entry.getValue().getCount() >= count) {
@@ -238,7 +238,7 @@ public abstract class BaseInventory implements Inventory {
     @Override
     public boolean canAddItem(Item item) {
         item = item.clone();
-        boolean checkDamage = item.getDamage() != null;
+        boolean checkDamage = item.hasMeta();
         boolean checkTag = item.getCompoundTag() != null;
         for (int i = 0; i < this.size; ++i) {
             Item slot = this.getItem(i);
@@ -322,8 +322,6 @@ public abstract class BaseInventory implements Inventory {
             }
         }
 
-        List<Integer> emptySlots = new ArrayList<>();
-
         for (int i = 0; i < this.getSize(); ++i) {
             Item item = this.getItem(i);
             if (item.getId() == Item.AIR || item.getCount() <= 0) {
@@ -331,7 +329,7 @@ public abstract class BaseInventory implements Inventory {
             }
 
             for (Item slot : itemSlots) {
-                if (slot.equals(item, slot.getDamage() != null, item.getCompoundTag() != null)) {
+                if (slot.equals(item, item.hasMeta(), item.getCompoundTag() != null)) {
                     int amount = Math.min(item.getCount(), slot.getCount());
                     slot.setCount(slot.getCount() - amount);
                     item.setCount(item.getCount() - amount);
@@ -463,7 +461,7 @@ public abstract class BaseInventory implements Inventory {
     @Override
     public void sendSlot(int index, Player[] players) {
         ContainerSetSlotPacket pk = new ContainerSetSlotPacket();
-        pk.slot = (short) index;
+        pk.slot = index;
         pk.item = this.getItem(index).clone();
 
         for (Player player : players) {

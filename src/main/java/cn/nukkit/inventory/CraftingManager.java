@@ -475,7 +475,7 @@ public class CraftingManager {
             }
         }
 
-        ShapedRecipe recipe = null;
+        ShapedRecipe recipe;
 
         if (height < 3) {
             recipe = ((new StonecutterShapedRecipe(Item.get(resultItemId, resultItemMeta, resultItemAmount), recipeShape)).setIngredient(ingredient, Item.get(ingredientId, ingredientMeta, ingredientAmount)));
@@ -726,12 +726,19 @@ public class CraftingManager {
         for (Map<Integer, Item> v : ingredients.values()) {
             for (Item item : v.values()) {
                 if (item != null) {
-                    hash += item.getId() + ":" + (item.getDamage() == null ? "?" : item.getDamage()) + "x" + item.getCount() + ",";
+                    hash += item.getId() + ":" + (!item.hasMeta() ? "?" : item.getDamage()) + "x" + item.getCount() + ",";
                 }
             }
 
             hash += ";";
         }
+
+        String index = result.getId() + ":" + (result.hasMeta() ? result.getDamage() : "");
+        if (!this.recipeLookup.containsKey(index)) {
+            this.recipeLookup.put(index, new HashMap<>());
+        }
+
+        this.recipeLookup.get(index).put(hash, recipe);
     }
 
     public void registerShapelessRecipe(ShapelessRecipe recipe) {
@@ -741,7 +748,7 @@ public class CraftingManager {
         List<Item> ingredients = recipe.getIngredientList();
         Collections.sort(ingredients, this.comparator);
         for (Item item : ingredients) {
-            hash += item.getId() + ":" + (item.getDamage() == null ? "?" : item.getDamage()) + "x" + item.getCount() + ",";
+            hash += item.getId() + ":" + (!item.hasMeta() ? "?" : item.getDamage()) + "x" + item.getCount() + ",";
         }
 
         if (!this.recipeLookup.containsKey(result.getId() + ":" + result.getDamage())) {
@@ -752,7 +759,7 @@ public class CraftingManager {
 
     public void registerFurnaceRecipe(FurnaceRecipe recipe) {
         Item input = recipe.getInput();
-        this.furnaceRecipes.put(input.getId() + ":" + (input.getDamage() == null ? "?" : input.getDamage()), recipe);
+        this.furnaceRecipes.put(input.getId() + ":" + (!input.hasMeta() ? "?" : input.getDamage()), recipe);
     }
 
     public boolean matchRecipe(ShapelessRecipe recipe) {
@@ -765,7 +772,7 @@ public class CraftingManager {
         List<Item> ingredients = recipe.getIngredientList();
         Collections.sort(ingredients, this.comparator);
         for (Item item : ingredients) {
-            hash += item.getId() + ":" + (item.getDamage() == null ? "?" : item.getDamage()) + "x" + item.getCount() + ",";
+            hash += item.getId() + ":" + (!item.hasMeta() ? "?" : item.getDamage()) + "x" + item.getCount() + ",";
         }
 
         if (this.recipeLookup.get(idx).containsKey(hash)) {
@@ -783,7 +790,7 @@ public class CraftingManager {
                 for (Item item : ingredients) {
                     int amount = item.getCount();
                     for (Item checkItem : checkInput) {
-                        if (checkItem.equals(item, checkItem.getDamage() != null)) {
+                        if (checkItem.equals(item, checkItem.hasMeta())) {
                             int remove = Math.min(checkItem.getCount(), amount);
                             checkItem.setCount(checkItem.getCount() - amount);
                             if (checkItem.getCount() == 0) {
