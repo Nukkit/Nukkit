@@ -210,7 +210,7 @@ public class SessionManager {
                 RakNet.PACKET_RAW,
                 new byte[]{(byte) (address.length() & 0xff)},
                 address.getBytes(StandardCharsets.UTF_8),
-                Binary.writeShort((short) port),
+                Binary.writeShort(port),
                 payload
         );
         this.server.pushThreadToMainPacket(buffer);
@@ -244,7 +244,7 @@ public class SessionManager {
                 identifier.getBytes(StandardCharsets.UTF_8),
                 new byte[]{(byte) (session.getAddress().length() & 0xff)},
                 session.getAddress().getBytes(StandardCharsets.UTF_8),
-                Binary.writeShort((short) session.getPort()),
+                Binary.writeShort(session.getPort()),
                 Binary.writeLong(session.getID())
         );
         this.server.pushThreadToMainPacket(buffer);
@@ -313,7 +313,7 @@ public class SessionManager {
                     len = packet[offset++];
                     String address = new String(Binary.subBytes(packet, offset, len), StandardCharsets.UTF_8);
                     offset += len;
-                    int port = Binary.readShort(Binary.subBytes(packet, offset, 2)) & 0xffff;
+                    int port = Binary.readShort(Binary.subBytes(packet, offset, 2));
                     offset += 2;
                     byte[] payload = Binary.subBytes(packet, offset);
                     this.socket.writePacket(payload, address, port);

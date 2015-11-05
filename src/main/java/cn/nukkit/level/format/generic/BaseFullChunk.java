@@ -7,9 +7,9 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.generator.biome.Biome;
-import cn.nukkit.nbt.CompoundTag;
-import cn.nukkit.nbt.DoubleTag;
-import cn.nukkit.nbt.ListTag;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.DoubleTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.tile.Tile;
 
 import java.io.IOException;
@@ -57,7 +57,7 @@ public abstract class BaseFullChunk implements FullChunk {
 
     @Override
     public BaseFullChunk clone() {
-        BaseFullChunk chunk = null;
+        BaseFullChunk chunk;
         try {
             chunk = (BaseFullChunk) super.clone();
         } catch (CloneNotSupportedException e) {

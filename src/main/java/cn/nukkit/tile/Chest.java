@@ -8,14 +8,14 @@ import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.nbt.CompoundTag;
-import cn.nukkit.nbt.ListTag;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.ListTag;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
-public class Chest extends Spawnable implements InventoryHolder, Container {
+public class Chest extends Spawnable implements InventoryHolder, Container, Nameable {
 
     protected ChestInventory inventory;
 
@@ -79,7 +79,7 @@ public class Chest extends Spawnable implements InventoryHolder, Container {
             return Item.get(Item.AIR, 0, 0);
         } else {
             CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
-            return Item.get(data.getShort("id"), (int) data.getShort("Damage"), data.getByte("Count"));
+            return Item.get(data.getShort("id"), data.getShort("Damage"), data.getByte("Count"));
         }
     }
 
@@ -90,7 +90,7 @@ public class Chest extends Spawnable implements InventoryHolder, Container {
         CompoundTag d = new CompoundTag()
                 .putByte("Count", (byte) item.getCount())
                 .putByte("Slot", (byte) index)
-                .putShort("id", (short) item.getId())
+                .putShort("id", item.getId())
                 .putShort("Damage", item.getDamage());
 
         if (item.getId() == Item.AIR || item.getCount() <= 0) {
@@ -139,6 +139,26 @@ public class Chest extends Spawnable implements InventoryHolder, Container {
             this.namedTag.remove("pairx");
             this.namedTag.remove("pairz");
         }
+    }
+
+    @Override
+    public String getName() {
+        return this.hasName() ? this.namedTag.getString("CustomName") : "Chest";
+    }
+
+    @Override
+    public boolean hasName() {
+        return this.namedTag.contains("CustomName");
+    }
+
+    @Override
+    public void setName(String name) {
+        if (name == null || name.equals("")) {
+            this.namedTag.remove("CustomName");
+            return;
+        }
+
+        this.namedTag.putString("CustomName", name);
     }
 
     public boolean isPaired() {
@@ -202,8 +222,9 @@ public class Chest extends Spawnable implements InventoryHolder, Container {
 
     @Override
     public CompoundTag getSpawnCompound() {
+        CompoundTag c;
         if (this.isPaired()) {
-            return new CompoundTag()
+            c = new CompoundTag()
                     .putString("id", Tile.CHEST)
                     .putInt("x", this.x)
                     .putInt("y", this.y)
@@ -211,11 +232,17 @@ public class Chest extends Spawnable implements InventoryHolder, Container {
                     .putInt("pairx", this.namedTag.getInt("pairx"))
                     .putInt("pairz", this.namedTag.getInt("pairz"));
         } else {
-            return new CompoundTag()
+            c = new CompoundTag()
                     .putString("id", Tile.CHEST)
                     .putInt("x", this.x)
                     .putInt("y", this.y)
                     .putInt("z", this.z);
         }
+
+        if (this.hasName()) {
+            c.put("CustomName", this.namedTag.get("CustomName"));
+        }
+
+        return c;
     }
 }

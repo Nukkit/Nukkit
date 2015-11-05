@@ -13,9 +13,9 @@ import java.util.Map;
 public class SimpleChunkManager implements ChunkManager {
     protected Map<String, FullChunk> chunks = new HashMap<>();
 
-    protected int seed;
+    protected long seed;
 
-    public SimpleChunkManager(int seed) {
+    public SimpleChunkManager(long seed) {
         this.seed = seed;
     }
 
@@ -70,11 +70,11 @@ public class SimpleChunkManager implements ChunkManager {
             this.chunks.remove(Level.chunkHash(chunkX, chunkZ));
             return;
         }
-        this.chunks.put(Level.chunkHash(chunkX, chunkZ), (BaseFullChunk) chunk);
+        this.chunks.put(Level.chunkHash(chunkX, chunkZ), chunk);
     }
 
     @Override
-    public int getSeed() {
+    public long getSeed() {
         return seed;
     }
 }

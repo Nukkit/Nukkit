@@ -3,7 +3,7 @@ package cn.nukkit.level.format.generic;
 import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.LevelProvider;
-import cn.nukkit.nbt.CompoundTag;
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.ChunkException;
 
 import java.io.IOException;
@@ -69,7 +69,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
             LevelProvider level = this.getProvider();
             int Y = y >> 4;
             try {
-                this.setInternalSection(Y, (ChunkSection) provider.getClass().getMethod("createChunkSection", int.class).invoke(provider.getClass(), Y));
+                this.setInternalSection(Y, (ChunkSection) level.getClass().getMethod("createChunkSection", int.class).invoke(level.getClass(), Y));
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                 e1.printStackTrace();
             }

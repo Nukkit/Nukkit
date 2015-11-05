@@ -12,10 +12,9 @@ import java.util.Random;
  */
 public class RedstoneOre extends Solid {
 
-    protected int id = REDSTONE_ORE;
 
     public RedstoneOre() {
-        super(REDSTONE_ORE);
+        this(0);
     }
 
     public RedstoneOre(int meta) {
@@ -49,7 +48,7 @@ public class RedstoneOre extends Solid {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_TOUCH) {
-            this.getLevel().setBlock(this, Block.get(Item.GLOWING_REDSTONE_ORE, (int) this.meta), false, true);
+            this.getLevel().setBlock(this, Block.get(Item.GLOWING_REDSTONE_ORE, this.meta), false, true);
 
             return Level.BLOCK_UPDATE_WEAK;
         }

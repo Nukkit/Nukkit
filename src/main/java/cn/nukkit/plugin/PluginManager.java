@@ -240,7 +240,7 @@ public class PluginManager {
                     String name = (String) entry.getKey();
                     File file = (File) entry.getValue();
                     if (dependencies.containsKey(name)) {
-                        for (String dependency : dependencies.get(name)) {
+                        for (String dependency : new ArrayList<>(dependencies.get(name))) {
                             if (loadedPlugins.containsKey(dependency) || this.getPlugin(dependency) != null) {
                                 dependencies.get(name).remove(dependency);
                             } else if (!plugins.containsKey(dependency)) {
@@ -250,7 +250,7 @@ public class PluginManager {
                             }
                         }
 
-                        if (dependencies.get(name).size() == 0) {
+                        if (dependencies.get(name).isEmpty()) {
                             dependencies.remove(name);
                         }
                     }

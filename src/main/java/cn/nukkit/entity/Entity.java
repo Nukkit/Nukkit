@@ -15,16 +15,15 @@ import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
-import cn.nukkit.nbt.CompoundTag;
-import cn.nukkit.nbt.DoubleTag;
-import cn.nukkit.nbt.FloatTag;
-import cn.nukkit.nbt.ListTag;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.DoubleTag;
+import cn.nukkit.nbt.tag.FloatTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.MobEffectPacket;
 import cn.nukkit.network.protocol.RemoveEntityPacket;
 import cn.nukkit.network.protocol.SetEntityDataPacket;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.utils.ChunkException;
-import com.sun.istack.internal.NotNull;
 
 import java.util.*;
 
@@ -78,7 +77,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     protected int dataFlags = 0;
 
-    protected Map<Integer, Object[]> dataProerties = new HashMap<Integer, Object[]>() {{
+    protected Map<Integer, Object[]> dataProperties = new HashMap<Integer, Object[]>() {{
         put(DATA_FLAGS, new Object[]{DATA_TYPE_BYTE, 0});
         put(DATA_AIR, new Object[]{DATA_TYPE_SHORT, 300});
         put(DATA_NAMETAG, new Object[]{DATA_TYPE_STRING, ""});
@@ -127,7 +126,7 @@ public abstract class Entity extends Location implements Metadatable {
     public float width;
     public float length;
 
-    private int health = 20;
+    protected int health = 20;
     private int maxHealth = 20;
 
     protected float ySize = 0;
@@ -138,7 +137,7 @@ public abstract class Entity extends Location implements Metadatable {
     public int ticksLived = 0;
     public int lastUpdate;
     public int maxFireTicks;
-    public short fireTicks = 0;
+    public int fireTicks = 0;
 
     public CompoundTag namedTag;
     public boolean canCollide = true;
@@ -211,12 +210,12 @@ public abstract class Entity extends Location implements Metadatable {
         this.fallDistance = this.namedTag.getFloat("FallDistance");
 
         if (!this.namedTag.contains("Fire")) {
-            this.namedTag.putShort("Fire", (short) 0);
+            this.namedTag.putShort("Fire", 0);
         }
         this.fireTicks = this.namedTag.getShort("Fire");
 
         if (!this.namedTag.contains("Air")) {
-            this.namedTag.putShort("Air", (short) 300);
+            this.namedTag.putShort("Air", 300);
         }
         this.setDataProperty(DATA_AIR, DATA_TYPE_SHORT, this.namedTag.getShort("Air"));
 
@@ -312,8 +311,8 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void addEffect(Effect effect) {
-        if (this.effects.containsKey(effect.getId())) {
-            Effect oldEffect = this.effects.get(effect.getId());
+        if (this.effects.containsKey((int) effect.getId())) {
+            Effect oldEffect = this.effects.get((int) effect.getId());
             if (Math.abs(effect.getAmplifier()) <= (oldEffect.getAmplifier())
                     || (Math.abs(effect.getAmplifier())) == Math.abs(oldEffect.getAmplifier())
                     && effect.getDuration() < oldEffect.getDuration()) {
@@ -448,13 +447,13 @@ public abstract class Entity extends Location implements Metadatable {
         );
 
         this.namedTag.putList(new ListTag<FloatTag>("Rotation")
-                        .add(new FloatTag("0", this.yaw))
-                        .add(new FloatTag("1", this.pitch))
+                        .add(new FloatTag("0", (float) this.yaw))
+                        .add(new FloatTag("1", (float) this.pitch))
         );
 
         this.namedTag.putFloat("FallDistance", this.fallDistance);
         this.namedTag.putShort("Fire", this.fireTicks);
-        this.namedTag.putShort("Air", (Short) this.getDataProperty(DATA_AIR));
+        this.namedTag.putShort("Air", (Integer) this.getDataProperty(DATA_AIR));
         this.namedTag.putBoolean("OnGround", this.onGround);
         this.namedTag.putBoolean("Invulnerable", this.invulnerable);
 
@@ -462,8 +461,8 @@ public abstract class Entity extends Location implements Metadatable {
             ListTag<CompoundTag> list = new ListTag<>("ActiveEffects");
             for (Effect effect : this.effects.values()) {
                 list.add(new CompoundTag(String.valueOf(effect.getId()))
-                                .putByte("Id", (byte) effect.getId())
-                                .putByte("Amplifier", (byte) effect.getAmplifier())
+                                .putByte("Id", effect.getId())
+                                .putByte("Amplifier", effect.getAmplifier())
                                 .putInt("Duration", effect.getDuration())
                                 .putBoolean("Ambient", false)
                                 .putBoolean("ShowParticles", effect.isVisible())
@@ -532,7 +531,7 @@ public abstract class Entity extends Location implements Metadatable {
     public void sendData(Player player, Map<Integer, Object[]> data) {
         SetEntityDataPacket pk = new SetEntityDataPacket();
         pk.eid = (player.equals(this) ? 0 : this.getId());
-        pk.metadata = data == null ? this.dataProerties : data;
+        pk.metadata = data == null ? this.dataProperties : data;
 
         player.dataPacket(pk);
     }
@@ -544,7 +543,7 @@ public abstract class Entity extends Location implements Metadatable {
     public void sendData(Player[] players, Map<Integer, Object[]> data) {
         SetEntityDataPacket pk = new SetEntityDataPacket();
         pk.eid = this.getId();
-        pk.metadata = data == null ? this.dataProerties : data;
+        pk.metadata = data == null ? this.dataProperties : data;
 
         Server.broadcastPacket(players, pk);
     }
@@ -806,9 +805,9 @@ public abstract class Entity extends Location implements Metadatable {
         double diffMotion = (this.motionX - this.lastMotionX) * (this.motionX - this.lastMotionX) + (this.motionY - this.lastMotionY) * (this.motionY - this.lastMotionY) + (this.motionZ - this.lastMotionZ) * (this.motionZ - this.lastMotionZ);
 
         if (diffPosition > 0.04 || diffRotation > 2.25 && (diffMotion > 0.0001 && this.getMotion().lengthSquared() <= 0.00001)) { //0.2 ** 2, 1.5 ** 2
-            this.lastX = (double) this.x;
-            this.lastY = (double) this.y;
-            this.lastZ = (double) this.z;
+            this.lastX = this.x;
+            this.lastY = this.y;
+            this.lastZ = this.z;
 
             this.lastYaw = this.yaw;
             this.lastPitch = this.pitch;
@@ -880,7 +879,7 @@ public abstract class Entity extends Location implements Metadatable {
     public void setOnFire(int seconds) {
         int ticks = seconds * 20;
         if (ticks > this.fireTicks) {
-            this.fireTicks = (short) ticks;
+            this.fireTicks = ticks;
         }
     }
 
@@ -1008,11 +1007,8 @@ public abstract class Entity extends Location implements Metadatable {
 
         AxisAlignedBB bb = block.getBoundingBox();
 
-        if (bb != null && block.isSolid() && !block.isTransparent() && bb.intersectsWith(this.getBoundingBox())) {
-            return true;
-        }
+        return bb != null && block.isSolid() && !block.isTransparent() && bb.intersectsWith(this.getBoundingBox());
 
-        return false;
     }
 
 
@@ -1164,7 +1160,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
-    public void checkGroundState(double movX, double movY, double movZ, double dx, double dy, double dz) {
+    protected void checkGroundState(double movX, double movY, double movZ, double dx, double dy, double dz) {
         this.isCollidedVertically = movY != dy;
         this.isCollidedHorizontally = (movX != dx || movZ != dz);
         this.isCollided = (this.isCollidedHorizontally || this.isCollidedVertically);
@@ -1214,7 +1210,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
-    public boolean setPositionAndRotation(Vector3 pos, float yaw, float pitch) {
+    public boolean setPositionAndRotation(Vector3 pos, double yaw, double pitch) {
         if (this.setPosition(pos)) {
             this.setRotation(yaw, pitch);
             return true;
@@ -1223,7 +1219,7 @@ public abstract class Entity extends Location implements Metadatable {
         return false;
     }
 
-    public void setRotation(float yaw, float pitch) {
+    public void setRotation(double yaw, double pitch) {
         this.yaw = yaw;
         this.pitch = pitch;
         this.scheduleUpdate();
@@ -1320,11 +1316,19 @@ public abstract class Entity extends Location implements Metadatable {
         if (pos instanceof Location) {
             return this.teleport(pos, ((Location) pos).yaw, ((Location) pos).pitch);
         } else {
-            return this.teleport(pos, this.yaw, this.pitch);
+            return this.teleport(pos, this.yaw);
         }
     }
 
-    public boolean teleport(Vector3 pos, float yaw, float pitch) {
+    public boolean teleport(Vector3 pos, double yaw) {
+        if (pos instanceof Location) {
+            return this.teleport(pos, ((Location) pos).yaw, ((Location) pos).pitch);
+        } else {
+            return this.teleport(pos, yaw, this.pitch);
+        }
+    }
+
+    public boolean teleport(Vector3 pos, double yaw, double pitch) {
         Position from = Position.fromObject(this, this.level);
         Position to = Position.fromObject(pos, pos instanceof Position ? ((Position) pos).getLevel() : this.level);
         EntityTeleportEvent ev = new EntityTeleportEvent(this, from, to);
@@ -1401,13 +1405,13 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
-    public boolean setDataProperty(int id, int type, @NotNull Object value) {
+    public boolean setDataProperty(int id, int type, Object value) {
         if (!value.equals(this.getDataProperty(id))) {
-            this.dataProerties.put(id, new Object[]{type, value});
+            this.dataProperties.put(id, new Object[]{type, value});
 
             this.sendData(this.hasSpawned.values().stream().toArray(Player[]::new), new HashMap<Integer, Object[]>() {
                 {
-                    put(id, dataProerties.get(id));
+                    put(id, dataProperties.get(id));
                 }
             });
 
@@ -1418,11 +1422,11 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public Object getDataProperty(int id) {
-        return this.dataProerties.containsKey(id) ? this.dataProerties.get(id)[1] : null;
+        return this.dataProperties.containsKey(id) ? this.dataProperties.get(id)[1] : null;
     }
 
     public int getDataPropertyType(int id) {
-        return (int) (this.dataProerties.containsKey(id) ? this.dataProerties.get(id)[0] : null);
+        return (int) (this.dataProperties.containsKey(id) ? this.dataProperties.get(id)[0] : null);
     }
 
     public void setDataFlag(int propertyId, int id) {

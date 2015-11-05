@@ -12,9 +12,9 @@ public class ContainerOpenPacket extends DataPacket {
         return NETWORK_ID;
     }
 
-    public byte windowId;
+    public byte windowid;
     public byte type;
-    public short slots;
+    public int slots;
     public int x;
     public int y;
     public int z;
@@ -27,7 +27,7 @@ public class ContainerOpenPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putByte(this.windowId);
+        this.putByte(this.windowid);
         this.putByte(this.type);
         this.putShort(this.slots);
         this.putInt(this.x);

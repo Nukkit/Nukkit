@@ -4,7 +4,7 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.nbt.CompoundTag;
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.ChunkException;
 
 import java.lang.reflect.Constructor;
@@ -19,6 +19,11 @@ public abstract class Tile extends Position {
     public static final String SIGN = "Sign";
     public static final String CHEST = "Chest";
     public static final String FURNACE = "Furnace";
+    public static final String FLOWER_POT = "FlowerPot";
+    public static final String MOB_SPAWNER = "MobSpawner";
+    public static final String SKULL = "Skull";
+    public static final String BREWING_STAND = "Cauldron";
+    public static final String ENCHANT_TABLE = "EnchantTable";
 
     public static long tileCount = 1;
 

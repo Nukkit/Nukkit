@@ -176,7 +176,7 @@ public class Binary {
 
             if (r != null) {
                 m.put(bottom, new Object[]{type, r});
-            } else if (rr != null) {
+            } else {
                 m.put(bottom, new Object[]{type, rr});
             }
             b = payload[offset];
@@ -203,7 +203,7 @@ public class Binary {
     }
 
     public static int readShort(byte[] bytes) {
-        return (bytes[0] & 0xFF << 8) + (bytes[1] & 0xFF);
+        return ((bytes[0] & 0xFF) << 8) + (bytes[1] & 0xFF);
     }
 
     public static short readSignedShort(byte[] bytes) {
@@ -354,12 +354,20 @@ public class Binary {
     }
 
     public static String bytesToHexString(byte[] src) {
+        return bytesToHexString(src, false);
+    }
+
+    public static String bytesToHexString(byte[] src, boolean blank) {
         StringBuilder stringBuilder = new StringBuilder("");
         if (src == null || src.length <= 0) {
             return null;
         }
-        for (byte aSrc : src) {
-            int v = aSrc & 0xFF;
+
+        for (byte b : src) {
+            if (!(stringBuilder.length() == 0) && blank) {
+                stringBuilder.append(" ");
+            }
+            int v = b & 0xFF;
             String hv = Integer.toHexString(v);
             if (hv.length() < 2) {
                 stringBuilder.append(0);

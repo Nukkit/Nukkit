@@ -9,12 +9,11 @@ import cn.nukkit.math.AxisAlignedBB;
  * Nukkit Project
  */
 public class StoneBricks extends Solid {
-    public static final short NORMAL = 0;
-    public static final short MOSSY = 1;
-    public static final short CRACKED = 2;
-    public static final short CHISELED = 3;
+    public static final int NORMAL = 0;
+    public static final int MOSSY = 1;
+    public static final int CRACKED = 2;
+    public static final int CHISELED = 3;
 
-    protected int id = STONE_BRICKS;
 
     public StoneBricks() {
         this(0);

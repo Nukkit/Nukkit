@@ -17,17 +17,23 @@ public class Nukkit {
     public final static String VERSION = "1.0dev";
     public final static String API_VERSION = "1.0.0";
     public final static String CODENAME = "蘋果(Apple)派(Pie)";
-    public final static String MINECRAFT_VERSION = "v0.12.1 alpha";
-    public final static String MINECRAFT_VERSION_NETWORK = "0.12.1";
+    public final static String MINECRAFT_VERSION = "v0.12.3 alpha";
+    public final static String MINECRAFT_VERSION_NETWORK = "0.12.3";
 
     public final static String PATH = System.getProperty("user.dir") + "/";
     public final static String DATA_PATH = System.getProperty("user.dir") + "/";
     public final static String PLUGIN_PATH = DATA_PATH + "plugins";
     public final static Long START_TIME = System.currentTimeMillis();
     public static boolean ANSI = true;
+    public static boolean shortTitle = false;
     public static int DEBUG = 1;
 
     public static void main(String[] args) {
+
+        //Shorter title for windows 8
+        if (System.getProperty("os.name").toLowerCase().contains("windows 8")) {
+            shortTitle = true;
+        }
 
         //启动参数
         for (String arg : args) {
@@ -42,7 +48,7 @@ public class Nukkit {
             }
             Server server = new Server(logger, PATH, DATA_PATH, PLUGIN_PATH);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.logException(e);
         }
 
         if (ANSI) {

@@ -2,7 +2,7 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.nbt.CompoundTag;
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
 /**
@@ -74,7 +74,7 @@ public class Arrow extends Projectile {
         pk.speedX = (float) this.motionX;
         pk.speedY = (float) this.motionY;
         pk.speedZ = (float) this.motionZ;
-        pk.metadata = this.dataProerties;
+        pk.metadata = this.dataProperties;
         player.dataPacket(pk);
         super.spawnTo(player);
     }

@@ -233,8 +233,8 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
                 pk = packet.encapsulatedPacket;
             }
 
-            if (!immediate && !needACK && packet.pid() != Info.BATCH_PACKET && Network.BATCH_THRESHOLD >= 0 && packet.getCount() >= Network.BATCH_THRESHOLD) {
-                this.server.batchPackets(new Player[]{player}, new DataPacket[]{packet}, true, packet.getChannel());
+            if (!immediate && !needACK && packet.pid() != Info.BATCH_PACKET && Network.BATCH_THRESHOLD >= 0 && packet.getBuffer() != null && packet.getBuffer().length >= Network.BATCH_THRESHOLD) {
+                this.server.batchPackets(new Player[]{player}, new DataPacket[]{packet}, true);
                 return null;
             }
 

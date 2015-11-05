@@ -8,11 +8,10 @@ import cn.nukkit.item.Tool;
  * Nukkit Project
  */
 public class SandStone extends Solid {
-    public static final short NORMAL = 0;
-    public static final short CHISELED = 1;
-    public static final short SMOOTH = 2;
+    public static final int NORMAL = 0;
+    public static final int CHISELED = 1;
+    public static final int SMOOTH = 2;
 
-    protected int id = SANDSTONE;
 
     public SandStone() {
         this(0);

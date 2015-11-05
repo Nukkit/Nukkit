@@ -10,16 +10,15 @@ import cn.nukkit.math.AxisAlignedBB;
  * Nukkit Project
  */
 public class Slab extends Transparent {
-    public static final short STONE = 0;
-    public static final short SANDSTONE = 1;
-    public static final short WOODEN = 2;
-    public static final short COBBLESTONE = 3;
-    public static final short BRICK = 4;
-    public static final short STONE_BRICK = 5;
-    public static final short QUARTZ = 6;
-    public static final short NETHER_BRICK = 7;
+    public static final int STONE = 0;
+    public static final int SANDSTONE = 1;
+    public static final int WOODEN = 2;
+    public static final int COBBLESTONE = 3;
+    public static final int BRICK = 4;
+    public static final int STONE_BRICK = 5;
+    public static final int QUARTZ = 6;
+    public static final int NETHER_BRICK = 7;
 
-    protected int id = SLAB;
 
     public Slab() {
         this(0);
@@ -83,11 +82,11 @@ public class Slab extends Transparent {
         this.meta &= 0x07;
         if (face == 0) {
             if (target.getId() == SLAB && (target.getDamage() & 0x08) == 0x08 && (target.getDamage() & 0x07) == (this.meta & 0x07)) {
-                this.getLevel().setBlock(target, Block.get(Item.DOUBLE_SLAB, (int) this.meta), true);
+                this.getLevel().setBlock(target, Block.get(Item.DOUBLE_SLAB, this.meta), true);
 
                 return true;
             } else if (block.getId() == SLAB && (block.getDamage() & 0x07) == (this.meta & 0x07)) {
-                this.getLevel().setBlock(block, Block.get(Item.DOUBLE_SLAB, (int) this.meta), true);
+                this.getLevel().setBlock(block, Block.get(Item.DOUBLE_SLAB, this.meta), true);
 
                 return true;
             } else {
@@ -95,11 +94,11 @@ public class Slab extends Transparent {
             }
         } else if (face == 1) {
             if (target.getId() == SLAB && (target.getDamage() & 0x08) == 0 && (target.getDamage() & 0x07) == (this.meta & 0x07)) {
-                this.getLevel().setBlock(target, Block.get(Item.DOUBLE_SLAB, (int) this.meta), true);
+                this.getLevel().setBlock(target, Block.get(Item.DOUBLE_SLAB, this.meta), true);
 
                 return true;
             } else if (block.getId() == SLAB && (block.getDamage() & 0x07) == (this.meta & 0x07)) {
-                this.getLevel().setBlock(block, Block.get(Item.DOUBLE_SLAB, (int) this.meta), true);
+                this.getLevel().setBlock(block, Block.get(Item.DOUBLE_SLAB, this.meta), true);
 
                 return true;
             }
@@ -107,7 +106,7 @@ public class Slab extends Transparent {
         } else {
             if (block.getId() == SLAB) {
                 if ((block.getDamage() & 0x07) == (this.meta & 0x07)) {
-                    this.getLevel().setBlock(block, Block.get(Item.DOUBLE_SLAB, (int) this.meta), true);
+                    this.getLevel().setBlock(block, Block.get(Item.DOUBLE_SLAB, this.meta), true);
 
                     return true;
                 }

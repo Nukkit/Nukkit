@@ -9,16 +9,15 @@ import cn.nukkit.inventory.FurnaceRecipe;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.nbt.CompoundTag;
-import cn.nukkit.nbt.ListTag;
-import cn.nukkit.network.Network;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.ContainerSetDataPacket;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
-public class Furnace extends Tile implements InventoryHolder, Container {
+public class Furnace extends Tile implements InventoryHolder, Container, Nameable {
 
     protected FurnaceInventory inventory;
 
@@ -35,21 +34,41 @@ public class Furnace extends Tile implements InventoryHolder, Container {
         }
 
         if (!this.namedTag.contains("BurnTime") || this.namedTag.getShort("BurnTime") < 0) {
-            this.namedTag.putShort("BurnTime", (short) 0);
+            this.namedTag.putShort("BurnTime", 0);
         }
 
         if (!this.namedTag.contains("BurnTime") || this.namedTag.getShort("CookTime") < 0 || (this.namedTag.getShort("BurnTime") == 0 && this.namedTag.getShort("CookTime") > 0)) {
-            this.namedTag.putShort("CookTime", (short) 0);
+            this.namedTag.putShort("CookTime", 0);
         }
 
         if (!this.namedTag.contains("MaxTime")) {
             this.namedTag.putShort("MaxTime", this.namedTag.getShort("BurnTime"));
-            this.namedTag.putShort("BurnTicks", (short) 0);
+            this.namedTag.putShort("BurnTicks", 0);
         }
 
         if (this.namedTag.getShort("BurnTime") > 0) {
             this.scheduleUpdate();
         }
+    }
+
+    @Override
+    public String getName() {
+        return this.hasName() ? this.namedTag.getString("CustomName") : "Furnace";
+    }
+
+    @Override
+    public boolean hasName() {
+        return this.namedTag.contains("CustomName");
+    }
+
+    @Override
+    public void setName(String name) {
+        if (name == null || name.equals("")) {
+            this.namedTag.remove("CustomName");
+            return;
+        }
+
+        this.namedTag.putString("CustomName", name);
     }
 
     @Override
@@ -93,7 +112,7 @@ public class Furnace extends Tile implements InventoryHolder, Container {
             return Item.get(Item.AIR, 0, 0);
         } else {
             CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
-            return Item.get(data.getShort("id"), (int) data.getShort("Damage"), data.getByte("Count"));
+            return Item.get(data.getShort("id"), data.getShort("Damage"), data.getByte("Count"));
         }
     }
 
@@ -104,7 +123,7 @@ public class Furnace extends Tile implements InventoryHolder, Container {
         CompoundTag d = new CompoundTag()
                 .putByte("Count", (byte) item.getCount())
                 .putByte("Slot", (byte) index)
-                .putShort("id", (short) item.getId())
+                .putShort("id", item.getId())
                 .putShort("Damage", item.getDamage());
 
         if (item.getId() == Item.AIR || item.getCount() <= 0) {
@@ -135,9 +154,9 @@ public class Furnace extends Tile implements InventoryHolder, Container {
 
         this.namedTag.putShort("MaxTime", ev.getBurnTime());
         this.namedTag.putShort("BurnTime", ev.getBurnTime());
-        this.namedTag.putShort("BurnTicks", (short) 0);
+        this.namedTag.putShort("BurnTicks", 0);
         if (this.getBlock().getId() == Item.FURNACE) {
-            this.getLevel().setBlock(this, Block.get(Item.BURNING_FURNACE, (int) this.getBlock().getDamage()), true);
+            this.getLevel().setBlock(this, Block.get(Item.BURNING_FURNACE, this.getBlock().getDamage()), true);
         }
 
         if (this.namedTag.getShort("BurnTime") > 0 && ev.isBurning()) {
@@ -167,13 +186,13 @@ public class Furnace extends Tile implements InventoryHolder, Container {
         }
 
         if (this.namedTag.getShort("BurnTime") > 0) {
-            this.namedTag.putShort("BurnTime", (short) (this.namedTag.getShort("BurnTime") + 1));
-            this.namedTag.putShort("BurnTicks", (short) Math.ceil((double) this.namedTag.getShort("BurnTime") / (double) this.namedTag.getShort("MaxTime") * 200d));
+            this.namedTag.putShort("BurnTime", (this.namedTag.getShort("BurnTime") + 1));
+            this.namedTag.putShort("BurnTicks", (int) Math.ceil((double) this.namedTag.getShort("BurnTime") / (double) this.namedTag.getShort("MaxTime") * 200d));
 
             if (smelt != null && canSmelt) {
-                this.namedTag.putShort("CookTime", (short) (this.namedTag.getShort("CookTime") + 1));
+                this.namedTag.putShort("CookTime", (this.namedTag.getShort("CookTime") + 1));
                 if (this.namedTag.getShort("CookTime") >= 200) {
-                    product = Item.get(smelt.getResult().getId(), Integer.valueOf(smelt.getResult().getDamage()), product.getCount() + 1);
+                    product = Item.get(smelt.getResult().getId(), smelt.getResult().getDamage(), product.getCount() + 1);
 
                     FurnaceSmeltEvent ev = new FurnaceSmeltEvent(this, raw, product);
                     this.server.getPluginManager().callEvent(ev);
@@ -186,39 +205,39 @@ public class Furnace extends Tile implements InventoryHolder, Container {
                         this.inventory.setSmelting(raw);
                     }
 
-                    this.namedTag.putShort("CookTime", (short) (this.namedTag.getShort("CookTime") - 200));
+                    this.namedTag.putShort("CookTime", (this.namedTag.getShort("CookTime") - 200));
                 }
             } else if (this.namedTag.getShort("BurnTime") <= 0) {
-                this.namedTag.putShort("BurnTime", (short) 0);
-                this.namedTag.putShort("CookTime", (short) 0);
-                this.namedTag.putShort("BurnTicks", (short) 0);
+                this.namedTag.putShort("BurnTime", 0);
+                this.namedTag.putShort("CookTime", 0);
+                this.namedTag.putShort("BurnTicks", 0);
             } else {
-                this.namedTag.putShort("CookTime", (short) 0);
+                this.namedTag.putShort("CookTime", 0);
             }
             ret = true;
         } else {
             if (this.getBlock().getId() == Item.BURNING_FURNACE) {
-                this.getLevel().setBlock(this, Block.get(Item.FURNACE, (int) this.getBlock().getDamage()), true);
+                this.getLevel().setBlock(this, Block.get(Item.FURNACE, this.getBlock().getDamage()), true);
             }
-            this.namedTag.putShort("BurnTime", (short) 0);
-            this.namedTag.putShort("CookTime", (short) 0);
-            this.namedTag.putShort("BurnTicks", (short) 0);
+            this.namedTag.putShort("BurnTime", 0);
+            this.namedTag.putShort("CookTime", 0);
+            this.namedTag.putShort("BurnTicks", 0);
         }
 
         for (Player player : this.getInventory().getViewers()) {
             int windowId = player.getWindowId(this.getInventory());
             if (windowId > 0) {
                 ContainerSetDataPacket pk = new ContainerSetDataPacket();
-                pk.windowId = (byte) windowId;
+                pk.windowid = (byte) windowId;
                 pk.property = 0;
                 pk.value = this.namedTag.getShort("CookTime");
-                player.dataPacket(pk.setChannel(Network.CHANNEL_WORLD_EVENTS));
+                player.dataPacket(pk);
 
                 pk = new ContainerSetDataPacket();
-                pk.windowId = (byte) windowId;
+                pk.windowid = (byte) windowId;
                 pk.property = 1;
                 pk.value = this.namedTag.getShort("BurnTicks");
-                player.dataPacket(pk.setChannel(Network.CHANNEL_WORLD_EVENTS));
+                player.dataPacket(pk);
             }
         }
 

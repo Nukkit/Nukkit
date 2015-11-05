@@ -16,7 +16,6 @@ public class Wood extends Solid {
     //public static final short ACACIA = 4;
     //public static final short DARK_OAK = 5;
 
-    protected int id = WOOD;
 
     public Wood() {
         this(0);
@@ -59,7 +58,7 @@ public class Wood extends Solid {
                 0b0100
         };
 
-        this.meta = (short) ((this.meta & 0x03) | faces[face]);
+        this.meta = ((this.meta & 0x03) | faces[face]);
         this.getLevel().setBlock(block, this, true, true);
 
         return true;

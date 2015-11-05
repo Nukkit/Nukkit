@@ -5,9 +5,8 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ItemDespawnEvent;
 import cn.nukkit.event.entity.ItemSpawnEvent;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.nbt.CompoundTag;
-import cn.nukkit.nbt.NbtIo;
-import cn.nukkit.network.Network;
+import cn.nukkit.nbt.NBTIO;
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddItemEntityPacket;
 
 /**
@@ -31,7 +30,7 @@ public class Item extends Entity {
 
     protected cn.nukkit.item.Item item;
 
-    protected short pickupDelay = 0;
+    protected int pickupDelay = 0;
 
     public float width = 0.25f;
     public float length = 0.25f;
@@ -69,7 +68,7 @@ public class Item extends Entity {
             return;
         }
 
-        this.item = NbtIo.getItemHelper(this.namedTag.getCompound("Item"));
+        this.item = NBTIO.getItemHelper(this.namedTag.getCompound("Item"));
 
         this.server.getPluginManager().callEvent(new ItemSpawnEvent(this));
     }
@@ -153,13 +152,13 @@ public class Item extends Entity {
     public void saveNBT() {
         super.saveNBT();
         this.namedTag.putCompound("Item", new CompoundTag()
-                        .putShort("id", (short) this.item.getId())
+                        .putShort("id", this.item.getId())
                         .putShort("Damage", this.item.getDamage())
                         .putByte("Count", (byte) this.item.getCount())
         );
 
-        this.namedTag.putShort("Health", (short) this.getHealth());
-        this.namedTag.putShort("Age", (short) this.age);
+        this.namedTag.putShort("Health", this.getHealth());
+        this.namedTag.putShort("Age", this.age);
         this.namedTag.putShort("PickupDelay", this.pickupDelay);
         if (this.owner != null) {
             this.namedTag.putString("Owner", this.owner);
@@ -179,11 +178,11 @@ public class Item extends Entity {
         return false;
     }
 
-    public short getPickupDelay() {
+    public int getPickupDelay() {
         return pickupDelay;
     }
 
-    public void setPickupDelay(short pickupDelay) {
+    public void setPickupDelay(int pickupDelay) {
         this.pickupDelay = pickupDelay;
     }
 
@@ -214,7 +213,7 @@ public class Item extends Entity {
         pk.speedY = (float) this.motionY;
         pk.speedZ = (float) this.motionZ;
         pk.item = this.getItem();
-        player.dataPacket(pk.setChannel(Network.CHANNEL_ENTITY_SPAWNING));
+        player.dataPacket(pk);
 
         this.sendData(player);
 
