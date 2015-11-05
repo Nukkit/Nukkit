@@ -50,7 +50,7 @@ import cn.nukkit.plugin.Plugin;
 import cn.nukkit.plugin.PluginLoadOrder;
 import cn.nukkit.plugin.PluginManager;
 import cn.nukkit.scheduler.FileWriteTask;
-import cn.nukkit.scheduler.ServerScheduler;
+import cn.nukkit.scheduler.Scheduler;
 import cn.nukkit.tile.*;
 import cn.nukkit.utils.*;
 
@@ -88,7 +88,7 @@ public class Server {
 
     private int profilingTickrate = 20;
 
-    private ServerScheduler scheduler = null;
+    private Scheduler scheduler = null;
 
     private int tickCounter;
 
@@ -245,8 +245,6 @@ public class Server {
             }
         }
 
-        ServerScheduler.WORKERS = (int) poolSize;
-
         Object threshold = this.getConfig("network.batch-threshold", 256);
         if (!(threshold instanceof Integer)) {
             try {
@@ -270,7 +268,7 @@ public class Server {
         this.alwaysTickPlayers = (boolean) this.getConfig("level-settings.always-tick-players", false);
         this.baseTickRate = (int) this.getConfig("level-settings.base-tick-rate", 1);
 
-        this.scheduler = new ServerScheduler();
+        this.scheduler = new Scheduler(this);
 
         this.entityMetadata = new EntityMetadataStore();
         this.playerMetadata = new PlayerMetadataStore();
@@ -523,7 +521,7 @@ public class Server {
         }
 
         if (!forceSync && this.networkCompressionAsync) {
-            this.getScheduler().scheduleAsyncTask(new CompressBatchedTask(data, targets, this.networkCompressionLevel));
+            this.getScheduler().scheduleAsync(new CompressBatchedTask(data, targets, this.networkCompressionLevel));
         } else {
             try {
                 this.broadcastPacketsCallback(Zlib.deflate(data, this.networkCompressionLevel), targets);
@@ -660,7 +658,7 @@ public class Server {
             HandlerList.unregisterAll();
 
             this.getLogger().debug("Stopping all tasks");
-            this.scheduler.cancelAllTasks();
+            this.scheduler.cancel();
             this.scheduler.mainThreadHeartbeat(Integer.MAX_VALUE);
 
             this.getLogger().debug("Saving properties");
@@ -1200,7 +1198,7 @@ public class Server {
         return craftingManager;
     }
 
-    public ServerScheduler getScheduler() {
+    public Scheduler getScheduler() {
         return scheduler;
     }
 
@@ -1308,7 +1306,7 @@ public class Server {
     public void saveOfflinePlayerData(String name, CompoundTag tag, boolean async) {
         try {
             if (async) {
-                this.getScheduler().scheduleAsyncTask(new FileWriteTask(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
+                this.getScheduler().scheduleAsync(new FileWriteTask(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
             } else {
                 Utils.writeFile(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", new ByteArrayInputStream(NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
             }
