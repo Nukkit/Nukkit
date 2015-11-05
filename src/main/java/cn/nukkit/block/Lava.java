@@ -10,16 +10,18 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 
 /**
- * Created on 15-11-3.
+ * author: MagicDroidX
+ * Nukkit Project
  */
 public class Lava extends Liquid {
 
+
     public Lava() {
-        super(Block.LAVA, 0);
+        this(0);
     }
 
     public Lava(int meta) {
-        super(Block.LAVA, meta);
+        super(LAVA, meta);
     }
 
     @Override
@@ -35,27 +37,30 @@ public class Lava extends Liquid {
     @Override
     public void onEntityCollide(Entity entity) {
         entity.fallDistance *= 0.5;
-
         if (!entity.hasEffect(Effect.FIRE_RESISTANCE)) {
-            EntityDamageByBlockEvent e = new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.CAUSE_LAVA, 4);
-            entity.attack(e.getFinalDamage(), e);
+            EntityDamageByBlockEvent ev = new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.CAUSE_LAVA, 4);
+            entity.attack(ev.getFinalDamage(), ev);
         }
 
-        EntityCombustByBlockEvent e = new EntityCombustByBlockEvent(this, entity, 15);
-        Server.getInstance().getPluginManager().callEvent(e);
-        if(!e.isCancelled()){
-            entity.setOnFire(e.getDuration());
+        EntityCombustByBlockEvent ev = new EntityCombustByBlockEvent(this, entity, 15);
+        Server.getInstance().getPluginManager().callEvent(ev);
+        if (!ev.isCancelled()) {
+            entity.setOnFire(ev.getDuration());
         }
 
         entity.resetFallDistance();
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz, Player player) {
-        boolean b = getLevel().setBlock(this, this, true, false);
-        getLevel().scheduleUpdate(this, tickRate());
-
-        return b;
+    public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz) {
+        return this.place(item, block, target, face, fx, fy, fz, null);
     }
 
+    @Override
+    public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz, Player player) {
+        boolean ret = this.getLevel().setBlock(this, this, true, false);
+        this.getLevel().scheduleUpdate(this, this.tickRate());
+
+        return ret;
+    }
 }
