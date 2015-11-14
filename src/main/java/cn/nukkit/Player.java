@@ -2378,7 +2378,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                 }
 
                 break;
-            case ProtocolInfo::ANIMATE_PACKET:
+            case ProtocolInfo.ANIMATE_PACKET:
 		if(this.spawned == false || !this.isAlive()){
 			break;
 		}
@@ -2394,7 +2394,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
 		pk.action = ev.getAnimationType();
 		Server.broadcastPacket(this.getViewers().values(), pk;
 		break;
-	    case ProtocolInfo::DROP_ITEM_PACKET:
+	    case ProtocolInfo.DROP_ITEM_PACKET:
 		if(this.spawned === false || this.blocked === true || !this.isAlive()){
 			break;
 		}
