@@ -2378,6 +2378,42 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                 }
 
                 break;
+            case ProtocolInfo::ANIMATE_PACKET:
+		if(this.spawned == false || !this.isAlive()){
+			break;
+		}
+		
+		PlayerAnimationEvent ev = new PlayerAnimationEvent(this, packet.action);
+		this.server.getPluginManager().callEvent();
+		if(ev.isCancelled()){
+			break;
+		}
+		
+		pk = new AnimatePacket();
+		pk.eid = this.getId();
+		pk.action = ev.getAnimationType();
+		Server.broadcastPacket(this.getViewers().values(), pk;
+		break;
+	    case ProtocolInfo::DROP_ITEM_PACKET:
+		if(this.spawned === false || this.blocked === true || !this.isAlive()){
+			break;
+		}
+		packet.eid = this.id;
+		item = this.inventory.getItemInHand();
+		PlayerDropItemEvent ev = new PlayerDropItemEvent(this, item);
+		this.server.getPluginManager().callEvent(ev);
+		if(ev.isCancelled()){
+			this.inventory.sendContents(this);
+			break;
+		}
+		
+		this.inventory.setItemInHand(Item.get(Item.AIR, 0, 1), this);
+		motion = this.getDirectionVector().multiply(0.4);
+		
+		this.level.dropItem(this.add(0, 1.3, 0), item, motion, 40);
+		
+		this.setDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION, false);
+		break;
             case ProtocolInfo.TEXT_PACKET:
                 if (this.spawned == false || !this.isAlive()) {
                     break;
