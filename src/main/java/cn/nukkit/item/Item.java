@@ -123,9 +123,7 @@ public class Item implements Cloneable {
     public static final int BURNING_FURNACE = 62;
     public static final int LIT_FURNACE = 62;
     public static final int SIGN_POST = 63;
-    public static final int DOOR_BLOCK = 64;
-    public static final int WOODEN_DOOR_BLOCK = 64;
-    public static final int WOOD_DOOR_BLOCK = 64;
+    public static final int OAK_DOOR_BLOCK = 64;
     public static final int LADDER = 65;
 
     public static final int COBBLE_STAIRS = 67;
@@ -249,6 +247,11 @@ public class Item implements Cloneable {
     public static final int FENCE_GATE_DARK_OAK = 186;
     public static final int FENCE_GATE_ACACIA = 187;
 
+    public static final int SPRUCE_DOOR_BLOCK = 193;
+    public static final int BIRCH_DOOR_BLOCK = 194;
+    public static final int JUNGLE_DOOR_BLOCK = 195;
+    public static final int ACACIA_DOOR_BLOCK = 196;
+    public static final int DARK_OAK_DOOR_BLOCK = 197;
     public static final int GRASS_PATH = 198;
 
     public static final int PODZOL = 243;
@@ -336,7 +339,7 @@ public class Item implements Cloneable {
     public static final int PAINTING = 321;
     public static final int GOLDEN_APPLE = 322;
     public static final int SIGN = 323;
-    public static final int WOODEN_DOOR = 324;
+    public static final int OAK_DOOR = 324;
     public static final int BUCKET = 325;
 
     public static final int MINECART = 328;
@@ -405,6 +408,12 @@ public class Item implements Cloneable {
     public static final int NETHER_BRICK = 405;
     public static final int QUARTZ = 406;
     public static final int NETHER_QUARTZ = 406;
+
+    public static final int SPRUCE_DOOR = 427;
+    public static final int BIRCH_DOOR = 428;
+    public static final int JUNGLE_DOOR = 429;
+    public static final int ACACIA_DOOR = 430;
+    public static final int DARK_OAK_DOOR = 431;
 
     public static final int CAMERA = 456;
     public static final int BEETROOT = 457;
@@ -530,7 +539,7 @@ public class Item implements Cloneable {
             list[PAINTING] = Painting.class;
             list[GOLDEN_APPLE] = GoldenApple.class;
             list[SIGN] = Sign.class;
-            list[WOODEN_DOOR] = WoodenDoor.class;
+            list[OAK_DOOR] = OakDoor.class;
             list[BUCKET] = Bucket.class;
             list[MINECART] = Minecart.class;
             list[IRON_DOOR] = IronDoor.class;
@@ -577,6 +586,11 @@ public class Item implements Cloneable {
             list[BEETROOT] = Beetroot.class;
             list[BEETROOT_SEEDS] = BeetrootSeeds.class;
             list[BEETROOT_SOUP] = BeetrootSoup.class;
+            list[BIRCH_DOOR] = BirchDoor.class;
+            list[SPRUCE_DOOR] = SpruceDoor.class;
+            list[JUNGLE_DOOR] = JungleDoor.class;
+            list[ACACIA_DOOR] = AcaciaDoor.class;
+            list[DARK_OAK_DOOR] = DarkOakDoor.class;
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
@@ -711,7 +725,7 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.LADDER, 0));
         addCreativeItem(Item.get(Item.SPONGE, 0));
         addCreativeItem(Item.get(Item.GLASS_PANE, 0));
-        addCreativeItem(Item.get(Item.WOODEN_DOOR, 0));
+        addCreativeItem(Item.get(Item.OAK_DOOR, 0));
         addCreativeItem(Item.get(Item.TRAPDOOR, 0));
         //addCreativeItem(Item.get(Item.FENCE, Fence.FENCE_OAK));
         //addCreativeItem(Item.get(Item.FENCE, Fence.FENCE_SPRUCE));

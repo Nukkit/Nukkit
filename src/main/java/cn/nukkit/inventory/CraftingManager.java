@@ -201,7 +201,7 @@ public class CraftingManager {
                 "PPP"
         )).setIngredient("P", Item.get(Item.WOODEN_PLANK, null, 6)));
 
-        this.registerRecipe((new BigShapedRecipe(Item.get(Item.WOODEN_DOOR, 0, 1),
+        this.registerRecipe((new BigShapedRecipe(Item.get(Item.OAK_DOOR, 0, 1),
                 "PP",
                 "PP",
                 "PP"

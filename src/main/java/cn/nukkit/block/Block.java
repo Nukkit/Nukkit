@@ -101,9 +101,7 @@ public class Block extends Position implements Metadatable, Cloneable {
     public static final int BURNING_FURNACE = 62;
     public static final int LIT_FURNACE = 62;
     public static final int SIGN_POST = 63;
-    public static final int DOOR_BLOCK = 64;
-    public static final int WOODEN_DOOR_BLOCK = 64;
-    public static final int WOOD_DOOR_BLOCK = 64;
+    public static final int OAK_DOOR_BLOCK = 64;
     public static final int LADDER = 65;
 
     public static final int COBBLE_STAIRS = 67;
@@ -227,6 +225,11 @@ public class Block extends Position implements Metadatable, Cloneable {
     public static final int FENCE_GATE_DARK_OAK = 186;
     public static final int FENCE_GATE_ACACIA = 187;
 
+    public static final int SPRUCE_DOOR_BLOCK = 193;
+    public static final int BIRCH_DOOR_BLOCK = 194;
+    public static final int JUNGLE_DOOR_BLOCK = 195;
+    public static final int ACACIA_DOOR_BLOCK = 196;
+    public static final int DARK_OAK_DOOR_BLOCK = 197;
     public static final int GRASS_PATH = 198;
 
     public static final int PODZOL = 243;
@@ -274,7 +277,7 @@ public class Block extends Position implements Metadatable, Cloneable {
             //list[COBBLESTONE] = Cobblestone.class;
             list[PLANKS] = Planks.class;
             //list[SAPLING] = Sapling.class;
-            //list[BEDROCK] = Bedrock.class;
+            list[BEDROCK] = Bedrock.class;
             list[WATER] = Water.class;
             //list[STILL_WATER] = StillWater.class;
             list[LAVA] = Lava.class;
@@ -323,13 +326,13 @@ public class Block extends Position implements Metadatable, Cloneable {
             //list[FURNACE] = Furnace.class;
             //list[BURNING_FURNACE] = BurningFurnace.class;
             list[SIGN_POST] = SignPost.class;
-            //list[WOOD_DOOR_BLOCK] = WoodDoor.class;
+            list[OAK_DOOR_BLOCK] = OakDoor.class;
             //list[LADDER] = Ladder.class;
 
             //list[COBBLESTONE_STAIRS] = CobblestoneStairs.class;
             //list[WALL_SIGN] = WallSign.class;
 
-            //list[IRON_DOOR_BLOCK] = IronDoor.class;
+            list[IRON_DOOR_BLOCK] = IronDoor.class;
             list[REDSTONE_ORE] = RedstoneOre.class;
             //list[GLOWING_REDSTONE_ORE] = GlowingRedstoneOre.class;
 
@@ -377,9 +380,9 @@ public class Block extends Position implements Metadatable, Cloneable {
             list[EMERALD_ORE] = EmeraldOre.class;*/
 
             //list[EMERALD_BLOCK] = Emerald.class;
-            /*list[SPRUCE_WOOD_STAIRS] = SpruceWoodStairs.class;
+            //list[SPRUCE_WOOD_STAIRS] = SpruceWoodStairs.class;
             list[BIRCH_WOOD_STAIRS] = BirchWoodStairs.class;
-            list[JUNGLE_WOOD_STAIRS] = JungleWoodStairs.class;*/
+            //list[JUNGLE_WOOD_STAIRS] = JungleWoodStairs.class;
             list[STONE_WALL] = StoneWall.class;
 
             //list[CARROT_BLOCK] = Carrot.class;
@@ -415,10 +418,16 @@ public class Block extends Position implements Metadatable, Cloneable {
             list[GRASS_PATH] = GrassPath.class;
 
             list[PODZOL] = Podzol.class;*/
-            //list[BEETROOT_BLOCK] = Beetroot.class;
+            list[BEETROOT_BLOCK] = Beetroot.class;
             /*list[STONECUTTER] = Stonecutter.class;
             list[GLOWING_OBSIDIAN] = GlowingObsidian.class;
             list[NETHER_REACTOR] = NetherReactor.class;*/
+
+            list[BIRCH_DOOR_BLOCK] = BirchDoor.class;
+            list[SPRUCE_DOOR_BLOCK] = SpruceDoor.class;
+            list[JUNGLE_DOOR_BLOCK] = JungleDoor.class;
+            list[ACACIA_DOOR_BLOCK] = AcaciaDoor.class;
+            list[DARK_OAK_DOOR_BLOCK] = DarkOakDoor.class;
 
             for (int id = 0; id < 256; id++) {
                 Class c = list[id];
