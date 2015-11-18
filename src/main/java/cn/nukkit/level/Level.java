@@ -25,6 +25,7 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.level.generator.*;
+import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.math.AxisAlignedBB;
@@ -1340,8 +1341,7 @@ public class Level implements ChunkManager, Metadatable {
                 players.remove(player.getLoaderId());
             }
 
-            //todo particle
-            this.addParticle();
+            this.addParticle(new DestroyBlockParticle(vector, target));
         }
 
         target.onBreak(item);
