@@ -25,6 +25,8 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.level.generator.*;
+import cn.nukkit.level.particle.Particle;
+import cn.nukkit.level.sound.Sound;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector2;
@@ -310,12 +312,44 @@ public class Level implements ChunkManager, Metadatable {
         this.temporalPosition = null;
     }
 
-    public void addSound() {
-        //todo
+    public void addSound(Sound sound){
+        this.addSound(sound, null);
     }
 
-    public void addParticle() {
-        //todo
+    public void addSound(Sound sound, Player[] players){
+        DataPacket[] pk = sound.encode();
+
+        if(players == null){
+            if(pk != null){
+                for(DataPacket e : pk) {
+                    this.addChunkPacket((int) sound.x >> 4, (int) sound.z >> 4, e);
+                }
+            }
+        }else{
+            if(pk != null){
+                this.server.batchPackets(players, pk, false);
+            }
+        }
+    }
+
+    public void addParticle(Particle particle){
+        this.addParticle(particle, null);
+    }
+
+    public void addParticle(Particle particle, Player[] players){
+        DataPacket[] pk = particle.encode();
+
+        if(players == null){
+            if(pk != null){
+                for(DataPacket e : pk){
+                    this.addChunkPacket((int) particle.x >> 4, (int) particle.z >> 4, e);
+                }
+            }
+        }else{
+            if(pk != null){
+                this.server.batchPackets(players, pk, false);
+            }
+        }
     }
 
     public boolean getAutoSave() {

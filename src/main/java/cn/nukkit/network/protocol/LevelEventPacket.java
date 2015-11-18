@@ -47,6 +47,7 @@ public class LevelEventPacket extends DataPacket {
     public static final int EVENT_ADD_PARTICLE_MASK = 0x4000;
 
     public int evid;
+
     public float x;
     public float y;
     public float z;

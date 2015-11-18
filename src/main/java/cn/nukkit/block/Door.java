@@ -3,9 +3,12 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 //import cn.nukkit.level.sound.DoorSound;
+import cn.nukkit.level.sound.DoorSound;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.Player;
+
+import java.util.Map;
 
 
 public abstract class Door extends Transparent{
@@ -285,9 +288,7 @@ public abstract class Door extends Transparent{
 			if(down.getId() == this.getId()){
 				int meta = down.getDamage() ^ 0x04;
 				this.getLevel().setBlock(down, Block.get(this.getId(), meta), true);
-				//Player[] players = $this->getLevel().getUsingChunk(this.x >> 4, this.z >> 4);
-
-				//this.level.addSound(new DoorSound(this));
+				this.level.addSound(new DoorSound(this));
 				return true;
 			}
 
@@ -295,8 +296,7 @@ public abstract class Door extends Transparent{
 		}else{
 			this.meta ^= 0x04;
 			this.getLevel().setBlock(this, this, true);
-			//Player[] players = this.getLevel().getUsingChunk(this.x >> 4, this.z >> 4);
-			//this.level.addSound(new DoorSound(this));
+			this.level.addSound(new DoorSound(this));
 		}
 
 		return true;
