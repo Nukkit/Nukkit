@@ -481,19 +481,15 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
-    public String getSaveId() {
-        return shortNames.get(this.getClass());
-    }
-
     public void saveNBT() {
         if (!(this instanceof Player)) {
             if (!this.getNameTag().equals("")) {
-                this.namedTag.putString("id", this.getSaveId());
+                this.namedTag.putString("id", getClass().getSimpleName());
                 this.namedTag.putString("CustomName", this.getNameTag());
-                this.namedTag.putString("CustomeNameVisible", String.valueOf(this.isNameTagVisible()));
+                this.namedTag.putString("CustomNameVisible", String.valueOf(this.isNameTagVisible()));
             } else {
                 this.namedTag.remove("CustomName");
-                this.namedTag.remove("CustomeNameVisible");
+                this.namedTag.remove("CustomNameVisible");
             }
         }
 
