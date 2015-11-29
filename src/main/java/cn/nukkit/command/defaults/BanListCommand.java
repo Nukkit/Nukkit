@@ -36,8 +36,9 @@ public class BanListCommand extends VanillaCommand {
                 return false;
             }
         } else {
-            list = sender.getServer().getNameBans();
-            args[0] = "players";
+            sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
+
+            return false;
         }
 
         String message = "";
