@@ -30,27 +30,35 @@ Get Nukkit
 
 Introduction
 -------------
-Nukkit is nuclear-powered server software for Minecraft: Pocket Edtion.
+Nukkit is nuclear-powered (java-based) server software for Minecraft: Pocket Edtion.
 It has a few key advantages over PocketMine-MP:
 
-* Written in Java, Nukkit is faster and more stable.
-* Having a similar structure with PocketMine-MP, because of this it's easy to contribute to Nukkit's development. And it is also easy to rewrite PocketMine-MP plugins into Nukkit plugins.
+* Nukkit is written in java, this makes it more fast and stable.
+* Nukkit has a similar structure to PocketMine-MP, because of this it's easy to contribute to Nukkit's development.
+* Nukkit has a similar API that PocketMine has. This makes porting plugins very easy.
+* Nukkit has a different networking system, allowing faster Networking.
 
-However, Nukkit is **not finished** yet. We welcome contributions.
+However, Nukkit is **not finished** yet, and we are currently testing it.
+Please report any issues or create a pull request to help contribute.
 
 Build JAR file
 -------------
+You need to compile Nukkit into a jar file. An IDE can do this.
 - Init modules by `git submodule update --init`
 - Compile by `mvn clean package`
 
 Running
 -------------
-Simply run `start.sh` or `start.cmd`. Or execute `java -jar Nukkit.jar`.
+Running Nukkit is very simple.
+First, drop the Nukkit.jar phar in a folder.
+Use terminal and locate that folder using `cd dictionary/dictionary`.
+Simply run `start.sh` or `start.cmd`. You can also excecute `java -jar Nukkit.jar`.
+After you run it for the first time, select a language and then Nukkit will start up!
 
 Plugin API
 -------------
 ####**Example Plugin**
-Example Plugin which shows the API of Nukkit.
+Example Plugin that shows you Nukkit's API:
 
 * __[Example Plugin](http://github.com/Nukkit/ExamplePlugin)__
 
