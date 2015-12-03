@@ -47,7 +47,7 @@ Running
 -------------
 Simply run `start.sh` or `start.cmd`. Or execute `java -jar Nukkit.jar`.
 
-For Russian users: If your console displays strange charachers where Russian characters should be at, Try starting Nukkit by: 
+For Russian users: If your console displays strange characters where Russian characters should be at, Try starting Nukkit by: 
 ```
 java -Dfile.encoding=cp866 -jar nukkit.jar
 ```
