@@ -1,4 +1,4 @@
-Nukkit
+KNukkit
 ===================
 ![nukkit](https://github.com/MagicDroidX/Nukkit/raw/master/images/banner.png)
 
@@ -32,6 +32,12 @@ It has a few key advantages over PocketMine-MP:
 * Having a similar structure with PocketMine-MP, because of this it's easy to contribute to Nukkit's development. And it is also easy to rewrite PocketMine-MP plugins into Nukkit plugins.
 
 However, Nukkit is **not finished** yet. We welcome contributions.
+
+Nukkit Servers
+--------------
+The test server we have that is powered by us is
+fcmcpe.com 23191 or 11111
+Server is open for everyone and it is mostly on everyday!
 
 Build JAR file
 -------------
