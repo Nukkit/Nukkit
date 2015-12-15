@@ -69,7 +69,7 @@ public class FallingSand extends Entity {
                 namedTag.putInt("TileID", blockId);
             }
             if (namedTag.contains("Data")) {
-                damage = namedTag.getByte("Data") & 0xff;
+                damage = namedTag.getInt("Data") & 0xff;
             }
         }
 
@@ -143,7 +143,12 @@ public class FallingSand extends Entity {
                     EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, block, Block.get(getBlock(), getDamage()));
                     server.getPluginManager().callEvent(event);
                     if (!event.isCancelled()) {
-                        getLevel().setBlock(pos, event.getTo(), true);
+                        if(block.getId() == 98){//A funny bug I must do it
+                            Vector3 newpos = (new Vector3(x - 0.5, y+1, z - 0.5)).floor();
+                            getLevel().setBlock(newpos, event.getTo(), true);
+                        }else {
+                            getLevel().setBlock(pos, event.getTo(), true);
+                        }
                     }
                 }
                 hasUpdate = true;
