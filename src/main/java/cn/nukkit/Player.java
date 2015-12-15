@@ -1589,10 +1589,11 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
             this.namedTag.putInt("FoodLevel", 20);
         }
         int foodLevel = this.namedTag.getInt("FoodLevel");
+
         if (!this.namedTag.contains("FoodSaturationLevel")) {
-            this.namedTag.putInt("FoodSaturationLevel", 20);
+            this.namedTag.putDouble("FoodSaturationLevel", 20);
         }
-        int foodSaturationLevel = this.namedTag.getInt("FoodSaturationLevel");
+        double foodSaturationLevel = this.namedTag.getDouble("FoodSaturationLevel");
         this.foodData = new PlayerFood(this, foodLevel, foodSaturationLevel);
 
         this.chunk.addEntity(this);
@@ -2396,8 +2397,10 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                 switch (entityEventPacket.event) {
                     case 9: //Eating
                         Item itemInHand = this.inventory.getItemInHand();
-                        int amount = EdibleItem.getRegainAmount(itemInHand.getId(), itemInHand.getDamage());
-                        if (this.getHealth() < this.getMaxHealth() && amount > 0) {
+                        int foodLevel = EdibleItem.getRegainFoodLevel(itemInHand.getId(), itemInHand.getDamage());
+                        double fsl = EdibleItem.getRegainFoodSaturationLevel(itemInHand.getId(), itemInHand.getDamage());
+
+                        if (this.getFoodData().getFoodLevel() < 20 && foodLevel > 0 && fsl > 0) {
                             PlayerItemConsumeEvent consumeEvent;
                             this.server.getPluginManager().callEvent(consumeEvent = new PlayerItemConsumeEvent(this, itemInHand));
                             if (consumeEvent.isCancelled()) {
@@ -2411,8 +2414,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                             this.dataPacket(pk);
                             Server.broadcastPacket(this.getViewers().values(), pk);
 
-                            EntityRegainHealthEvent regainHealthEvent = new EntityRegainHealthEvent(this, amount, EntityRegainHealthEvent.CAUSE_EATING);
-                            this.heal(regainHealthEvent.getAmount(), regainHealthEvent);
+                            this.getFoodData().addFoodLevel(foodLevel, fsl);
 
                             --itemInHand.count;
                             this.inventory.setItemInHand(itemInHand);
@@ -2686,6 +2688,10 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
 
     }
 
+    public void eatFoodInHand() {
+
+    }
+
     public boolean kick() {
         return this.kick("");
     }
@@ -2912,7 +2918,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
             this.namedTag.putString("lastIP", this.getAddress());
 
             this.namedTag.putInt("FoodLevel", this.getFoodData().getFoodLevel());
-            this.namedTag.putInt("FoodSaturationLevel", this.getFoodData().getFoodSaturationLevel());
+            this.namedTag.putDouble("FoodSaturationLevel", this.getFoodData().getFoodSaturationLevel());
 
             if (!"".equals(this.username) && this.namedTag != null) {
                 this.server.saveOfflinePlayerData(this.username, this.namedTag, async);

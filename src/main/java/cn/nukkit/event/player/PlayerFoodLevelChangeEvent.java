@@ -12,9 +12,9 @@ public class PlayerFoodLevelChangeEvent extends PlayerEvent implements Cancellab
     }
 
     protected int foodLevel;
-    protected int foodSaturationLevel;
+    protected double foodSaturationLevel;
 
-    public PlayerFoodLevelChangeEvent(Player player, int foodLevel, int foodSaturationLevel) {
+    public PlayerFoodLevelChangeEvent(Player player, int foodLevel, double foodSaturationLevel) {
         this.player = player;
         this.foodLevel = foodLevel;
         this.foodSaturationLevel = foodSaturationLevel;
@@ -28,7 +28,7 @@ public class PlayerFoodLevelChangeEvent extends PlayerEvent implements Cancellab
         this.foodLevel = foodLevel;
     }
 
-    public int getFoodSaturationLevel() {
+    public double getFoodSaturationLevel() {
         return foodSaturationLevel;
     }
 
