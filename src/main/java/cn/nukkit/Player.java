@@ -1780,11 +1780,6 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                     break;
                 }
 
-                if (!loginPacket.skin.isValid()) {
-                    this.close("", "disconnectionScreen.invalidSkin");
-                    break;
-                }
-
                 this.setSkin(loginPacket.skin);
 
                 PlayerPreLoginEvent playerPreLoginEvent;
