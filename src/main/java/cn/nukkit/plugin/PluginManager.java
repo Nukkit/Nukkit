@@ -27,7 +27,7 @@ public class PluginManager {
 
     private SimpleCommandMap commandMap;
 
-    protected Map<String, Plugin> plugins = new HashMap<>();
+    protected Map<String, Plugin> plugins = new LinkedHashMap<>();
 
     protected Map<String, Permission> permissions = new HashMap<>();
 
@@ -255,10 +255,11 @@ public class PluginManager {
                     }
 
                     if (softDependencies.containsKey(name)) {
-                        for (String dependency : softDependencies.get(name)) {
-                            if (loadedPlugins.containsKey(dependency) || this.getPlugin(dependency) != null) {
-                                softDependencies.get(name).remove(dependency);
-                            }
+                        Iterator<String> iterator = softDependencies.get(name).iterator();
+                        while (iterator.hasNext()){
+                            String dependency = iterator.next();
+                            if (loadedPlugins.containsKey(dependency) || this.getPlugin(dependency) != null)
+                                iterator.remove();
                         }
 
                         if (softDependencies.get(name).isEmpty()) {
