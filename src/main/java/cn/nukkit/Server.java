@@ -56,6 +56,7 @@ import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.tile.*;
 import cn.nukkit.utils.*;
+import com.google.common.collect.ImmutableList;
 
 import java.io.*;
 import java.nio.ByteOrder;
@@ -850,7 +851,7 @@ public class Server {
     }
 
     private void checkTickUpdates(int currentTick, long tickTime) {
-        for (Player p : this.players.values()) {
+        for (Player p : ImmutableList.copyOf(players.values())) {
             if (!p.loggedIn && (tickTime - p.creationTime) >= 10000) {
                 p.close("", "Login timeout");
             } else if (this.alwaysTickPlayers) {

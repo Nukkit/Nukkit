@@ -51,6 +51,7 @@ import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.ChunkException;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
+import com.google.common.collect.ImmutableList;
 
 import java.util.*;
 
@@ -1474,7 +1475,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE, this);
         }
 
-        for (Player p : this.server.getOnlinePlayers().values()) {
+        for (Player p : ImmutableList.copyOf(server.getOnlinePlayers().values())) {
             if (p != this && Objects.equals(p.getName().toLowerCase(), this.getName().toLowerCase())) {
                 if (!p.kick("logged in from another location")) {
                     this.close(this.getLeaveMessage(), "Logged in from another location");
@@ -2837,7 +2838,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                 }
             }
 
-            for (Player player : this.server.getOnlinePlayers().values()) {
+            for (Player player : ImmutableList.copyOf(server.getOnlinePlayers().values())) {
                 if (!player.canSee(this)) {
                     player.showPlayer(this);
                 }
@@ -2845,11 +2846,11 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
 
             this.hiddenPlayers = new HashMap<>();
 
-            for (Inventory window : new ArrayList<>(this.windowIndex.values())) {
+            for (Inventory window : ImmutableList.copyOf(this.windowIndex.values())) {
                 this.removeWindow(window);
             }
 
-            for (String index : new ArrayList<>(this.usedChunks.keySet())) {
+            for (String index : ImmutableList.copyOf(this.usedChunks.keySet())) {
                 Chunk.Entry entry = Level.getChunkXZ(index);
                 this.level.unregisterChunkLoader(this, entry.chunkX, entry.chunkZ);
                 this.usedChunks.remove(index);
