@@ -91,7 +91,7 @@ public class NBTIO {
     }
 
     public static CompoundTag readCompressed(InputStream in, ByteOrder endianness) throws IOException {
-        try (GZIPInputStream gzipInputStream = new GZIPInputStream(in, 1024)) {
+        try (GZIPInputStream gzipInputStream = new GZIPInputStream(in, 10240)) {
             return read(gzipInputStream, endianness);
         }
     }
@@ -101,7 +101,7 @@ public class NBTIO {
     }
 
     public static CompoundTag readCompressed(byte[] data, ByteOrder endianness) throws IOException {
-        try (GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(data))) {
+        try (GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(data), 10240)) {
             return read(gzipInputStream, endianness);
         }
     }
