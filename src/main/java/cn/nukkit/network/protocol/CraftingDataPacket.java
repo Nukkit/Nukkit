@@ -1,5 +1,6 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.Server;
 import cn.nukkit.inventory.FurnaceRecipe;
 import cn.nukkit.inventory.ShapedRecipe;
 import cn.nukkit.inventory.ShapelessRecipe;
@@ -152,7 +153,7 @@ public class CraftingDataPacket extends DataPacket {
         }
 
         putByte((byte) (cleanRecipes ? 1 : 0));
-        System.out.println(this.getCount());
+        Server.getInstance().getLogger().debug("CraftingDataPacket: Count: "+String.valueOf(this.getCount()));
     }
 
     @Override
