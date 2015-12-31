@@ -2001,7 +2001,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                                         //todo: why aimPos doesn't work?
                                         .add(new DoubleTag("", -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)))
                                         .add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
-                                        .add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))s
+                                        .add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
 
                                 .putList(new ListTag<FloatTag>("Rotation")
                                         .add(new FloatTag("", (float) yaw))
