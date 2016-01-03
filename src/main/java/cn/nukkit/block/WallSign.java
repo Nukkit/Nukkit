@@ -30,10 +30,10 @@ public class WallSign extends SignPost {
     public int onUpdate(int type) {
         int[] faces = {
                 0,
-                5,
                 4,
-                3,
-                2
+                5,
+                2,
+                3
         };
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if (this.getSide(faces[this.meta]).getId() == Item.AIR) {
