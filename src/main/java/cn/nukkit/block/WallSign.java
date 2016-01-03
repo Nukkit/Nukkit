@@ -33,7 +33,7 @@ public class WallSign extends SignPost {
                 5,
                 4,
                 3,
-                2,
+                2
         };
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if (this.getSide(faces[this.meta]).getId() == Item.AIR) {
