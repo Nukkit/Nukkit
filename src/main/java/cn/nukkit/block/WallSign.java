@@ -29,10 +29,11 @@ public class WallSign extends SignPost {
     @Override
     public int onUpdate(int type) {
         int[] faces = {
-                3,
-                2,
+                0,
                 5,
                 4,
+                3,
+                2,
         };
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if (this.getSide(faces[this.meta]).getId() == Item.AIR) {
