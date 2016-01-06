@@ -9,6 +9,7 @@ import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.event.TextContainer;
 import cn.nukkit.event.TranslationContainer;
+import cn.nukkit.event.block.SignChangeEvent
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.inventory.CraftItemEvent;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
@@ -35,6 +36,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.metadata.MetadataValue;
+import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
@@ -46,6 +48,7 @@ import cn.nukkit.permission.Permission;
 import cn.nukkit.permission.PermissionAttachment;
 import cn.nukkit.permission.PermissionAttachmentInfo;
 import cn.nukkit.plugin.Plugin;
+import cn.nukkit.tile.Sign;
 import cn.nukkit.tile.Spawnable;
 import cn.nukkit.tile.Tile;
 import cn.nukkit.utils.Binary;
@@ -53,6 +56,8 @@ import cn.nukkit.utils.ChunkException;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
 
+import java.io.IOException;
+import java.nio.ByteOrder;
 import java.util.*;
 
 //import cn.nukkit.entity.Item;
