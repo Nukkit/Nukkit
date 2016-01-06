@@ -9,7 +9,7 @@ import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.event.TextContainer;
 import cn.nukkit.event.TranslationContainer;
-import cn.nukkit.event.block.SignChangeEvent
+import cn.nukkit.event.block.SignChangeEvent;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.inventory.CraftItemEvent;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
