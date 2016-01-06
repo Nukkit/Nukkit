@@ -17,7 +17,7 @@ import java.util.Set;
 public class SimpleTransactionGroup implements TransactionGroup {
 
     private long creationTime;
-    protected boolean hasExecuted = true;
+    protected boolean hasExecuted = false;
 
     protected Player source = null;
 
