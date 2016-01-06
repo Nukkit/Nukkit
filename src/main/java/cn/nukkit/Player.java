@@ -2803,7 +2803,131 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                 //todo: achievement
 
                 break;
-            //todo alot
+            case ProtocolInfo.CONTAINER_SET_SLOT_PACKET:
+                if (!this.spawned || this.blocked || !this.isAlive()) {
+                    break;
+                }
+
+                ContainerSetSlotPacket containerSetSlotPacket = (ContainerSetSlotPacket) packet;
+
+                if (containerSetSlotPacket.slot < 0) {
+                    break;
+                }
+
+                BaseTransaction transaction;
+
+                if (containerSetSlotPacket.windowid == 0) { //Our inventory
+                    if (containerSetSlotPacket.slot >= this.inventory.getSize()) {
+                        break;
+                    }
+                    if (this.isCreative()) {
+                        if (Item.getCreativeItemIndex(containerSetSlotPacket.item) != -1) {
+                            this.inventory.setItem(containerSetSlotPacket.slot, containerSetSlotPacket.item);
+                            this.inventory.setHotbarSlotIndex(containerSetSlotPacket.slot, containerSetSlotPacket.slot); //links $hotbar[$packet->slot] to $slots[$packet->slot]
+                        }
+                    }
+                    transaction = new BaseTransaction(this.inventory, containerSetSlotPacket.slot, this.inventory.getItem(containerSetSlotPacket.slot), containerSetSlotPacket.item);
+                } else if (containerSetSlotPacket.windowid == ContainerSetContentPacket.SPECIAL_ARMOR) { //Our armor
+                    if (containerSetSlotPacket.slot >= 4) {
+                        break;
+                    }
+                    transaction = new BaseTransaction(this.inventory, containerSetSlotPacket.slot + this.inventory.getSize(), this.inventory.getArmorItem(containerSetSlotPacket.slot), containerSetSlotPacket.item);
+                } else if (this.windowIndex.containsKey(containerSetSlotPacket.windowid)) {
+                    this.craftingType = 0;
+                    Inventory inv = this.windowIndex.get(containerSetSlotPacket.windowid);
+                    transaction = new BaseTransaction(inv, containerSetSlotPacket.slot, inv.getItem(containerSetSlotPacket.slot), containerSetSlotPacket.item);
+                } else {
+                    break;
+                }
+                if (transaction.getSourceItem().deepEquals(transaction.getTargetItem()) && transaction.getTargetItem().getCount() == transaction.getSourceItem().getCount()) { //No changes!
+                    //No changes, just a local inventory update sent by the server
+                    break;
+                }
+                if (this.currentTransaction == null || this.currentTransaction.getCreationTime() < (System.currentTimeMillis() - 0.008)) {
+                    if (this.currentTransaction != null) {
+                        for (Inventory inventory : this.currentTransaction.getInventories()) {
+                            if (inventory instanceof PlayerInventory) {
+                                ((PlayerInventory) inventory).sendArmorContents(this);
+                            }
+                            inventory.sendContents(this);
+                        }
+                    }
+                    this.currentTransaction = new SimpleTransactionGroup(this);
+                }
+                this.currentTransaction.addTransaction(transaction);
+                if (this.currentTransaction.canExecute()) {
+                    this.currentTransaction.execute();
+                /* TODO: achievements
+                HashSet<String> achievements = new HashSet<>();
+                for(Transaction ts : this.currentTransaction.getTransactions()) {
+                    Inventory inv = ts.getInventory();
+                    if (inv instanceof FurnaceInventory) {
+                        if (ts.getSlot() == 2) {
+                            switch (inv.getResult().getId()){
+                                case Item.IRON_INGOT:
+                                    achievements.add("acquireIron");
+                                    break;
+                            }
+                        }
+                    }
+                }
+                if (this.currentTransaction.execute()) {
+                    for(String a : achievements) {
+                        this.awardAchievement(a);
+                    }
+                }*/
+                    this.currentTransaction = null;
+                }
+                break;
+            case ProtocolInfo.BLOCK_ENTITY_DATA_PACKET:
+                if (!this.spawned || this.blocked || !this.isAlive()) {
+                    break;
+                }
+
+                BlockEntityDataPacket blockEntityDataPacket = (BlockEntityDataPacket) packet;
+
+                this.craftingType = 0;
+                Vector3 position = new Vector3(blockEntityDataPacket.x, blockEntityDataPacket.y, blockEntityDataPacket.z);
+                if (position.distanceSquared(this) > 10000) {
+                    break;
+                }
+                Tile t = this.level.getTile(position);
+                if (t instanceof Sign) {
+                    CompoundTag nbt;
+
+                    try {
+                        nbt = NBTIO.read(blockEntityDataPacket.namedTag, ByteOrder.LITTLE_ENDIAN);
+                    } catch (IOException e) {
+                        e.printStackTrace(); //idk
+                        break;
+                    }
+
+                    if (!nbt.getString("id").equals(Tile.SIGN)) {
+                        ((Sign) t).spawnTo(this);
+                    } else {
+                        SignChangeEvent event = new SignChangeEvent(t.getBlock(), this, new String[]{
+                                TextFormat.clean(nbt.getString("Text1")), TextFormat.clean
+                                (nbt.getString("Text2")), TextFormat.clean(nbt.getString("Text3")),
+                                TextFormat.clean(nbt.getString("Text4"))
+                        });
+                        if (!t.namedTag.contains("Creator") || !Arrays.equals(t.namedTag.getByteArray("Creator"), this.getRawUniqueId())) {
+                            event.setCancelled();
+                        } else {
+                            for (String line : event.getLines()) {
+                                if (line.length() > 16) {
+                                    ev.setCancelled();
+                                }
+                            }
+                        }
+                        this.server.getPluginManager().callEvent(event);
+                        if (!event.isCancelled()) {
+                            ((Sign) t).setText(event.getLine(0), event.getLine(1), event.getLine(2), event.getLine(3));
+                        } else {
+                            ((Sign) t).spawnTo(this);
+                        }
+                    }
+                }
+                break;
             default:
                 break;
         }
