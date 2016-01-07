@@ -2920,7 +2920,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                         } else {
                             for (String line : event.getLines()) {
                                 if (line.length() > 16) {
-                                    ev.setCancelled();
+                                    event.setCancelled();
                                 }
                             }
                         }
