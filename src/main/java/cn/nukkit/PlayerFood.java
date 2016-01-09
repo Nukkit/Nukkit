@@ -37,7 +37,7 @@ public class PlayerFood {
         this.setFoodLevel(foodLevel, -1);
     }
 
-    public void setFoodLevel(double foodLevel, int FSL) {
+    public void setFoodLevel(int foodLevel, double FSL) {
         if (foodLevel > 20) foodLevel = 20;
         if (foodLevel < 0) foodLevel = 0;
         if (foodLevel <= 6 && !(this.getFoodLevel() <= 6)) {
