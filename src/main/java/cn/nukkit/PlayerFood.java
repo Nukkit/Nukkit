@@ -33,7 +33,7 @@ public class PlayerFood {
         return this.foodLevel;
     }
 
-    public void setFoodLevel(double foodLevel) {
+    public void setFoodLevel(int foodLevel) {
         this.setFoodLevel(foodLevel, -1);
     }
 
