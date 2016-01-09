@@ -1226,8 +1226,8 @@ public class Item implements Cloneable {
             CompoundTag entry = ench.get(k);
             if (entry.getShort("id") == enchantment.getId()) {
                 ench.add(k, new CompoundTag()
-                                .putShort("id", enchantment.getId())
-                                .putShort("lvl", enchantment.getLevel())
+                        .putShort("id", enchantment.getId())
+                        .putShort("lvl", enchantment.getLevel())
                 );
                 found = true;
                 break;
@@ -1236,8 +1236,8 @@ public class Item implements Cloneable {
 
         if (!found) {
             ench.add(new CompoundTag()
-                            .putShort("id", enchantment.getId())
-                            .putShort("lvl", enchantment.getLevel())
+                    .putShort("id", enchantment.getId())
+                    .putShort("lvl", enchantment.getLevel())
             );
         }
 
@@ -1308,7 +1308,7 @@ public class Item implements Cloneable {
             tag.getCompound("display").putString("Name", name);
         } else {
             tag.putCompound("display", new CompoundTag("display")
-                            .putString("Name", name)
+                    .putString("Name", name)
             );
         }
 

@@ -87,7 +87,7 @@ public class ThrownPotion extends Projectile {
             this.getLevel().addParticle(particle1);
             Particle particle2 = Potions.getParticle(getPotionType(), this);
             if (particle2 != null)
-            this.getLevel().addParticle(particle2);
+                this.getLevel().addParticle(particle2);
             hasUpdate = true;
 
             Entity[] entities = this.getLevel().getNearbyEntities(this.getBoundingBox().grow(8.25, 4.24, 8.25));

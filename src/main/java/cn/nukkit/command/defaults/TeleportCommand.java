@@ -15,9 +15,10 @@ import cn.nukkit.utils.TextFormat;
  */
 public class TeleportCommand extends VanillaCommand {
     public TeleportCommand(String name) {
-            super(name, "%nukkit.command.tp.description", "%commands.tp.usage");
-            this.setPermission("nukkit.command.tp");
+        super(name, "%nukkit.command.tp.description", "%commands.tp.usage");
+        this.setPermission("nukkit.command.tp");
     }
+
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
 
@@ -84,33 +85,30 @@ public class TeleportCommand extends VanillaCommand {
         */
 
 
-
-        Player origin=sender.getServer().getPlayer(args[0]);
-        if(origin==null){
+        Player origin = sender.getServer().getPlayer(args[0]);
+        if (origin == null) {
             sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.player.notFound"));
             return true;
         }
-        if(args.length==2){
-            Player destination=sender.getServer().getPlayer(args[1]);
-            if(destination==null){
+        if (args.length == 2) {
+            Player destination = sender.getServer().getPlayer(args[1]);
+            if (destination == null) {
                 sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.player.notFound"));
                 return true;
             }
 
             origin.teleport(destination);
-        }
-        else{
+        } else {
             try {
                 Double x = Double.valueOf(args[1]);
                 Double y = Double.valueOf(args[2]);
                 Double z = Double.valueOf(args[3]);
-                Double y_rot,x_rot;
-                if(args.length==6){
-                    y_rot=Double.valueOf(args[4]);
-                    x_rot=Double.valueOf(args[5]);
-                    origin.teleport(new Vector3(x,y,z),y_rot,x_rot);
-                }
-                else {
+                Double y_rot, x_rot;
+                if (args.length == 6) {
+                    y_rot = Double.valueOf(args[4]);
+                    x_rot = Double.valueOf(args[5]);
+                    origin.teleport(new Vector3(x, y, z), y_rot, x_rot);
+                } else {
                     origin.teleport(new Vector3(x, y, z));
                 }
             } catch (Exception e) {
