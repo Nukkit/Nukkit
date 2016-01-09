@@ -32,7 +32,7 @@ public class PlayerFoodLevelChangeEvent extends PlayerEvent implements Cancellab
         return foodSaturationLevel;
     }
 
-    public void setFoodSaturationLevel(int foodSaturationLevel) {
+    public void setFoodSaturationLevel(double foodSaturationLevel) {
         this.foodSaturationLevel = foodSaturationLevel;
     }
 }
