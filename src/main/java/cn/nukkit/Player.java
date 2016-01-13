@@ -79,6 +79,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
     public static final int SURVIVAL_SLOTS = 36;
     public static final int CREATIVE_SLOTS = 112;
 
+    private PlayerChatEvent chatEvent;
     protected SourceInterface interfaz;
 
     public boolean spawned = false;
@@ -423,6 +424,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         this.rawUUID = null;
 
         this.creationTime = System.currentTimeMillis();
+	this.chatEvent = new PlayerChatEvent();
     }
 
     public boolean isPlayer() {
@@ -2632,7 +2634,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                                 this.server.dispatchCommand(commandPreprocessEvent.getPlayer(), commandPreprocessEvent.getMessage().substring(1));
                                 //Timings::playerCommandTimer.stopTiming();
                             } else { //Chat
-                                PlayerChatEvent chatEvent = new PlayerChatEvent(this, msg);
+                                chatEvent.sendMessage(this, msg);
                                 this.server.getPluginManager().callEvent(chatEvent);
                                 if (!chatEvent.isCancelled()) {
                                     this.server.broadcastMessage(this.getServer().getLanguage().translateString(chatEvent.getFormat(), new String[]{chatEvent.getPlayer().getDisplayName(), chatEvent.getMessage()}), chatEvent.getRecipients());
