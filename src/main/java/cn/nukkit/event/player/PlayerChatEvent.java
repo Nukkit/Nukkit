@@ -21,25 +21,15 @@ public class PlayerChatEvent extends PlayerMessageEvent implements Cancellable {
 
     protected Set<CommandSender> recipients = new HashSet<>();
 
-    public PlayerChatEvent(Player player, String message) {
-        this(player, message, "chat.type.text", null);
-    }
-
-    public PlayerChatEvent(Player player, String message, String format, Set<CommandSender> recipients) {
+    public void sendMessage(Player player, String message) {
         this.player = player;
         this.message = message;
+	this.format = "chat.type.text";
 
-        this.format = format;
-
-        if (recipients == null) {
-            for (Permissible permissible : Server.getInstance().getPluginManager().getPermissionSubscriptions(Server.BROADCAST_CHANNEL_USERS)) {
-                if (permissible instanceof CommandSender) {
-                    this.recipients.add((CommandSender) permissible);
-                }
+        for (Permissible permissible : Server.getInstance().getPluginManager().getPermissionSubscriptions(Server.BROADCAST_CHANNEL_USERS)) {
+            if (permissible instanceof CommandSender) {
+                this.recipients.add((CommandSender) permissible);
             }
-
-        } else {
-            this.recipients = recipients;
         }
     }
 
