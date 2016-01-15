@@ -383,10 +383,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[IRON_BARS] = IronBars.class;
             list[GLASS_PANE] = GlassPane.class;
             list[MELON_BLOCK] = Melon.class;
-            /*list[PUMPKIN_STEM] = PumpkinStem.class;
+            list[PUMPKIN_STEM] = PumpkinStem.class;
             list[MELON_STEM] = MelonStem.class;
-            list[VINE] = Vine.class;
-            */
+            //list[VINE] = Vine.class;
+
             list[FENCE_GATE] = FenceGate.class;
 
             list[BRICK_STAIRS] = BrickStairs.class;
@@ -413,8 +413,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[JUNGLE_WOOD_STAIRS] = JungleWoodStairs.class;
             list[STONE_WALL] = StoneWall.class;
 
-            //list[CARROT_BLOCK] = Carrot.class;
-            //list[POTATO_BLOCK] = Potato.class;
+            list[CARROT_BLOCK] = Carrot.class;
+            list[POTATO_BLOCK] = Potato.class;
             list[ANVIL] = Anvil.class;
 
             list[REDSTONE_BLOCK] = Redstone.class;
