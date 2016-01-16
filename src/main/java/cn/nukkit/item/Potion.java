@@ -1,9 +1,6 @@
 package cn.nukkit.item;
 
-import cn.nukkit.entity.Effect;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.entity.EntityRegainHealthEvent;
 
 public class Potion extends Item {
 
@@ -61,8 +58,4 @@ public class Potion extends Item {
         return 1;
     }
 
-    public void applyPotion(Entity entity) {
-        cn.nukkit.potion.Potion potion = cn.nukkit.potion.Potion.getPotion(getDamage());
-        potion.applyTo(entity);
-    }
 }

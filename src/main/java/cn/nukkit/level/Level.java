@@ -1215,7 +1215,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean setBlock(Vector3 pos, Block block) {
-        return this.setBlock(pos, block, false, true);
+        return this.setBlock(pos, block, false);
     }
 
     public boolean setBlock(Vector3 pos, Block block, boolean direct) {
@@ -1236,12 +1236,12 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             block.position(position);
-            this.blockCache.remove(Level.blockHash((int) pos.x, (int) pos.y, (int) pos.z));
+            this.blockCache.remove(Level.blockHash((int) position.x, (int) position.y, (int) position.z));
 
-            String index = Level.chunkHash((int) pos.x >> 4, (int) pos.z >> 4);
+            String index = Level.chunkHash((int) position.x >> 4, (int) position.z >> 4);
 
             if (direct) {
-                this.sendBlocks(this.getChunkPlayers((int) pos.x >> 4, (int) pos.z >> 4).values().stream().toArray(Player[]::new), new Block[]{block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+                this.sendBlocks(this.getChunkPlayers((int) position.x >> 4, (int) position.z >> 4).values().stream().toArray(Player[]::new), new Block[]{block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
                 this.chunkCache.remove(index);
             } else {
                 if (!this.changedBlocks.containsKey(index)) {
@@ -1251,7 +1251,7 @@ public class Level implements ChunkManager, Metadatable {
                 this.changedBlocks.get(index).put(Level.blockHash((int) block.x, (int) block.y, (int) block.z), block.clone());
             }
 
-            for (ChunkLoader loader : this.getChunkLoaders((int) pos.x >> 4, (int) pos.z >> 4)) {
+            for (ChunkLoader loader : this.getChunkLoaders((int) position.x >> 4, (int) position.z >> 4)) {
                 loader.onBlockChanged(block);
             }
 
@@ -1269,16 +1269,15 @@ public class Level implements ChunkManager, Metadatable {
                     //added for redstone support
                     RedstoneUpdateEvent rsEv = new RedstoneUpdateEvent(ev.getBlock());
                     this.server.getPluginManager().callEvent(rsEv);
-                    if(!rsEv.isCancelled()) {
+                    if (!rsEv.isCancelled()) {
                         Block redstoneWire = rsEv.getBlock().getSide(Vector3.SIDE_DOWN);
-                        if(redstoneWire instanceof RedstoneWire) {
+                        if (redstoneWire instanceof RedstoneWire) {
                             if (rsEv.getBlock() instanceof Solid) {
                                 int level = redstoneWire.getPowerLevel();
                                 redstoneWire.setPowerLevel(redstoneWire.getNeighborPowerLevel() - 1);
                                 redstoneWire.getLevel().setBlock(redstoneWire, redstoneWire, true, true);
                                 Redstone.deactive(redstoneWire, level);
-                            }
-                            else {
+                            } else {
                                 redstoneWire.setPowerLevel(redstoneWire.getNeighborPowerLevel() - 1);
                                 redstoneWire.getLevel().setBlock(redstoneWire, redstoneWire, true, true);
                                 Redstone.active(redstoneWire);
@@ -1287,7 +1286,7 @@ public class Level implements ChunkManager, Metadatable {
                     }
                 }
 
-                this.updateAround(pos);
+                this.updateAround(position);
             }
 
             return true;
@@ -1545,7 +1544,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (player != null) {
-            PlayerInteractEvent ev = new PlayerInteractEvent(player, item, target, face, PlayerInteractEvent.RIGHT_CLICK_BLOCK);
+            PlayerInteractEvent ev = new PlayerInteractEvent(player, item, target, face, target.getId() == 0 ? PlayerInteractEvent.RIGHT_CLICK_AIR : PlayerInteractEvent.RIGHT_CLICK_BLOCK);
             int distance = this.server.getSpawnRadius();
             if (!player.isOp() && distance > -1) {
                 Vector2 t = new Vector2(target.x, target.z);
@@ -1571,7 +1570,7 @@ public class Level implements ChunkManager, Metadatable {
             } else {
                 return null;
             }
-        } else if (target.canBeActivated() && target.onActivate(item, player)) {
+        } else if (target.canBeActivated() && target.onActivate(item, null)) {
             return item;
         }
         Block hand;
@@ -1622,15 +1621,20 @@ public class Level implements ChunkManager, Metadatable {
 
         Tag tag = item.getNamedTagEntry("CanPlaceOn");
         if (tag instanceof ListTag) {
-            boolean canBreak = false;
+            boolean canPlace = false;
             for (Tag v : ((ListTag<Tag>) tag).getAll()) {
                 if (v instanceof StringTag) {
                     Item entry = Item.fromString(((StringTag) v).data);
                     if (entry.getId() > 0 && entry.getBlock() != null && entry.getBlock().getId() == target.getId()) {
-                        canBreak = true;
+                        canPlace = true;
                         break;
                     }
                 }
+            }
+
+
+            if (!canPlace) {
+                return null;
             }
         }
 
