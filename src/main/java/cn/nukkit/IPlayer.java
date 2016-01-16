@@ -99,7 +99,7 @@ public interface IPlayer extends ServerOperator, Metadatable {
      * 得到这个接口的{@code Player}对象。<br>
      * Returns a {@code Player} object for this interface.
      *
-     * @return {@code Player} a person who kille player.
+     * @return {@code Player} a person who killed player.
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     Player getKiller();
