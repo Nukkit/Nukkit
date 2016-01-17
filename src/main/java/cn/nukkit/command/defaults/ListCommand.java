@@ -22,15 +22,15 @@ public class ListCommand extends VanillaCommand {
         }
         final String[] online = {""};
         final int[] onlineCount = {0};
-        sender.getServer().getOnlinePlayers().forEach((s, player) -> {
+        for(Player player : sender.getServer().getOnlinePlayers().values()){
             if (player.isOnline() && (!(sender instanceof Player) || ((Player) sender).canSee(player))) {
-                online[0] += player.getDisplayName() + ", ";
+                online[0] += player.getDisplayName();
                 ++onlineCount[0];
             }
-        });
+        }
         sender.sendMessage(new TranslationContainer("commands.players.list",
                 new String[]{String.valueOf(onlineCount[0]), String.valueOf(sender.getServer().getMaxPlayers())}));
-        sender.sendMessage(online[0]);
+        sender.sendMessage(String.join(",", online[0]));
         return true;
     }
 }
