@@ -15,7 +15,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.level.Level;
-import cn.nukkit.level.Position;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.LevelProviderManager;
@@ -821,10 +821,18 @@ public class Server {
     }
 
     public void sendFullPlayerListData(Player player) {
+        this.sendFullPlayerListData(player, false);
+    }
+
+    public void sendFullPlayerListData(Player player, boolean self) {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
         List<PlayerListPacket.Entry> entries = new ArrayList<>();
         for (Player p : this.playerList.values()) {
+            if (!self && p.equals(player)) {
+                continue;
+            }
+
             entries.add(new PlayerListPacket.Entry(p.getUniqueId(), p.getId(), p.getDisplayName(), p.getSkin()));
         }
 
@@ -1307,7 +1315,7 @@ public class Server {
             this.logger.notice(this.getLanguage().translateString("nukkit.data.playerNotFound", name));
         }
 
-        Position spawn = this.getDefaultLevel().getSafeSpawn();
+        Location spawn = this.getDefaultLevel().getSafeSpawn();
         CompoundTag nbt = new CompoundTag()
                 .putLong("firstPlayed", System.currentTimeMillis() / 1000)
                 .putLong("lastPlayed", System.currentTimeMillis() / 1000)
