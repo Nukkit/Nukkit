@@ -109,11 +109,6 @@ public class OfflinePlayer implements IPlayer {
     }
 
     @Override
-    public Player getKiller() {
-        return killer;
-    }
-
-    @Override
     public Long getFirstPlayed() {
         return this.namedTag != null ? this.namedTag.getLong("firstPlayed") : null;
     }

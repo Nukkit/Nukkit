@@ -167,7 +167,6 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
     private PlayerFood foodData = null;
 
     private float movementSpeed = 0.1f;
-    private Player killer;
 
     public TranslationContainer getLeaveMessage() {
         return new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.left", this.getDisplayName());
@@ -209,11 +208,6 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
     @Override
     public Player getPlayer() {
         return this;
-    }
-
-    @Override
-    public Player getKiller() {
-        return this.killer;
     }
 
     @Override
@@ -3179,6 +3173,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
 
     @Override
     public void kill() {
+        Player killer = null;
         if (!this.spawned) {
             return;
         }
@@ -3273,7 +3268,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                     if (e instanceof Player) {
                         message = "death.attack.explosion.player";
                         params.add(((Player) e).getDisplayName());
-                        this.killer =((Player) e);
+                        killer =((Player) e);
                     } else if (e instanceof Living) {
                         message = "death.attack.explosion.player";
                         params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : ((Living) e).getName());
@@ -3299,8 +3294,8 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         this.scheduleUpdate();
 
         PlayerDeathEvent ev;
-        this.server.getPluginManager().callEvent(ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new))));
-        this.killer = null; // clean after event passes
+        this.server.getPluginManager().callEvent(ev = new PlayerDeathEvent(this, killer, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new))));
+        killer = null; // clean after event passes
         if (!ev.getKeepInventory()) {
             for (Item item : ev.getDrops()) {
                 this.level.dropItem(this, item);
