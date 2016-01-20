@@ -40,3 +40,4 @@ plugins
 plugins/*
 players
 players/*
+/bin/
