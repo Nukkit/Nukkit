@@ -1,5 +1,11 @@
 package cn.nukkit.command.defaults;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
+import com.google.common.base.Joiner;
+
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.event.TranslationContainer;
@@ -20,17 +26,18 @@ public class ListCommand extends VanillaCommand {
         if (!this.testPermission(sender)) {
             return true;
         }
-        final String[] online = {""};
-        final int[] onlineCount = {0};
-        sender.getServer().getOnlinePlayers().forEach((s, player) -> {
-            if (player.isOnline() && (!(sender instanceof Player) || ((Player) sender).canSee(player))) {
-                online[0] += player.getDisplayName() + ", ";
-                ++onlineCount[0];
-            }
-        });
-        sender.sendMessage(new TranslationContainer("commands.players.list",
-                new String[]{String.valueOf(onlineCount[0]), String.valueOf(sender.getServer().getMaxPlayers())}));
-        sender.sendMessage(online[0]);
+        final List<String> onlinePlayers = sender.getServer()
+        		.getOnlinePlayers()
+        		.values()
+        		.stream()
+        		.filter(Player::isOnline)
+        		.filter(player -> !(sender instanceof Player) || ((Player) sender).canSee(player))
+        		.map(Player::getName)
+        		.collect(Collectors.toList());
+        
+        sender.sendMessage(new TranslationContainer("commands.players.list", new String[]{
+        		String.valueOf(onlinePlayers.size()), String.valueOf(sender.getServer().getMaxPlayers())}));
+        sender.sendMessage(Joiner.on(',').join(onlinePlayers));
         return true;
     }
 }
