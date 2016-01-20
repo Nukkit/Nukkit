@@ -31,7 +31,7 @@ public class ListCommand extends VanillaCommand {
         		.values()
         		.stream()
         		.filter(Player::isOnline)
-        		.filter(player -> !(sender instanceof Player) || ((Player) sender).canSee(player))
+        		.filter( player -> !(sender instanceof Player) || ((Player) sender).canSee(player) )
         		.map(Player::getName)
         		.collect(Collectors.toList());
         
