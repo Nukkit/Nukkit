@@ -1,11 +1,11 @@
 package cn.nukkit.command.defaults;
 
+import java.util.Arrays;
+
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.event.TranslationContainer;
-
-import java.util.Objects;
 
 /**
  * author: MagicDroidX
@@ -31,20 +31,24 @@ public class BanCommand extends VanillaCommand {
         }
 
         String name = args[0];
-        String reason = "";
-        for (int i = 1; i < args.length; i++) {
-            reason += args[i] + " ";
+        StringBuilder builder = new StringBuilder();
+        
+        Arrays.stream(args).skip(1).forEach(arg -> {
+        	builder.append(arg).append(" ");
+        });
+
+        if (builder.length() > 0) {
+        	builder.substring(0, builder.length() - 1);
         }
 
-        if (reason.length() > 0) {
-            reason = reason.substring(0, reason.length() - 1);
-        }
-
+        String reason = builder.toString();
+        
         sender.getServer().getNameBans().addBan(name, reason, null, sender.getName());
 
         Player player = sender.getServer().getPlayerExact(name);
+        
         if (player != null) {
-            player.kick(!Objects.equals(reason, "") ? "Banned by admin. Reason: " + reason : "Banned by admin");
+            player.kick(reason.length() != 0 ? "Banned by admin. Reason: " + reason : "Banned by admin");
         }
 
         Command.broadcastCommandMessage(sender, new TranslationContainer("%commands.ban.success", player != null ? player.getName() : name));
