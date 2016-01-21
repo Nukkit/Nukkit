@@ -44,6 +44,7 @@ import cn.nukkit.permission.Permission;
 import cn.nukkit.permission.PermissionAttachment;
 import cn.nukkit.permission.PermissionAttachmentInfo;
 import cn.nukkit.plugin.Plugin;
+import cn.nukkit.potion.Potion;
 import cn.nukkit.tile.Sign;
 import cn.nukkit.tile.Spawnable;
 import cn.nukkit.tile.Tile;
@@ -167,6 +168,8 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
     private PlayerFood foodData = null;
 
     private float movementSpeed = 0.1f;
+
+    private Entity killer = null;
 
     public TranslationContainer getLeaveMessage() {
         return new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.left", this.getDisplayName());
@@ -603,6 +606,8 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
 
         this.server.sendRecipeList(this);
         this.sendSettings();
+
+        this.server.sendFullPlayerListData(this, false);
 
         this.sendPotionEffects(this);
         this.sendData(this);
@@ -1628,8 +1633,6 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         setDifficultyPacket.difficulty = this.server.getDifficulty();
         this.dataPacket(setDifficultyPacket);
 
-        this.server.sendFullPlayerListData(this);
-
         this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn", new String[]{
                 TextFormat.AQUA + this.username + TextFormat.WHITE,
                 this.ip,
@@ -2155,33 +2158,8 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                                     }
                                 }
                             }
-                        } else if (this.inventory.getItemInHand().getId() == Item.BUCKET && this.inventory.getItemInHand().getDamage() == 1) {
-                            //牛奶！
-                            PlayerItemConsumeEvent itemConsumeEvent = new PlayerItemConsumeEvent(this, this.inventory.getItemInHand());
-                            this.server.getPluginManager().callEvent(itemConsumeEvent);
-                            if (itemConsumeEvent.isCancelled()) {
-                                this.inventory.sendContents(this);
-                                break;
-                            }
-
-                            EntityEventPacket pk = new EntityEventPacket();
-                            pk.eid = this.getId();
-                            pk.event = EntityEventPacket.USE_ITEM;
-                            this.dataPacket(pk);
-                            Server.broadcastPacket(this.getViewers().values(), pk);
-
-                            if (this.isSurvival()) {
-                                Item itemSlot = this.inventory.getItemInHand();
-                                itemSlot.count--;
-                                this.inventory.setItemInHand(itemSlot);
-                                this.inventory.addItem(Item.get(Item.BUCKET, 0, 1));
-                            }
-
-                            this.removeAllEffects();
-                        } else {
-                            this.inventory.sendContents(this);
                         }
-                        break;
+                        //milk removed here, see the section of food
 
                     case PlayerActionPacket.ACTION_STOP_SLEEPING:
                         this.stopSleep();
@@ -2483,7 +2461,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                                 }
                             }
 
-                            cn.nukkit.potion.Potion potion = cn.nukkit.potion.Potion.getPotion(itemInHand.getDamage());
+                            Potion potion = Potion.getPotion(itemInHand.getDamage());
                             if (potion != null) potion.applyTo(this);
 
                         } else {
@@ -3188,6 +3166,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
             case EntityDamageEvent.CAUSE_ENTITY_ATTACK:
                 if (cause instanceof EntityDamageByEntityEvent) {
                     Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
+                    killer = e;
                     if (e instanceof Player) {
                         message = "death.attack.player";
                         params.add(((Player) e).getDisplayName());
@@ -3204,6 +3183,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
             case EntityDamageEvent.CAUSE_PROJECTILE:
                 if (cause instanceof EntityDamageByEntityEvent) {
                     Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
+                    killer = e;
                     if (e instanceof Player) {
                         message = "death.attack.arrow";
                         params.add(((Player) e).getDisplayName());
@@ -3264,6 +3244,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
             case EntityDamageEvent.CAUSE_ENTITY_EXPLOSION:
                 if (cause instanceof EntityDamageByEntityEvent) {
                     Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
+                    killer = e;
                     if (e instanceof Player) {
                         message = "death.attack.explosion.player";
                         params.add(((Player) e).getDisplayName());
@@ -3444,6 +3425,10 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
     //@Override
     public float getMovementSpeed() {
         return this.movementSpeed;
+    }
+
+    public Entity getKiller() {
+        return killer;
     }
 
     @Override
@@ -3872,7 +3857,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
 
     //todo a lot on dimension
 
-    public void updateDimension() {
+    public void setDimension() {
         ChangeDimensionPacket pk = new ChangeDimensionPacket();
         pk.dimension = (byte) (getLevel().getDimension() & 0xff);
         this.dataPacket(pk);
