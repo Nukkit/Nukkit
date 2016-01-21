@@ -1301,19 +1301,6 @@ public class Server {
 
     public CompoundTag getOfflinePlayerData(String name) {
         name = name.toLowerCase();
-        String path = this.getDataPath() + "players/";
-        File file = new File(path + name + ".dat");
-
-        if (file.exists()) {
-            try {
-                return NBTIO.readCompressed(new FileInputStream(file));
-            } catch (Exception e) {
-                file.renameTo(new File(path + name + ".dat.bak"));
-                this.logger.notice(this.getLanguage().translateString("nukkit.data.playerCorrupted", name));
-            }
-        } else {
-            this.logger.notice(this.getLanguage().translateString("nukkit.data.playerNotFound", name));
-        }
 
         Position spawn = this.getDefaultLevel().getSafeSpawn();
         CompoundTag nbt = new CompoundTag()
@@ -1350,18 +1337,7 @@ public class Server {
     }
 
     public void saveOfflinePlayerData(String name, CompoundTag tag, boolean async) {
-        try {
-            if (async) {
-                this.getScheduler().scheduleAsyncTask(new FileWriteTask(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
-            } else {
-                Utils.writeFile(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", new ByteArrayInputStream(NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
-            }
-        } catch (Exception e) {
-            this.logger.critical(this.getLanguage().translateString("nukkit.data.saveError", new String[]{name, e.getMessage()}));
-            if (Nukkit.DEBUG > 1 && this.logger != null) {
-                this.logger.logException(e);
-            }
-        }
+
     }
 
     public Player getPlayer(String name) {

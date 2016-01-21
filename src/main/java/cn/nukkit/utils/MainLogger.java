@@ -17,7 +17,6 @@ import java.util.Date;
  */
 public class MainLogger extends ThreadedLogger {
 
-    protected File logFile;
     protected String logStream = "";
     protected boolean shutdown;
     protected boolean logDebug = false;
@@ -35,14 +34,7 @@ public class MainLogger extends ThreadedLogger {
             throw new RuntimeException("MainLogger has been already created");
         }
         logger = this;
-        this.logFile = new File(logFile);
-        if (!this.logFile.exists()) {
-            try {
-                this.logFile.createNewFile();
-            } catch (IOException e) {
-                this.logException(e);
-            }
-        }
+
         this.logDebug = logDebug;
         this.start();
     }
@@ -157,46 +149,12 @@ public class MainLogger extends ThreadedLogger {
             }
             CommandReader.getInstance().unstashLine();
             String str = new SimpleDateFormat("Y-M-d").format(now) + " " + cleanMessage + "" + "\r\n";
-            this.logStream += str;
         }
     }
 
     @Override
     public void run() {
-        this.shutdown = false;
-        while (!this.shutdown) {
-            synchronized (this) {
-                if (this.logStream.length() > 0) {
-                    String chunk = this.logStream;
-                    this.logStream = "";
-                    try {
-                        FileWriter fileWriter = new FileWriter(this.logFile, true);
-                        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-                        bufferedWriter.write(chunk);
-                        bufferedWriter.close();
-                    } catch (IOException e) {
-                        this.logException(e);
-                    }
-                }
-                try {
-                    wait(25000);
-                } catch (InterruptedException e) {
-                    //igonre
-                }
-            }
-        }
-        if (this.logStream.length() > 0) {
-            String chunk = this.logStream;
-            this.logStream = "";
-            try {
-                FileWriter fileWriter = new FileWriter(this.logFile, true);
-                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-                bufferedWriter.write(chunk);
-                bufferedWriter.close();
-            } catch (IOException e) {
-                this.logException(e);
-            }
-        }
+
     }
 
 }
