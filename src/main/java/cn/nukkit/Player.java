@@ -3273,7 +3273,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         this.scheduleUpdate();
 
         PlayerDeathEvent ev;
-        this.server.getPluginManager().callEvent(ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new)), this.getExperience()));
+        this.server.getPluginManager().callEvent(ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new)), this.getExperienceLevel()));
 
         if (!ev.getKeepInventory()) {
             for (Item item : ev.getDrops()) {
@@ -3287,7 +3287,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
 
         if (!ev.getKeepExperience()) {
             if (this.isSurvival() || this.isAdventure()) {
-                int exp = this.getExperienceLevel() * 7;
+                int exp = ev.getExperience() * 7;
                 if (exp > 100) exp = 100;
                 int add = 1;
                 for (int ii = 1; ii < exp; ii += add) {
