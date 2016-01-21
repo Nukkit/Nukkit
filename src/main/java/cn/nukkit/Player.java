@@ -3175,6 +3175,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
 
     @Override
     public void kill() {
+        Player killer = null;
         if (!this.spawned) {
             return;
         }
@@ -3270,6 +3271,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                     if (e instanceof Player) {
                         message = "death.attack.explosion.player";
                         params.add(((Player) e).getDisplayName());
+                        killer =((Player) e);
                     } else if (e instanceof Living) {
                         message = "death.attack.explosion.player";
                         params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : ((Living) e).getName());
@@ -3295,8 +3297,8 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         this.scheduleUpdate();
 
         PlayerDeathEvent ev;
-        this.server.getPluginManager().callEvent(ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new))));
-
+        this.server.getPluginManager().callEvent(ev = new PlayerDeathEvent(this, killer, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new))));
+        killer = null; // clean after event passes
         if (!ev.getKeepInventory()) {
             for (Item item : ev.getDrops()) {
                 this.level.dropItem(this, item);

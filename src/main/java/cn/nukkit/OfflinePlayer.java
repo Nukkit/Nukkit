@@ -20,6 +20,7 @@ public class OfflinePlayer implements IPlayer {
     private String name;
     private Server server;
     private CompoundTag namedTag;
+    private Player killer;
 
     /**
      * 初始化这个{@code OfflinePlayer}对象。<br>

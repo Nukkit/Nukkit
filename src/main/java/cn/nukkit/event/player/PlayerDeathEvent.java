@@ -9,6 +9,7 @@ import cn.nukkit.item.Item;
 
 public class PlayerDeathEvent extends EntityDeathEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
+    private Player killer;
 
     public static HandlerList getHandlers() {
         return handlers;
@@ -17,18 +18,23 @@ public class PlayerDeathEvent extends EntityDeathEvent implements Cancellable {
     private TextContainer deathMessage;
     private boolean keepInventory = false;
 
-    public PlayerDeathEvent(Player player, Item[] drops, TextContainer deathMessage) {
+    public PlayerDeathEvent(Player player, Player killer, Item[] drops, TextContainer deathMessage) {
         super(player, drops);
         this.deathMessage = deathMessage;
+        this.killer = killer;
     }
 
-    public PlayerDeathEvent(Player player, Item[] drops, String deathMessage) {
-        this(player, drops, new TextContainer(deathMessage));
+    public PlayerDeathEvent(Player player, Player killer, Item[] drops, String deathMessage) {
+        this(player, killer, drops, new TextContainer(deathMessage));
     }
 
     @Override
     public Player getEntity() {
         return (Player) super.getEntity();
+    }
+
+    public Player getKiller() {
+        return this.killer;
     }
 
     public TextContainer getDeathMessage() {
