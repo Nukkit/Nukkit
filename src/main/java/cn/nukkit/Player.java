@@ -18,9 +18,9 @@ import cn.nukkit.event.inventory.InventoryPickupItemEvent;
 import cn.nukkit.event.player.*;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.event.server.DataPacketSendEvent;
-import cn.nukkit.food.Food;
 import cn.nukkit.inventory.*;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.food.Food;
 import cn.nukkit.level.ChunkLoader;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
@@ -167,6 +167,8 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
     private PlayerFood foodData = null;
 
     private float movementSpeed = 0.1f;
+
+    private Entity killer = null;
 
     public TranslationContainer getLeaveMessage() {
         return new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.left", this.getDisplayName());
@@ -603,6 +605,9 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
 
         this.server.sendRecipeList(this);
         this.sendSettings();
+
+        this.server.updatePlayerListData(this.getUniqueId(), this.getId(), this.getDisplayName(), this.getSkin());
+        this.server.sendFullPlayerListData(this, false);
 
         this.sendPotionEffects(this);
         this.sendData(this);
@@ -1563,7 +1568,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         float foodSaturationLevel = this.namedTag.getFloat("foodSaturationLevel");
         this.foodData = new PlayerFood(this, foodLevel, foodSaturationLevel);
 
-        this.server.addOnlinePlayer(this);
+        this.server.addOnlinePlayer(this, false);
 
         PlayerLoginEvent ev;
         this.server.getPluginManager().callEvent(ev = new PlayerLoginEvent(this, "Plugin reason"));
@@ -1627,8 +1632,6 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         SetDifficultyPacket setDifficultyPacket = new SetDifficultyPacket();
         setDifficultyPacket.difficulty = this.server.getDifficulty();
         this.dataPacket(setDifficultyPacket);
-
-        this.server.sendFullPlayerListData(this);
 
         this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn", new String[]{
                 TextFormat.AQUA + this.username + TextFormat.WHITE,
@@ -2155,33 +2158,8 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                                     }
                                 }
                             }
-                        } else if (this.inventory.getItemInHand().getId() == Item.BUCKET && this.inventory.getItemInHand().getDamage() == 1) {
-                            //牛奶！
-                            PlayerItemConsumeEvent itemConsumeEvent = new PlayerItemConsumeEvent(this, this.inventory.getItemInHand());
-                            this.server.getPluginManager().callEvent(itemConsumeEvent);
-                            if (itemConsumeEvent.isCancelled()) {
-                                this.inventory.sendContents(this);
-                                break;
-                            }
-
-                            EntityEventPacket pk = new EntityEventPacket();
-                            pk.eid = this.getId();
-                            pk.event = EntityEventPacket.USE_ITEM;
-                            this.dataPacket(pk);
-                            Server.broadcastPacket(this.getViewers().values(), pk);
-
-                            if (this.isSurvival()) {
-                                Item itemSlot = this.inventory.getItemInHand();
-                                itemSlot.count--;
-                                this.inventory.setItemInHand(itemSlot);
-                                this.inventory.addItem(Item.get(Item.BUCKET, 0, 1));
-                            }
-
-                            this.removeAllEffects();
-                        } else {
-                            this.inventory.sendContents(this);
                         }
-                        break;
+                        //milk removed here, see the section of food
 
                     case PlayerActionPacket.ACTION_STOP_SLEEPING:
                         this.stopSleep();
@@ -2446,7 +2424,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                 AnimatePacket animatePacket = new AnimatePacket();
                 animatePacket.eid = this.getId();
                 animatePacket.action = animationEvent.getAnimationType();
-                Server.broadcastPacket(this.getViewers().values(), packet);
+                Server.broadcastPacket(this.getViewers().values(), animatePacket);
                 break;
             case ProtocolInfo.SET_HEALTH_PACKET:
                 //use UpdateAttributePacket instead
@@ -2483,8 +2461,11 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
                                 }
                             }
 
-                            cn.nukkit.potion.Potion potion = cn.nukkit.potion.Potion.getPotion(itemInHand.getDamage());
-                            if (potion != null) potion.applyTo(this);
+                            Potion potion = Potion.getPotion(itemInHand.getDamage()).setSplash(false);
+
+                            if (potion != null) {
+                                potion.applyPotion(this);
+                            }
 
                         } else {
                             EntityEventPacket pk = new EntityEventPacket();
@@ -3188,6 +3169,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
             case EntityDamageEvent.CAUSE_ENTITY_ATTACK:
                 if (cause instanceof EntityDamageByEntityEvent) {
                     Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
+                    killer = e;
                     if (e instanceof Player) {
                         message = "death.attack.player";
                         params.add(((Player) e).getDisplayName());
@@ -3204,6 +3186,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
             case EntityDamageEvent.CAUSE_PROJECTILE:
                 if (cause instanceof EntityDamageByEntityEvent) {
                     Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
+                    killer = e;
                     if (e instanceof Player) {
                         message = "death.attack.arrow";
                         params.add(((Player) e).getDisplayName());
@@ -3264,6 +3247,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
             case EntityDamageEvent.CAUSE_ENTITY_EXPLOSION:
                 if (cause instanceof EntityDamageByEntityEvent) {
                     Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
+                    killer = e;
                     if (e instanceof Player) {
                         message = "death.attack.explosion.player";
                         params.add(((Player) e).getDisplayName());
@@ -3292,7 +3276,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
         this.scheduleUpdate();
 
         PlayerDeathEvent ev;
-        this.server.getPluginManager().callEvent(ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new))));
+        this.server.getPluginManager().callEvent(ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new)), this.getExperienceLevel()));
 
         if (!ev.getKeepInventory()) {
             for (Item item : ev.getDrops()) {
@@ -3304,17 +3288,18 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
             }
         }
 
-        //todo Can I add keep exp in PlayerDeathEvent?
-        if (this.isSurvival() || this.isAdventure()) {
-            int exp = this.getExperienceLevel() * 7;
-            if (exp > 100) exp = 100;
-            int add = 1;
-            for (int ii = 1; ii < exp; ii += add) {
-                this.getLevel().dropExpOrb(this, add);
-                add = new NukkitRandom().nextRange(1, 3);
+        if (!ev.getKeepExperience()) {
+            if (this.isSurvival() || this.isAdventure()) {
+                int exp = ev.getExperience() * 7;
+                if (exp > 100) exp = 100;
+                int add = 1;
+                for (int ii = 1; ii < exp; ii += add) {
+                    this.getLevel().dropExpOrb(this, add);
+                    add = new NukkitRandom().nextRange(1, 3);
+                }
             }
+            this.setExperience(0, 0);
         }
-        this.setExperience(0, 0);
 
         if (!Objects.equals(ev.getDeathMessage().toString(), "")) {
             this.server.broadcast(ev.getDeathMessage(), Server.BROADCAST_CHANNEL_USERS);
@@ -3444,6 +3429,10 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
     //@Override
     public float getMovementSpeed() {
         return this.movementSpeed;
+    }
+
+    public Entity getKiller() {
+        return killer;
     }
 
     @Override
@@ -3872,7 +3861,7 @@ public class Player extends Human implements CommandSender, InventoryHolder, Chu
 
     //todo a lot on dimension
 
-    public void updateDimension() {
+    public void setDimension() {
         ChangeDimensionPacket pk = new ChangeDimensionPacket();
         pk.dimension = (byte) (getLevel().getDimension() & 0xff);
         this.dataPacket(pk);

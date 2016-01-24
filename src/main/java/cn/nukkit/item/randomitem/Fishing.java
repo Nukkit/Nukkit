@@ -1,11 +1,9 @@
 package cn.nukkit.item.randomitem;
 
-import cn.nukkit.Player;
-import cn.nukkit.item.FishingRod;
+import cn.nukkit.entity.Potion;
+import cn.nukkit.item.Dye;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.utils.Dyes;
-import cn.nukkit.utils.Potions;
 
 import static cn.nukkit.item.randomitem.RandomItem.*;
 
@@ -36,10 +34,20 @@ public final class Fishing {
     public static final Selector JUNK_ROTTEN_FLESH = putSelector(new ConstantItemSelector(Item.ROTTEN_FLESH, JUNKS), 0.12F);
     public static final Selector JUNK_STICK = putSelector(new ConstantItemSelector(Item.STICK, JUNKS), 0.06F);
     public static final Selector JUNK_STRING_ITEM = putSelector(new ConstantItemSelector(Item.STRING, JUNKS), 0.06F);
-    public static final Selector JUNK_WATTER_BOTTLE = putSelector(new ConstantItemSelector(Item.POTION, Potions.NO_EFFECTS, JUNKS), 0.12F);
+    public static final Selector JUNK_WATTER_BOTTLE = putSelector(new ConstantItemSelector(Item.POTION, Potion.NO_EFFECTS, JUNKS), 0.12F);
     public static final Selector JUNK_BONE = putSelector(new ConstantItemSelector(Item.BONE, JUNKS), 0.12F);
-    public static final Selector JUNK_INK_SAC = putSelector(new ConstantItemSelector(Item.DYE, Dyes.BLACK, 10, JUNKS), 0.012F);
+    public static final Selector JUNK_INK_SAC = putSelector(new ConstantItemSelector(Item.DYE, Dye.BLACK, 10, JUNKS), 0.012F);
     public static final Selector JUNK_TRIPWIRE_HOOK = putSelector(new ConstantItemSelector(Item.TRIPWIRE_HOOK, JUNKS), 0.12F);
+
+    public static Item getFishingResult(Item rod) {
+        int fortuneLevel = 0;
+        int lureLevel = 0;
+        if (rod != null) {
+            fortuneLevel = rod.getEnchantment(Enchantment.TYPE_FISHING_FORTUNE).getLevel();
+            lureLevel = rod.getEnchantment(Enchantment.TYPE_FISHING_LURE).getLevel();
+        }
+        return getFishingResult(fortuneLevel, lureLevel);
+    }
 
     public static Item getFishingResult(int fortuneLevel, int lureLevel) {
         float treasureChance = limitRange(0, 1, 0.05f + 0.01f * fortuneLevel - 0.01f * lureLevel);

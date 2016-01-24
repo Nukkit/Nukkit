@@ -1,6 +1,5 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.Item;
 import cn.nukkit.item.Tool;
 import cn.nukkit.utils.BlockColor;
 
@@ -14,7 +13,7 @@ public class IronTrapdoor extends Trapdoor {
     }
 
     public IronTrapdoor(int meta) {
-        super(0);
+        super(meta);
     }
 
     @Override
@@ -42,12 +41,6 @@ public class IronTrapdoor extends Trapdoor {
         return Tool.TYPE_PICKAXE;
     }
 
-    @Override
-    public int[][] getDrops(Item item) {
-        return new int[][]{
-                {this.getId(), 0, 1}
-        };
-    }
 
     @Override
     public BlockColor getColor() {
