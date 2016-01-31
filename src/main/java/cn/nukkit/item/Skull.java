@@ -22,6 +22,6 @@ public class Skull extends Item{
 
     @Override
     public int getMaxStackSize() {
-        return 1;
+        return 64;
     }
 }
