@@ -204,7 +204,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int FLOWER_POT_BLOCK = 140;
     public static final int CARROT_BLOCK = 141;
     public static final int POTATO_BLOCK = 142;
-
+    public static final int SKULL_BLOCK = 144;
     public static final int ANVIL = 145;
     public static final int TRAPPED_CHEST = 146;
     public static final int LIGHT_WEIGHTED_PRESSURE_PLATE = 147;
@@ -421,6 +421,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
             list[CARROT_BLOCK] = Carrot.class;
             list[POTATO_BLOCK] = Potato.class;
+            list[SKULL_BLOCK] = SkullBlock.class;
             list[ANVIL] = Anvil.class;
 
             list[REDSTONE_BLOCK] = Redstone.class;
