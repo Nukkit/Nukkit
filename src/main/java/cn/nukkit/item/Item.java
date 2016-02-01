@@ -663,7 +663,7 @@ public class Item implements Cloneable {
             list[CARROT] = Carrot.class;
             list[POTATO] = Potato.class;
             list[BAKED_POTATO] = BakedPotato.class;
-            //list[SKULL] = Skull.class;
+            list[SKULL] = Skull.class;
             list[PUMPKIN_PIE] = PumpkinPie.class;
             list[NETHER_BRICK] = NetherBrick.class;
             list[QUARTZ] = Quartz.class;
