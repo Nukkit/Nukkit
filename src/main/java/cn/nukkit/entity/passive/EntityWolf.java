@@ -49,7 +49,7 @@ public class EntityWolf extends EntityTameable {
 
 	@Override
 	public Item[] getDrops() {
-		return new Item[] { Item.get(Item.RAW_PORKCHOP) };
+		return new Item[] {};
 	}
 
 	@Override
