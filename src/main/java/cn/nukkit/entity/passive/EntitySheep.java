@@ -39,7 +39,7 @@ public class EntitySheep extends EntityAnimal {
 		if (isBaby()) {
 			return 0.95f * 0.9f; // No have information
 		}
-		return 0.95f * getHealth();
+		return 0.95f * getHeight();
 	}
 
 	@Override
