@@ -10,7 +10,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
  */
 public class EntityChicken extends EntityAnimal {
 
-	public static final int NETWORK_ID = 93;
+	public static final int NETWORK_ID = 10;
 
 	public EntityChicken(FullChunk chunk, CompoundTag nbt) {
 		super(chunk, nbt);

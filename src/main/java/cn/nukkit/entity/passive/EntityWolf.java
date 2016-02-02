@@ -10,7 +10,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
  */
 public class EntityWolf extends EntityTameable {
 
-	public static final int NETWORK_ID = 95;
+	public static final int NETWORK_ID = 14;
 
 	public EntityWolf(FullChunk chunk, CompoundTag nbt) {
 		super(chunk, nbt);
