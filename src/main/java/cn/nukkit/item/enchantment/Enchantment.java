@@ -1,5 +1,12 @@
 package cn.nukkit.item.enchantment;
 
+import cn.nukkit.item.Armor;
+import cn.nukkit.item.Item;
+import cn.nukkit.item.Tool;
+
+import java.util.HashSet;
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * author: MagicDroidX
  * Nukkit Project
@@ -63,39 +70,127 @@ public class Enchantment implements Cloneable {
     public static final int SLOT_FISHING_ROD = 0b100000000000;
     public static final int SLOT_CARROT_STICK = 0b1000000000000;
 
+    public static final String[] words = {"the", "elder", "scrolls", "klaatu", "berata", "niktu", "xyzzy", "bless", "curse", "light", "darkness", "fire", "air", "earth", "water", "hot", "dry", "cold", "wet", "ignite", "snuff", "embiggen", "twist", "shorten", "stretch", "fiddle", "destroy", "imbue", "galvanize", "enchant", "free", "limited", "range", "of", "towards", "inside", "sphere", "cube", "self", "other", "ball", "mental", "physical", "grow", "shrink", "demon", "elemental", "spirit", "animal", "creature", "beast", "humanoid", "undead", "fresh", "stale"};
+
     protected static Enchantment[] enchantments;
 
     public static void init() {
         enchantments = new Enchantment[256];
 
-        enchantments[TYPE_ARMOR_PROTECTION] = new Enchantment(TYPE_ARMOR_PROTECTION, "%enchantment.protect.all", RARITY_COMMON, ACTIVATION_EQUIP, SLOT_ARMOR);
-        enchantments[TYPE_ARMOR_FIRE_PROTECTION] = new Enchantment(TYPE_ARMOR_FIRE_PROTECTION, "%enchantment.protect.fire", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_ARMOR);
-        enchantments[TYPE_ARMOR_FALL_PROTECTION] = new Enchantment(TYPE_ARMOR_FALL_PROTECTION, "%enchantment.protect.fall", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_FEET);
-        enchantments[TYPE_ARMOR_PROTECTION] = new Enchantment(TYPE_ARMOR_PROTECTION, "%enchantment.protect.all", RARITY_COMMON, ACTIVATION_EQUIP, SLOT_ARMOR);
-        enchantments[TYPE_ARMOR_FIRE_PROTECTION] = new Enchantment(TYPE_ARMOR_FIRE_PROTECTION, "%enchantment.protect.fire", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_ARMOR);
-        enchantments[TYPE_ARMOR_FALL_PROTECTION] = new Enchantment(TYPE_ARMOR_FALL_PROTECTION, "%enchantment.protect.fall", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_FEET);
-        enchantments[TYPE_ARMOR_EXPLOSION_PROTECTION] = new Enchantment(TYPE_ARMOR_EXPLOSION_PROTECTION, "%enchantment.protect.explosion", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_ARMOR);
-        enchantments[TYPE_ARMOR_PROJECTILE_PROTECTION] = new Enchantment(TYPE_ARMOR_PROJECTILE_PROTECTION, "%enchantment.protect.projectile", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_ARMOR);
-        enchantments[TYPE_ARMOR_THORNS] = new Enchantment(TYPE_ARMOR_THORNS, "%enchantment.thorns", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_ARMOR);
-        enchantments[TYPE_WATER_BREATHING] = new Enchantment(TYPE_WATER_BREATHING, "%enchantment.water.breathing", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_HEAD);
-        enchantments[TYPE_WATER_SPEED] = new Enchantment(TYPE_WATER_SPEED, "%enchantment.water.speed", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_FEET);
-        enchantments[TYPE_WATER_AFFINITY] = new Enchantment(TYPE_WATER_AFFINITY, "%enchantment.water.affinity", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_TOOL);
-        enchantments[TYPE_WEAPON_SHARPNESS] = new Enchantment(TYPE_WEAPON_SHARPNESS, "%enchantment.weapon.sharpness", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_SWORD);
-        enchantments[TYPE_WEAPON_SMITE] = new Enchantment(TYPE_WEAPON_SMITE, "%enchantment.weapon.smite", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_SWORD);
-        enchantments[TYPE_WEAPON_ARTHROPODS] = new Enchantment(TYPE_WEAPON_ARTHROPODS, "%enchantment.weapon.arthropods", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_SWORD);
-        enchantments[TYPE_WEAPON_KNOCKBACK] = new Enchantment(TYPE_WEAPON_KNOCKBACK, "%enchantment.weapon.knockback", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_SWORD);
-        enchantments[TYPE_WEAPON_FIRE_ASPECT] = new Enchantment(TYPE_WEAPON_FIRE_ASPECT, "%enchantment.weapon.fire", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_SWORD);
-        enchantments[TYPE_WEAPON_LOOTING] = new Enchantment(TYPE_WEAPON_LOOTING, "%enchantment.weapon.looting", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_SWORD);
-        enchantments[TYPE_MINING_EFFICIENCY] = new Enchantment(TYPE_MINING_EFFICIENCY, "%enchantment.mining.efficiency", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_PICKAXE);
-        enchantments[TYPE_MINING_SILK_TOUCH] = new Enchantment(TYPE_MINING_SILK_TOUCH, "%enchantment.mining.silktouch", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_PICKAXE);
-        enchantments[TYPE_MINING_DURABILITY] = new Enchantment(TYPE_MINING_DURABILITY, "%enchantment.mining.durability", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_TOOL);
-        enchantments[TYPE_MINING_FORTUNE] = new Enchantment(TYPE_MINING_FORTUNE, "%enchantment.mining.fortune", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_PICKAXE);
-        enchantments[TYPE_BOW_POWER] = new Enchantment(TYPE_BOW_POWER, "%enchantment.bow.power", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_BOW);
-        enchantments[TYPE_BOW_KNOCKBACK] = new Enchantment(TYPE_BOW_KNOCKBACK, "%enchantment.bow.knockback", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_BOW);
-        enchantments[TYPE_BOW_FLAME] = new Enchantment(TYPE_BOW_FLAME, "%enchantment.bow.flame", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_BOW);
-        enchantments[TYPE_BOW_INFINITY] = new Enchantment(TYPE_BOW_INFINITY, "%enchantment.bow.infinity", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_BOW);
-        enchantments[TYPE_FISHING_FORTUNE] = new Enchantment(TYPE_FISHING_FORTUNE, "%enchantment.fishing.fortune", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_FISHING_ROD);
-        enchantments[TYPE_FISHING_LURE] = new Enchantment(TYPE_FISHING_LURE, "%enchantment.fishing.lure", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_FISHING_ROD);
+        enchantments[TYPE_ARMOR_PROTECTION] = new Enchantment(TYPE_ARMOR_PROTECTION, "%enchantment.protect.all", RARITY_COMMON, ACTIVATION_EQUIP, SLOT_ARMOR, 4);
+        enchantments[TYPE_ARMOR_FIRE_PROTECTION] = new Enchantment(TYPE_ARMOR_FIRE_PROTECTION, "%enchantment.protect.fire", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_ARMOR, 4);
+        enchantments[TYPE_ARMOR_FALL_PROTECTION] = new Enchantment(TYPE_ARMOR_FALL_PROTECTION, "%enchantment.protect.fall", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_FEET, 4);
+        enchantments[TYPE_ARMOR_EXPLOSION_PROTECTION] = new Enchantment(TYPE_ARMOR_EXPLOSION_PROTECTION, "%enchantment.protect.explosion", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_ARMOR, 4);
+        enchantments[TYPE_ARMOR_PROJECTILE_PROTECTION] = new Enchantment(TYPE_ARMOR_PROJECTILE_PROTECTION, "%enchantment.protect.projectile", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_ARMOR, 4);
+        enchantments[TYPE_ARMOR_THORNS] = new Enchantment(TYPE_ARMOR_THORNS, "%enchantment.thorns", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_ARMOR, 3);
+        enchantments[TYPE_WATER_BREATHING] = new Enchantment(TYPE_WATER_BREATHING, "%enchantment.water.breathing", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_HEAD, 3);
+        enchantments[TYPE_WATER_SPEED] = new Enchantment(TYPE_WATER_SPEED, "%enchantment.water.speed", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_FEET, 3);
+        enchantments[TYPE_WATER_AFFINITY] = new Enchantment(TYPE_WATER_AFFINITY, "%enchantment.water.affinity", RARITY_UNCOMMON, ACTIVATION_EQUIP, SLOT_HEAD, 1);
+        enchantments[TYPE_WEAPON_SHARPNESS] = new Enchantment(TYPE_WEAPON_SHARPNESS, "%enchantment.weapon.sharpness", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_SWORD, 5);
+        enchantments[TYPE_WEAPON_SMITE] = new Enchantment(TYPE_WEAPON_SMITE, "%enchantment.weapon.smite", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_SWORD, 5);
+        enchantments[TYPE_WEAPON_ARTHROPODS] = new Enchantment(TYPE_WEAPON_ARTHROPODS, "%enchantment.weapon.arthropods", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_SWORD, 5);
+        enchantments[TYPE_WEAPON_KNOCKBACK] = new Enchantment(TYPE_WEAPON_KNOCKBACK, "%enchantment.weapon.knockback", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_SWORD, 2);
+        enchantments[TYPE_WEAPON_FIRE_ASPECT] = new Enchantment(TYPE_WEAPON_FIRE_ASPECT, "%enchantment.weapon.fire", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_SWORD, 2);
+        enchantments[TYPE_WEAPON_LOOTING] = new Enchantment(TYPE_WEAPON_LOOTING, "%enchantment.weapon.looting", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_SWORD, 3);
+        enchantments[TYPE_MINING_EFFICIENCY] = new Enchantment(TYPE_MINING_EFFICIENCY, "%enchantment.mining.efficiency", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_PICKAXE, 5);
+        enchantments[TYPE_MINING_SILK_TOUCH] = new Enchantment(TYPE_MINING_SILK_TOUCH, "%enchantment.mining.silktouch", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_PICKAXE, 1);
+        enchantments[TYPE_MINING_DURABILITY] = new Enchantment(TYPE_MINING_DURABILITY, "%enchantment.mining.durability", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_ALL, 3);
+        enchantments[TYPE_MINING_FORTUNE] = new Enchantment(TYPE_MINING_FORTUNE, "%enchantment.mining.fortune", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_PICKAXE, 3);
+        enchantments[TYPE_BOW_POWER] = new Enchantment(TYPE_BOW_POWER, "%enchantment.bow.power", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_BOW, 5);
+        enchantments[TYPE_BOW_KNOCKBACK] = new Enchantment(TYPE_BOW_KNOCKBACK, "%enchantment.bow.knockback", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_BOW, 2);
+        enchantments[TYPE_BOW_FLAME] = new Enchantment(TYPE_BOW_FLAME, "%enchantment.bow.flame", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_BOW, 1);
+        enchantments[TYPE_BOW_INFINITY] = new Enchantment(TYPE_BOW_INFINITY, "%enchantment.bow.infinity", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_BOW, 1);
+        enchantments[TYPE_FISHING_FORTUNE] = new Enchantment(TYPE_FISHING_FORTUNE, "%enchantment.fishing.fortune", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_FISHING_ROD, 3);
+        enchantments[TYPE_FISHING_LURE] = new Enchantment(TYPE_FISHING_LURE, "%enchantment.fishing.lure", RARITY_UNCOMMON, ACTIVATION_HELD, SLOT_FISHING_ROD, 3);
+
+        EnchantmentLevelTable.init();
+    }
+
+    public static int getEnchantAbility(Item item) {
+        switch (item.getId()) {
+            case Item.BOOK:
+            case Item.BOW:
+            case Item.FISHING_ROD:
+                return 4;
+        }
+
+        if (item.isArmor()) {
+            switch (item.getTier()) {
+                case Armor.TIER_CHAIN:
+                    return 12;
+                case Armor.TIER_IRON:
+                    return 9;
+                case Armor.TIER_DIAMOND:
+                    return 10;
+                case Armor.TIER_LEATHER:
+                    return 15;
+                case Armor.TIER_GOLD:
+                    return 25;
+            }
+        }
+
+        if (item.isTool()) {
+            switch (item.getTier()) {
+                case Tool.TIER_WOODEN:
+                    return 15;
+                case Tool.TIER_STONE:
+                    return 5;
+                case Tool.TIER_DIAMOND:
+                    return 10;
+                case Tool.TIER_IRON:
+                    return 14;
+                case Tool.TIER_GOLD:
+                    return 22;
+            }
+        }
+
+        return 0;
+    }
+
+    public static int getEnchantWeight(int enchantmentId) {
+        switch (enchantmentId) {
+            case TYPE_ARMOR_PROTECTION:
+                return 10;
+            case TYPE_ARMOR_FIRE_PROTECTION:
+                return 5;
+            case TYPE_ARMOR_FALL_PROTECTION:
+                return 2;
+            case TYPE_ARMOR_EXPLOSION_PROTECTION:
+                return 5;
+            case TYPE_WATER_BREATHING:
+                return 2;
+            case TYPE_WATER_AFFINITY:
+                return 2;
+            case TYPE_WEAPON_SHARPNESS:
+                return 10;
+            case TYPE_WEAPON_SMITE:
+                return 5;
+            case TYPE_WEAPON_ARTHROPODS:
+                return 5;
+            case TYPE_WEAPON_KNOCKBACK:
+                return 5;
+            case TYPE_WEAPON_FIRE_ASPECT:
+                return 2;
+            case TYPE_WEAPON_LOOTING:
+                return 2;
+            case TYPE_MINING_EFFICIENCY:
+                return 10;
+            case TYPE_MINING_SILK_TOUCH:
+                return 1;
+            case TYPE_MINING_DURABILITY:
+                return 5;
+            case TYPE_MINING_FORTUNE:
+                return 2;
+            case TYPE_BOW_POWER:
+                return 10;
+            case TYPE_BOW_KNOCKBACK:
+                return 2;
+            case TYPE_BOW_FLAME:
+                return 2;
+            case TYPE_BOW_INFINITY:
+                return 1;
+        }
+        return 0;
     }
 
     public static Enchantment getEnchantment(int id) {
@@ -104,9 +199,9 @@ public class Enchantment implements Cloneable {
                 return enchantments[id].clone();
             }
         } catch (Exception e) {
-            return new Enchantment(TYPE_INVALID, "unknown", 0, 0, 0);
+            return new Enchantment(TYPE_INVALID, "unknown", 0, 0, 0, 0);
         }
-        return new Enchantment(TYPE_INVALID, "unknown", 0, 0, 0);
+        return new Enchantment(TYPE_INVALID, "unknown", 0, 0, 0, 0);
     }
 
     public static Enchantment getEnchantmentByName(String name) {
@@ -120,17 +215,27 @@ public class Enchantment implements Cloneable {
 
     private int id;
     private int level = 1;
+    private int maxLevel;
     private String name;
     private int rarity;
     private int activationType;
     private int slot;
 
-    private Enchantment(int id, String name, int rarity, int activationType, int slot) {
+    private Enchantment(int id, String name, int rarity, int activationType, int slot, int maxLevel) {
         this.id = id;
         this.name = name;
         this.rarity = rarity;
         this.activationType = activationType;
         this.slot = slot;
+        this.maxLevel = maxLevel;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Enchantment) {
+            return ((Enchantment) obj).getId() == this.getId() && ((Enchantment) obj).getLevel() == this.getLevel();
+        }
+        return false;
     }
 
     public int getId() {
@@ -166,6 +271,10 @@ public class Enchantment implements Cloneable {
         return this;
     }
 
+    public int getMaxLevel() {
+        return this.maxLevel;
+    }
+
     @Override
     public Enchantment clone() {
         try {
@@ -173,5 +282,16 @@ public class Enchantment implements Cloneable {
         } catch (CloneNotSupportedException e) {
             return null;
         }
+    }
+
+    public static String generateName() {
+        int count = ThreadLocalRandom.current().nextInt(3, 6);
+        HashSet<String> set = new HashSet<>();
+        while (set.size() < count) {
+            set.add(Enchantment.words[ThreadLocalRandom.current().nextInt(0, Enchantment.words.length)]);
+        }
+
+        String[] words = set.stream().toArray(String[]::new);
+        return String.join(" ", words);
     }
 }
