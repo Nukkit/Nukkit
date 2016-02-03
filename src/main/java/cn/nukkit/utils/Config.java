@@ -318,7 +318,7 @@ public class Config {
         List value = this.getList(key);
 
         if (value == null) {
-            return new ArrayList<>(0);
+            return null;
         }
 
         List<String> result = new ArrayList<>();
@@ -336,7 +336,7 @@ public class Config {
         List<?> list = getList(key);
 
         if (list == null) {
-            return new ArrayList<>(0);
+            return null;
         }
 
         List<Integer> result = new ArrayList<>();
@@ -364,7 +364,7 @@ public class Config {
         List<?> list = getList(key);
 
         if (list == null) {
-            return new ArrayList<>(0);
+            return null;
         }
 
         List<Boolean> result = new ArrayList<>();
@@ -388,7 +388,7 @@ public class Config {
         List<?> list = getList(path);
 
         if (list == null) {
-            return new ArrayList<>(0);
+            return null;
         }
 
         List<Double> result = new ArrayList<>();
@@ -416,7 +416,7 @@ public class Config {
         List<?> list = getList(path);
 
         if (list == null) {
-            return new ArrayList<>(0);
+            return null;
         }
 
         List<Float> result = new ArrayList<>();
@@ -444,7 +444,7 @@ public class Config {
         List<?> list = getList(path);
 
         if (list == null) {
-            return new ArrayList<>(0);
+            return null;
         }
 
         List<Long> result = new ArrayList<>();
@@ -472,7 +472,7 @@ public class Config {
         List<?> list = getList(path);
 
         if (list == null) {
-            return new ArrayList<Byte>(0);
+            return null;
         }
 
         List<Byte> result = new ArrayList<Byte>();
@@ -500,7 +500,7 @@ public class Config {
         List<?> list = getList(path);
 
         if (list == null) {
-            return new ArrayList<>(0);
+            return null;
         }
 
         List<Character> result = new ArrayList<>();
@@ -526,7 +526,7 @@ public class Config {
         List<?> list = getList(path);
 
         if (list == null) {
-            return new ArrayList<>(0);
+            return null;
         }
 
         List<Short> result = new ArrayList<>();
@@ -555,7 +555,7 @@ public class Config {
         List<Map> result = new ArrayList<>();
 
         if (list == null) {
-            return result;
+            return null;
         }
 
         for (Object object : list) {
