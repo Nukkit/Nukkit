@@ -22,11 +22,6 @@ public class EntitySheep extends EntityAnimal {
 	}
 
 	@Override
-	public float getLength() {
-		return 0.9f;
-	}
-
-	@Override
 	public float getHeight() {
 		if (isBaby()) {
 			return 0.9f; // No have information
@@ -56,4 +51,9 @@ public class EntitySheep extends EntityAnimal {
 	public int getNetworkId() {
 		return NETWORK_ID;
 	}
+	
+    @Override
+    public void initEntity(){
+        this.setMaxHealth(8);
+    }
 }

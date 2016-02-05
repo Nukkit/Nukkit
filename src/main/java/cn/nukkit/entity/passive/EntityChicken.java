@@ -22,11 +22,6 @@ public class EntityChicken extends EntityAnimal {
 	}
 
 	@Override
-	public float getLength() {
-		return 0.4f;
-	}
-
-	@Override
 	public float getHeight() {
 		if (isBaby()) {
 			return 0.51f;
@@ -55,5 +50,11 @@ public class EntityChicken extends EntityAnimal {
 	@Override
 	public int getNetworkId() {
 		return NETWORK_ID;
+	}
+	
+	@Override
+	protected void initEntity() {
+		super.initEntity();
+		setMaxHealth(4);
 	}
 }

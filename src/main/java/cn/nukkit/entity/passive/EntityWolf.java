@@ -56,4 +56,14 @@ public class EntityWolf extends EntityTameable {
 	public int getNetworkId() {
 		return NETWORK_ID;
 	}
+	
+    @Override
+    public void initEntity(){
+        super.initEntity();
+        if(isTamed()){
+        	setMaxHealth(20);
+        }else{
+        	setMaxHealth(8);
+        }
+    }
 }

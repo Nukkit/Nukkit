@@ -22,11 +22,6 @@ public class EntityPig extends EntityAnimal {
 	}
 
 	@Override
-	public float getLength() {
-		return 0.9f;
-	}
-
-	@Override
 	public float getHeight() {
 		if (isBaby()) {
 			return 0.9f; // No have information
@@ -55,5 +50,11 @@ public class EntityPig extends EntityAnimal {
 	@Override
 	public int getNetworkId() {
 		return NETWORK_ID;
+	}
+	
+	@Override
+	protected void initEntity() {
+		super.initEntity();
+		setMaxHealth(10);
 	}
 }
