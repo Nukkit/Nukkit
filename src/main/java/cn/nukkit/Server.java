@@ -1,6 +1,7 @@
 package cn.nukkit;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.blockentity.*;
 import cn.nukkit.command.*;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
@@ -26,7 +27,6 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.LevelProviderManager;
 import cn.nukkit.level.format.anvil.Anvil;
@@ -66,7 +66,6 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
-import cn.nukkit.tile.*;
 import cn.nukkit.utils.*;
 
 import java.io.*;
@@ -348,7 +347,7 @@ public class Server {
         this.commandMap = new SimpleCommandMap(this);
 
         this.registerEntities();
-        this.registerTiles();
+        this.registerBlockEntities();
 
         InventoryType.init();
         Block.init();
@@ -385,7 +384,12 @@ public class Server {
 
         for (String name : ((Map<String, Object>) this.getConfig("worlds", new HashMap<>())).keySet()) {
             if (!this.loadLevel(name)) {
-                long seed = (long) this.getConfig("worlds." + name + ".seed", System.currentTimeMillis());
+                long seed;
+                try {
+                    seed = ((Integer) this.getConfig("worlds." + name + ".seed")).longValue();
+                } catch (Exception e) {
+                    seed = System.currentTimeMillis();
+                }
 
                 Map<String, Object> options = new HashMap<>();
                 String[] opts = ((String) this.getConfig("worlds." + name + ".generator", Generator.getGenerator("default").getSimpleName())).split(":");
@@ -1587,7 +1591,7 @@ public class Server {
 
         this.getPluginManager().callEvent(new LevelLoadEvent(level));
 
-        this.getLogger().notice(this.getLanguage().translateString("nukkit.level.backgroundGeneration", name));
+        /*this.getLogger().notice(this.getLanguage().translateString("nukkit.level.backgroundGeneration", name));
 
         int centerX = (int) level.getSpawnLocation().getX() >> 4;
         int centerZ = (int) level.getSpawnLocation().getZ() >> 4;
@@ -1615,7 +1619,7 @@ public class Server {
         for (String index : order.keySet()) {
             Chunk.Entry entry = Level.getChunkXZ(index);
             level.populateChunk(entry.chunkX, entry.chunkZ, true);
-        }
+        }*/
 
         return true;
     }
@@ -1825,12 +1829,14 @@ public class Server {
         // TODO: 2016/1/30 all finds of minecart
     }
 
-    private void registerTiles() {
-        Tile.registerTile(Chest.class);
-        Tile.registerTile(Furnace.class);
-        Tile.registerTile(Sign.class);
-        Tile.registerTile(EnchantTable.class);
-        Tile.registerTile(BrewingStand.class);
+    private void registerBlockEntities() {
+        BlockEntity.registerBlockEntities(BlockEntityBrewingStand.class);
+        BlockEntity.registerBlockEntities(BlockEntityChest.class);
+        BlockEntity.registerBlockEntities(BlockEntityEnchantTable.class);
+        BlockEntity.registerBlockEntities(BlockEntityFlowerPot.class);
+        BlockEntity.registerBlockEntities(BlockEntityFurnace.class);
+        BlockEntity.registerBlockEntities(BlockEntitySign.class);
+        BlockEntity.registerBlockEntities(BlockEntitySkull.class);
     }
 
     public static Server getInstance() {
