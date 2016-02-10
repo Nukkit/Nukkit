@@ -20,13 +20,14 @@ import cn.nukkit.utils.ServerKiller;
  * @author MagicDroidX(code) @ Nukkit Project
  * @author 粉鞋大妈(javadoc) @ Nukkit Project
  * @since Nukkit 1.0 | Nukkit API 1.0.0
+ * Support v0.13.1 & v0.13.2
  */
 public class Nukkit {
 
     public final static String VERSION = "1.0dev";
     public final static String API_VERSION = "1.0.0";
     public final static String CODENAME = "蘋果(Apple)派(Pie)";
-    public final static String MINECRAFT_VERSION = "v0.13.1 alpha";
+    public final static String MINECRAFT_VERSION = "v0.13.x alpha";
     public final static String MINECRAFT_VERSION_NETWORK = "0.13.1";
 
     public final static String PATH = System.getProperty("user.dir") + "/";
