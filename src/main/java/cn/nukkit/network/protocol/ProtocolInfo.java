@@ -10,6 +10,7 @@ public interface ProtocolInfo {
      * Actual Minecraft: PE protocol version
      */
     byte CURRENT_PROTOCOL = 38;
+	byte ACCEPTED_PROTOCOLS = [38,39];
     byte LOGIN_PACKET = (byte) 0x8f;
     byte PLAY_STATUS_PACKET = (byte) 0x90;
     byte DISCONNECT_PACKET = (byte) 0x91;
