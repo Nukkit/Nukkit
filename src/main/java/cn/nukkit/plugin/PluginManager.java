@@ -114,6 +114,20 @@ public class PluginManager {
 
         return null;
     }
+    
+    //Warning: Use this API as less as you can
+	public boolean addPlugin(Plugin p)
+	{
+		try
+		{
+			this.plugins.put(p.getDescription().getName(),p);
+			return true;
+		}
+		catch(Exception e)
+		{
+			return false;
+		}
+	}
 
     public Map<String, Plugin> loadPlugins(String dictionary) {
         return this.loadPlugins(new File(dictionary));
