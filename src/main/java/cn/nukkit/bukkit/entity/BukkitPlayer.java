@@ -913,12 +913,13 @@ public class BukkitPlayer implements Player{
 
     @Override
     public GameMode getGameMode() {
-        return null;
+        return GameMode.getByValue(nukkitPlayer.getGamemode());
     }
 
     @Override
     public void setGameMode(GameMode gameMode) {
-
+        int gameModeValue = gameMode.getValue();
+        nukkitPlayer.setGamemode(gameModeValue);
     }
 
     @Override
@@ -928,117 +929,117 @@ public class BukkitPlayer implements Player{
 
     @Override
     public int getExpToLevel() {
-        return 0;
+        return nukkitPlayer.getExperienceLevel();
     }
 
     @Override
     public double getEyeHeight() {
-        return 0;
+        return nukkitPlayer.getEyeHeight();
     }
 
     @Override
     public double getEyeHeight(boolean b) {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
     public Location getEyeLocation() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public List<Block> getLineOfSight(HashSet<Byte> hashSet, int i) {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public List<Block> getLineOfSight(Set<Material> set, int i) {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public Block getTargetBlock(HashSet<Byte> hashSet, int i) {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public Block getTargetBlock(Set<Material> set, int i) {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public List<Block> getLastTwoTargetBlocks(HashSet<Byte> hashSet, int i) {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public List<Block> getLastTwoTargetBlocks(Set<Material> set, int i) {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public Egg throwEgg() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public Snowball throwSnowball() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public Arrow shootArrow() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public int getRemainingAir() {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
     public void setRemainingAir(int i) {
-
+        throw new NotImplementedException();
     }
 
     @Override
     public int getMaximumAir() {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
     public void setMaximumAir(int i) {
-
+        throw new NotImplementedException();
     }
 
     @Override
     public int getMaximumNoDamageTicks() {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
     public void setMaximumNoDamageTicks(int i) {
-
+        throw new NotImplementedException();
     }
 
     @Override
     public double getLastDamage() {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
     public int _INVALID_getLastDamage() {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
     public void setLastDamage(double v) {
-
+        throw new NotImplementedException();
     }
 
     @Override
     public void _INVALID_setLastDamage(int i) {
-
+        throw new NotImplementedException();
     }
 
     @Override

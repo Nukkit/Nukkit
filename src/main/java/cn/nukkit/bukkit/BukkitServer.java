@@ -1,11 +1,11 @@
 package cn.nukkit.bukkit;
 
+import cn.nukkit.bukkit.entity.BukkitPlayer;
+import cn.nukkit.bukkit.thread.TaskScheduler;
 import com.avaje.ebean.config.ServerConfig;
+import org.apache.commons.lang.NotImplementedException;
 import org.bukkit.*;
-import org.bukkit.command.CommandException;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.command.PluginCommand;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
@@ -15,6 +15,7 @@ import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicesManager;
+import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -52,52 +53,57 @@ public class BukkitServer implements Server {
 
     @Override
     public Player[] _INVALID_getOnlinePlayers() {
-        return new Player[0];
+        Collection<cn.nukkit.Player> nukkitPlayers = nukkitServer.getOnlinePlayers().values();
+        ArrayList<Player> players = new ArrayList<Player>();
+        for (cn.nukkit.Player player : nukkitPlayers) {
+            players.add(new BukkitPlayer(player));
+        }
+        return players.toArray(new Player[players.size()]);
     }
 
     @Override
     public Collection<? extends Player> getOnlinePlayers() {
-        return null;
+        return new ArrayList<Player>(Arrays.asList(_INVALID_getOnlinePlayers()));
     }
 
     @Override
     public int getMaxPlayers() {
-        return 0;
+        return nukkitServer.getMaxPlayers();
     }
 
     @Override
     public int getPort() {
-        return 0;
+        return nukkitServer.getPort();
     }
 
     @Override
     public int getViewDistance() {
-        return 0;
+        return nukkitServer.getViewDistance();
     }
 
     @Override
     public String getIp() {
-        return null;
+        return nukkitServer.getIp();
     }
 
     @Override
     public String getServerName() {
-        return null;
+        return nukkitServer.getName();
     }
 
     @Override
     public String getServerId() {
-        return null;
+        return nukkitServer.getServerUniqueId().toString();
     }
 
     @Override
     public String getWorldType() {
-        return null;
+        return nukkitServer.getLevelType();
     }
 
     @Override
     public boolean getGenerateStructures() {
-        return false;
+        return nukkitServer.getGenerateStructures();
     }
 
     @Override
@@ -107,17 +113,17 @@ public class BukkitServer implements Server {
 
     @Override
     public boolean getAllowNether() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean hasWhitelist() {
-        return false;
+        return nukkitServer.hasWhitelist();
     }
 
     @Override
     public void setWhitelist(boolean b) {
-
+        throw new NotImplementedException();
     }
 
     @Override
@@ -132,122 +138,135 @@ public class BukkitServer implements Server {
 
     @Override
     public int broadcastMessage(String s) {
+        nukkitServer.broadcastMessage(s);
         return 0;
     }
 
     @Override
     public String getUpdateFolder() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public File getUpdateFolderFile() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public long getConnectionThrottle() {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
     public int getTicksPerAnimalSpawns() {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
     public int getTicksPerMonsterSpawns() {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
     public Player getPlayer(String s) {
+        Map<String, cn.nukkit.Player> nukkitPlayers = nukkitServer.getOnlinePlayers();
+        for (Map.Entry<String, cn.nukkit.Player> entry : nukkitPlayers.entrySet()) {
+            if(entry.getKey().equals(s)) {
+                return new BukkitPlayer(entry.getValue());
+            }
+        }
         return null;
     }
 
     @Override
     public Player getPlayerExact(String s) {
-        return null;
+        return getPlayer(s);
     }
 
     @Override
     public List<Player> matchPlayer(String s) {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public Player getPlayer(UUID uuid) {
+        Player[] players = this.getOnlinePlayers().toArray(new Player[this.getOnlinePlayers().size()]);
+        for (Player player : players) {
+            if(player.getUniqueId() == (uuid)){
+                return player;
+            }
+        }
         return null;
     }
 
     @Override
     public PluginManager getPluginManager() {
-        return null;
+        return new SimplePluginManager(this, new SimpleCommandMap(this));
     }
 
     @Override
     public BukkitScheduler getScheduler() {
-        return null;
+        return new TaskScheduler(nukkitServer.getScheduler());
     }
 
     @Override
     public ServicesManager getServicesManager() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public List<World> getWorlds() {
-        return null;
+        return null; //todo todo
     }
 
     @Override
     public World createWorld(WorldCreator worldCreator) {
-        return null;
+        return null; //todo todo
     }
 
     @Override
     public boolean unloadWorld(String s, boolean b) {
-        return false;
+        return false; //todo todo
     }
 
     @Override
     public boolean unloadWorld(World world, boolean b) {
-        return false;
+        return false; // todo todo
     }
 
     @Override
     public World getWorld(String s) {
-        return null;
+        return null; // todo todo first priority
     }
 
     @Override
     public World getWorld(UUID uuid) {
-        return null;
+        return null; // todo todo second priority
     }
 
     @Override
     public MapView getMap(short i) {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public MapView createMap(World world) {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public void reload() {
-
+        throw new NotImplementedException();
     }
 
     @Override
     public Logger getLogger() {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public PluginCommand getPluginCommand(String s) {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
