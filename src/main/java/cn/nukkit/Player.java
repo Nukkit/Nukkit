@@ -1704,8 +1704,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.setNameTag(this.username);
                 this.iusername = this.username.toLowerCase();
 
-                if (this.server.getOnlinePlayers().size() > this.server.getMaxPlayers()) {
-                    this.close("", "disconnectionScreen.serverFull");
+                if (this.server.getOnlinePlayers().size() > this.server.getMaxPlayers() && this.kick("disconnectionScreen.serverFull", false)) {
                     break;
                 }
 
@@ -2532,7 +2531,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (textPacket.type == TextPacket.TYPE_CHAT) {
                     textPacket.message = this.removeFormat ? TextFormat.clean(textPacket.message) : textPacket.message;
                     for (String msg : textPacket.message.split("\n")) {
-                        if (!"".equals(msg.trim()) && msg.length() <= 255 && this.messageCounter-- > 0) {
+                        if (!msg.trim().isEmpty() && msg.length() <= 255 && this.messageCounter-- > 0) {
                             if (msg.startsWith("/")) { //Command
                                 PlayerCommandPreprocessEvent commandPreprocessEvent = new PlayerCommandPreprocessEvent(this, msg);
                                 if (commandPreprocessEvent.getMessage().length() > 320) {
@@ -2940,22 +2939,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean kick(String reason, boolean isAdmin) {
-        if (!this.loggedIn) {
-            return false;
-        }
-
         PlayerKickEvent ev;
         this.server.getPluginManager().callEvent(ev = new PlayerKickEvent(this, reason, this.getLeaveMessage()));
         if (!ev.isCancelled()) {
             String message;
             if (isAdmin) {
                 if (!this.isBanned()) {
-                    message = "Kicked by admin." + (!"".equals(reason) ? " Reason: " + reason : "");
+                    message = "Kicked by admin." + (!reason.isEmpty() ? " Reason: " + reason : "");
                 } else {
                     message = reason;
                 }
             } else {
-                if ("".equals(reason)) {
+                if (reason.isEmpty()) {
                     message = "disconnectionScreen.noReason";
                 } else {
                     message = reason;
@@ -2974,7 +2969,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void sendMessage(String message) {
         String[] mes = this.server.getLanguage().translateString(message).split("\\n");
         for (String m : mes) {
-            if (!"".equals(m)) {
+            if (!m.isEmpty()) {
                 TextPacket pk = new TextPacket();
                 pk.type = TextPacket.TYPE_RAW;
                 pk.message = m;
@@ -3170,7 +3165,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.namedTag.putInt("foodLevel", this.getFoodData().getLevel());
             this.namedTag.putFloat("foodSaturationLevel", this.getFoodData().getFoodSaturationLevel());
 
-            if (!"".equals(this.username) && this.namedTag != null) {
+            if (!this.username.isEmpty() && this.namedTag != null) {
                 this.server.saveOfflinePlayerData(this.username, this.namedTag, async);
             }
         }
