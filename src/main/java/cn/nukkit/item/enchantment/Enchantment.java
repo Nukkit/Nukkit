@@ -134,6 +134,11 @@ public abstract class Enchantment implements Cloneable {
         }
     }
 
+    public Enchantment setUnsafeLevel(int level){ //WARNING: buggy
+        this.level = level;
+        return this;
+    }
+
     public int getId() {
         return id;
     }
