@@ -178,11 +178,6 @@ public class MainLogger extends ThreadedLogger {
                         this.logException(e);
                     }
                 }
-                try {
-                    wait(25000);
-                } catch (InterruptedException e) {
-                    //igonre
-                }
             }
         }
         if (this.logStream.length() > 0) {
