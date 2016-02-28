@@ -8,6 +8,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.entity.item.*;
+import cn.nukkit.entity.mob.EntityCreeper;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntitySnowball;
 import cn.nukkit.entity.weather.EntityLightning;
@@ -1809,6 +1810,7 @@ public class Server {
         Entity.registerEntity("Snowball", EntitySnowball.class);
         Entity.registerEntity("Painting", EntityPainting.class);
         //todo mobs
+        Entity.registerEntity("Creeper", EntityCreeper.class);
 
         Entity.registerEntity("ThrownExpBottle", EntityExpBottle.class);
         Entity.registerEntity("XpOrb", EntityXPOrb.class);
