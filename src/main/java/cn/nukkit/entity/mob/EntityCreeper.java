@@ -26,11 +26,16 @@ public class EntityCreeper extends EntityMob {
         return getDataPropertyBoolean(DATA_POWERED);
     }
 
+    public void setPowered(boolean powered){
+        this.namedTag.putBoolean("IsPowered",powered);
+        this.dataProperties.putBoolean(DATA_POWERED, powered);
+    }
+
     @Override
     protected void initEntity() {
         super.initEntity();
 
-        if (this.namedTag.getBoolean("powered") || this.namedTag.getBoolean("IsPowered")) {
+        if (this.namedTag.getBoolean("IsPowered")) {
             this.dataProperties.putBoolean(DATA_POWERED, true);
         }
     }
