@@ -1,5 +1,10 @@
 package cn.nukkit.network;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import cn.nukkit.Nukkit;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
@@ -13,12 +18,7 @@ import cn.nukkit.raknet.server.RakNetServer;
 import cn.nukkit.raknet.server.ServerHandler;
 import cn.nukkit.raknet.server.ServerInstance;
 import cn.nukkit.utils.Binary;
-import cn.nukkit.utils.MainLogger;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import cn.nukkit.utils.LocalisedLogger;
 
 /**
  * author: MagicDroidX
@@ -138,8 +138,9 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
             } catch (Exception e) {
                 e.printStackTrace();
                 if (Nukkit.DEBUG > 1 && pk != null) {
-                    MainLogger logger = this.server.getLogger();
+                	LocalisedLogger logger = this.server.getLogger();
                     if (logger != null) {
+                    	// TODO - not localised
                         logger.debug("Packet " + pk.getClass().getName() + " 0x" + Binary.bytesToHexString(packet.buffer));
                         logger.logException(e);
                     }

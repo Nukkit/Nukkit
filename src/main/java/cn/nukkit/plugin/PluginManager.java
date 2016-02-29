@@ -1,21 +1,35 @@
 package cn.nukkit.plugin;
 
-import cn.nukkit.Server;
-import cn.nukkit.command.PluginCommand;
-import cn.nukkit.command.SimpleCommandMap;
-import cn.nukkit.event.*;
-import cn.nukkit.permission.Permissible;
-import cn.nukkit.permission.Permission;
-import cn.nukkit.utils.MainLogger;
-import cn.nukkit.utils.PluginException;
-import cn.nukkit.utils.Utils;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.regex.Pattern;
+
+import cn.nukkit.Server;
+import cn.nukkit.command.PluginCommand;
+import cn.nukkit.command.SimpleCommandMap;
+import cn.nukkit.event.Event;
+import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.EventPriority;
+import cn.nukkit.event.HandlerList;
+import cn.nukkit.event.Listener;
+import cn.nukkit.permission.Permissible;
+import cn.nukkit.permission.Permission;
+import cn.nukkit.utils.LocalisedLogger;
+import cn.nukkit.utils.MainLogger;
+import cn.nukkit.utils.PluginException;
+import cn.nukkit.utils.Utils;
 
 /**
  * author: MagicDroidX
@@ -168,14 +182,14 @@ public class PluginManager {
                         if (description != null) {
                             String name = description.getName();
                             if (name.toLowerCase().contains("nukkit") || name.toLowerCase().contains("minecraft") || name.toLowerCase().contains("mojang")) {
-                                this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "%nukkit.plugin.restrictedName"}));
+                                this.server.getLogger().errorLocal("nukkit.plugin.loadError", name, "%nukkit.plugin.restrictedName");
                                 continue;
                             } else if (name.contains(" ")) {
-                                this.server.getLogger().warning(this.server.getLanguage().translateString("nukkit.plugin.spacesDiscouraged", name));
+                                this.server.getLogger().warningLocal("nukkit.plugin.spacesDiscouraged", name);
                             }
 
                             if (plugins.containsKey(name) || this.getPlugin(name) != null) {
-                                this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.duplicateError", name));
+                                this.server.getLogger().errorLocal("nukkit.plugin.duplicateError", name);
                                 continue;
                             }
 
@@ -185,7 +199,7 @@ public class PluginManager {
 
                                 //Check the format: majorVersion.minorVersion.patch
                                 if (!Pattern.matches("[0-9]\\.[0-9]\\.[0-9]", version)) {
-                                    this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "Wrong API format"}));
+                                    this.server.getLogger().errorLocal("nukkit.plugin.loadError", name, "Wrong API format");
                                     continue;
                                 }
 
@@ -207,7 +221,7 @@ public class PluginManager {
                             }
 
                             if (!compatible) {
-                                this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "%nukkit.plugin.incompatibleAPI"}));
+                                this.server.getLogger().errorLocal("nukkit.plugin.loadError", name, "%nukkit.plugin.incompatibleAPI");
                             }
 
                             plugins.put(name, file);
@@ -227,10 +241,9 @@ public class PluginManager {
                             }
                         }
                     } catch (Exception e) {
-                        this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin" +
-                                ".fileError", new String[]{file.getName(), dictionary.toString(), Utils
-                                .getExceptionMessage(e)}));
-                        MainLogger logger = this.server.getLogger();
+                        this.server.getLogger().errorLocal("nukkit.plugin.fileError", file.getName(), dictionary.toString(), 
+                        		Utils.getExceptionMessage(e));
+                        LocalisedLogger logger = this.server.getLogger();
                         if (logger != null) {
                             logger.logException(e);
                         }
@@ -247,8 +260,7 @@ public class PluginManager {
                             if (loadedPlugins.containsKey(dependency) || this.getPlugin(dependency) != null) {
                                 dependencies.get(name).remove(dependency);
                             } else if (!plugins.containsKey(dependency)) {
-                                this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit" +
-                                        ".plugin.loadError", new String[]{name, "%nukkit.plugin.unknownDependency"}));
+                                this.server.getLogger().criticalLocal("nukkit.plugin.loadError", name, "%nukkit.plugin.unknownDependency");
                                 break;
                             }
                         }
@@ -277,7 +289,7 @@ public class PluginManager {
                         if (plugin != null) {
                             loadedPlugins.put(name, plugin);
                         } else {
-                            this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.genericLoadError", name));
+                            this.server.getLogger().criticalLocal("nukkit.plugin.genericLoadError", name);
                         }
                     }
                 }
@@ -293,14 +305,14 @@ public class PluginManager {
                             if (plugin != null) {
                                 loadedPlugins.put(name, plugin);
                             } else {
-                                this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.genericLoadError", name));
+                                this.server.getLogger().criticalLocal("nukkit.plugin.genericLoadError", name);
                             }
                         }
                     }
 
                     if (missingDependency) {
                         for (String name : plugins.keySet()) {
-                            this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "%nukkit.plugin.circularDependency"}));
+                            this.server.getLogger().criticalLocal("nukkit.plugin.loadError", name, "%nukkit.plugin.circularDependency");
                         }
                         plugins.clear();
                     }
@@ -451,7 +463,7 @@ public class PluginManager {
                 }
                 plugin.getPluginLoader().enablePlugin(plugin);
             } catch (Exception e) {
-                MainLogger logger = this.server.getLogger();
+            	LocalisedLogger logger = this.server.getLogger();
                 if (logger != null) {
                     logger.logException(e);
                 }
@@ -467,7 +479,7 @@ public class PluginManager {
             String key = (String) entry.getKey();
             Object data = entry.getValue();
             if (key.contains(":")) {
-                this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.commandError", new String[]{key, plugin.getDescription().getFullName()}));
+                this.server.getLogger().criticalLocal("nukkit.plugin.commandError", key, plugin.getDescription().getFullName());
                 continue;
             }
             if (data instanceof Map) {
@@ -487,7 +499,7 @@ public class PluginManager {
                         List<String> aliasList = new ArrayList<>();
                         for (String alias : (List<String>) aliases) {
                             if (alias.contains(":")) {
-                                this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.aliasError", new String[]{alias, plugin.getDescription().getFullName()}));
+                                this.server.getLogger().criticalLocal("nukkit.plugin.aliasError", alias, plugin.getDescription().getFullName());
                                 continue;
                             }
                             aliasList.add(alias);
@@ -523,7 +535,7 @@ public class PluginManager {
             try {
                 plugin.getPluginLoader().disablePlugin(plugin);
             } catch (Exception e) {
-                MainLogger logger = this.server.getLogger();
+            	LocalisedLogger logger = this.server.getLogger();
                 if (logger != null) {
                     logger.logException(e);
                 }
@@ -556,8 +568,10 @@ public class PluginManager {
                 try {
                     registration.callEvent(event);
                 } catch (Exception e) {
-                    this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.eventError", new String[]{event.getEventName(), registration.getPlugin().getDescription().getFullName(), e.getMessage(), registration.getListener().getClass().getName()}));
-                    MainLogger logger = this.server.getLogger();
+                    this.server.getLogger().criticalLocal("nukkit.plugin.eventError", event.getEventName(), 
+                    		registration.getPlugin().getDescription().getFullName(), e.getMessage(), 
+                    		registration.getListener().getClass().getName());
+                    LocalisedLogger logger = this.server.getLogger();
                     if (logger != null) {
                         logger.logException(e);
                     }
@@ -611,7 +625,8 @@ public class PluginManager {
                 // This loop checks for extending deprecated events
                 if (clazz.getAnnotation(Deprecated.class) != null) {
                     if (Boolean.valueOf(String.valueOf(this.server.getConfig("settings.deprecated-verbpse", true)))) {
-                        this.server.getLogger().warning(this.server.getLanguage().translateString("nukkit.plugin.deprecatedEvent", new String[]{plugin.getName(), clazz.getName(), listener.getClass().getName() + "." + method.getName() + "()"}));
+                        this.server.getLogger().warningLocal("nukkit.plugin.deprecatedEvent", plugin.getName(), clazz.getName(), 
+                        		listener.getClass().getName() + "." + method.getName() + "()");
                     }
                     break;
                 }

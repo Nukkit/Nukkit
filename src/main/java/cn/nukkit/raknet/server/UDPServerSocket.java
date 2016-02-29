@@ -1,7 +1,5 @@
 package cn.nukkit.raknet.server;
 
-import cn.nukkit.utils.ThreadedLogger;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -11,6 +9,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.Arrays;
 
+import cn.nukkit.utils.Logger;
+
 /**
  * author: MagicDroidX
  * Nukkit Project
@@ -18,18 +18,18 @@ import java.util.Arrays;
 public class UDPServerSocket {
 
     protected DatagramChannel channel;
-    protected ThreadedLogger logger;
+    protected Logger logger;
     protected DatagramSocket socket;
 
-    public UDPServerSocket(ThreadedLogger logger) {
+    public UDPServerSocket(Logger logger) {
         this(logger, 19132, "0.0.0.0");
     }
 
-    public UDPServerSocket(ThreadedLogger logger, int port) {
+    public UDPServerSocket(Logger logger, int port) {
         this(logger, port, "0.0.0.0");
     }
 
-    public UDPServerSocket(ThreadedLogger logger, int port, String interfaz) {
+    public UDPServerSocket(Logger logger, int port, String interfaz) {
         this.logger = logger;
         try {
             this.channel = DatagramChannel.open();

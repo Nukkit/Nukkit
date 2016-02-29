@@ -1,8 +1,41 @@
 package cn.nukkit.level;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.block.*;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockAir;
+import cn.nukkit.block.BlockBeetroot;
+import cn.nukkit.block.BlockCactus;
+import cn.nukkit.block.BlockCarrot;
+import cn.nukkit.block.BlockFarmland;
+import cn.nukkit.block.BlockGrass;
+import cn.nukkit.block.BlockIce;
+import cn.nukkit.block.BlockLeaves;
+import cn.nukkit.block.BlockLeaves2;
+import cn.nukkit.block.BlockMushroomBrown;
+import cn.nukkit.block.BlockMushroomRed;
+import cn.nukkit.block.BlockMycelium;
+import cn.nukkit.block.BlockPotato;
+import cn.nukkit.block.BlockRedstoneWire;
+import cn.nukkit.block.BlockSapling;
+import cn.nukkit.block.BlockSnowLayer;
+import cn.nukkit.block.BlockSolid;
+import cn.nukkit.block.BlockStemMelon;
+import cn.nukkit.block.BlockStemPumpkin;
+import cn.nukkit.block.BlockSugarcane;
+import cn.nukkit.block.BlockWheat;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.entity.Entity;
@@ -13,7 +46,14 @@ import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.block.BlockUpdateEvent;
-import cn.nukkit.event.level.*;
+import cn.nukkit.event.level.ChunkLoadEvent;
+import cn.nukkit.event.level.ChunkPopulateEvent;
+import cn.nukkit.event.level.ChunkUnloadEvent;
+import cn.nukkit.event.level.LevelSaveEvent;
+import cn.nukkit.event.level.LevelUnloadEvent;
+import cn.nukkit.event.level.SpawnChangeEvent;
+import cn.nukkit.event.level.ThunderChangeEvent;
+import cn.nukkit.event.level.WeatherChangeEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.redstone.RedstoneUpdateEvent;
 import cn.nukkit.event.weather.LightningStrikeEvent;
@@ -28,25 +68,46 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.level.generator.Generator;
-import cn.nukkit.level.generator.task.*;
+import cn.nukkit.level.generator.task.GenerationTask;
+import cn.nukkit.level.generator.task.GeneratorRegisterTask;
+import cn.nukkit.level.generator.task.GeneratorUnregisterTask;
+import cn.nukkit.level.generator.task.LightPopulationTask;
+import cn.nukkit.level.generator.task.PopulationTask;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.sound.Sound;
-import cn.nukkit.math.*;
+import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.NukkitMath;
+import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.math.Vector2;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.metadata.BlockMetadataStore;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
 import cn.nukkit.nbt.NBTIO;
-import cn.nukkit.nbt.tag.*;
-import cn.nukkit.network.protocol.*;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.DoubleTag;
+import cn.nukkit.nbt.tag.FloatTag;
+import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.nbt.tag.StringTag;
+import cn.nukkit.nbt.tag.Tag;
+import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.network.protocol.FullChunkDataPacket;
+import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.network.protocol.MoveEntityPacket;
+import cn.nukkit.network.protocol.SetEntityMotionPacket;
+import cn.nukkit.network.protocol.SetTimePacket;
+import cn.nukkit.network.protocol.UpdateBlockPacket;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.redstone.Redstone;
 import cn.nukkit.scheduler.AsyncTask;
-import cn.nukkit.utils.*;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.LevelException;
+import cn.nukkit.utils.LocalisedLogger;
+import cn.nukkit.utils.PriorityObject;
+import cn.nukkit.utils.TextFormat;
+import cn.nukkit.utils.Utils;
 
 /**
  * author: MagicDroidX
@@ -204,7 +265,7 @@ public class Level implements ChunkManager, Metadatable {
             throw new LevelException("Caused by " + Utils.getExceptionMessage(e));
         }
 
-        this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.preparing", TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE));
+        this.server.getLogger().infoLocal("nukkit.level.preparing", TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE);
 
         this.generator = Generator.getGenerator(this.provider.getGenerator());
 
@@ -446,7 +507,7 @@ public class Level implements ChunkManager, Metadatable {
             return false;
         }
 
-        this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.unloading", TextFormat.GREEN + this.getName() + TextFormat.WHITE));
+        this.server.getLogger().infoLocal("nukkit.level.unloading", TextFormat.GREEN + this.getName() + TextFormat.WHITE);
         Level defaultLevel = this.server.getDefaultLevel();
 
         for (Player player : this.getPlayers().values()) {
@@ -2326,8 +2387,8 @@ public class Level implements ChunkManager, Metadatable {
             }
             this.provider.unloadChunk(x, z, safe);
         } catch (Exception e) {
-            MainLogger logger = this.server.getLogger();
-            logger.error(this.server.getLanguage().translateString("nukkit.level.chunkUnloadError", e.toString()));
+        	LocalisedLogger logger = this.server.getLogger();
+            logger.errorLocal("nukkit.level.chunkUnloadError", e.toString());
             logger.logException(e);
         }
 

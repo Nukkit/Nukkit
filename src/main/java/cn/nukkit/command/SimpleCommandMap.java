@@ -1,13 +1,56 @@
 package cn.nukkit.command;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import cn.nukkit.Server;
-import cn.nukkit.command.defaults.*;
+import cn.nukkit.command.defaults.BanCommand;
+import cn.nukkit.command.defaults.BanIpCommand;
+import cn.nukkit.command.defaults.BanListCommand;
+import cn.nukkit.command.defaults.DefaultGamemodeCommand;
+import cn.nukkit.command.defaults.DeopCommand;
+import cn.nukkit.command.defaults.DifficultyCommand;
+import cn.nukkit.command.defaults.EffectCommand;
+import cn.nukkit.command.defaults.EnchantCommand;
+import cn.nukkit.command.defaults.GamemodeCommand;
+import cn.nukkit.command.defaults.GarbageCollectorCommand;
+import cn.nukkit.command.defaults.GiveCommand;
+import cn.nukkit.command.defaults.HelpCommand;
+import cn.nukkit.command.defaults.KickCommand;
+import cn.nukkit.command.defaults.KillCommand;
+import cn.nukkit.command.defaults.ListCommand;
+import cn.nukkit.command.defaults.MeCommand;
+import cn.nukkit.command.defaults.OpCommand;
+import cn.nukkit.command.defaults.PardonCommand;
+import cn.nukkit.command.defaults.PardonIpCommand;
+import cn.nukkit.command.defaults.ParticleCommand;
+import cn.nukkit.command.defaults.PluginsCommand;
+import cn.nukkit.command.defaults.ReloadCommand;
+import cn.nukkit.command.defaults.SaveCommand;
+import cn.nukkit.command.defaults.SaveOffCommand;
+import cn.nukkit.command.defaults.SaveOnCommand;
+import cn.nukkit.command.defaults.SayCommand;
+import cn.nukkit.command.defaults.SeedCommand;
+import cn.nukkit.command.defaults.SetWorldSpawnCommand;
+import cn.nukkit.command.defaults.SpawnpointCommand;
+import cn.nukkit.command.defaults.StatusCommand;
+import cn.nukkit.command.defaults.StopCommand;
+import cn.nukkit.command.defaults.TeleportCommand;
+import cn.nukkit.command.defaults.TellCommand;
+import cn.nukkit.command.defaults.TimeCommand;
+import cn.nukkit.command.defaults.VanillaCommand;
+import cn.nukkit.command.defaults.VersionCommand;
+import cn.nukkit.command.defaults.WeatherCommand;
+import cn.nukkit.command.defaults.WhitelistCommand;
+import cn.nukkit.command.defaults.XpCommand;
 import cn.nukkit.event.TranslationContainer;
-import cn.nukkit.utils.MainLogger;
+import cn.nukkit.utils.LocalisedLogger;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Utils;
-
-import java.util.*;
 
 /**
  * author: MagicDroidX
@@ -151,8 +194,8 @@ public class SimpleCommandMap implements CommandMap {
             target.execute(sender, sentCommandLabel, args);
         } catch (Exception e) {
             sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.exception"));
-            this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.command.exception", new String[]{cmdLine, target.toString(), Utils.getExceptionMessage(e)}));
-            MainLogger logger = sender.getServer().getLogger();
+            this.server.getLogger().criticalLocal("nukkit.command.exception", cmdLine, target.toString(), Utils.getExceptionMessage(e));
+            LocalisedLogger logger = sender.getServer().getLogger();
             if (logger != null) {
                 logger.logException(e);
             }
@@ -188,7 +231,7 @@ public class SimpleCommandMap implements CommandMap {
             String alias = entry.getKey();
             List<String> commandStrings = entry.getValue();
             if (alias.contains(" ") || alias.contains(":")) {
-                this.server.getLogger().warning(this.server.getLanguage().translateString("nukkit.command.alias.illegal", alias));
+                this.server.getLogger().warningLocal("nukkit.command.alias.illegal", alias);
                 continue;
             }
             List<String> targets = new ArrayList<>();
@@ -210,7 +253,7 @@ public class SimpleCommandMap implements CommandMap {
             }
 
             if (bad.length() > 0) {
-                this.server.getLogger().warning(this.server.getLanguage().translateString("nukkit.command.alias.notFound", new String[]{alias, bad}));
+                this.server.getLogger().warningLocal("nukkit.command.alias.notFound", alias, bad);
                 continue;
             }
 
