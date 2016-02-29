@@ -199,11 +199,11 @@ public class Server {
         //todo: VersionString 现在不必要
 
         if (!new File(this.dataPath + "nukkit.yml").exists()) {
-            this.getLogger().info(TextFormat.GREEN + "Welcome! Please choose a language first!");
+            logger.info(TextFormat.GREEN + "Welcome! Please choose a language first!");
             try {
                 String[] lines = Utils.readFile(this.getClass().getClassLoader().getResourceAsStream("lang/language.list")).split("\n");
                 for (String line : lines) {
-                    this.getLogger().info(line);
+                    logger.info(line);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -229,10 +229,7 @@ public class Server {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
         }
-
-        this.console.start();
 
         logger.info("Loading " + TextFormat.GREEN + "nukkit.yml" + TextFormat.WHITE + "...");
         this.config = new Config(this.dataPath + "nukkit.yml", Config.YAML);
@@ -271,6 +268,8 @@ public class Server {
         this.baseLang = new BaseLang((String) this.getConfig("settings.language", BaseLang.FALLBACK_LANGUAGE));
 
         this.logger = new LocalisedLogger(logger, baseLang);
+        
+        this.console.start();
         
         this.logger.infoLocal("nukkit.server.start", TextFormat.AQUA + this.getVersion() + TextFormat.WHITE);
 
