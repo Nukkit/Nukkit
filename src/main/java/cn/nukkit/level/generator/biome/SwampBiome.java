@@ -10,7 +10,7 @@ public class SwampBiome extends GrassyBiome {
         super();
         
         PopulatorTree trees = new PopulatorTree(BlockSapling.OAK); 
-        trees.setBaseAmount(2); 
+        trees.setBaseAmount(1); 
 
         this.setElevation(62, 63);
 
