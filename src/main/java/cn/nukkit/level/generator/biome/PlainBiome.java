@@ -5,6 +5,7 @@ import cn.nukkit.block.BlockFlower;
 import cn.nukkit.level.generator.populator.PopulatorFlower;
 import cn.nukkit.level.generator.populator.PopulatorGrass;
 import cn.nukkit.level.generator.populator.PopulatorTallGrass;
+import cn.nukkit.level.generator.populator.PopulatorTree;
 
 /**
  * author: MagicDroidX
@@ -29,11 +30,13 @@ public class PlainBiome extends GrassyBiome {
         flower.addType(Block.RED_FLOWER, BlockFlower.TYPE_WHITE_TULIP);
         flower.addType(Block.RED_FLOWER, BlockFlower.TYPE_PINK_TULIP);
         flower.addType(Block.RED_FLOWER, BlockFlower.TYPE_OXEYE_DAISY);
-
+        PopulatorTree tree = new PopulatorTree();
+        tree.setRandomAmount(1);
 
         this.addPopulator(grass);
         this.addPopulator(tallGrass);
         this.addPopulator(flower);
+        this.addPopulator(tree);
 
         this.setElevation(63, 74);
 
