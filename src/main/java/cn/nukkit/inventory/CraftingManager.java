@@ -246,7 +246,7 @@ public class CraftingManager {
                 "PPP"
         )).setIngredient("P", Item.get(Item.WOODEN_PLANK, BlockPlanks.ACACIA, 1)));
 
-        this.registerRecipe((new BigShapedRecipe(Item.get(Item.WOOD_SLAB, BlockPlanks.ACACIA, 6),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.WOOD_SLAB, BlockPlanks.ACACIA, 6),
                 "PPP"
         )).setIngredient("P", Item.get(Item.WOODEN_PLANK, BlockPlanks.ACACIA, 1)));
 
@@ -256,7 +256,7 @@ public class CraftingManager {
                 "PPP"
         )).setIngredient("P", Item.get(Item.WOODEN_PLANK, BlockPlanks.DARK_OAK, 1)));
 
-        this.registerRecipe((new BigShapedRecipe(Item.get(Item.WOOD_SLAB, BlockPlanks.DARK_OAK, 6),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.WOOD_SLAB, BlockPlanks.DARK_OAK, 6),
                 "PPP"
         )).setIngredient("P", Item.get(Item.WOODEN_PLANK, BlockPlanks.DARK_OAK, 1)));
 
@@ -294,8 +294,9 @@ public class CraftingManager {
         )).setIngredient("I", Item.get(Item.IRON_INGOT, 0, 1)));
 
         this.registerRecipe((new BigShapedRecipe(Item.get(Item.BOOK, 0, 1),
-                "P P",
-                " P "
+                "P",
+                "P",
+                "P"
         )).setIngredient("P", Item.get(Item.PAPER, 0, 1)));
 
         this.registerRecipe((new BigShapedRecipe(Item.get(Item.BOOKSHELF, 0, 1),
@@ -311,8 +312,7 @@ public class CraftingManager {
         )).setIngredient("S", Item.get(Item.STICK, 0, 1)).setIngredient("W", Item.get(Item.WOOL, null, 1)));
 
         this.registerRecipe((new ShapedRecipe(Item.get(Item.PAPER, 0, 3),
-                "SS",
-                "S"
+                "SSS"
         )).setIngredient("S", Item.get(Item.SUGARCANE, 0, 1)));
 
         this.registerRecipe((new BigShapedRecipe(Item.get(Item.SIGN, 0, 3),
@@ -322,7 +322,6 @@ public class CraftingManager {
         )).setIngredient("S", Item.get(Item.STICK, 0, 1)).setIngredient("P", Item.get(Item.WOODEN_PLANKS, null, 1))); //TODO: check if it gives one sign or three
 
         this.registerRecipe((new BigShapedRecipe(Item.get(Item.IRON_BARS, 0, 16),
-                "III",
                 "III",
                 "III"
         )).setIngredient("I", Item.get(Item.IRON_INGOT, 0, 1)));
