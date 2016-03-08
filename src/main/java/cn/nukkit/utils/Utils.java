@@ -30,11 +30,12 @@ public class Utils {
             file.createNewFile();
         }
         FileOutputStream stream = new FileOutputStream(file);
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = content.read(buffer)) != -1) {
-            stream.write(buffer, 0, length);
-        }
+        DataInputStream wrapper = new DataInputStream(content);
+        byte allower = wrapper.readByte();
+        byte[] buffer = new byte[wrapper.available() + 1];
+        buffer[0] = allower;
+        wrapper.readFully(buffer, 1, wrapper.available());
+        stream.write(buffer);
         stream.close();
     }
 
