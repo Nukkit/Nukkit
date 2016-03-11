@@ -43,6 +43,7 @@ public class Normal extends Generator {
     private Simplex noiseMountains;
     private Simplex noiseBaseGround;
     private Simplex noiseRiver;
+    private Simplex noiseBiomeColor;
 
     private BiomeSelector selector;
 
@@ -108,6 +109,7 @@ public class Normal extends Generator {
         this.noiseMountains = new Simplex(this.random, 4F, 1F, 1F / 500F);
         this.noiseBaseGround = new Simplex(this.random, 4F, 1F / 4F, 1F / 64F);
         this.noiseRiver = new Simplex(this.random, 2F, 1F, 1F / 512F);
+        this.noiseBiomeColor = new Simplex(this.random, 2F, 1F, 3F);
         this.random.setSeed(this.level.getSeed());
         this.selector = new BiomeSelector(this.random, Biome.getBiome(Biome.OCEAN));
         this.heightOffset = random.nextRange(-5, 3);
@@ -129,8 +131,9 @@ public class Normal extends Generator {
         PopulatorGroundCover cover = new PopulatorGroundCover();
         this.generationPopulators.add(cover);
 
-        PopulatorCaves caves = new PopulatorCaves();
-        this.populators.add(caves);
+        //PopulatorCaves caves = new PopulatorCaves();
+        //this.populators.add(caves);
+        /* I Hate Caves !! */
 
         PopulatorOre ores = new PopulatorOre();
         ores.setOreTypes(new OreType[]{
@@ -155,6 +158,7 @@ public class Normal extends Generator {
         double[][] mountainNoise = Generator.getFastNoise2D(this.noiseMountains, 16, 16, 4, chunkX * 16, 0, chunkZ * 16);
         double[][] baseNoise = Generator.getFastNoise2D(this.noiseBaseGround, 16, 16, 4, chunkX * 16, 0, chunkZ * 16);
         double[][] riverNoise = Generator.getFastNoise2D(this.noiseRiver, 16, 16, 4, chunkX * 16, 0, chunkZ * 16);
+        double[][] biomeColorNoise = Generator.getFastNoise2D(this.noiseBiomeColor, 16, 16, 4, chunkX * 16, 0, chunkZ * 16);
 
         FullChunk chunk = this.level.getChunk(chunkX, chunkZ);
 
@@ -244,7 +248,11 @@ public class Normal extends Generator {
                 //biome color
                 //todo: smooth chunk color
                 int biomecolor = biome.getColor();
-                chunk.setBiomeColor(genx, genz, (biomecolor >> 16), (biomecolor >> 8) & 0xff, (biomecolor & 0xff));
+                int colorNoise = 0;
+                if ((biome.getTemperature() > 0.05)) {
+                    colorNoise = (int)(biomeColorNoise[genx][genz] * 18) - 20;
+                }
+                chunk.setBiomeColor(genx, genz, (biomecolor >> 16) + colorNoise, (biomecolor >> 8) & 0xff + colorNoise, (biomecolor & 0xff) + colorNoise);
                 //generating
                 int generateHeight = genyHeight > seaHeight ? genyHeight : seaHeight;
                 for (int geny = 0; geny <= generateHeight; geny++) {
