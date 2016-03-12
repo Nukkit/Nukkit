@@ -1,12 +1,12 @@
 package cn.nukkit.command;
 
-import cn.nukkit.Server;
-import cn.nukkit.event.TranslationContainer;
-import cn.nukkit.utils.MainLogger;
-import cn.nukkit.utils.TextFormat;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.nukkit.Server;
+import cn.nukkit.event.TranslationContainer;
+import cn.nukkit.utils.LocalisedLogger;
+import cn.nukkit.utils.TextFormat;
 
 /**
  * author: MagicDroidX
@@ -38,7 +38,7 @@ public class FormattedCommandAlias extends Command {
                     sender.sendMessage(TextFormat.RED + e.getMessage());
                 } else {
                     sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.exception"));
-                    MainLogger logger = sender.getServer().getLogger();
+                    LocalisedLogger logger = sender.getServer().getLogger();
                     if (logger != null) {
                         logger.logException(e);
                     }

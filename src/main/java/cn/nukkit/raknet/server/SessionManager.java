@@ -1,18 +1,47 @@
 package cn.nukkit.raknet.server;
 
-import cn.nukkit.raknet.RakNet;
-import cn.nukkit.raknet.protocol.EncapsulatedPacket;
-import cn.nukkit.raknet.protocol.Packet;
-import cn.nukkit.raknet.protocol.packet.*;
-import cn.nukkit.utils.Binary;
-import cn.nukkit.utils.ThreadedLogger;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+
+import cn.nukkit.raknet.RakNet;
+import cn.nukkit.raknet.protocol.EncapsulatedPacket;
+import cn.nukkit.raknet.protocol.Packet;
+import cn.nukkit.raknet.protocol.packet.ACK;
+import cn.nukkit.raknet.protocol.packet.ADVERTISE_SYSTEM;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_0;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_1;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_2;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_3;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_4;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_5;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_6;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_7;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_8;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_9;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_A;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_B;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_C;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_D;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_E;
+import cn.nukkit.raknet.protocol.packet.DATA_PACKET_F;
+import cn.nukkit.raknet.protocol.packet.NACK;
+import cn.nukkit.raknet.protocol.packet.OPEN_CONNECTION_REPLY_1;
+import cn.nukkit.raknet.protocol.packet.OPEN_CONNECTION_REPLY_2;
+import cn.nukkit.raknet.protocol.packet.OPEN_CONNECTION_REQUEST_1;
+import cn.nukkit.raknet.protocol.packet.OPEN_CONNECTION_REQUEST_2;
+import cn.nukkit.raknet.protocol.packet.UNCONNECTED_PING;
+import cn.nukkit.raknet.protocol.packet.UNCONNECTED_PING_OPEN_CONNECTIONS;
+import cn.nukkit.raknet.protocol.packet.UNCONNECTED_PONG;
+import cn.nukkit.utils.Binary;
+import cn.nukkit.utils.Logger;
 
 /**
  * author: MagicDroidX
@@ -60,7 +89,7 @@ public class SessionManager {
         return this.server.port;
     }
 
-    public ThreadedLogger getLogger() {
+    public Logger getLogger() {
         return this.server.getLogger();
     }
 

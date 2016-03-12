@@ -1243,7 +1243,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             revert = ev.isRevert();
 
                             if (revert) {
-                                this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidMove", this.getName()));
+                                this.server.getLogger().warningLocal("nukkit.player.invalidMove", this.getName());
                             }
                         }
                     }
@@ -1659,7 +1659,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         setDifficultyPacket.difficulty = this.server.getDifficulty();
         this.dataPacket(setDifficultyPacket);
 
-        this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn", new String[]{
+        this.server.getLogger().infoLocal("nukkit.player.logIn",
                 TextFormat.AQUA + this.username + TextFormat.WHITE,
                 this.ip,
                 String.valueOf(this.port),
@@ -1667,8 +1667,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.level.getName(),
                 String.valueOf(NukkitMath.round(this.x, 4)),
                 String.valueOf(NukkitMath.round(this.y, 4)),
-                String.valueOf(NukkitMath.round(this.z, 4))
-        }));
+                String.valueOf(NukkitMath.round(this.z, 4)));
 
         if (this.isOp()) {
             this.setRemoveFormat(false);
@@ -2350,7 +2349,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     if (targetEntity instanceof EntityItem || targetEntity instanceof EntityArrow) {
                         this.kick("Attempting to attack an invalid entity");
-                        this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.getName()));
+                        this.server.getLogger().warningLocal("nukkit.player.invalidEntity", this.getName());
                         break;
                     }
 
@@ -3170,12 +3169,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.server.getPluginManager().unsubscribeFromPermission(Server.BROADCAST_CHANNEL_USERS, this);
             this.spawned = false;
-            this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logOut", new String[]{
+            this.server.getLogger().infoLocal("nukkit.player.logOut", 
                     TextFormat.AQUA + (this.getName() == null ? "" : this.getName()) + TextFormat.WHITE,
                     this.ip,
                     String.valueOf(this.port),
-                    this.getServer().getLanguage().translateString(reason)
-            }));
+                    this.getServer().getLanguage().translateString(reason));
             this.windows = new HashMap<>();
             this.windowIndex = new HashMap<>();
             this.usedChunks = new HashMap<>();

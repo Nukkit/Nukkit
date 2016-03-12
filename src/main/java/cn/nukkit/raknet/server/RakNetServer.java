@@ -1,8 +1,9 @@
 package cn.nukkit.raknet.server;
 
-import cn.nukkit.utils.ThreadedLogger;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import cn.nukkit.utils.Logger;
+import cn.nukkit.utils.ThreadedLogger;
 
 /**
  * author: MagicDroidX
@@ -12,7 +13,7 @@ public class RakNetServer extends Thread {
     protected int port;
     protected String interfaz;
 
-    protected ThreadedLogger logger;
+    protected Logger logger;
 
     protected ConcurrentLinkedQueue<byte[]> externalQueue;
     protected ConcurrentLinkedQueue<byte[]> internalQueue;
@@ -20,11 +21,11 @@ public class RakNetServer extends Thread {
     protected boolean shutdown;
 
 
-    public RakNetServer(ThreadedLogger logger, int port) {
+    public RakNetServer(Logger logger, int port) {
         this(logger, port, "0.0.0.0");
     }
 
-    public RakNetServer(ThreadedLogger logger, int port, String interfaz) {
+    public RakNetServer(Logger logger, int port, String interfaz) {
         this.port = port;
         if (port < 1 || port > 65536) {
             throw new IllegalArgumentException("Invalid port range");
@@ -55,7 +56,7 @@ public class RakNetServer extends Thread {
         return interfaz;
     }
 
-    public ThreadedLogger getLogger() {
+    public Logger getLogger() {
         return logger;
     }
 

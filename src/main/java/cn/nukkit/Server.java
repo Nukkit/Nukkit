@@ -114,7 +114,7 @@ public class Server {
 
     private boolean dispatchSignals = false;
 
-    private MainLogger logger;
+    private LocalisedLogger logger;
 
     private CommandReader console;
 
@@ -178,7 +178,6 @@ public class Server {
 
     public Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
         instance = this;
-        this.logger = logger;
 
         this.filePath = filePath;
         if (!new File(dataPath + "worlds/").exists()) {
@@ -200,11 +199,11 @@ public class Server {
         //todo: VersionString 现在不必要
 
         if (!new File(this.dataPath + "nukkit.yml").exists()) {
-            this.getLogger().info(TextFormat.GREEN + "Welcome! Please choose a language first!");
+            logger.info(TextFormat.GREEN + "Welcome! Please choose a language first!");
             try {
                 String[] lines = Utils.readFile(this.getClass().getClassLoader().getResourceAsStream("lang/language.list")).split("\n");
                 for (String line : lines) {
-                    this.getLogger().info(line);
+                    logger.info(line);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -230,15 +229,12 @@ public class Server {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
         }
 
-        this.console.start();
-
-        this.logger.info("Loading " + TextFormat.GREEN + "nukkit.yml" + TextFormat.WHITE + "...");
+        logger.info("Loading " + TextFormat.GREEN + "nukkit.yml" + TextFormat.WHITE + "...");
         this.config = new Config(this.dataPath + "nukkit.yml", Config.YAML);
 
-        this.logger.info("Loading " + TextFormat.GREEN + "server properties" + TextFormat.WHITE + "...");
+        logger.info("Loading " + TextFormat.GREEN + "server properties" + TextFormat.WHITE + "...");
         this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new LinkedHashMap<String, Object>() {
             {
                 put("motd", "Nukkit Server For Minecraft: PE");
@@ -270,8 +266,12 @@ public class Server {
 
         this.forceLanguage = (Boolean) this.getConfig("settings.force-language", false);
         this.baseLang = new BaseLang((String) this.getConfig("settings.language", BaseLang.FALLBACK_LANGUAGE));
-        this.logger.info(this.getLanguage().translateString("language.selected", new String[]{getLanguage().getName(), getLanguage().getLang()}));
-        this.logger.info(getLanguage().translateString("nukkit.server.start", TextFormat.AQUA + this.getVersion() + TextFormat.WHITE));
+
+        this.logger = new LocalisedLogger(logger, baseLang);
+        
+        this.console.start();
+        
+        this.logger.infoLocal("nukkit.server.start", TextFormat.AQUA + this.getVersion() + TextFormat.WHITE);
 
         Object poolSize = this.getConfig("settings.async-workers", "auto");
         if (!(poolSize instanceof Integer)) {
@@ -328,18 +328,16 @@ public class Server {
         }
 
         Nukkit.DEBUG = (int) this.getConfig("debug.level", 1);
-        if (this.logger instanceof MainLogger) {
-            this.logger.setLogDebug(Nukkit.DEBUG > 1);
-        }
+        this.logger.setLogDebug(Nukkit.DEBUG > 1);
 
-        this.logger.info(this.getLanguage().translateString("nukkit.server.networkStart", new String[]{this.getIp().equals("") ? "*" : this.getIp(), String.valueOf(this.getPort())}));
+        this.logger.infoLocal("nukkit.server.networkStart", this.getIp().equals("") ? "*" : this.getIp(), String.valueOf(this.getPort()));
         this.serverID = UUID.randomUUID();
 
         this.network = new Network(this);
         this.network.setName(this.getMotd());
 
-        this.logger.info(this.getLanguage().translateString("nukkit.server.info", new String[]{this.getName(), TextFormat.YELLOW + this.getNukkitVersion() + TextFormat.WHITE, TextFormat.AQUA + this.getCodename() + TextFormat.WHITE, this.getApiVersion()}));
-        this.logger.info(this.getLanguage().translateString("nukkit.server.license", this.getName()));
+        this.logger.infoLocal("nukkit.server.info", this.getName(), TextFormat.YELLOW + this.getNukkitVersion() + TextFormat.WHITE, TextFormat.AQUA + this.getCodename() + TextFormat.WHITE, this.getApiVersion());
+        this.logger.infoLocal("nukkit.server.license", this.getName());
 
         this.consoleSender = new ConsoleCommandSender();
         this.commandMap = new SimpleCommandMap(this);
@@ -624,8 +622,9 @@ public class Server {
     }
 
     public void reload() {
-        this.logger.info("Reloading...");
+        this.logger.infoLocal("nukkit.command.reload.reloading");
 
+        // TODO - not localised
         this.logger.info("Saving levels...");
 
         for (Level level : this.levels.values()) {
@@ -636,6 +635,7 @@ public class Server {
         this.pluginManager.clearPlugins();
         this.commandMap.clearCommands();
 
+        // TODO - not localised
         this.logger.info("Reloading properties...");
         this.properties.reload();
         this.maxPlayers = this.getPropertyInt("max-players", 20);
@@ -715,6 +715,7 @@ public class Server {
             //todo other things
         } catch (Exception e) {
             this.logger.logException(e); //todo remove this?
+            // TODO - not localised
             this.logger.emergency("Exception happened while shutting down, exit the process");
             System.exit(1);
         }
@@ -733,9 +734,9 @@ public class Server {
 
         this.tickCounter = 0;
 
-        this.logger.info(this.getLanguage().translateString("nukkit.server.defaultGameMode", getGamemodeString(this.getGamemode())));
+        this.logger.infoLocal("nukkit.server.defaultGameMode", getGamemodeString(this.getGamemode()));
 
-        this.logger.info(this.getLanguage().translateString("nukkit.server.startFinished", String.valueOf((double) (System.currentTimeMillis() - Nukkit.START_TIME) / 1000)));
+        this.logger.infoLocal("nukkit.server.startFinished", String.valueOf((double) (System.currentTimeMillis() - Nukkit.START_TIME) / 1000));
 
         this.tickProcessor();
         this.forceShutdown();
@@ -920,7 +921,7 @@ public class Server {
                     this.logger.logException(e);
                 }
 
-                this.logger.critical(this.getLanguage().translateString("nukkit.level.tickError", new String[]{level.getName(), e.toString()}));
+                this.logger.criticalLocal("nukkit.level.tickError", level.getName(), e.toString());
             }
         }
     }
@@ -995,7 +996,7 @@ public class Server {
             }
 
             if (this.getTicksPerSecondAverage() < 12) {
-                this.logger.warning(this.getLanguage().translateString("nukkit.server.tickOverload"));
+                this.logger.warningLocal("nukkit.server.tickOverload");
             }
         }
 
@@ -1245,7 +1246,7 @@ public class Server {
         return this.getPropertyString("motd", "Nukkit Server For Minecraft: PE");
     }
 
-    public MainLogger getLogger() {
+    public LocalisedLogger getLogger() {
         return this.logger;
     }
 
@@ -1334,10 +1335,10 @@ public class Server {
                 return NBTIO.readCompressed(new FileInputStream(file));
             } catch (Exception e) {
                 file.renameTo(new File(path + name + ".dat.bak"));
-                this.logger.notice(this.getLanguage().translateString("nukkit.data.playerCorrupted", name));
+                this.logger.noticeLocal("nukkit.data.playerCorrupted", name);
             }
         } else {
-            this.logger.notice(this.getLanguage().translateString("nukkit.data.playerNotFound", name));
+            this.logger.noticeLocal("nukkit.data.playerNotFound", name);
         }
 
         Position spawn = this.getDefaultLevel().getSafeSpawn();
@@ -1382,7 +1383,7 @@ public class Server {
                 Utils.writeFile(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", new ByteArrayInputStream(NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
             }
         } catch (Exception e) {
-            this.logger.critical(this.getLanguage().translateString("nukkit.data.saveError", new String[]{name, e.getMessage()}));
+            this.logger.criticalLocal("nukkit.data.saveError", name, e.getMessage());
             if (Nukkit.DEBUG > 1 && this.logger != null) {
                 this.logger.logException(e);
             }
@@ -1507,7 +1508,7 @@ public class Server {
         if (this.isLevelLoaded(name)) {
             return true;
         } else if (!this.isLevelGenerated(name)) {
-            this.logger.notice(this.getLanguage().translateString("nukkit.level.notFound", name));
+            this.logger.noticeLocal("nukkit.level.notFound", name);
 
             return false;
         }
@@ -1517,7 +1518,7 @@ public class Server {
         Class<? extends LevelProvider> provider = LevelProviderManager.getProvider(path);
 
         if (provider == null) {
-            this.logger.error(this.getLanguage().translateString("nukkit.level.loadError", new String[]{name, "Unknown provider"}));
+            this.logger.errorLocal("nukkit.level.loadError", name, "Unknown provider");
 
             return false;
         }
@@ -1526,10 +1527,8 @@ public class Server {
         try {
             level = new Level(this, name, path, provider);
         } catch (Exception e) {
-            this.logger.error(this.getLanguage().translateString("nukkit.level.loadError", new String[]{name, e.getMessage()}));
-            if (this.logger instanceof MainLogger) {
-                this.logger.logException(e);
-            }
+            this.logger.errorLocal("nukkit.level.loadError", name, e.getMessage());
+            this.logger.logException(e);
             return false;
         }
 
@@ -1589,10 +1588,8 @@ public class Server {
 
             level.setTickRate(this.baseTickRate);
         } catch (Exception e) {
-            this.logger.error(this.getLanguage().translateString("nukkit.level.generationError", new String[]{name, e.getMessage()}));
-            if (this.logger instanceof MainLogger) {
-                this.logger.logException(e);
-            }
+            this.logger.errorLocal("nukkit.level.generationError", name, e.getMessage());
+            this.logger.logException(e);
             return false;
         }
 
