@@ -632,9 +632,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.generationScreen(0);
     }
 
-    public void generationScreen(byte dimension){
+    public void generationScreen(int dimension){
         ChangeDimensionPacket pk = new ChangeDimensionPacket();
-        pk.dimension = dimension;
+        pk.dimension = (byte) dimension;
         pk.x = (float) this.x;
         pk.y = (float) this.y;
         pk.z = (float) this.z;
