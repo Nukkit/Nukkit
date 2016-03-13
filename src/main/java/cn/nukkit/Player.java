@@ -184,6 +184,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private final AtomicReference<Locale> locale = new AtomicReference<>(null);
 
+    private boolean shouldSpawnPacket = false;
 
     public TranslationContainer getLeaveMessage() {
         return new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.left", this.getDisplayName());
@@ -614,9 +615,32 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
+        if(this.loadQueue.size().equals(0) && this.shouldSpawnPacket){
+            PlayStatusPacket pk = new PlayStatusPacket();
+            pk.status = PlayStatusPacket.PLAYER_SPAWN;
+            this.dataPacket(pk);
+
+            this.shouldSpawnPacket = false;
+        }
+
         if (this.chunkLoadCount >= this.spawnThreshold && !this.spawned && this.teleportPosition == null) {
             this.doFirstSpawn();
         }
+    }
+
+    public void generationScreen(){
+        this.generationScreen(0);
+    }
+
+    public void generationScreen(int dimension){
+        ChangeDimensionPacket pk = new ChangeDimensionPacket();
+        pk.dimension = dimension;
+        pk.x = (float) this.x;
+        pk.y = (float) this.y;
+        pk.z = (float) this.z;
+        this.dataPacket(pk);
+
+        this.shouldSpawnPacket = true;
     }
 
     protected void doFirstSpawn() {
