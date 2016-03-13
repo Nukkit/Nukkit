@@ -1,5 +1,6 @@
 package cn.nukkit.level.generator.biome;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFlower;
 import cn.nukkit.block.BlockSapling;
@@ -32,7 +33,9 @@ public class SwampBiome extends GrassyBiome {
         this.addPopulator(trees);
         this.addPopulator(flower);
         this.addPopulator(lilypad);
-        this.addPopulator(caves);
+        if ((int) Server.getInstance().getConfig("generator.caves", 1) == 1) {
+            this.addPopulator(caves);
+        }
 
         this.setElevation(62, 63);
 
