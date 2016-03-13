@@ -1,5 +1,6 @@
 package cn.nukkit.level.generator;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.*;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.format.FullChunk;
@@ -131,9 +132,12 @@ public class Normal extends Generator {
         PopulatorGroundCover cover = new PopulatorGroundCover();
         this.generationPopulators.add(cover);
 
-        //PopulatorCaves caves = new PopulatorCaves();
-        //this.populators.add(caves);
-        /* I Hate Caves !! */
+        if ((int)Server.getInstance().getConfig("generator.caves", 1) >= 2) {
+            PopulatorCaves caves = new PopulatorCaves();
+            this.populators.add(caves);
+            /* I Hate Caves !! */
+        }
+
 
         PopulatorOre ores = new PopulatorOre();
         ores.setOreTypes(new OreType[]{
@@ -248,10 +252,7 @@ public class Normal extends Generator {
                 //biome color
                 //todo: smooth chunk color
                 int biomecolor = biome.getColor();
-                int colorNoise = 0;
-                if ((biome.getTemperature() > 0.05)) {
-                    colorNoise = (int)(biomeColorNoise[genx][genz] * 18) - 20;
-                }
+                int colorNoise = (int)(biomeColorNoise[genx][genz] * 15) - 20;
                 chunk.setBiomeColor(genx, genz, (biomecolor >> 16) + colorNoise, (biomecolor >> 8) & 0xff + colorNoise, (biomecolor & 0xff) + colorNoise);
                 //generating
                 int generateHeight = genyHeight > seaHeight ? genyHeight : seaHeight;
@@ -264,6 +265,7 @@ public class Normal extends Generator {
                         } else {
                             chunk.setBlock(genx, geny, genz, Block.STILL_WATER);
                         }
+                        chunk.setBlockSkyLight(genx, geny, genz, 0);
                     } else {
                         chunk.setBlock(genx, geny, genz, Block.STONE);
                     }
