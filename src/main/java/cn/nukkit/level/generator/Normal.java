@@ -138,7 +138,6 @@ public class Normal extends Generator {
             /* I Hate Caves !! */
         }
 
-
         PopulatorOre ores = new PopulatorOre();
         ores.setOreTypes(new OreType[]{
                 new OreType(new BlockOreCoal(), 20, 16, 0, 128),
@@ -162,7 +161,6 @@ public class Normal extends Generator {
         double[][] mountainNoise = Generator.getFastNoise2D(this.noiseMountains, 16, 16, 4, chunkX * 16, 0, chunkZ * 16);
         double[][] baseNoise = Generator.getFastNoise2D(this.noiseBaseGround, 16, 16, 4, chunkX * 16, 0, chunkZ * 16);
         double[][] riverNoise = Generator.getFastNoise2D(this.noiseRiver, 16, 16, 4, chunkX * 16, 0, chunkZ * 16);
-        double[][] biomeColorNoise = Generator.getFastNoise2D(this.noiseBiomeColor, 16, 16, 4, chunkX * 16, 0, chunkZ * 16);
 
         FullChunk chunk = this.level.getChunk(chunkX, chunkZ);
 
@@ -265,7 +263,6 @@ public class Normal extends Generator {
                         } else {
                             chunk.setBlock(genx, geny, genz, Block.STILL_WATER);
                         }
-                        chunk.setBlockSkyLight(genx, geny, genz, 0);
                     } else {
                         chunk.setBlock(genx, geny, genz, Block.STONE);
                     }
