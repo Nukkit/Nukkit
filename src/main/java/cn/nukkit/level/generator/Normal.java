@@ -138,7 +138,6 @@ public class Normal extends Generator {
             /* I Hate Caves !! */
         }
 
-
         PopulatorOre ores = new PopulatorOre();
         ores.setOreTypes(new OreType[]{
                 new OreType(new BlockOreCoal(), 20, 16, 0, 128),

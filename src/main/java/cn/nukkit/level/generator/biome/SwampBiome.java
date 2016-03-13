@@ -1,10 +1,8 @@
 package cn.nukkit.level.generator.biome;
 
-import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFlower;
 import cn.nukkit.block.BlockSapling;
-import cn.nukkit.level.generator.populator.PopulatorCaves;
 import cn.nukkit.level.generator.populator.PopulatorFlower;
 import cn.nukkit.level.generator.populator.PopulatorLilyPad;
 import cn.nukkit.level.generator.populator.PopulatorTree;
