@@ -615,7 +615,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        if(this.loadQueue.size().equals(0) && this.shouldSpawnPacket){
+        if(this.loadQueue.size() == 0 && this.shouldSpawnPacket){
             PlayStatusPacket pk = new PlayStatusPacket();
             pk.status = PlayStatusPacket.PLAYER_SPAWN;
             this.dataPacket(pk);
@@ -632,7 +632,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.generationScreen(0);
     }
 
-    public void generationScreen(int dimension){
+    public void generationScreen(byte dimension){
         ChangeDimensionPacket pk = new ChangeDimensionPacket();
         pk.dimension = dimension;
         pk.x = (float) this.x;
