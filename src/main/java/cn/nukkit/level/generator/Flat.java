@@ -5,6 +5,7 @@ import cn.nukkit.block.*;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.generator.biome.Biome;
+import cn.nukkit.level.generator.noise.Simplex;
 import cn.nukkit.level.generator.object.ore.OreType;
 import cn.nukkit.level.generator.populator.Populator;
 import cn.nukkit.level.generator.populator.PopulatorOre;
@@ -43,6 +44,8 @@ public class Flat extends Generator {
     private int floorLevel;
 
     private String preset;
+
+    private Simplex noiseBiomeColor;
 
     @Override
     public ChunkManager getChunkManager() {
@@ -129,6 +132,7 @@ public class Flat extends Generator {
 
             this.chunk = this.level.getChunk(chunkX, chunkZ).clone();
             this.chunk.setGenerated();
+
             int c = Biome.getBiome(biome).getColor();
             int R = c >> 16;
             int G = (c >> 8) & 0xff;
@@ -137,7 +141,7 @@ public class Flat extends Generator {
             for (int Z = 0; Z < 16; ++Z) {
                 for (int X = 0; X < 16; ++X) {
                     this.chunk.setBiomeId(X, Z, biome);
-                    this.chunk.setBiomeColor(X, Z, R, G, B);
+                    this.chunk.setBiomeColor(X, Z, R - 12, G - 12, B - 12);
                     for (y = 0; y < 128; ++y) {
                         this.chunk.setBlock(X, y, Z, this.structure[y][0], this.structure[y][1]);
                     }
@@ -168,12 +172,15 @@ public class Flat extends Generator {
     @Override
     public void init(ChunkManager level, NukkitRandom random) {
         this.level = level;
+        random.setSeed(this.level.getSeed());
         this.random = random;
+        this.noiseBiomeColor = new Simplex(this.random, 2F, 1F, 3F);
     }
 
     @Override
     public void generateChunk(int chunkX, int chunkZ) {
         if (this.chunk == null) {
+            this.random.setSeed(0xdeadbeef ^ (chunkX << 8) ^ chunkZ ^ this.level.getSeed());
             if (this.options.containsKey("preset") && !"".equals(this.options.get("preset"))) {
                 this.parsePreset((String) this.options.get("preset"), chunkX, chunkZ);
             } else {
@@ -181,6 +188,18 @@ public class Flat extends Generator {
             }
         }
         BaseFullChunk chunk = this.chunk.clone();
+        double[][] biomeColorNoise = Generator.getFastNoise2D(this.noiseBiomeColor, 16, 16, 4, chunkX * 16, 0, chunkZ * 16);
+
+        int colorNoise;
+        for (int Z = 0; Z < 16; ++Z) {
+            for (int X = 0; X < 16; ++X) {
+                colorNoise = (int)(biomeColorNoise[X][Z] * 18) - 3;
+                //System.out.println(colorNoise);
+                int[] c = chunk.getBiomeColor(X, Z);
+                chunk.setBiomeColor(X, Z, c[0] + colorNoise, c[1] + colorNoise, c[2] + colorNoise);
+            }
+        }
+
         chunk.setX(chunkX);
         chunk.setZ(chunkZ);
         this.level.setChunk(chunkX, chunkZ, chunk);

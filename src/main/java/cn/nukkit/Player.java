@@ -568,11 +568,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.batchDataPacket(pk);
 
-        if (this.spawned) {
-            for (Entity entity : this.level.getChunkEntities(x, z).values()) {
-                if (!this.equals(entity) && !entity.closed && entity.isAlive()) {
-                    entity.spawnTo(this);
-                }
+        for (Entity entity : this.level.getChunkEntities(x, z).values()) {
+            if (!this.equals(entity) && !entity.closed && entity.isAlive()) {
+                entity.spawnTo(this);
             }
         }
     }
