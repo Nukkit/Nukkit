@@ -731,7 +731,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         int x = 0;
         int z = 0;
 
-        for (int i = 0; i < this.viewDistance * this.viewDistance * Math.PI; ++i) {
+        for (int i = 0; i < this.viewDistance; ++i) {
 
             int chunkX = x + centerX;
             int chunkZ = z + centerZ;
