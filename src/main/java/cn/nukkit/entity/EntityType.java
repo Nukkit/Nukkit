@@ -1,0 +1,50 @@
+package cn.nukkit.entity;
+
+
+public interface EntityType {
+    int DROPPED_ITEM = 64;
+    int EXPERIENCE_ORB = 69;
+    int PRIMED_TNT = 65;
+    int FALLING_BLOCK = 66;
+    int THROWN_EXP_BOTTLE = 68;
+    int FISHING_HOOK = 77;
+    int ARROW = 80;
+    int SNOWBALL = 81;
+    int EGG = 82;
+    int PAINTING = 83;
+    int MINECART = 84;
+    int GHAST_FIREBALL = 85;
+    int SPLASH_POTION = 86;
+    int BOAT = 90;
+    int LIGHTNING = 93;
+    int BLAZE_FIREBALL = 94;
+    int HOPPER_MINECART = 96;
+    int TNT_MINECART = 97;
+    int CHEST_MINECART = 98;
+    int ZOMBIE = 32;
+    int CREEPER = 33;
+    int SKELETON = 34;
+    int SPIDER = 35;
+    int ZOMBIE_PIGMAN = 36;
+    int SLIME = 37;
+    int ENDERMAN = 38;
+    int SILVERFISH = 39;
+    int CAVE_SPIDER = 40;
+    int GHAST = 41;
+    int MAGMA_CUBE = 42;
+    int BLAZE = 43;
+    int ZOMBIE_VILLAGER = 44;
+    int CHICKEN = 10;
+    int COW = 11;
+    int PIG = 12;
+    int SHEEP = 13;
+    int WOLF = 14;
+    int MOOSHROOM_COW = 16;
+    int SQUID = 17;
+    int RABBIT = 18;
+    int BAT = 19;
+    int IRON_GOLEM = 20;
+    int SNOW_GOLEM = 21;
+    int OCELOT = 22;
+    int VILLAGER = 15;
+}

@@ -6,10 +6,7 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.command.CommandSender;
-import cn.nukkit.entity.Attribute;
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityHuman;
-import cn.nukkit.entity.EntityLiving;
+import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.projectile.EntityArrow;
@@ -185,6 +182,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private final AtomicReference<Locale> locale = new AtomicReference<>(null);
 
+    private Integer entityType = null;
+
 
     public TranslationContainer getLeaveMessage() {
         return new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.left", this.getDisplayName());
@@ -261,10 +260,42 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return autoJump;
     }
 
+    public int getEntityType(){
+        return this.entityType;
+    }
+
+    public void setEntityType(int entityType){
+        this.entityType = entityType;
+    }
+
     @Override
     public void spawnTo(Player player) {
         if (this.spawned && player.spawned && this.isAlive() && player.isAlive() && player.getLevel().equals(this.level) && player.canSee(this) && !this.isSpectator()) {
-            super.spawnTo(player);
+            if(this.entityType == null) {
+                super.spawnTo(player);
+            } else if (!this.equals(player) && !this.hasSpawned.containsKey(player.getLoaderId())) {
+                this.hasSpawned.put(player.getLoaderId(), player);
+
+                if (this.skin.getData().length < 64 * 32 * 4) {
+                    throw new IllegalStateException(this.getClass().getSimpleName() + " must have a valid skin set");
+                }
+
+                AddEntityPacket pk = new AddEntityPacket();
+                pk.type = this.entityType;
+                pk.eid = this.getId();
+                pk.x = (float) this.x;
+                pk.y = (float) this.y;
+                pk.z = (float) this.z;
+                pk.yaw = (float) this.yaw;
+                pk.pitch = (float) this.pitch;
+                pk.speedX = (float) this.motionX;
+                pk.speedY = (float) this.motionY;
+                pk.speedZ = (float) this.motionZ;
+                pk.metadata = this.dataProperties;
+                player.dataPacket(pk);
+
+                this.inventory.sendArmorContents(player);
+            }
         }
     }
 
