@@ -2754,7 +2754,7 @@ public class Level implements ChunkManager, Metadatable {
         return dimension;
     }
     
-    public int setDimension(int dimension) {
+    public void setDimension(int dimension) {
         this.dimension = dimension;
     }
 
