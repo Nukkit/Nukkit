@@ -2753,6 +2753,10 @@ public class Level implements ChunkManager, Metadatable {
     public int getDimension() {
         return dimension;
     }
+    
+    public int setDimension(int dimension) {
+        this.dimension = dimension;
+    }
 
     public boolean canBlockSeeSky(Vector3 pos) {
         return this.getHighestBlockAt(pos.getFloorX(), pos.getFloorZ()) < pos.getY();
