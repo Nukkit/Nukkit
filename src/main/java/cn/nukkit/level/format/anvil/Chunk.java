@@ -1,13 +1,14 @@
 package cn.nukkit.level.format.anvil;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
+import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.generic.BaseChunk;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
-import cn.nukkit.tile.Tile;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
@@ -84,7 +85,7 @@ public class Chunk extends BaseChunk {
         cn.nukkit.level.format.ChunkSection[] sections = new cn.nukkit.level.format.ChunkSection[8];
         for (Tag section : this.nbt.getList("Sections").getAll()) {
             if (section instanceof CompoundTag) {
-                int y = ((CompoundTag) section).getByte("Y") & 0xff;
+                int y = ((CompoundTag) section).getByte("Y");
                 if (y < 8) {
                     sections[y] = new ChunkSection((CompoundTag) section);
                 }
@@ -206,7 +207,7 @@ public class Chunk extends BaseChunk {
 
             return new Chunk(provider, chunk.getCompound("Level"));
         } catch (Exception e) {
-            e.printStackTrace();
+            Server.getInstance().getLogger().logException(e);
             return null;
         }
     }
@@ -244,7 +245,7 @@ public class Chunk extends BaseChunk {
                 continue;
             }
             CompoundTag s = new CompoundTag(null);
-            s.putByte("Y", (byte) (section.getY() & 0xff));
+            s.putByte("Y", (section.getY() & 0xff));
             s.putByteArray("Blocks", section.getIdArray());
             s.putByteArray("Data", section.getDataArray());
             s.putByteArray("BlockLight", section.getLightArray());
@@ -264,9 +265,9 @@ public class Chunk extends BaseChunk {
         nbt.putList(entityListTag);
 
         ArrayList<CompoundTag> tiles = new ArrayList<>();
-        for (Tile tile : this.getTiles().values()) {
-            tile.saveNBT();
-            tiles.add(tile.namedTag);
+        for (BlockEntity blockEntity : this.getBlockEntities().values()) {
+            blockEntity.saveNBT();
+            tiles.add(blockEntity.namedTag);
         }
         ListTag<CompoundTag> tileListTag = new ListTag<>("TileEntities");
         tileListTag.setAll(tiles);
@@ -306,7 +307,7 @@ public class Chunk extends BaseChunk {
                 continue;
             }
             CompoundTag s = new CompoundTag(null);
-            s.putByte("Y", (byte) (section.getY()));
+            s.putByte("Y", (section.getY()));
             s.putByteArray("Blocks", section.getIdArray());
             s.putByteArray("Data", section.getDataArray());
             s.putByteArray("BlockLight", section.getLightArray());
@@ -330,9 +331,9 @@ public class Chunk extends BaseChunk {
         nbt.putList(entityListTag);
 
         ArrayList<CompoundTag> tiles = new ArrayList<>();
-        for (Tile tile : this.getTiles().values()) {
-            tile.saveNBT();
-            tiles.add(tile.namedTag);
+        for (BlockEntity blockEntity : this.getBlockEntities().values()) {
+            blockEntity.saveNBT();
+            tiles.add(blockEntity.namedTag);
         }
         ListTag<CompoundTag> tileListTag = new ListTag<>("TileEntities");
         tileListTag.setAll(tiles);
@@ -382,7 +383,7 @@ public class Chunk extends BaseChunk {
             chunk.heightMap = new int[256];
             chunk.biomeColors = new int[256];
 
-            chunk.nbt.putByte("V", (byte) 1);
+            chunk.nbt.putByte("V", 1);
             chunk.nbt.putLong("InhabitedTime", 0);
             chunk.nbt.putBoolean("TerrainGenerated", false);
             chunk.nbt.putBoolean("TerrainPopulated", false);

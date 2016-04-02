@@ -1,6 +1,7 @@
 package cn.nukkit.level.format.mcregion;
 
 import cn.nukkit.Player;
+import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.generic.BaseFullChunk;
@@ -9,7 +10,6 @@ import cn.nukkit.nbt.tag.ByteArrayTag;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.IntArrayTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.tile.Tile;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Zlib;
@@ -399,9 +399,9 @@ public class Chunk extends BaseFullChunk {
                 offset += 4;
             }
             byte flags = data[offset++];
-            chunk.nbt.putByte("TerrainGenerated", (byte) (flags & 0b1));
-            chunk.nbt.putByte("TerrainPopulated", (byte) ((flags >> 1) & 0b1));
-            chunk.nbt.putByte("LightPopulated", (byte) ((flags >> 2) & 0b1));
+            chunk.nbt.putByte("TerrainGenerated", (flags & 0b1));
+            chunk.nbt.putByte("TerrainPopulated", ((flags >> 1) & 0b1));
+            chunk.nbt.putByte("LightPopulated", ((flags >> 2) & 0b1));
             return chunk;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -457,9 +457,9 @@ public class Chunk extends BaseFullChunk {
         nbt.putList(entityListTag);
 
         ArrayList<CompoundTag> tiles = new ArrayList<>();
-        for (Tile tile : this.getTiles().values()) {
-            tile.saveNBT();
-            tiles.add(tile.namedTag);
+        for (BlockEntity blockEntity : this.getBlockEntities().values()) {
+            blockEntity.saveNBT();
+            tiles.add(blockEntity.namedTag);
         }
         ListTag<CompoundTag> tileListTag = new ListTag<>("TileEntities");
         tileListTag.setAll(tiles);
@@ -514,7 +514,7 @@ public class Chunk extends BaseFullChunk {
             chunk.heightMap = new int[256];
             chunk.biomeColors = new int[256];
 
-            chunk.nbt.putByte("V", (byte) 1);
+            chunk.nbt.putByte("V", 1);
             chunk.nbt.putLong("InhabitedTime", 0);
             chunk.nbt.putBoolean("TerrainGenerated", false);
             chunk.nbt.putBoolean("TerrainPopulated", false);

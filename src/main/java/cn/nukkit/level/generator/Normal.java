@@ -8,6 +8,7 @@ import cn.nukkit.level.generator.biome.BiomeSelector;
 import cn.nukkit.level.generator.noise.Simplex;
 import cn.nukkit.level.generator.object.ore.OreType;
 import cn.nukkit.level.generator.populator.Populator;
+import cn.nukkit.level.generator.populator.PopulatorCaves;
 import cn.nukkit.level.generator.populator.PopulatorGroundCover;
 import cn.nukkit.level.generator.populator.PopulatorOre;
 import cn.nukkit.math.NukkitRandom;
@@ -106,7 +107,7 @@ public class Normal extends Generator {
         this.noiseLand = new Simplex(this.random, 2F, 1F / 8F, 1F / 512F);
         this.noiseMountains = new Simplex(this.random, 4F, 1F, 1F / 500F);
         this.noiseBaseGround = new Simplex(this.random, 4F, 1F / 4F, 1F / 64F);
-        this.noiseRiver = new Simplex(this.random, 4F, 1F / 4F, 1F / 128F);
+        this.noiseRiver = new Simplex(this.random, 2F, 1F, 1F / 512F);
         this.random.setSeed(this.level.getSeed());
         this.selector = new BiomeSelector(this.random, Biome.getBiome(Biome.OCEAN));
         this.heightOffset = random.nextRange(-5, 3);
@@ -128,16 +129,19 @@ public class Normal extends Generator {
         PopulatorGroundCover cover = new PopulatorGroundCover();
         this.generationPopulators.add(cover);
 
+        PopulatorCaves caves = new PopulatorCaves();
+        this.populators.add(caves);
+
         PopulatorOre ores = new PopulatorOre();
         ores.setOreTypes(new OreType[]{
-                new OreType(new CoalOre(), 20, 16, 0, 128),
-                new OreType(new IronOre(), 20, 8, 0, 64),
-                new OreType(new RedstoneOre(), 8, 7, 0, 16),
-                new OreType(new LapisOre(), 1, 6, 0, 32),
-                new OreType(new GoldOre(), 2, 8, 0, 32),
-                new OreType(new DiamondOre(), 1, 7, 0, 16),
-                new OreType(new Dirt(), 20, 32, 0, 128),
-                new OreType(new Gravel(), 10, 16, 0, 128)
+                new OreType(new BlockOreCoal(), 20, 16, 0, 128),
+                new OreType(new BlockOreIron(), 20, 8, 0, 64),
+                new OreType(new BlockOreRedstone(), 8, 7, 0, 16),
+                new OreType(new BlockOreLapis(), 1, 6, 0, 32),
+                new OreType(new BlockOreGold(), 2, 8, 0, 32),
+                new OreType(new BlockOreDiamond(), 1, 7, 0, 16),
+                new OreType(new BlockDirt(), 20, 32, 0, 128),
+                new OreType(new BlockGravel(), 10, 16, 0, 128)
         });
         this.populators.add(ores);
     }
@@ -154,8 +158,8 @@ public class Normal extends Generator {
 
         FullChunk chunk = this.level.getChunk(chunkX, chunkZ);
 
-        for(int genx = 0; genx < 16; genx++) {
-            for(int genz = 0; genz < 16; genz++) {
+        for (int genx = 0; genx < 16; genx++) {
+            for (int genz = 0; genz < 16; genz++) {
 
                 Biome biome;
                 boolean canBaseGround = false;
@@ -175,8 +179,8 @@ public class Normal extends Generator {
                 int mountainGenerate = (int) (mountainHeight * mountainHeightGenerate);
 
                 int landHeightGenerate = (int) (landHeightRange * landHeightNoise);
-                if(landHeightGenerate > landHeightRange) {
-                    if(landHeightGenerate > landHeightRange) {
+                if (landHeightGenerate > landHeightRange) {
+                    if (landHeightGenerate > landHeightRange) {
                         canBaseGround = true;
                     }
                     landHeightGenerate = landHeightRange;
@@ -186,48 +190,52 @@ public class Normal extends Generator {
                 genyHeight += mountainGenerate;
 
                 //prepare for generate ocean, desert, and land
-                if(genyHeight < beathStartHeight) {
-                    if(genyHeight < beathStartHeight - 5) {
+                if (genyHeight < beathStartHeight) {
+                    if (genyHeight < beathStartHeight - 5) {
                         genyHeight += (int) (seaFloorGenerateRange * seaFloorNoise[genx][genz]);
                     }
                     biome = Biome.getBiome(Biome.OCEAN);
-                    if(genyHeight < seaFloorHeight - seaFloorGenerateRange) {
+                    if (genyHeight < seaFloorHeight - seaFloorGenerateRange) {
                         genyHeight = seaFloorHeight;
                     }
-                    canRiver=false;
-                }
-                else if(genyHeight <= beathStopHeight && genyHeight >= beathStartHeight) {
+                    canRiver = false;
+                } else if (genyHeight <= beathStopHeight && genyHeight >= beathStartHeight) {
                     //todo: there is no beach biome, use desert temporarily
                     biome = Biome.getBiome(Biome.DESERT);
-                }
-                else {
+                } else {
                     biome = this.pickBiome(chunkX * 16 + genx, chunkZ * 16 + genz);
                     if (canBaseGround) {
                         int baseGroundHeight = (int) (landHeightRange * landHeightNoise) - landHeightRange;
                         int baseGroundHeight2 = (int) (basegroundHeight * (baseNoise[genx][genz] + 1F));
                         if (baseGroundHeight2 > baseGroundHeight) baseGroundHeight2 = baseGroundHeight;
+                        if (baseGroundHeight2 > mountainGenerate)
+                            baseGroundHeight2 = baseGroundHeight2 - mountainGenerate;
+                        else baseGroundHeight2 = 0;
                         genyHeight += baseGroundHeight2;
                     }
                 }
-                if(canRiver && genyHeight <= seaHeight - 5) {
+                if (canRiver && genyHeight <= seaHeight - 5) {
                     canRiver = false;
                 }
                 //generate river
-                if(canRiver) {
+                if (canRiver) {
                     double riverGenerate = riverNoise[genx][genz];
-                    if(riverGenerate > -0.25F && riverGenerate < 0.25F) {
+                    if (riverGenerate > -0.25F && riverGenerate < 0.25F) {
                         riverGenerate = riverGenerate > 0 ? riverGenerate : -riverGenerate;
                         riverGenerate = 0.25F - riverGenerate;
-                        //y=x^2 * 63.33
+                        //y=x^2 * 4 - 0.0000001
                         riverGenerate = riverGenerate * riverGenerate * 4F;
                         //smooth again
                         riverGenerate = riverGenerate - 0.0000001F;
                         riverGenerate = riverGenerate > 0 ? riverGenerate : 0;
                         genyHeight -= riverGenerate * 64;
-                        if(genyHeight < seaHeight) {
+                        if (genyHeight < seaHeight) {
                             biome = Biome.getBiome(Biome.RIVER);
-                            if(genyHeight < seaHeight - 5) {
-                                genyHeight = seaHeight - 5;
+                            //to generate river floor
+                            if (genyHeight <= seaHeight - 8) {
+                                int genyHeight1 = seaHeight - 9 + (int) (basegroundHeight * (baseNoise[genx][genz] + 1F));
+                                int genyHeight2 = genyHeight < seaHeight - 7 ? seaHeight - 7 : genyHeight;
+                                genyHeight = genyHeight1 > genyHeight2 ? genyHeight1 : genyHeight2;
                             }
                         }
                     }
@@ -239,7 +247,7 @@ public class Normal extends Generator {
                 chunk.setBiomeColor(genx, genz, (biomecolor >> 16), (biomecolor >> 8) & 0xff, (biomecolor & 0xff));
                 //generating
                 int generateHeight = genyHeight > seaHeight ? genyHeight : seaHeight;
-                for(int geny = 0; geny <= generateHeight; geny++) {
+                for (int geny = 0; geny <= generateHeight; geny++) {
                     if (geny <= bedrockDepth && (geny == 0 || random.nextRange(1, 5) == 1)) {
                         chunk.setBlock(genx, geny, genz, Block.BEDROCK);
                     } else if (geny > genyHeight) {

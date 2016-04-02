@@ -69,7 +69,7 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
         super.initEntity();
 
         if (namedTag.contains("Fuse")) {
-            fuse = namedTag.getByte("Fuse") & 0xff;
+            fuse = namedTag.getByte("Fuse");
         } else {
             fuse = 80;
         }
@@ -82,7 +82,7 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
 
     public void saveNBT() {
         super.saveNBT();
-        namedTag.putByte("Fuse", (byte) fuse);
+        namedTag.putByte("Fuse", fuse);
     }
 
     public boolean onUpdate(int currentTick) {
@@ -136,9 +136,13 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
     public void explode() {
         EntityExplosionPrimeEvent event = new EntityExplosionPrimeEvent(this, 4);
         server.getPluginManager().callEvent(event);
-        if (event.isCancelled()) return;
+        if (event.isCancelled()) {
+            return;
+        }
         Explosion explosion = new Explosion(this, event.getForce(), this);
-        if (event.isBlockBreaking()) explosion.explodeA();
+        if (event.isBlockBreaking()) {
+            explosion.explodeA();
+        }
         explosion.explodeB();
     }
 

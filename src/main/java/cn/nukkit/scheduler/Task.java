@@ -1,5 +1,7 @@
 package cn.nukkit.scheduler;
 
+import cn.nukkit.Server;
+
 /**
  * 表达一个任务的类。<br>A class that describes a task.
  * <p>
@@ -16,9 +18,8 @@ package cn.nukkit.scheduler;
  * @author MagicDroidX(code) @ Nukkit Project
  * @author 粉鞋大妈(javadoc) @ Nukkit Project
  * @since Nukkit 1.0 | Nukkit API 1.0.0
- * @deprecated Use Java Runnable instead.
  */
-public abstract class Task {
+public abstract class Task implements Runnable {
     private TaskHandler taskHandler = null;
 
     public final TaskHandler getHandler() {
@@ -45,8 +46,21 @@ public abstract class Task {
      */
     public abstract void onRun(int currentTick);
 
+    @Override
+    public final void run() {
+
+    }
+
     public void onCancel() {
 
+    }
+
+    public void cancel() {
+        try {
+            this.getHandler().cancel();
+        } catch (RuntimeException ex) {
+            Server.getInstance().getLogger().critical("Exception while invoking onCancel", ex);
+        }
     }
 
 }

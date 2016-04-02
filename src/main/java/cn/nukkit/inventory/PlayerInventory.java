@@ -2,11 +2,13 @@ package cn.nukkit.inventory;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.BlockAir;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.event.entity.EntityArmorChangeEvent;
 import cn.nukkit.event.entity.EntityInventoryChangeEvent;
 import cn.nukkit.event.player.PlayerItemHeldEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.network.protocol.ContainerSetContentPacket;
 import cn.nukkit.network.protocol.ContainerSetSlotPacket;
 import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
@@ -73,7 +75,7 @@ public class PlayerInventory extends BaseInventory {
         if (item != null) {
             return item;
         } else {
-            return Item.get(Item.AIR, 0, 0);
+            return new ItemBlock(new BlockAir(), 0, 0);
         }
     }
 
@@ -238,7 +240,7 @@ public class PlayerInventory extends BaseInventory {
     @Override
     public boolean clear(int index) {
         if (this.slots.containsKey(index)) {
-            Item item = Item.get(Item.AIR, null, 0);
+            Item item = new ItemBlock(new BlockAir(), null, 0);
             Item old = this.slots.get(index);
             if (index >= this.getSize() && index < this.size) {
                 EntityArmorChangeEvent ev = new EntityArmorChangeEvent(this.getHolder(), old, item, index);
@@ -329,7 +331,7 @@ public class PlayerInventory extends BaseInventory {
 
         for (int i = 0; i < 4; ++i) {
             if (items[i] == null) {
-                items[i] = Item.get(Item.AIR, null, 0);
+                items[i] = new ItemBlock(new BlockAir(), null, 0);
             }
 
             if (items[i].getId() == Item.AIR) {
@@ -387,19 +389,10 @@ public class PlayerInventory extends BaseInventory {
     @Override
     public void sendContents(Player[] players) {
         ContainerSetContentPacket pk = new ContainerSetContentPacket();
-        InventoryHolder holder = this.getHolder();
-        if (holder instanceof Player && ((Player) holder).isCreative()) {
-            pk.slots = new Item[Item.getCreativeItems().size()];
-            for (int i = 0; i < Item.getCreativeItems().size(); ++i) {
-                pk.slots[i] = Item.getCreativeItem(i);
-            }
-        } else {
-            pk.slots = new Item[this.getSize()];
-            for (int i = 0; i < this.getSize(); ++i) {
-                pk.slots[i] = this.getItem(i);
-            }
+        pk.slots = new Item[this.getSize()];
+        for (int i = 0; i < this.getSize(); ++i) {
+            pk.slots[i] = this.getItem(i);
         }
-
 
         for (Player player : players) {
             if (player.equals(this.getHolder())) {

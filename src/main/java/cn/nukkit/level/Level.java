@@ -3,18 +3,23 @@ package cn.nukkit.level;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.*;
+import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.item.EntityXPOrb;
 import cn.nukkit.entity.projectile.EntityArrow;
+import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.block.BlockUpdateEvent;
 import cn.nukkit.event.level.*;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.redstone.RedstoneUpdateEvent;
+import cn.nukkit.event.weather.LightningStrikeEvent;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.FullChunk;
@@ -38,9 +43,6 @@ import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.redstone.Redstone;
 import cn.nukkit.scheduler.AsyncTask;
-import cn.nukkit.tile.Chest;
-import cn.nukkit.tile.Sign;
-import cn.nukkit.tile.Tile;
 import cn.nukkit.utils.*;
 
 import java.util.*;
@@ -73,10 +75,11 @@ public class Level implements ChunkManager, Metadatable {
     public static final int DIMENSION_OVERWORLD = 0;
     public static final int DIMENSION_NETHER = 1;
 
-    private Map<Long, Tile> tiles = new HashMap<>();
+    private Map<Long, BlockEntity> blockEntities = new HashMap<>();
 
-    private Map<String, Map<Long, SetEntityMotionPacket.Entry>> motionToSend = new HashMap<>();
-    private Map<String, Map<Long, MoveEntityPacket.Entry>> moveToSend = new HashMap<>();
+    private Map<Long, SetEntityMotionPacket.Entry> motionToSend = new HashMap<>();
+    private Map<Long, MoveEntityPacket.Entry> moveToSend = new HashMap<>();
+    private Map<Long, MovePlayerPacket> playerMoveToSend = new HashMap<>();
 
     private Map<Long, Player> players = new HashMap<>();
 
@@ -84,7 +87,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public Map<Long, Entity> updateEntities = new HashMap<>();
 
-    public Map<Long, Tile> updateTiles = new HashMap<>();
+    public Map<Long, BlockEntity> updateBlockEntities = new HashMap<>();
 
     private Map<String, Block> blockCache = new HashMap<>();
 
@@ -152,25 +155,36 @@ public class Level implements ChunkManager, Metadatable {
     private int chunksPerTicks;
     private boolean clearChunksOnTick;
     private HashMap<Integer, Class<? extends Block>> randomTickBlocks = new HashMap<Integer, Class<? extends Block>>() {{
-        put(Block.GRASS, Grass.class);
-        put(Block.SAPLING, Sapling.class);
-        put(Block.LEAVES, Leaves.class);
-        put(Block.WHEAT_BLOCK, Wheat.class);
-        put(Block.FARMLAND, Farmland.class);
-        put(Block.SNOW_LAYER, SnowLayer.class);
-        put(Block.ICE, Ice.class);
-        put(Block.CACTUS, Cactus.class);
-        put(Block.SUGARCANE_BLOCK, Sugarcane.class);
-        put(Block.RED_MUSHROOM, RedMushroom.class);
-        put(Block.BROWN_MUSHROOM, BrownMushroom.class);
-        //put(Block.PUMPKIN_STEM, PumpkinStem.class);
-        //put(Block.MELON_STEM, MelonStem.class);
-        put(Block.MYCELIUM, Mycelium.class);
-        put(Block.CARROT_BLOCK, Carrot.class);
-        //put(Block.POTATO_BLOCK, Potato.class);
-        put(Block.LEAVES2, Leaves2.class);
-        put(Block.BEETROOT_BLOCK, Beetroot.class);
+        put(Block.GRASS, BlockGrass.class);
+        put(Block.FARMLAND, BlockFarmland.class);
+        put(Block.MYCELIUM, BlockMycelium.class);
+
+        put(Block.SAPLING, BlockSapling.class);
+
+        put(Block.LEAVES, BlockLeaves.class);
+        put(Block.LEAVES2, BlockLeaves2.class);
+
+        put(Block.SNOW_LAYER, BlockSnowLayer.class);
+        put(Block.ICE, BlockIce.class);
+        put(Block.LAVA, BlockLava.class);
+        put(Block.STILL_LAVA, BlockLavaStill.class);
+
+        put(Block.CACTUS, BlockCactus.class);
+        put(Block.BEETROOT_BLOCK, BlockBeetroot.class);
+        put(Block.CARROT_BLOCK, BlockCarrot.class);
+        put(Block.POTATO_BLOCK, BlockPotato.class);
+        put(Block.MELON_STEM, BlockStemMelon.class);
+        put(Block.PUMPKIN_STEM, BlockStemPumpkin.class);
+        put(Block.WHEAT_BLOCK, BlockWheat.class);
+        put(Block.SUGARCANE_BLOCK, BlockSugarcane.class);
+        put(Block.RED_MUSHROOM, BlockMushroomRed.class);
+        put(Block.BROWN_MUSHROOM, BlockMushroomBrown.class);
+
+        put(Block.FIRE, BlockFire.class);
+        put(Block.GLOWING_REDSTONE_ORE, BlockOreRedstoneGlowing.class);
     }};
+
+    protected int updateLCG = (new Random()).nextInt();
 
     private int tickRate;
     public int tickRateTime = 0;
@@ -179,7 +193,7 @@ public class Level implements ChunkManager, Metadatable {
     private Class<? extends Generator> generator;
     private Generator generatorInstance;
 
-    private java.util.Random rand = new java.util.Random();
+    public java.util.Random rand = new java.util.Random();
     private boolean raining = false;
     private int rainTime = 0;
     private boolean thundering = false;
@@ -434,7 +448,7 @@ public class Level implements ChunkManager, Metadatable {
     public boolean unload(boolean force) {
         LevelUnloadEvent ev = new LevelUnloadEvent(this);
 
-        if (this.equals(this.server.getDefaultLevel()) && !force) {
+        if (this == this.server.getDefaultLevel() && !force) {
             ev.setCancelled();
         }
 
@@ -447,15 +461,15 @@ public class Level implements ChunkManager, Metadatable {
         this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.unloading", TextFormat.GREEN + this.getName() + TextFormat.WHITE));
         Level defaultLevel = this.server.getDefaultLevel();
 
-        for (Player player : this.getPlayers().values()) {
-            if (this.equals(defaultLevel) || defaultLevel == null) {
+        for (Player player : new ArrayList<>(this.getPlayers().values())) {
+            if (this == defaultLevel || defaultLevel == null) {
                 player.close(player.getLeaveMessage(), "Forced default level unload");
             } else {
                 player.teleport(this.server.getDefaultLevel().getSafeSpawn());
             }
         }
 
-        if (this.equals(defaultLevel)) {
+        if (this == defaultLevel) {
             this.server.setDefaultLevel(null);
         }
 
@@ -551,7 +565,29 @@ public class Level implements ChunkManager, Metadatable {
         }
     }
 
+    public void sendTime(Player player) {
+        if (this.stopTime) {
+            SetTimePacket pk0 = new SetTimePacket();
+            pk0.time = (int) this.time;
+            pk0.started = true;
+            player.dataPacket(pk0);
+        }
+
+        SetTimePacket pk = new SetTimePacket();
+        pk.time = (int) this.time;
+        pk.started = !this.stopTime;
+
+        player.dataPacket(pk);
+    }
+
     public void sendTime() {
+        if (this.stopTime) {
+            SetTimePacket pk0 = new SetTimePacket();
+            pk0.time = (int) this.time;
+            pk0.started = true;
+            Server.broadcastPacket(this.players.values().stream().toArray(Player[]::new), pk0);
+        }
+
         SetTimePacket pk = new SetTimePacket();
         pk.time = (int) this.time;
         pk.started = !this.stopTime;
@@ -590,6 +626,45 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
+        if (this.isThundering()) {
+            synchronized (this) {
+                for (FullChunk chunk : this.getChunks().values()) {
+                    if (rand.nextInt(100000) == 0) {
+                        this.updateLCG = this.updateLCG * 3 + 1013904223;
+                        int LCG = this.updateLCG >> 2;
+                        int x = LCG & 0x0f;
+                        int z = LCG >> 8 & 0x0f;
+                        int y = chunk.getHighestBlockAt(x, z);
+                        int bId = chunk.getBlockId(x, y, z);
+                        if (bId != Block.TALL_GRASS && bId != Block.WATER) y += 1;
+                        CompoundTag nbt = new CompoundTag()
+                                .putList(new ListTag<DoubleTag>("Pos")
+                                        .add(new DoubleTag("", x + 16 * chunk.getX()))
+                                        .add(new DoubleTag("", y))
+                                        .add(new DoubleTag("", z + 16 * chunk.getZ())))
+                                .putList(new ListTag<DoubleTag>("Motion")
+                                        .add(new DoubleTag("", 0))
+                                        .add(new DoubleTag("", 0))
+                                        .add(new DoubleTag("", 0)))
+                                .putList(new ListTag<FloatTag>("Rotation")
+                                        .add(new FloatTag("", 0))
+                                        .add(new FloatTag("", 0)));
+
+                        EntityLightning bolt = new EntityLightning(chunk, nbt);
+                        LightningStrikeEvent ev = new LightningStrikeEvent(this, bolt);
+                        if (!ev.isCancelled()) {
+                            bolt.spawnToAll();
+                        } else {
+                            bolt.setEffect(false);
+                        }
+
+                    }
+
+                }
+            }
+
+        }
+
         this.levelCurrentTick++;
 
         this.unloadChunks();
@@ -607,10 +682,10 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        if (!this.updateTiles.isEmpty()) {
-            for (long id : new ArrayList<>(this.updateTiles.keySet())) {
-                if (!this.updateTiles.get(id).onUpdate()) {
-                    this.updateTiles.remove(id);
+        if (!this.updateBlockEntities.isEmpty()) {
+            for (long id : new ArrayList<>(this.updateBlockEntities.keySet())) {
+                if (!this.updateBlockEntities.get(id).onUpdate()) {
+                    this.updateBlockEntities.remove(id);
                 }
             }
         }
@@ -647,25 +722,28 @@ public class Level implements ChunkManager, Metadatable {
             this.checkSleep();
         }
 
-        for (String key : this.moveToSend.keySet()) {
-            Chunk.Entry chunkEntry = Level.getChunkXZ(key);
-            int chunkX = chunkEntry.chunkX;
-            int chunkZ = chunkEntry.chunkZ;
+        List<DataPacket> movementPackets = new ArrayList<>();
+
+        {
             MoveEntityPacket pk = new MoveEntityPacket();
-            pk.entities = this.moveToSend.get(key).values().stream().toArray(MoveEntityPacket.Entry[]::new);
-            this.addChunkPacket(chunkX, chunkZ, pk);
+            pk.entities = this.moveToSend.values().stream().toArray(MoveEntityPacket.Entry[]::new);
+            movementPackets.add(pk);
         }
         this.moveToSend = new HashMap<>();
 
-        for (String key : this.motionToSend.keySet()) {
-            Chunk.Entry chunkEntry = Level.getChunkXZ(key);
-            int chunkX = chunkEntry.chunkX;
-            int chunkZ = chunkEntry.chunkZ;
+        {
             SetEntityMotionPacket pk = new SetEntityMotionPacket();
-            pk.entities = this.motionToSend.get(key).values().stream().toArray(SetEntityMotionPacket.Entry[]::new);
-            this.addChunkPacket(chunkX, chunkZ, pk);
+            pk.entities = this.motionToSend.values().stream().toArray(SetEntityMotionPacket.Entry[]::new);
+            movementPackets.add(pk);
         }
         this.motionToSend = new HashMap<>();
+
+        {
+            movementPackets.addAll(this.playerMoveToSend.values());
+        }
+        this.playerMoveToSend = new HashMap<>();
+
+        this.getServer().batchPackets(this.getPlayers().values().stream().toArray(Player[]::new), movementPackets.stream().toArray(DataPacket[]::new), true);
 
         for (String key : this.chunkPackets.keySet()) {
             Chunk.Entry chunkEntry = Level.getChunkXZ(key);
@@ -873,11 +951,12 @@ public class Level implements ChunkManager, Metadatable {
                 for (ChunkSection section : ((Chunk) chunk).getSections()) {
                     if (!(section instanceof EmptyChunkSection)) {
                         int Y = section.getY();
-                        int k = new java.util.Random().nextInt(0x7fffffff);
+                        this.updateLCG = this.updateLCG * 3 + 1013904223;
+                        int k = this.updateLCG >> 2;
                         for (int i = 0; i < 3; ++i, k >>= 10) {
                             int x = k & 0x0f;
-                            int y = (k >> 8) & 0x0f;
-                            int z = (k >> 16) & 0x0f;
+                            int y = k >> 8 & 0x0f;
+                            int z = k >> 16 & 0x0f;
 
                             blockId = section.getBlockId(x, y, z);
                             if (this.randomTickBlocks.containsKey(blockId)) {
@@ -899,11 +978,12 @@ public class Level implements ChunkManager, Metadatable {
             } else {
                 for (int Y = 0; Y < 8 && (Y < 3 || blockTest != 0); ++Y) {
                     blockTest = 0;
-                    int k = new java.util.Random().nextInt();
+                    this.updateLCG = this.updateLCG * 3 + 1013904223;
+                    int k = this.updateLCG >> 2;
                     for (int i = 0; i < 3; ++i, k >>= 10) {
                         int x = k & 0x0f;
-                        int y = (k >> 8) & 0x0f;
-                        int z = (k >> 16) & 0x0f;
+                        int y = k >> 8 & 0x0f;
+                        int z = k >> 16 & 0x0f;
 
                         blockTest |= blockId = chunk.getBlockId(x, y + (Y << 4), z);
                         if (this.randomTickBlocks.containsKey(blockId)) {
@@ -1001,6 +1081,35 @@ public class Level implements ChunkManager, Metadatable {
         this.server.getPluginManager().callEvent(ev = new BlockUpdateEvent(this.getBlock(this.temporalVector.setComponents(pos.x, pos.y, pos.z + 1))));
         if (!ev.isCancelled()) {
             ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
+        }
+    }
+
+    public void updateAroundRedstone(Block block) {
+        BlockUpdateEvent ev = new BlockUpdateEvent(block);
+        this.server.getPluginManager().callEvent(ev);
+        if (!ev.isCancelled()) {
+            for (Entity entity : this.getNearbyEntities(new AxisAlignedBB(block.x - 1, block.y - 1, block.z - 1, block.x + 1, block.y + 1, block.z + 1))) {
+                entity.scheduleUpdate();
+            }
+            ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
+
+            RedstoneUpdateEvent rsEv = new RedstoneUpdateEvent(ev.getBlock());
+            this.server.getPluginManager().callEvent(rsEv);
+            if (!rsEv.isCancelled()) {
+                Block redstoneWire = rsEv.getBlock().getSide(Vector3.SIDE_DOWN);
+                if (redstoneWire instanceof BlockRedstoneWire) {
+                    if (rsEv.getBlock() instanceof BlockSolid) {
+                        int level = redstoneWire.getPowerLevel();
+                        redstoneWire.setPowerLevel(redstoneWire.getNeighborPowerLevel() - 1);
+                        redstoneWire.getLevel().setBlock(redstoneWire, redstoneWire, true, true);
+                        Redstone.deactive(redstoneWire, level);
+                    } else {
+                        redstoneWire.setPowerLevel(redstoneWire.getNeighborPowerLevel() - 1);
+                        redstoneWire.getLevel().setBlock(redstoneWire, redstoneWire, true, true);
+                        Redstone.active(redstoneWire);
+                    }
+                }
+            }
         }
     }
 
@@ -1286,35 +1395,7 @@ public class Level implements ChunkManager, Metadatable {
 
             if (update) {
                 this.updateAllLight(block);
-
-                BlockUpdateEvent ev = new BlockUpdateEvent(block);
-                this.server.getPluginManager().callEvent(ev);
-                if (!ev.isCancelled()) {
-                    for (Entity entity : this.getNearbyEntities(new AxisAlignedBB(block.x - 1, block.y - 1, block.z - 1, block.x + 1, block.y + 1, block.z + 1))) {
-                        entity.scheduleUpdate();
-                    }
-                    ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
-
-                    //added for redstone support
-                    RedstoneUpdateEvent rsEv = new RedstoneUpdateEvent(ev.getBlock());
-                    this.server.getPluginManager().callEvent(rsEv);
-                    if (!rsEv.isCancelled()) {
-                        Block redstoneWire = rsEv.getBlock().getSide(Vector3.SIDE_DOWN);
-                        if (redstoneWire instanceof RedstoneWire) {
-                            if (rsEv.getBlock() instanceof Solid) {
-                                int level = redstoneWire.getPowerLevel();
-                                redstoneWire.setPowerLevel(redstoneWire.getNeighborPowerLevel() - 1);
-                                redstoneWire.getLevel().setBlock(redstoneWire, redstoneWire, true, true);
-                                Redstone.deactive(redstoneWire, level);
-                            } else {
-                                redstoneWire.setPowerLevel(redstoneWire.getNeighborPowerLevel() - 1);
-                                redstoneWire.getLevel().setBlock(redstoneWire, redstoneWire, true, true);
-                                Redstone.active(redstoneWire);
-                            }
-                        }
-                    }
-                }
-
+                this.updateAroundRedstone(block);
                 this.updateAround(position);
             }
 
@@ -1382,7 +1463,7 @@ public class Level implements ChunkManager, Metadatable {
         Block target = this.getBlock(vector);
         Item[] drops;
         if (item == null) {
-            item = Item.get(Item.AIR, 0, 0);
+            item = new ItemBlock(new BlockAir(), 0, 0);
         }
 
         if (player != null) {
@@ -1438,7 +1519,7 @@ public class Level implements ChunkManager, Metadatable {
         Block above = this.getBlock(new Vector3(target.x, target.y + 1, target.z));
         if (above != null) {
             if (above.getId() == Item.FIRE) {
-                this.setBlock(above, new Air(), true);
+                this.setBlock(above, new BlockAir(), true);
             }
         }
 
@@ -1466,42 +1547,42 @@ public class Level implements ChunkManager, Metadatable {
         if (createParticles) {
             Map<Integer, Player> players = this.getChunkPlayers((int) target.x >> 4, (int) target.z >> 4);
 
+            this.addParticle(new DestroyBlockParticle(target.add(0.5), target), players.values());
+
             if (player != null) {
                 players.remove(player.getLoaderId());
             }
-
-            this.addParticle(new DestroyBlockParticle(target.add(0.5), target), players.values());
         }
 
         target.onBreak(item);
 
-        Tile tile = this.getTile(target);
-        if (tile != null) {
-            if (tile instanceof InventoryHolder) {
-                if (tile instanceof Chest) {
-                    ((Chest) tile).unpair();
+        BlockEntity blockEntity = this.getBlockEntity(target);
+        if (blockEntity != null) {
+            if (blockEntity instanceof InventoryHolder) {
+                if (blockEntity instanceof BlockEntityChest) {
+                    ((BlockEntityChest) blockEntity).unpair();
                 }
 
-                for (Item chestItem : ((InventoryHolder) tile).getInventory().getContents().values()) {
+                for (Item chestItem : ((InventoryHolder) blockEntity).getInventory().getContents().values()) {
                     this.dropItem(target, chestItem);
                 }
             }
 
-            tile.close();
+            blockEntity.close();
         }
 
         if (item != null) {
             item.useOn(target);
             if (item.isTool() && item.getDamage() >= item.getMaxDurability()) {
-                item = Item.get(Item.AIR, 0, 0);
+                item.count--;
+                item = new ItemBlock(new BlockAir(), 0, 0);
             }
         }
 
         int dropExp = target.getDropExp();
         if (player != null) {
+            player.addExperience(dropExp);
             if (player.isSurvival()) {
-                player.addExperience(dropExp);
-
                 for (int ii = 1; ii <= dropExp; ii++) {
                     this.dropExpOrb(target, 1);
                 }
@@ -1542,13 +1623,12 @@ public class Level implements ChunkManager, Metadatable {
                         .add(new FloatTag("", 0))
                         .add(new FloatTag("", 0)));
         Entity entity = new EntityXPOrb(this.getChunk(source.getFloorX() >> 4, source.getFloorZ() >> 4), nbt);
-        if (entity instanceof EntityXPOrb) {
-            EntityXPOrb xpOrb = (EntityXPOrb) entity;
-            xpOrb.setExp(exp);
-            xpOrb.setPickupDelay(delay);
-            xpOrb.saveNBT();
-            xpOrb.spawnToAll();
-        }
+        EntityXPOrb xpOrb = (EntityXPOrb) entity;
+        xpOrb.setExp(exp);
+        xpOrb.setPickupDelay(delay);
+        xpOrb.saveNBT();
+
+        xpOrb.spawnToAll();
 
     }
 
@@ -1592,7 +1672,7 @@ public class Level implements ChunkManager, Metadatable {
 
                 if (!player.isSneaking() && item.canBeActivated() && item.onActivate(this, player, block, target, face, fx, fy, fz)) {
                     if (item.getCount() <= 0) {
-                        item = Item.get(Item.AIR, 0, 0);
+                        item = new ItemBlock(new BlockAir(), 0, 0);
                         return item;
                     }
                 }
@@ -1606,10 +1686,6 @@ public class Level implements ChunkManager, Metadatable {
         if (item.canBePlaced()) {
             hand = item.getBlock();
             hand.position(block);
-        } else if (block.getId() == Item.FIRE) {
-            this.setBlock(block, new Air(), true);
-
-            return null;
         } else {
             return null;
         }
@@ -1688,33 +1764,12 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
-        if (hand.getId() == Item.SIGN_POST || hand.getId() == Item.WALL_SIGN) {
-            CompoundTag nbt = new CompoundTag()
-                    .putString("id", Tile.SIGN)
-                    .putInt("x", (int) block.x)
-                    .putInt("y", (int) block.y)
-                    .putInt("z", (int) block.z)
-                    .putString("Text1", "")
-                    .putString("Text2", "")
-                    .putString("Text3", "")
-                    .putString("Text4", "");
-
-            if (player != null) {
-                nbt.putString("Creator", player.getUniqueId().toString());
-            }
-
-            if (item.hasCustomBlockData()) {
-                for (Tag atag : item.getCustomBlockData().getAllTags()) {
-                    nbt.put(atag.getName(), atag);
-                }
-            }
-
-            new Sign(this.getChunk((int) block.x >> 4, (int) block.z >> 4), nbt);
+        if (player != null && !player.isCreative()) {
+            item.setCount(item.getCount() - 1);
         }
 
-        item.setCount(item.getCount() - 1);
         if (item.getCount() <= 0) {
-            item = Item.get(Item.AIR, 0, 0);
+            item = new ItemBlock(new BlockAir(), 0, 0);
         }
         return item;
     }
@@ -1743,7 +1798,7 @@ public class Level implements ChunkManager, Metadatable {
             for (int x = minX; x <= maxX; ++x) {
                 for (int z = minZ; z <= maxZ; ++z) {
                     for (Entity ent : this.getChunkEntities(x, z).values()) {
-                        if ((entity == null || (!ent.equals(entity) && entity.canCollideWith(ent))) && ent.boundingBox.intersectsWith(bb)) {
+                        if ((entity == null || (ent != entity && entity.canCollideWith(ent))) && ent.boundingBox.intersectsWith(bb)) {
                             nearby.add(ent);
                         }
                     }
@@ -1770,7 +1825,7 @@ public class Level implements ChunkManager, Metadatable {
             for (int x = minX; x <= maxX; ++x) {
                 for (int z = minZ; z <= maxZ; ++z) {
                     for (Entity ent : this.getChunkEntities(x, z).values()) {
-                        if (!Objects.equals(ent, entity) && ent.boundingBox.intersectsWith(bb)) {
+                        if (ent != entity && ent.boundingBox.intersectsWith(bb)) {
                             nearby.add(ent);
                         }
                     }
@@ -1781,12 +1836,12 @@ public class Level implements ChunkManager, Metadatable {
         return nearby.stream().toArray(Entity[]::new);
     }
 
-    public Map<Long, Tile> getTiles() {
-        return tiles;
+    public Map<Long, BlockEntity> getBlockEntities() {
+        return blockEntities;
     }
 
-    public Tile getTileById(long tileId) {
-        return this.tiles.containsKey(tileId) ? this.tiles.get(tileId) : null;
+    public BlockEntity getBlockEntityById(long blockEntityId) {
+        return this.blockEntities.containsKey(blockEntityId) ? this.blockEntities.get(blockEntityId) : null;
     }
 
     public Map<Long, Player> getPlayers() {
@@ -1797,7 +1852,7 @@ public class Level implements ChunkManager, Metadatable {
         return loaders;
     }
 
-    public Tile getTile(Vector3 pos) {
+    public BlockEntity getBlockEntity(Vector3 pos) {
         FullChunk chunk = this.getChunk((int) pos.x >> 4, (int) pos.z >> 4, false);
 
         if (chunk != null) {
@@ -1812,9 +1867,9 @@ public class Level implements ChunkManager, Metadatable {
         return (chunk = this.getChunk(X, Z)) != null ? chunk.getEntities() : new HashMap<>();
     }
 
-    public Map<Long, Tile> getChunkTiles(int X, int Z) {
+    public Map<Long, BlockEntity> getChunkBlockEntities(int X, int Z) {
         FullChunk chunk;
-        return (chunk = this.getChunk(X, Z)) != null ? chunk.getTiles() : new HashMap<>();
+        return (chunk = this.getChunk(X, Z)) != null ? chunk.getBlockEntities() : new HashMap<>();
     }
 
     @Override
@@ -1984,7 +2039,7 @@ public class Level implements ChunkManager, Metadatable {
         } else {
             Map<Long, Entity> oldEntities = oldChunk != null ? oldChunk.getEntities() : new HashMap<>();
 
-            Map<Long, Tile> oldTiles = oldChunk != null ? oldChunk.getTiles() : new HashMap<>();
+            Map<Long, BlockEntity> oldBlockEntities = oldChunk != null ? oldChunk.getBlockEntities() : new HashMap<>();
 
             this.provider.setChunk(chunkX, chunkZ, chunk);
             this.chunks.put(index, chunk);
@@ -1994,9 +2049,9 @@ public class Level implements ChunkManager, Metadatable {
                 entity.chunk = chunk;
             }
 
-            for (Tile tile : oldTiles.values()) {
-                chunk.addTile(tile);
-                tile.chunk = chunk;
+            for (BlockEntity blockEntity : oldBlockEntities.values()) {
+                chunk.addBlockEntity(blockEntity);
+                blockEntity.chunk = chunk;
             }
         }
 
@@ -2126,7 +2181,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void removeEntity(Entity entity) {
-        if (!entity.getLevel().equals(this)) {
+        if (entity.getLevel() != this) {
             throw new LevelException("Invalid Entity level");
         }
 
@@ -2142,7 +2197,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addEntity(Entity entity) {
-        if (!entity.getLevel().equals(this)) {
+        if (entity.getLevel() != this) {
             throw new LevelException("Invalid Entity level");
         }
 
@@ -2152,21 +2207,21 @@ public class Level implements ChunkManager, Metadatable {
         this.entities.put(entity.getId(), entity);
     }
 
-    public void addTile(Tile tile) {
-        if (!tile.getLevel().equals(this)) {
-            throw new LevelException("Invalid Tile level");
+    public void addBlockEntity(BlockEntity blockEntity) {
+        if (blockEntity.getLevel() != this) {
+            throw new LevelException("Invalid Block Entity level");
         }
-        tiles.put(tile.getId(), tile);
-        this.clearChunkCache((int) tile.getX() >> 4, (int) tile.getZ() >> 4);
+        blockEntities.put(blockEntity.getId(), blockEntity);
+        this.clearChunkCache((int) blockEntity.getX() >> 4, (int) blockEntity.getZ() >> 4);
     }
 
-    public void removeTile(Tile tile) {
-        if (!tile.getLevel().equals(this)) {
-            throw new LevelException("Invalid Tile level");
+    public void removeBlockEntity(BlockEntity blockEntity) {
+        if (blockEntity.getLevel() != this) {
+            throw new LevelException("Invalid Block Entity level");
         }
-        tiles.remove(tile.getId());
-        updateTiles.remove(tile.getId());
-        this.clearChunkCache((int) tile.getX() >> 4, (int) tile.getZ() >> 4);
+        blockEntities.remove(blockEntity.getId());
+        updateBlockEntities.remove(blockEntity.getId());
+        this.clearChunkCache((int) blockEntity.getX() >> 4, (int) blockEntity.getZ() >> 4);
     }
 
     public boolean isChunkInUse(int x, int z) {
@@ -2283,7 +2338,7 @@ public class Level implements ChunkManager, Metadatable {
                         ++entities;
                     }
 
-                    if (chunk.hasChanged() || !chunk.getTiles().isEmpty() || entities > 0) {
+                    if (chunk.hasChanged() || !chunk.getBlockEntities().isEmpty() || entities > 0) {
                         this.provider.setChunk(x, z, chunk);
                         this.provider.saveChunk(x, z);
                     }
@@ -2318,7 +2373,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public Position getSafeSpawn(Vector3 spawn) {
-        if (spawn == null || spawn.y <= 0) {
+        if (spawn == null || spawn.y < 1) {
             spawn = this.getSpawnLocation();
         }
 
@@ -2473,6 +2528,17 @@ public class Level implements ChunkManager, Metadatable {
 
     public void doChunkGarbageCollection() {
 
+        //remove all invaild block entities.
+        List<BlockEntity> toClose = new ArrayList<>();
+        for (BlockEntity anBlockEntity : blockEntities.values()) {
+            if (anBlockEntity == null) continue;
+            if (anBlockEntity.isBlockEntityValid()) continue;
+            toClose.add(anBlockEntity);
+        }
+        for (BlockEntity be : toClose.toArray(new BlockEntity[toClose.size()])) {
+            be.close();
+        }
+
         for (String index : this.chunks.keySet()) {
 
             if (!this.unloadQueue.containsKey(index)) {
@@ -2547,25 +2613,23 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addEntityMotion(int chunkX, int chunkZ, long entityId, double x, double y, double z) {
-        String index = Level.chunkHash(chunkX, chunkZ);
-        if (!this.motionToSend.containsKey(index)) {
-            this.motionToSend.put(index, new HashMap<>());
-        }
-
-        this.motionToSend.get(index).put(entityId, new SetEntityMotionPacket.Entry(entityId, x, y, z));
-    }
-
-    public void addEntityMovement(int chunkX, int chunkZ, long entityId, double x, double y, double z, double yaw, double pitch) {
-        this.addEntityMovement(chunkX, chunkZ, entityId, x, y, z, yaw, pitch, yaw);
+        this.motionToSend.put(entityId, new SetEntityMotionPacket.Entry(entityId, x, y, z));
     }
 
     public void addEntityMovement(int chunkX, int chunkZ, long entityId, double x, double y, double z, double yaw, double pitch, double headYaw) {
-        String index = Level.chunkHash(chunkX, chunkZ);
-        if (!this.moveToSend.containsKey(index)) {
-            this.moveToSend.put(index, new HashMap<>());
-        }
+        this.moveToSend.put(entityId, new MoveEntityPacket.Entry(entityId, x, y, z, yaw, headYaw, pitch));
+    }
 
-        this.moveToSend.get(index).put(entityId, new MoveEntityPacket.Entry(entityId, x, y, z, yaw, headYaw, pitch));
+    public void addPlayerMovement(int chunkX, int chunkZ, long entityId, double x, double y, double z, double yaw, double pitch, boolean onGround) {
+        MovePlayerPacket pk = new MovePlayerPacket();
+        pk.eid = entityId;
+        pk.x = (float) x;
+        pk.y = (float) y;
+        pk.z = (float) z;
+        pk.yaw = (float) yaw;
+        pk.pitch = (float) pitch;
+        pk.onGround = onGround;
+        this.playerMoveToSend.put(entityId, pk);
     }
 
     public boolean isRaining() {
@@ -2690,6 +2754,10 @@ public class Level implements ChunkManager, Metadatable {
 
     public int getDimension() {
         return dimension;
+    }
+
+    public boolean canBlockSeeSky(Vector3 pos) {
+        return this.getHighestBlockAt(pos.getFloorX(), pos.getFloorZ()) < pos.getY();
     }
 
 }

@@ -4,10 +4,11 @@ import cn.nukkit.Nukkit;
 import cn.nukkit.command.CommandReader;
 import org.fusesource.jansi.AnsiConsole;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -99,10 +100,6 @@ public class MainLogger extends ThreadedLogger {
     }
 
     public void logException(Exception e) {
-        this.logException(e, e.getStackTrace());
-    }
-
-    public void logException(Exception e, StackTraceElement[] trace) {
         this.alert(Utils.getExceptionMessage(e));
     }
 
@@ -148,16 +145,19 @@ public class MainLogger extends ThreadedLogger {
         Date now = new Date();
         String cleanMessage = new SimpleDateFormat("HH:mm:ss").format(now) + " " + TextFormat.clean(message);
         message = TextFormat.toANSI(TextFormat.AQUA + new SimpleDateFormat("HH:mm:ss").format(now) + TextFormat.RESET + " " + message + TextFormat.RESET);
+
+        CommandReader.getInstance().stashLine();
+        if (Nukkit.ANSI) {
+            System.out.println(message);
+        } else {
+            System.out.println(cleanMessage);
+        }
+        CommandReader.getInstance().unstashLine();
+        String str = new SimpleDateFormat("Y-M-d").format(now) + " " + cleanMessage + "" + "\r\n";
+        this.logStream += str;
+
         synchronized (this) {
-            CommandReader.getInstance().stashLine();
-            if (Nukkit.ANSI) {
-                System.out.println(message);
-            } else {
-                System.out.println(cleanMessage);
-            }
-            CommandReader.getInstance().unstashLine();
-            String str = new SimpleDateFormat("Y-M-d").format(now) + " " + cleanMessage + "" + "\r\n";
-            this.logStream += str;
+            this.notify();
         }
     }
 
@@ -165,38 +165,85 @@ public class MainLogger extends ThreadedLogger {
     public void run() {
         this.shutdown = false;
         while (!this.shutdown) {
-            synchronized (this) {
-                if (this.logStream.length() > 0) {
-                    String chunk = this.logStream;
-                    this.logStream = "";
-                    try {
-                        FileWriter fileWriter = new FileWriter(this.logFile, true);
-                        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-                        bufferedWriter.write(chunk);
-                        bufferedWriter.close();
-                    } catch (IOException e) {
-                        this.logException(e);
-                    }
-                }
+            while (this.logStream.length() > 0) {
+                String chunk = this.logStream;
+                this.logStream = "";
                 try {
-                    wait(25000);
-                } catch (InterruptedException e) {
-                    //igonre
+                    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(this.logFile, true), StandardCharsets.UTF_8);
+                    writer.write(chunk);
+                    writer.flush();
+                    writer.close();
+                } catch (Exception e) {
+                    this.logException(e);
                 }
             }
+
+            try {
+                synchronized (this) {
+                    wait(25000);
+                }
+            } catch (InterruptedException e) {
+                //igonre
+            }
         }
+
         if (this.logStream.length() > 0) {
             String chunk = this.logStream;
             this.logStream = "";
             try {
-                FileWriter fileWriter = new FileWriter(this.logFile, true);
-                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-                bufferedWriter.write(chunk);
-                bufferedWriter.close();
-            } catch (IOException e) {
+                OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(this.logFile, true), StandardCharsets.UTF_8);
+                writer.write(chunk);
+                writer.flush();
+                writer.close();
+            } catch (Exception e) {
                 this.logException(e);
             }
         }
+    }
+
+    @Override
+    public void emergency(String message, Throwable t) {
+        this.emergency(message + "\r\n" + Utils.getExceptionMessage(t));
+    }
+
+    @Override
+    public void alert(String message, Throwable t) {
+        this.alert(message + "\r\n" + Utils.getExceptionMessage(t));
+    }
+
+    @Override
+    public void critical(String message, Throwable t) {
+        this.critical(message + "\r\n" + Utils.getExceptionMessage(t));
+    }
+
+    @Override
+    public void error(String message, Throwable t) {
+        this.error(message + "\r\n" + Utils.getExceptionMessage(t));
+    }
+
+    @Override
+    public void warning(String message, Throwable t) {
+        this.warning(message + "\r\n" + Utils.getExceptionMessage(t));
+    }
+
+    @Override
+    public void notice(String message, Throwable t) {
+        this.notice(message + "\r\n" + Utils.getExceptionMessage(t));
+    }
+
+    @Override
+    public void info(String message, Throwable t) {
+        this.info(message + "\r\n" + Utils.getExceptionMessage(t));
+    }
+
+    @Override
+    public void debug(String message, Throwable t) {
+        this.debug(message + "\r\n" + Utils.getExceptionMessage(t));
+    }
+
+    @Override
+    public void log(LogLevel level, String message, Throwable t) {
+        this.log(level, message + "\r\n" + Utils.getExceptionMessage(t));
     }
 
 }

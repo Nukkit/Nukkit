@@ -10,6 +10,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -103,7 +104,7 @@ public class Config {
             try {
                 this.file.createNewFile();
             } catch (IOException e) {
-                MainLogger.getLogger().error("Could not create Config " + this.file.toString() + ": " + e.getMessage());
+                MainLogger.getLogger().error("Could not create Config " + this.file.toString(), e);
             }
             this.config = defaultMap;
             this.save();
@@ -126,33 +127,8 @@ public class Config {
                 } catch (IOException e) {
                     Server.getInstance().getLogger().logException(e);
                 }
-                switch (this.type) {
-                    case Config.PROPERTIES:
-                        this.parseProperties(content);
-                        break;
-                    case Config.JSON:
-                        GsonBuilder builder = new GsonBuilder();
-                        Gson gson = builder.create();
-                        this.config = gson.fromJson(content, new TypeToken<LinkedHashMap<String, Object>>() {
-                        }.getType());
-                        break;
-                    case Config.YAML:
-                        DumperOptions dumperOptions = new DumperOptions();
-                        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-                        Yaml yaml = new Yaml(dumperOptions);
-                        this.config = yaml.loadAs(content, LinkedHashMap.class);
-                        if (this.config == null) {
-                            this.config = new LinkedHashMap<>();
-                        }
-                        break;
-                    // case Config.SERIALIZED
-                    case Config.ENUM:
-                        this.parseList(content);
-                        break;
-                    default:
-                        this.correct = false;
-                        return false;
-                }
+                this.parseContent(content);
+                if (!this.correct) return false;
                 if (this.setDefault(defaultMap) > 0) {
                     this.save();
                 }
@@ -161,6 +137,21 @@ public class Config {
             }
         }
         return true;
+    }
+
+    public boolean load(InputStream inputStream) {
+        if (inputStream == null) return false;
+        if (this.correct) {
+            String content = "";
+            try {
+                content = Utils.readFile(inputStream);
+            } catch (IOException e) {
+                Server.getInstance().getLogger().logException(e);
+                return false;
+            }
+            this.parseContent(content);
+        }
+        return correct;
     }
 
     public boolean check() {
@@ -205,7 +196,7 @@ public class Config {
                 try {
                     Utils.writeFile(this.file, content);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Server.getInstance().getLogger().logException(e);
                 }
             }
             return true;
@@ -241,25 +232,21 @@ public class Config {
             return defaultValue;
         }
 
-        if (this.nestedCache.containsKey(key)) {
-            try {
-                return (T) this.nestedCache.get(key);
-            } catch (ClassCastException e) {
-                return defaultValue;
-            }
-        }
-        String[] vars = key.split("\\.");
-
-        Map map = this.config;
-        for (int i = 0; i < vars.length - 1; i++) {
-            String k = vars[i];
-            if (!map.containsKey(k)) {
-                return defaultValue;
-            }
-            map = (Map<String, Object>) map.get(k);
-        }
-
         try {
+            if (this.nestedCache.containsKey(key)) {
+                return (T) this.nestedCache.get(key);
+            }
+            String[] vars = key.split("\\.");
+
+            Map map = this.config;
+            for (int i = 0; i < vars.length - 1; i++) {
+                String k = vars[i];
+                if (!map.containsKey(k)) {
+                    return defaultValue;
+                }
+                map = (Map<String, Object>) map.get(k);
+            }
+
             return (T) map.getOrDefault(vars[vars.length - 1], defaultValue);
         } catch (ClassCastException e) {
             return defaultValue;
@@ -295,7 +282,8 @@ public class Config {
     }
 
     public String getString(String key, String defaultValue) {
-        return this.get(key, defaultValue);
+        Object result = this.get(key, defaultValue);
+        return String.valueOf(result);
     }
 
     public boolean getBoolean(String key) {
@@ -314,7 +302,7 @@ public class Config {
         return this.get(key, defaultList);
     }
 
-    private List<String> getStringList(String key) {
+    public List<String> getStringList(String key) {
         List value = this.getList(key);
 
         if (value == null) {
@@ -689,29 +677,66 @@ public class Config {
         }
     }
 
-    /** @deprecated use {@link #get(String)} instead */
+    /**
+     * @deprecated use {@link #get(String)} instead
+     */
     @Deprecated
     public Object getNested(String key) {
         return get(key);
     }
 
-    /** @deprecated use {@link #get(String, T)} instead */
+    /**
+     * @deprecated use {@link #get(String, T)} instead
+     */
     @Deprecated
     public <T> T getNested(String key, T defaultValue) {
         return get(key, defaultValue);
     }
 
-    /** @deprecated use {@link #get(String)} instead */
+    /**
+     * @deprecated use {@link #get(String)} instead
+     */
     @Deprecated
     @SuppressWarnings("unchecked")
     public <T> T getNestedAs(String key, Class<T> type) {
         return (T) get(key);
     }
 
-    /** @deprecated use {@link #remove(String)} instead */
+    /**
+     * @deprecated use {@link #remove(String)} instead
+     */
     @Deprecated
     public void removeNested(String key) {
         remove(key);
+    }
+
+    private void parseContent(String content) {
+        switch (this.type) {
+            case Config.PROPERTIES:
+                this.parseProperties(content);
+                break;
+            case Config.JSON:
+                GsonBuilder builder = new GsonBuilder();
+                Gson gson = builder.create();
+                this.config = gson.fromJson(content, new TypeToken<LinkedHashMap<String, Object>>() {
+                }.getType());
+                break;
+            case Config.YAML:
+                DumperOptions dumperOptions = new DumperOptions();
+                dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+                Yaml yaml = new Yaml(dumperOptions);
+                this.config = yaml.loadAs(content, LinkedHashMap.class);
+                if (this.config == null) {
+                    this.config = new LinkedHashMap<>();
+                }
+                break;
+            // case Config.SERIALIZED
+            case Config.ENUM:
+                this.parseList(content);
+                break;
+            default:
+                this.correct = false;
+        }
     }
 
 }

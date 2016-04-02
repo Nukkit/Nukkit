@@ -78,8 +78,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         this.namedTag.putShort("Health", this.getHealth());
     }
 
-    public abstract String getName();
-
     public boolean hasLineOfSight(Entity entity) {
         //todo
         return true;
@@ -277,6 +275,24 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         }
 
         return blocks.stream().toArray(Block[]::new);
+    }
+
+    public Block getTargetBlock(int maxDistance) {
+        return getTargetBlock(maxDistance, new HashMap<Integer, Object>());
+    }
+
+    public Block getTargetBlock(int maxDistance, Map<Integer, Object> transparent) {
+        try {
+            Block[] blocks = this.getLineOfSight(maxDistance, 1, transparent);
+            Block block = blocks[0];
+            if (block instanceof Block) {
+                return block;
+            }
+        } catch (Exception e) {
+
+        }
+
+        return null;
     }
 
     public void setMovementSpeed(float speed) {

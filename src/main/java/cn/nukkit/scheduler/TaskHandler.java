@@ -1,5 +1,6 @@
 package cn.nukkit.scheduler;
 
+import cn.nukkit.Server;
 import cn.nukkit.plugin.Plugin;
 
 /**
@@ -80,6 +81,9 @@ public class TaskHandler {
     }
 
     public void cancel() {
+        if (!this.isCancelled() && this.task instanceof Task) {
+            ((Task) this.task).onCancel();
+        }
         this.cancelled = true;
     }
 
@@ -89,12 +93,16 @@ public class TaskHandler {
     }
 
     public void run(int currentTick) {
-        setLastRunTick(currentTick);
-        getTask().run();
+        try {
+            setLastRunTick(currentTick);
+            getTask().run();
+        } catch (RuntimeException ex) {
+            Server.getInstance().getLogger().critical("Exception while invoking run", ex);
+        }
     }
 
     public String getTaskName() {
-        return this.timingName != null ? this.timingName : this.task.getClass().getName();
+        return this.timingName;
     }
 
     public boolean isAsynchronous() {

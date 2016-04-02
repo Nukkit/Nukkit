@@ -100,7 +100,7 @@ public abstract class EntityProjectile extends Entity {
 
             for (Entity entity : list) {
                 if (/*!entity.canCollideWith(this) or */
-                        (entity.equals(this.shootingEntity) && this.ticksLived < 5)
+                        (entity == this.shootingEntity && this.ticksLived < 5)
                         ) {
                     continue;
                 }
@@ -134,9 +134,6 @@ public abstract class EntityProjectile extends Entity {
 
                     if (this instanceof EntityArrow && ((EntityArrow) this).isCritical) {
                         damage += new Random().nextInt((int) (damage / 2) + 1);
-                    }
-                    if (this instanceof EntitySnowball || this instanceof EntityEgg) {
-                        damage = 0;
                     }
 
                     EntityDamageEvent ev;

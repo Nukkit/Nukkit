@@ -53,11 +53,11 @@ public class Location extends Position {
         return fromObject(pos, level, 0.0f, 0.0f);
     }
 
-    public static Location fromObject(Vector3 pos, Level level, float yaw) {
+    public static Location fromObject(Vector3 pos, Level level, double yaw) {
         return fromObject(pos, level, yaw, 0.0f);
     }
 
-    public static Location fromObject(Vector3 pos, Level level, float yaw, float pitch) {
+    public static Location fromObject(Vector3 pos, Level level, double yaw, double pitch) {
         return new Location(pos.x, pos.y, pos.z, yaw, pitch, (level == null) ? ((pos instanceof Position) ? ((Position) pos).level : null) : level);
     }
 
@@ -153,6 +153,15 @@ public class Location extends Position {
     @Override
     public Location abs() {
         return new Location((int) Math.abs(this.x), (int) Math.abs(this.y), (int) Math.abs(this.z), this.yaw, this.pitch, this.level);
+    }
+
+    public Vector3 getDirectionVector() {
+        double pitch = ((getPitch() + 90) * Math.PI) / 180;
+        double yaw = ((getYaw() + 90) * Math.PI) / 180;
+        double x = Math.sin(pitch) * Math.cos(yaw);
+        double z = Math.sin(pitch) * Math.sin(yaw);
+        double y = Math.cos(pitch);
+        return new Vector3(x, y, z).normalize();
     }
 
 }

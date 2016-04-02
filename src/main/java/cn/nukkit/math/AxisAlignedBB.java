@@ -1,5 +1,6 @@
 package cn.nukkit.math;
 
+import cn.nukkit.Server;
 import cn.nukkit.level.MovingObjectPosition;
 
 /**
@@ -276,17 +277,17 @@ public class AxisAlignedBB implements Cloneable {
 
         int face = -1;
 
-        if (vector.equals(v1)) {
+        if (vector == v1) {
             face = 4;
-        } else if (vector.equals(v2)) {
+        } else if (vector == v2) {
             face = 5;
-        } else if (vector.equals(v3)) {
+        } else if (vector == v3) {
             face = 0;
-        } else if (vector.equals(v4)) {
+        } else if (vector == v4) {
             face = 1;
-        } else if (vector.equals(v5)) {
+        } else if (vector == v5) {
             face = 2;
-        } else if (vector.equals(v6)) {
+        } else if (vector == v6) {
             face = 3;
         }
 
@@ -303,7 +304,7 @@ public class AxisAlignedBB implements Cloneable {
         try {
             return (AxisAlignedBB) super.clone();
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            Server.getInstance().getLogger().logException(e);
         }
         return null;
     }
