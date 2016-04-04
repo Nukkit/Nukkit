@@ -83,11 +83,7 @@ public class BlockEnchantingTable extends BlockSolid {
 
         if (item.hasCustomBlockData()) {
             Map<String, Tag> customData = item.getCustomBlockData().getTags();
-            Iterator iter = customData.entrySet().iterator();
-            while (iter.hasNext()) {
-                Map.Entry tag = (Map.Entry) iter.next();
-                nbt.put((String) tag.getKey(), (Tag) tag.getValue());
-            }
+            customData.entrySet().forEach((tag) -> nbt.put(tag.getKey(), tag.getValue()));
         }
 
         BlockEntity.createBlockEntity(BlockEntity.ENCHANT_TABLE, getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);

@@ -169,11 +169,7 @@ public class Explosion {
 
         ItemBlock air = new ItemBlock(new BlockAir());
 
-        Iterator iter = this.affectedBlocks.iterator();
-        //Iterator iter = this.affectedBlocks.entrySet().iterator();
-        while (iter.hasNext()) {
-            Block block = (Block) iter.next();
-            //Block block = (Block) ((HashMap.Entry) iter.next()).getValue();
+        for (Block block : this.affectedBlocks) {
             if (block.getId() == Block.TNT) {
                 double mot = Math.random() * Math.PI * 2;
                 EntityPrimedTNT tnt = new EntityPrimedTNT(this.level.getChunk((int) block.x >> 4, (int) block.z >> 4),
