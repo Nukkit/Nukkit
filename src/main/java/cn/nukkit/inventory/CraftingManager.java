@@ -877,24 +877,21 @@ public class CraftingManager {
 
     }
 
-    public final Comparator<Item> comparator = new Comparator<Item>() {
-        @Override
-        public int compare(Item i1, Item i2) {
-            if (i1.getId() > i2.getId()) {
-                return 1;
-            } else if (i1.getId() < i2.getId()) {
-                return -1;
-            } else if (i1.getDamage() > i2.getDamage()) {
-                return 1;
-            } else if (i1.getDamage() < i2.getDamage()) {
-                return -1;
-            } else if (i1.getCount() > i2.getCount()) {
-                return 1;
-            } else if (i1.getCount() < i2.getCount()) {
-                return -1;
-            } else {
-                return 0;
-            }
+    public final Comparator<Item> comparator = (i1, i2) -> {
+        if (i1.getId() > i2.getId()) {
+            return 1;
+        } else if (i1.getId() < i2.getId()) {
+            return -1;
+        } else if (i1.getDamage() > i2.getDamage()) {
+            return 1;
+        } else if (i1.getDamage() < i2.getDamage()) {
+            return -1;
+        } else if (i1.getCount() > i2.getCount()) {
+            return 1;
+        } else if (i1.getCount() < i2.getCount()) {
+            return -1;
+        } else {
+            return 0;
         }
     };
 

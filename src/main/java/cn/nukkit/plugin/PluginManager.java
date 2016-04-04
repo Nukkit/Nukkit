@@ -149,17 +149,15 @@ public class PluginManager {
             }
 
             for (final PluginLoader loader : loaders.values()) {
-                for (File file : dictionary.listFiles(new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        for (Pattern pattern : loader.getPluginFilters()) {
-                            if (pattern.matcher(name).matches()) {
-                                return true;
-                            }
+                FilenameFilter matchesPlugin = (dir, name) -> {
+                    for (Pattern pattern : loader.getPluginFilters()) {
+                        if (pattern.matcher(name).matches()) {
+                            return true;
                         }
-                        return false;
                     }
-                })) {
+                    return false;
+                };
+                for (File file : dictionary.listFiles(matchesPlugin)) {
                     if (file.isDirectory() && !includeDir) {
                         continue;
                     }
