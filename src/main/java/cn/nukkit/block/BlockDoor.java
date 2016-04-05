@@ -236,9 +236,8 @@ public abstract class BlockDoor extends BlockTransparent {
             }
 
             this.setDamage(direction & 0x03);
-            Level level = this.getLevel();
-            level.setBlock(blockUp, Block.get(this.getId(), metaUp), true, false); //Top
-            level.setBlock(block, this, true, false); //Bottom
+            this.getLevel().setBlock(block, this, true, false); //Bottom
+            this.getLevel().setBlock(blockUp, Block.get(this.getId(), metaUp), true, false); //Top
             return true;
         }
 
