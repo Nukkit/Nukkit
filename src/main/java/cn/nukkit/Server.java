@@ -95,7 +95,7 @@ public class Server {
 
     private PluginManager pluginManager = null;
 
-    private int profilingTickrate = 20;
+    private int profilingTickrate = 50;
 
     private ServerScheduler scheduler = null;
 
@@ -103,11 +103,11 @@ public class Server {
 
     private long nextTick;
 
-    private float[] tickAverage = {20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20};
+    private float[] tickAverage = {50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50};
 
     private float[] useAverage = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    private float maxTick = 20;
+    private float maxTick = 50;
 
     private float maxUse = 0;
 
@@ -141,7 +141,7 @@ public class Server {
     public int networkCompressionLevel = 7;
 
     private boolean autoTickRate = true;
-    private int autoTickRateLimit = 20;
+    private int autoTickRateLimit = 50;
     private boolean alwaysTickPlayers = false;
     private int baseTickRate = 1;
 
@@ -304,7 +304,7 @@ public class Server {
         this.networkCompressionAsync = (boolean) this.getConfig("network.async-compression", true);
 
         this.autoTickRate = (boolean) this.getConfig("level-settings.auto-tick-rate", true);
-        this.autoTickRateLimit = (int) this.getConfig("level-settings.auto-tick-rate-limit", 20);
+        this.autoTickRateLimit = (int) this.getConfig("level-settings.auto-tick-rate-limit", 50);
         this.alwaysTickPlayers = (boolean) this.getConfig("level-settings.always-tick-players", false);
         this.baseTickRate = (int) this.getConfig("level-settings.base-tick-rate", 1);
 
@@ -970,7 +970,7 @@ public class Server {
 
         if ((this.tickCounter & 0b1111) == 0) {
             this.titleTick();
-            this.maxTick = 20;
+            this.maxTick = 50;
             this.maxUse = 0;
 
             if ((this.tickCounter & 0b111111111) == 0) {
@@ -1012,7 +1012,7 @@ public class Server {
         //float tick = Math.min(20, 1000 / Math.max(1, now - tickTime));
         //float use = Math.min(1, (now - tickTime) / 50);
 
-        float tick = (float) Math.min(20, 1000000000 / Math.max(1000000, ((double) nowNano - tickTimeNano)));
+        float tick = (float) Math.min(50, 1000000000 / Math.max(1000000, ((double) nowNano - tickTimeNano)));
         float use = (float) Math.min(1, ((double) (nowNano - tickTimeNano)) / 50000000);
 
         if (this.maxTick > tick) {

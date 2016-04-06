@@ -1,4 +1,4 @@
-Nukkit
+Nukkit - KidzZone Edition - Fork for KidzZone Server
 ===================
 ![nukkit](https://github.com/MagicDroidX/Nukkit/raw/master/images/banner.png)
 
