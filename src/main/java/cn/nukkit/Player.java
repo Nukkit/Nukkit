@@ -2983,8 +2983,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 break;
             case ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET:
                 RequestChunkRadiusPacket requestChunkRadiusPacket = (RequestChunkRadiusPacket) packet;
+                
                 ChunkRadiusUpdatePacket chunkRadiusUpdatePacket = new ChunkRadiusUpdatePacket();
-                chunkRadiusUpdatePacket.radius = this.viewDistance;
+                chunkRadiusUpdatePacket.radius = requestChunkRadiusPacket.radius;
                 this.dataPacket(chunkRadiusUpdatePacket);
                 break;
             default:
