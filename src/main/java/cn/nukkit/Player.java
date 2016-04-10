@@ -2276,6 +2276,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.setSneaking(false);
                         }
                         break;
+                    case PlayerActionPacket.ACTION_JUMP:
+                        PlayerJumpEvent playerJumpEvent = new PlayerJumpEvent(this);
+                        this.server.getPluginManager().callEvent(playerJumpEvent);
+                        break;
                 }
 
                 this.startAction = -1;
