@@ -1779,20 +1779,26 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 break;
             case ProtocolInfo.MOVE_PLAYER_PACKET:
-                movePacketCount++;
-
                 long time = System.currentTimeMillis();
 
-                if(time - lastSpeedCheck >= 1000){
+                long timeDiff = time - lastSpeedCheck;
+
+                if(timeDiff >= 1000){
                     lastSpeedCheck = time;
 
-                    if(movePacketCount > 26 ){ // + 6 packets
+                    long maxCount = (timeDiff / 1000) * 21;
+
+                    /*if(movePacketCount > 26 ){ // + 6 packets
                         this.kick("sending packets too fast");
                         break;
-                    }
+                    }*/
+
+                    System.out.println("\n"+movePacketCount);
 
                     movePacketCount = 0;
                 }
+
+                movePacketCount++;
 
                 MovePlayerPacket movePlayerPacket = (MovePlayerPacket) packet;
                 Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
