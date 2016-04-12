@@ -1675,6 +1675,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.onPlayerLogin(this);
     }
 
+    private long lastSpeedCheck = 0;
+    private long movePacketCount = 0;
+
     public void handleDataPacket(DataPacket packet) {
         if (!connected) {
             return;
@@ -1776,7 +1779,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 break;
             case ProtocolInfo.MOVE_PLAYER_PACKET:
+                movePacketCount++;
 
+                long time = System.currentTimeMillis();
+
+                if(time - lastSpeedCheck >= 1000){
+                    lastSpeedCheck = time;
+
+                    if(movePacketCount > 26 ){ // + 6 packets
+                        this.kick("sending packets too fast");
+                        break;
+                    }
+
+                    movePacketCount = 0;
+                }
 
                 MovePlayerPacket movePlayerPacket = (MovePlayerPacket) packet;
                 Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
