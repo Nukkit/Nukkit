@@ -1788,12 +1788,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     long maxCount = (timeDiff / 1000) * 21;
 
-                    /*if(movePacketCount > 26 ){ // + 6 packets
+                    if(movePacketCount > maxCount ) { // + 6 packets
                         this.kick("sending packets too fast");
                         break;
-                    }*/
-
-                    System.out.println("\n"+movePacketCount);
+                    }
 
                     movePacketCount = 0;
                 }
