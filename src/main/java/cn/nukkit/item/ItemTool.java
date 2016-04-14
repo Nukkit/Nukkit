@@ -2,8 +2,11 @@ package cn.nukkit.item;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.ByteTag;
 import cn.nukkit.nbt.tag.Tag;
+
+import java.util.Random;
 
 /**
  * author: MagicDroidX
@@ -57,6 +60,18 @@ public abstract class ItemTool extends Item {
     public boolean useOn(Block block) {
         if (this.isUnbreakable()) {
             return true;
+        }
+
+        Enchantment durability = this.getEnchantment(Enchantment.ID_DURABILITY);
+
+        if(durability != null && durability.getLevel() >= 1) {
+            double reduceChance = (100 / (durability.getLevel() + 1));
+
+            Random rnd = new Random();
+
+            if(rnd.nextInt((int) Math.floor(reduceChance)) < reduceChance){
+                return true;
+            }
         }
 
         if (block.getToolType() == ItemTool.TYPE_PICKAXE && this.isPickaxe() ||
