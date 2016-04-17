@@ -3646,6 +3646,31 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
+    public boolean teleport(Vector3 pos) {
+        return this.teleport(pos, TeleportCause.PLUGIN);
+    }
+
+    @Override
+    public boolean teleport(Vector3 pos, TeleportCause cause) {
+        return this.teleport(Location.fromObject(pos, this.level, this.yaw, this.pitch), cause);
+    }
+
+    @Override
+    public boolean teleport(Position pos) {
+        return this.teleport(pos, TeleportCause.PLUGIN);
+    }
+
+    @Override
+    public boolean teleport(Position pos, TeleportCause cause) {
+        return this.teleport(Location.fromObject(pos, pos.level, this.yaw, this.pitch), cause);
+    }
+
+    @Override
+    public boolean teleport(Location location) {
+        return this.teleport(location, TeleportCause.PLUGIN);
+    }
+
+    @Override
     public boolean teleport(Location location, TeleportCause cause) {
         if (!this.isOnline()) {
             return false;
