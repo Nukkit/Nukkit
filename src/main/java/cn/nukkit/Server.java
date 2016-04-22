@@ -1391,7 +1391,7 @@ public class Server {
         Player found = null;
         name = name.toLowerCase();
         int delta = Integer.MAX_VALUE;
-        for (Player player : this.getOnlinePlayers().values()) {
+        for (Player player : new ArrayList<>(this.getOnlinePlayers().values())) {
             if (player.getName().toLowerCase().startsWith(name)) {
                 int curDelta = player.getName().length() - name.length();
                 if (curDelta < delta) {
@@ -1409,7 +1409,7 @@ public class Server {
 
     public Player getPlayerExact(String name) {
         name = name.toLowerCase();
-        for (Player player : this.getOnlinePlayers().values()) {
+        for (Player player : new ArrayList<>(this.getOnlinePlayers().values())) {
             if (player.getName().toLowerCase().equals(name)) {
                 return player;
             }
@@ -1421,7 +1421,7 @@ public class Server {
     public Player[] matchPlayer(String partialName) {
         partialName = partialName.toLowerCase();
         List<Player> matchedPlayer = new ArrayList<>();
-        for (Player player : this.getOnlinePlayers().values()) {
+        for (Player player : new ArrayList<>(this.getOnlinePlayers().values())) {
             if (player.getName().toLowerCase().equals(partialName)) {
                 return new Player[]{player};
             } else if (player.getName().toLowerCase().contains(partialName)) {
