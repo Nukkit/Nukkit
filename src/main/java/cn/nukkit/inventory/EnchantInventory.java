@@ -123,7 +123,6 @@ public class EnchantInventory extends ContainerInventory {
                                 break;
                             }
                         }
-                        key--;
 
                         Enchantment enchantment = possible.get(key);
                         result.add(enchantment);
