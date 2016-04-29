@@ -189,6 +189,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private int hash;
 
+    public ArrayDeque<Long> movePackets = new ArrayDeque<>();
 
     public TranslationContainer getLeaveMessage() {
         return new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.left", this.getDisplayName());
@@ -1782,7 +1783,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
 
                 boolean revert = false;
-                if (!this.isAlive() || !this.spawned) {
+
+                long time = System.currentTimeMillis();
+
+                while(time - movePackets.getFirst() > 1){
+                    movePackets.removeFirst();
+                }
+
+                if(movePackets.size() > 21){
+                    revert = true;
+                }
+
+                movePackets.add(time);
+
+                if (!this.isAlive() || !this.spawned || revert) {
                     revert = true;
                     this.forceMovement = new Vector3(this.x, this.y, this.z);
                 }
