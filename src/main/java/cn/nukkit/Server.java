@@ -1305,8 +1305,8 @@ public class Server {
         return commandMap;
     }
 
-    public Map<String, Player> getOnlinePlayers() {
-        return new HashMap<>(players);
+    public Map<UUID, Player> getOnlinePlayers() {
+        return new HashMap<>(playerList);
     }
 
     public void addRecipe(Recipe recipe) {
