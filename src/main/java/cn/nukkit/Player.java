@@ -1792,7 +1792,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 long time = System.currentTimeMillis();
 
-                while(!movePackets.isEmpty() && time - movePackets.getFirst() > 1){
+                while(!movePackets.isEmpty() && time - movePackets.getFirst() > 1000){
                     movePackets.removeFirst();
                 }
 
