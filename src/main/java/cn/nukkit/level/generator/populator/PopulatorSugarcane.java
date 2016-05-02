@@ -5,6 +5,11 @@ import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 
+/**
+ *  Nukkit Minecraft PE Server Software
+ *  This class was written by Niall Lindsay <Niall7459>
+**/
+
 public class PopulatorSugarcane extends Populator {
     private ChunkManager level;
     private int randomAmount;
