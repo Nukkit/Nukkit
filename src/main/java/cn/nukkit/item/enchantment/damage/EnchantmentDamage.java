@@ -43,7 +43,7 @@ public abstract class EnchantmentDamage extends Enchantment {
                     return (double) level * 2.5;
                 }
             case ALL:
-                return (double) level * 1.25;
+                return (double) level > 0 ? (level - 1) * 0.5 + 1 : 0;
         }
 
         return 0;

@@ -1,6 +1,7 @@
 package cn.nukkit.item.enchantment;
 
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.bow.EnchantmentBowFlame;
@@ -176,6 +177,10 @@ public abstract class Enchantment implements Cloneable {
     }
 
     public void doPostAttack(Entity attacker, Entity entity) {
+
+    }
+
+    public void apply(EntityDamageByEntityEvent event) {
 
     }
 

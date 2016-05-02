@@ -33,6 +33,8 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemArrow;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemGlassBottle;
+import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.item.enchantment.damage.EnchantmentDamage;
 import cn.nukkit.item.food.Food;
 import cn.nukkit.level.ChunkLoader;
 import cn.nukkit.level.Level;
@@ -187,6 +189,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private int hash;
 
+    public ArrayDeque<Long> movePackets = new ArrayDeque<>();
 
     public TranslationContainer getLeaveMessage() {
         return new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.left", this.getDisplayName());
@@ -1786,13 +1789,25 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 break;
             case ProtocolInfo.MOVE_PLAYER_PACKET:
-
-
                 MovePlayerPacket movePlayerPacket = (MovePlayerPacket) packet;
                 Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
 
                 boolean revert = false;
-                if (!this.isAlive() || !this.spawned) {
+
+                long time = System.currentTimeMillis();
+
+                while(!movePackets.isEmpty() && time - movePackets.getFirst() > 1000){
+                    movePackets.removeFirst();
+                }
+
+                if(movePackets.size() > 21){
+                    System.out.println("\npackets "+movePackets.size());
+                    revert = true;
+                }
+
+                movePackets.add(time);
+
+                if (!this.isAlive() || !this.spawned || revert) {
                     revert = true;
                     this.forceMovement = new Vector3(this.x, this.y, this.z);
                 }
@@ -2144,6 +2159,28 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     break;
                                 }
 
+                                double damage = 2.0;
+                                boolean fire = false;
+                                double knockback = 1;
+
+                                for (Enchantment ench : bow.getEnchantments()) {
+                                    if (ench.getLevel() <= 0) {
+                                        continue;
+                                    }
+
+                                    switch (ench.getId()) {
+                                        case Enchantment.ID_BOW_POWER:
+                                            damage += 0.25 * (ench.getLevel() + 1);
+                                            break;
+                                        case Enchantment.ID_BOW_FLAME:
+                                            fire = true;
+                                            break;
+                                        case Enchantment.ID_BOW_KNOCKBACK:
+                                            knockback += 0.5 * ench.getLevel();
+                                            break;
+                                    }
+                                }
+
                                 CompoundTag nbt = new CompoundTag()
                                         .putList(new ListTag<DoubleTag>("Pos")
                                                 .add(new DoubleTag("", x))
@@ -2156,7 +2193,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         .putList(new ListTag<FloatTag>("Rotation")
                                                 .add(new FloatTag("", (float) yaw))
                                                 .add(new FloatTag("", (float) pitch)))
-                                        .putShort("Fire", this.isOnFire() ? 45 * 60 : 0);
+                                        .putShort("Fire", (this.isOnFire() || fire) ? 45 * 60 : 0)
+                                        .putDouble("damage", damage)
+                                        .putDouble("knockBack", knockback);
 
                                 int diff = (this.server.getTick() - this.startAction);
                                 double p = (double) diff / 20;
@@ -2383,7 +2422,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     };
 
                     HashMap<Integer, Float> damage = new HashMap<>();
-                    damage.put(EntityDamageEvent.MODIFIER_BASE, damageTable.getOrDefault(item.getId(), 1f));
+
+                    float itemDamage = damageTable.getOrDefault(item.getId(), 1f);
+
+                    Enchantment[] enchantments = item.getEnchantments();
+
+                    for (Enchantment ench : enchantments) {
+                        if (ench.getLevel() <= 0) {
+                            continue;
+                        }
+
+                        itemDamage += ench.getDamageBonus(targetEntity);
+                    }
+
+                    damage.put(EntityDamageEvent.MODIFIER_BASE, itemDamage);
 
                     if (!this.canInteract(targetEntity, 8)) {
                         cancelled = true;
@@ -2475,6 +2527,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.inventory.sendContents(this);
                         }
                         break;
+                    }
+
+                    for (Enchantment ench : enchantments) {
+                        ench.doPostAttack(this, targetEntity);
+                        ench.doPostHurt(this, targetEntity);
                     }
 
                     if (item.isTool() && this.isSurvival()) {

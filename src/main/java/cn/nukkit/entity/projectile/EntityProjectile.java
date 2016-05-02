@@ -132,13 +132,25 @@ public abstract class EntityProjectile extends Entity {
                     double motion = Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
                     double damage = Math.ceil(motion * this.getDamage());
 
-                    if (this instanceof EntityArrow && ((EntityArrow) this).isCritical) {
-                        damage += new Random().nextInt((int) (damage / 2) + 1);
+                    double knockback = 1;
+
+                    if (this instanceof EntityArrow) {
+                        if (this.namedTag.contains("damage")) {
+                            damage = this.namedTag.getDouble("damage");
+                        }
+
+                        if (this.namedTag.contains("knockback")) {
+                            knockback = this.namedTag.getDouble("knockback");
+                        }
+
+                        if (((EntityArrow) this).isCritical) {
+                            damage += new Random().nextInt((int) (damage / 2) + 1);
+                        }
                     }
 
                     EntityDamageEvent ev;
                     if (this.shootingEntity == null) {
-                        ev = new EntityDamageByEntityEvent(this, movingObjectPosition.entityHit, EntityDamageEvent.CAUSE_PROJECTILE, (float) damage);
+                        ev = new EntityDamageByEntityEvent(this, movingObjectPosition.entityHit, EntityDamageEvent.CAUSE_PROJECTILE, (float) damage, (float) knockback);
                     } else {
                         ev = new EntityDamageByChildEntityEvent(this.shootingEntity, this, movingObjectPosition.entityHit, EntityDamageEvent.CAUSE_PROJECTILE, (float) damage);
                     }

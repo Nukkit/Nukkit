@@ -1,5 +1,6 @@
 package cn.nukkit.item.enchantment.bow;
 
+import cn.nukkit.entity.Entity;
 import cn.nukkit.item.enchantment.Enchantment;
 
 /**
@@ -24,5 +25,11 @@ public class EnchantmentBowPower extends EnchantmentBow {
     @Override
     public int getMaxLevel() {
         return 5;
+    }
+
+    @Override
+    public double getDamageBonus(Entity entity) {
+
+        return 0;
     }
 }
