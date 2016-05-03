@@ -198,9 +198,10 @@ public abstract class BlockDoor extends BlockTransparent {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (this.getSide(0).getId() == AIR) {
-                if (this.getSide(1) instanceof BlockDoor) {
-                    this.getLevel().setBlock(this.getSide(1), new BlockAir(), false);
+            if (this.getSide(Vector3.SIDE_DOWN).getId() == AIR) {
+                Block blockAbove = this.getSide(Vector3.SIDE_UP);
+                if (blockAbove instanceof BlockDoor) {
+                    this.getLevel().setBlock(blockAbove, new BlockAir(), false);
                 }
 
                 this.getLevel().useBreakOn(this);
@@ -235,8 +236,8 @@ public abstract class BlockDoor extends BlockTransparent {
             }
 
             this.setDamage(direction & 0x03);
-            this.getLevel().setBlock(block, this, true, true); //Bottom
-            this.getLevel().setBlock(blockUp, Block.get(this.getId(), metaUp), true); //Top
+            this.getLevel().setBlock(block, this, true, false); //Bottom
+            this.getLevel().setBlock(blockUp, Block.get(this.getId(), metaUp), true, false); //Top
             return true;
         }
 
