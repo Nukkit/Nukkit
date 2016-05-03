@@ -1,6 +1,7 @@
 package cn.nukkit.potion;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -185,6 +186,15 @@ public class Effect implements Cloneable {
                 if ((interval = (40 >> this.amplifier)) > 0) {
                     return (this.duration % interval) == 0;
                 }
+
+                return true;
+            case Effect.HUNGER:
+                if (this.amplifier < 0) { // prevents hacking with amplifier -1
+                    return false;
+                }
+                if ((interval = 20) > 0) {
+                    return (this.duration % interval) == 0;
+                }
                 return true;
             case Effect.SPEED:
             case Effect.SLOWNESS:
@@ -238,6 +248,10 @@ public class Effect implements Cloneable {
     }
 
     public void add(Entity entity, boolean modify) {
+        this.add(entity, modify, null);
+    }
+
+    public void add(Entity entity, boolean modify, Effect oldEffect) {
         if (entity instanceof Player) {
             MobEffectPacket pk = new MobEffectPacket();
             pk.eid = 0;
@@ -250,21 +264,30 @@ public class Effect implements Cloneable {
             } else {
                 pk.eventId = MobEffectPacket.EVENT_ADD;
             }
-
             ((Player) entity).dataPacket(pk);
-
-            if (this.id == Effect.SPEED) {
-                ((Player) entity).setMovementSpeed((float) (((this.amplifier + 1) * 0.2 + 1) * 0.1));
-            }
-
-            if (this.id == Effect.SLOWNESS) {
-                ((Player) entity).setMovementSpeed((float) (((this.amplifier + 1) * -0.15 + 1) * 0.1));
-            }
         }
-
+        float speed;
         if (this.id == Effect.INVISIBILITY) {
             entity.setDataFlag(Entity.DATA_FLAGS, Entity.DATA_FLAG_INVISIBLE, true);
             entity.setDataProperty(new ByteEntityData(Entity.DATA_SHOW_NAMETAG, 0));
+        } else if (this.id == Effect.SPEED) {
+            Attribute attr = Attribute.getAttribute(Attribute.MOVEMENT_SPEED);
+            if (modify && oldEffect != null) {
+                speed = attr.getValue() / (1f + 0.2f * oldEffect.getAmplifier());
+            } else {
+                speed = attr.getValue();
+            }
+            speed *= (1f + 0.2f * this.amplifier);
+            attr.setValue(speed);
+        } else if (this.id == Effect.SLOWNESS) {
+            Attribute attr = Attribute.getAttribute(Attribute.MOVEMENT_SPEED);
+            if (modify && oldEffect != null) {
+                speed = attr.getValue() / (1f - 0.15f * oldEffect.getAmplifier());
+            } else {
+                speed = attr.getValue();
+            }
+            speed *= (1 - 0.15 * this.amplifier);
+            attr.setValue(speed);
         }
     }
 
@@ -272,19 +295,19 @@ public class Effect implements Cloneable {
         if (entity instanceof Player) {
             MobEffectPacket pk = new MobEffectPacket();
             pk.eid = 0;
-            pk.effectId = this.getId();
             pk.eventId = MobEffectPacket.EVENT_REMOVE;
-
+            pk.effectId = this.getId();
             ((Player) entity).dataPacket(pk);
-
-            if (this.id == Effect.SPEED || this.id == Effect.SLOWNESS) {
-                ((Player) entity).setMovementSpeed(0.1f);
-            }
         }
-
         if (this.id == Effect.INVISIBILITY) {
             entity.setDataFlag(Entity.DATA_FLAGS, Entity.DATA_FLAG_INVISIBLE, false);
             entity.setDataProperty(new ByteEntityData(Entity.DATA_SHOW_NAMETAG, 1));
+        } else if (this.id == Effect.SPEED) {
+            Attribute attr = Attribute.getAttribute(Attribute.MOVEMENT_SPEED);
+            attr.setValue(attr.getValue() / (1f + 0.2f * this.amplifier));
+        } else if (this.id == Effect.SLOWNESS) {
+            Attribute attr = Attribute.getAttribute(Attribute.MOVEMENT_SPEED);
+            attr.setValue(attr.getValue() / (1f - 0.15f * this.amplifier));
         }
     }
 
