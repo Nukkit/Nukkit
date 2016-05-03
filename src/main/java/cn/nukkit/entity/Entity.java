@@ -344,7 +344,11 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setSprinting(boolean value) {
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SPRINTING, value);
+        if (value != this.isSprinting()) {
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_SPRINTING, value);
+            Attribute attr = Attribute.getAttribute(Attribute.MOVEMENT_SPEED);
+            attr.setValue(value ? (attr.getValue() * 1.3f) : (attr.getValue() / 1.3f));
+        }
     }
 
     public Map<Integer, Effect> getEffects() {
