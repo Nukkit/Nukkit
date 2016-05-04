@@ -41,9 +41,15 @@ public abstract class BlockLiquid extends BlockTransparent {
         return false;
     }
 
-    @Override
-    public AxisAlignedBB getBoundingBox() {
-        return null;
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return new AxisAlignedBB(
+                this.x,
+                this.y,
+                this.z,
+                this.x + 1,
+                this.y + getFluidHeightPercent() - 0.1111111,
+                this.z + 1
+        );
     }
 
     @Override
@@ -353,7 +359,7 @@ public abstract class BlockLiquid extends BlockTransparent {
                     ++x;
                 } else if (j == 2) {
                     --z;
-                } else if (j == 3) {
+                } else{
                     ++z;
                 }
                 Block blockSide = this.getLevel().getBlock(this.temporalVector.setComponents(x, y, z));
