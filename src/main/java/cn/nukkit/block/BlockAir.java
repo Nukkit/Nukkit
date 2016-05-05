@@ -38,6 +38,11 @@ public class BlockAir extends BlockTransparent {
     }
 
     @Override
+    public AxisAlignedBB getBoundingBox() {
+        return null;
+    }
+
+    @Override
     public boolean canBeFlowedInto() {
         return true;
     }
