@@ -48,6 +48,11 @@ public class WhitelistCommand extends VanillaCommand {
                 case "on":
                     sender.getServer().setPropertyBoolean("white-list", true);
                     Command.broadcastCommandMessage(sender, new TranslationContainer("commands.whitelist.enabled"));
+                    #for (allplayers){
+                    #    if player is not in whitelist{
+                    #        kick
+                    #    }
+                    #}
 
                     return true;
                 case "off":
