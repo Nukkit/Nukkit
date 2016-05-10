@@ -37,7 +37,7 @@ public class GamemodeCommand extends VanillaCommand {
 
             return true;
         }
-        if (gameMode >= 3) {
+        if (gameMode >= 4) {
             sender.sendMessage("Unknown game mode");
 
             return true;
