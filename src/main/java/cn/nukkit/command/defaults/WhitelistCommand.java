@@ -48,11 +48,14 @@ public class WhitelistCommand extends VanillaCommand {
                 case "on":
                     sender.getServer().setPropertyBoolean("white-list", true);
                     Command.broadcastCommandMessage(sender, new TranslationContainer("commands.whitelist.enabled"));
-                    #for (allplayers){
-                    #    if player is not in whitelist{
-                    #        kick
-                    #    }
-                    #}
+                    for (Player player : this.plugin.getServer().getOnlinePlayers().values()) {
+                        if (player.equals(sender)){
+                            sender.sendMessage(new TranslationContainer("commands.generic.usage", "All players but you were kicked so that the whitelist takes effect now");
+                        } esle{
+                        String reason = args.length == 0 ? Message.CMD_KICKALL_NO_REASON.toString() : TextFormat.colorize(this.plugin.join("Whitelist is enabled so all players who didn't turn the whitelist on were kicked."));
+                        player.kick(reason, false);
+                        }
+                    }
 
                     return true;
                 case "off":
