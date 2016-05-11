@@ -32,7 +32,7 @@ public class LightPopulationTask extends AsyncTask {
         chunk.setLightPopulated();
 
         for(int x = 0; x < 16; ++ x){
-			for(int z = 0; z < 16; ++ z){
+		for(int z = 0; z < 16; ++ z){
 		        int[] blockColor = chunk.getBiomeColor(x, z);
 		        if(blockColor[0] == 0 && blockColor[1] == 0){
 		        	int biomeColor = Biome.getBiome(chunk.getBiomeId(x, z)).getColor();
