@@ -38,7 +38,7 @@ public class LightPopulationTask extends AsyncTask {
 		        	int biomeColor = Biome.getBiome(chunk.getBiomeId(x, z)).getColor();
 		        	chunk.setBiomeColor(x, z, (biomeColor >> 16), (biomeColor >> 8) & 0xff, (biomeColor & 0xff));
 		        }		        	
-			}
+		}
         }
 
         this.chunk = chunk.clone();
