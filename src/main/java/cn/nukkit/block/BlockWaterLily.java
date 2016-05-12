@@ -38,7 +38,7 @@ public class BlockWaterLily extends BlockFlowable {
 
     @Override
     public boolean canPassThrough() {
-        return true;
+        return false;
     }
 
     @Override
