@@ -13,11 +13,19 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Attribute implements Cloneable {
-    public static final int MAX_HEALTH = 0;
-    public static final int EXPERIENCE = 1;
-    public static final int EXPERIENCE_LEVEL = 2;
-    public static final int MAX_HUNGER = 3;
-    public static final int MOVEMENT_SPEED = 4;
+
+    public static final int ABSORPTION = 0;
+    public static final int SATURATION = 1;
+    public static final int EXHAUSTION = 2;
+    public static final int KNOCKBACK_RESISTANCE = 3;
+    public static final int HEALTH = 4;
+    public static final int MOVEMENT_SPEED = 5;
+    public static final int FOLLOW_RANGE = 6;
+    public static final int HUNGER = 7;
+    public static final int FOOD = 7;
+    public static final int ATTACK_DAMAGE = 8;
+    public static final int EXPERIENCE_LEVEL = 9;
+    public static final int EXPERIENCE = 10;
 
     private int id;
     protected float minValue;
@@ -31,11 +39,21 @@ public class Attribute implements Cloneable {
     protected static Map<Integer, Attribute> attributes = new HashMap<>();
 
     public static void init() {
-        addAttribute(MAX_HEALTH, "generic.health", 0, 0x7fffffff, 20, true);
-        addAttribute(EXPERIENCE, "player.experience", 0, 1, 0, true);
-        addAttribute(EXPERIENCE_LEVEL, "player.level", 0, 24791, 0, true);
-        addAttribute(MAX_HUNGER, "player.hunger", 0, 20, 20, true);
-        addAttribute(MOVEMENT_SPEED, "generic.movementSpeed", 0, 24791, 0.1f, true);
+        addAttribute(ABSORPTION, "generic.absorption", 0.00f, 340282346638528859811704183484516925440.00f, 0.00f);
+        addAttribute(SATURATION, "player.saturation", 0.00f, 20.00f, 5.00f);
+        addAttribute(EXHAUSTION, "player.exhaustion", 0.00f, 5.00f, 0.41f);
+        addAttribute(KNOCKBACK_RESISTANCE, "generic.knockbackResistance", 0.00f, 1.00f, 0.00f);
+        addAttribute(HEALTH, "generic.health", 0.00f, 20.00f, 20.00f);
+        addAttribute(MOVEMENT_SPEED, "generic.movementSpeed", 0.00f, 340282346638528859811704183484516925440.00f, 0.10f);
+        addAttribute(FOLLOW_RANGE, "generic.followRange", 0.00f, 2048.00f, 16.00f, false);
+        addAttribute(HUNGER, "player.hunger", 0.00f, 20.00f, 20.00f);
+        addAttribute(ATTACK_DAMAGE, "generic.attackDamage", 0.00f, 340282346638528859811704183484516925440.00f, 1.00f, false);
+        addAttribute(EXPERIENCE_LEVEL, "player.level", 0.00f, 24791.00f, 0.00f);
+        addAttribute(EXPERIENCE, "player.experience", 0.00f, 1.00f, 0.00f);
+    }
+
+    public static Attribute addAttribute(int id, String name, float minValue, float maxValue, float defaultValue) {
+        return addAttribute(id, name, minValue, maxValue, defaultValue, true);
     }
 
     public static Attribute addAttribute(int id, String name, float minValue, float maxValue, float defaultValue, boolean shouldSend) {

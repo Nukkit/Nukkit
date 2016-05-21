@@ -347,7 +347,11 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setSprinting(boolean value) {
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SPRINTING, value);
+        if (value != this.isSprinting()) {
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_SPRINTING, value);
+            Attribute attr = Attribute.getAttribute(Attribute.MOVEMENT_SPEED);
+            attr.setValue(value ? (attr.getValue() * 1.3f) : (attr.getValue() / 1.3f));
+        }
     }
 
     public Map<Integer, Effect> getEffects() {
@@ -385,10 +389,12 @@ public abstract class Entity extends Location implements Metadatable {
 
         Effect oldEffect = this.effects.getOrDefault(effect.getId(), null);
         if (oldEffect != null) {
-            if (Math.abs(effect.getAmplifier()) < Math.abs(oldEffect.getAmplifier())) return;
-            if (Math.abs(effect.getAmplifier()) == Math.abs(oldEffect.getAmplifier())
-                    && effect.getDuration() < oldEffect.getDuration()) return;
-            effect.add(this, true);
+            if (Math.abs(effect.getAmplifier()) <= (oldEffect.getAmplifier())
+                    || (Math.abs(effect.getAmplifier()) == Math.abs(oldEffect.getAmplifier())
+                    && effect.getDuration() < oldEffect.getDuration())) {
+                return;
+            }
+            effect.add(this, true, oldEffect);
         } else {
             effect.add(this, false);
         }

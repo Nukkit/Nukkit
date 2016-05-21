@@ -128,7 +128,7 @@ public class PlayerFood {
     }
 
     public void sendFoodLevel(int foodLevel) {
-        this.getPlayer().setAttribute(Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(foodLevel));
+        this.getPlayer().setAttribute(Attribute.getAttribute(Attribute.HUNGER).setValue(foodLevel));
     }
 
     public void update(int tickDiff) {
