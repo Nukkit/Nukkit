@@ -29,10 +29,7 @@ import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.event.server.DataPacketSendEvent;
 import cn.nukkit.inventory.*;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemArrow;
-import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemGlassBottle;
+import cn.nukkit.item.*;
 import cn.nukkit.item.food.Food;
 import cn.nukkit.level.ChunkLoader;
 import cn.nukkit.level.Level;
@@ -182,6 +179,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private PlayerFood foodData = null;
 
     private Entity killer = null;
+
+    public long lastEat;
 
     private final AtomicReference<Locale> locale = new AtomicReference<>(null);
 
@@ -424,6 +423,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.perm = new PermissibleBase(this);
         this.server = Server.getInstance();
         this.lastBreak = Long.MAX_VALUE;
+        this.lastEat = Long.MAX_VALUE;
         this.ip = ip;
         this.port = port;
         this.clientID = clientID;
@@ -1990,7 +1990,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    if (item.getId() == Item.SNOWBALL) {
+                    if(item instanceof ItemEdible){
+                        lastEat = System.currentTimeMillis();
+
+                    } else if (item.getId() == Item.SNOWBALL) {
                         CompoundTag nbt = new CompoundTag()
                                 .putList(new ListTag<DoubleTag>("Pos")
                                         .add(new DoubleTag("", x))
@@ -2564,7 +2567,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 switch (entityEventPacket.event) {
                     case EntityEventPacket.USE_ITEM: //Eating
                         Item itemInHand = this.inventory.getItemInHand();
-                        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
+
+                        boolean fastEat = System.currentTimeMillis() - lastEat < 1800; //2 seconds
+
+                        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand, fastEat);
+                        if(fastEat){
+                            consumeEvent.setCancelled();
+                        }
+
                         this.server.getPluginManager().callEvent(consumeEvent);
                         if (consumeEvent.isCancelled()) {
                             this.inventory.sendContents(this);

@@ -141,7 +141,7 @@ public class Network {
 
                 DataPacket pk;
                 //TODO: CHECK THIS HACK FOR 0.14
-                if ((pk = this.getPacket(buf[1])) != null) {
+                if ((pk = this.getPacket(buf[0])) != null) {
                     if (pk.pid() == ProtocolInfo.BATCH_PACKET) {
                         throw new IllegalStateException("Invalid BatchPacket inside BatchPacket");
                     }
