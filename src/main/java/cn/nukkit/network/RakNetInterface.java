@@ -26,6 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RakNetInterface implements ServerInstance, AdvancedSourceInterface {
 
+    public static final String MAGIC_BYTE = "\\xfe";
+
     private Server server;
 
     private Network network;
@@ -224,7 +226,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
                 if (packet.encapsulatedPacket == null) {
                     packet.encapsulatedPacket = new CacheEncapsulatedPacket();
                     packet.encapsulatedPacket.identifierACK = null;
-                    packet.encapsulatedPacket.buffer = Binary.appendBytes((byte) 0x8e, buffer);
+                    packet.encapsulatedPacket.buffer = Binary.appendBytes(MAGIC_BYTE.getBytes(), buffer);
                     if (packet.getChannel() != 0) {
                         packet.encapsulatedPacket.reliability = 3;
                         packet.encapsulatedPacket.orderChannel = packet.getChannel();
@@ -244,7 +246,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
 
             if (pk == null) {
                 pk = new EncapsulatedPacket();
-                pk.buffer = Binary.appendBytes((byte) 0x8e, buffer);
+                pk.buffer = Binary.appendBytes(MAGIC_BYTE.getBytes(), buffer);
                 if (packet.getChannel() != 0) {
                     packet.reliability = 3;
                     packet.orderChannel = packet.getChannel();
