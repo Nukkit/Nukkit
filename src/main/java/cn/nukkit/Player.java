@@ -197,7 +197,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public Long getClientId() {
-        return clientID;
+        return randomClientId;
     }
 
     @Override
