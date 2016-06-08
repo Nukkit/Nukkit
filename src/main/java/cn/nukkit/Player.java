@@ -61,10 +61,13 @@ import cn.nukkit.permission.PermissionAttachmentInfo;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
+import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.*;
@@ -1555,11 +1558,81 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.tryAuthenticate();
     }
 
-    public void tryAuthenticate() {
-        this.authenticateCallback(true);
-    }
+	public void tryAuthenticate() {
+		Player player = this;
+		
+		this.getServer().getScheduler().scheduleAsyncTask(new AsyncTask() {
+			CompoundTag nbt;
+			Position safeSpawn;
+			String defaultLevelName, username, dataPath;
+			int defaultGamemode, state=0;
+			
+			public AsyncTask setData(Position safeSpawn, String defaultLevelName, int defaultGamemode, String username, String dataPath) {
+				this.safeSpawn = safeSpawn;
+				this.defaultLevelName = defaultLevelName;
+				this.defaultGamemode = defaultGamemode;
+				this.username = username.toLowerCase();
+				this.dataPath = dataPath;
+				return this;
+			}
 
-    public void authenticateCallback(boolean valid) {
+			@Override
+			public void onRun() {
+		        String path = dataPath + "players/";
+		        File file = new File(path + username + ".dat");
+
+		        if (file.exists()) {
+		            try {
+		                nbt = NBTIO.readCompressed(new FileInputStream(file));
+		            } catch (Exception e) {
+		                file.renameTo(new File(path + username + ".dat.bak"));
+		                state = 1;
+		            }
+		        } else {
+		        	state = 2;
+		        }
+
+		        Position spawn = this.safeSpawn;
+		        nbt = new CompoundTag()
+		                .putLong("firstPlayed", System.currentTimeMillis() / 1000)
+		                .putLong("lastPlayed", System.currentTimeMillis() / 1000)
+		                .putList(new ListTag<DoubleTag>("Pos")
+		                        .add(new DoubleTag("0", spawn.x))
+		                        .add(new DoubleTag("1", spawn.y))
+		                        .add(new DoubleTag("2", spawn.z)))
+		                .putString("Level", defaultLevelName)
+		                .putList(new ListTag<>("Inventory"))
+		                .putCompound("Achievements", new CompoundTag())
+		                .putInt("playerGameType", defaultGamemode)
+		                .putList(new ListTag<DoubleTag>("Motion")
+		                        .add(new DoubleTag("0", 0))
+		                        .add(new DoubleTag("1", 0))
+		                        .add(new DoubleTag("2", 0)))
+		                .putList(new ListTag<FloatTag>("Rotation")
+		                        .add(new FloatTag("0", 0))
+		                        .add(new FloatTag("1", 0)))
+		                .putFloat("FallDistance", 0)
+		                .putShort("Fire", 0)
+		                .putShort("Air", 300)
+		                .putBoolean("OnGround", true)
+		                .putBoolean("Invulnerable", false)
+		                .putString("NameTag", username);
+			}
+			
+			public void onCompletion(Server server) {
+				if(state == 1)
+					server.getLogger().notice(server.getLanguage().translateString("nukkit.data.playerCorrupted", username));
+				if(state == 2)
+					server.getLogger().notice(server.getLanguage().translateString("nukkit.data.playerNotFound", username));
+		        server.saveOfflinePlayerData(username, nbt, true);
+		        
+				player.authenticateCallback(true, nbt);
+			}
+		}.setData(this.getServer().getDefaultLevel().getSafeSpawn(), this.getServer().getDefaultLevel().getName(),
+				this.getServer().getGamemode(), this.getName(), this.getServer().getDataPath()));
+	}
+
+    public void authenticateCallback(boolean valid, CompoundTag nbt) {
         //TODO add more stuff after authentication is available
 
         if (!valid) {
@@ -1567,10 +1640,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        this.processLogin();
+        this.processLogin(nbt);
     }
 
-    protected void processLogin() {
+    protected void processLogin(CompoundTag nbt) {
         if (!this.server.isWhitelisted((this.getName()).toLowerCase())) {
             this.close(this.getLeaveMessage(), "Server is white-listed");
 
@@ -1604,10 +1677,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        CompoundTag nbt = this.server.getOfflinePlayerData(this.username);
         if (nbt == null) {
             this.close(this.getLeaveMessage(), "Invalid data");
-
             return;
         }
 
