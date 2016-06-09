@@ -945,6 +945,7 @@ public class Level implements ChunkManager, Metadatable {
 				this.chunkTickList.remove(index);
 				continue;
 			}
+			
 			this.requestChunk(chunkX, chunkZ, new ChunkHandler() {
 				HashMap<Integer, Class<? extends Block>> randomTickBlocks;
 				boolean useSections;
@@ -1064,7 +1065,7 @@ public class Level implements ChunkManager, Metadatable {
 			if (chunk.hasChanged()) {
 				try {
 					this.provider.setChunk(chunk.getX(), chunk.getZ(), chunk);
-					this.provider.saveChunk(chunk.getX(), chunk.getZ(), true);
+					this.provider.saveChunk(chunk.getX(), chunk.getZ());
 
 					chunk.setChanged(false);
 				} catch (Exception e) {
@@ -2051,38 +2052,24 @@ public class Level implements ChunkManager, Metadatable {
 			}
 			this.chunkPopulationQueue.remove(index);
 			chunk.setProvider(this.provider);
-			
-			int levelId = this.getId();
-			this.requestChunk(x, z, new ChunkHandler() {
-				BaseFullChunk chunk;
-				public ChunkHandler setData(BaseFullChunk chunk){
-					this.chunk = chunk;
-					return this;
-				}
-				@Override
-				public void onRun(BaseFullChunk oldChunk, Server server) {
-					Level level = server.getLevel(levelId);
-					level.setChunkCallback(x, z, chunk, oldChunk, false);
-					
-					chunk = level.getChunk(x, z, false);
-					if (chunk != null && (oldChunk == null || !oldChunk.isPopulated()) && chunk.isPopulated()
-							&& chunk.getProvider() != null) {
-						server.getPluginManager().callEvent(new ChunkPopulateEvent(chunk));
+			this.setChunk(x, z, chunk, false);
+			chunk = this.getChunk(x, z, false);
+			if (chunk != null && (oldChunk == null || !oldChunk.isPopulated()) && chunk.isPopulated()
+					&& chunk.getProvider() != null) {
+				this.server.getPluginManager().callEvent(new ChunkPopulateEvent(chunk));
 
-						for (ChunkLoader loader : level.getChunkLoaders(x, z)) {
-							loader.onChunkPopulated(chunk);
-						}
-					}
+				for (ChunkLoader loader : this.getChunkLoaders(x, z)) {
+					loader.onChunkPopulated(chunk);
 				}
-			}.setData(chunk), false, false);
+			}
 		} else if (this.chunkGenerationQueue.containsKey(index) || this.chunkPopulationLock.containsKey(index)) {
 			this.chunkGenerationQueue.remove(index);
 			this.chunkPopulationLock.remove(index);
 			chunk.setProvider(this.provider);
-			this.setChunk(x, z, chunk, false, true);
+			this.setChunk(x, z, chunk, false);
 		} else {
 			chunk.setProvider(this.provider);
-			this.setChunk(x, z, chunk, false, true);
+			this.setChunk(x, z, chunk, false);
 		}
 	}
 
@@ -2097,30 +2084,12 @@ public class Level implements ChunkManager, Metadatable {
 	}
 
 	public void setChunk(int chunkX, int chunkZ, BaseFullChunk chunk, boolean unload) {
-		this.setChunk(chunkX, chunkZ, chunk, unload, false);
-	}
-
-	public void setChunk(int chunkX, int chunkZ, BaseFullChunk chunk, boolean unload, boolean async) {
 		if (chunk == null) {
 			return;
 		}
-
-		if (!async) {
-			this.setChunkCallback(chunkX, chunkZ, chunk, this.getChunk(chunkX, chunkZ, false), unload);
-			return;
-		}
-
-		int levelId = this.getId();
-		this.requestChunk(chunkX, chunkZ, new ChunkHandler() {
-			@Override
-			public void onRun(BaseFullChunk oldChunk, Server server) {
-				server.getLevel(levelId).setChunkCallback(chunkX, chunkZ, chunk, oldChunk, unload);
-			}
-		}, false, false);
-	}
-	
-	public void setChunkCallback(int chunkX, int chunkZ, BaseFullChunk chunk, BaseFullChunk oldChunk,boolean unload){
+		
 		String index = Level.chunkHash(chunkX, chunkZ);
+		FullChunk oldChunk = this.getChunk(chunkX, chunkZ, false);
 		if (unload && oldChunk != null) {
 			this.unloadChunk(chunkX, chunkZ, false, false);
 
@@ -2224,10 +2193,6 @@ public class Level implements ChunkManager, Metadatable {
 	}
 
 	public void requestChunk(int x, int z, ChunkHandler handler, boolean create) {
-		this.requestChunk(x, z, handler, create, true);
-	}
-	
-	public void requestChunk(int x, int z, ChunkHandler handler, boolean create, boolean runCallback){
 		RequestChunkTask originTask = this.provider.requestChunkTask(x, z, create);
 		if (!(originTask instanceof AsyncTask)) {
 			handler.onRun(server.getLevel(this.levelId).getChunk(x, z), this.server);
@@ -2251,8 +2216,7 @@ public class Level implements ChunkManager, Metadatable {
 
 			@Override
 			public void onCompletion(Server server) {
-				if(runCallback)
-					this.originTask.onCompletion(server);
+				this.originTask.onCompletion(server);
 				handler.onRun(this.originTask.getChunk(), server);
 			}
 		}.setData(originTask, handler);
@@ -2349,6 +2313,7 @@ public class Level implements ChunkManager, Metadatable {
 					this.sendChunkFromCache(x, z);
 					continue;
 				}
+				
 				RequestChunkTask task = this.provider.requestChunkTask(x, z, true);
                 if (task != null) {
                     this.server.getScheduler().scheduleAsyncTask(task);
@@ -2543,7 +2508,7 @@ public class Level implements ChunkManager, Metadatable {
 
 					if (chunk.hasChanged() || !chunk.getBlockEntities().isEmpty() || entities > 0) {
 						this.provider.setChunk(x, z, chunk);
-						this.provider.saveChunk(x, z, true);
+						this.provider.saveChunk(x, z);
 					}
 				}
 				for (ChunkLoader loader : this.getChunkLoaders(x, z)) {
