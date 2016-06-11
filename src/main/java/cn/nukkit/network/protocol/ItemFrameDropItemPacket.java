@@ -1,7 +1,6 @@
-package GameTeam;
+package cn.nukkit.network.protocol;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.network.protocol.DataPacket;
 
 public class ItemFrameDropItemPacket extends DataPacket{
 
