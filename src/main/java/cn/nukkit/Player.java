@@ -3,6 +3,7 @@ package cn.nukkit;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityItemFrame;
 import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.command.CommandSender;
@@ -3085,6 +3086,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 chunkRadiusUpdatePacket.radius = this.viewDistance;
                 this.dataPacket(chunkRadiusUpdatePacket);
                 break;
+            case ProtocolInfo.ITEM_FRAME_DROP_ITEM_PACKET:
+            	BlockEntityItemFrame tile = (BlockEntityItemFrame) e.getPlayer().getLevel().getBlockEntity(e.getPlayer().temporalVector.setComponents(pk.x, pk.y, pk.z));
+            	if (tile instanceof BlockEntityItemFrame){
+                    Block block = e.getPlayer().getLevel().getBlock(tile);
+                    Item item = tile.getItem();
+                    e.getPlayer().getLevel().dropItem(tile, item);
+                    tile.setItemRotation(0);
+            	}
+            	break;
             default:
                 break;
         }
