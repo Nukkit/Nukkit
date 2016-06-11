@@ -719,6 +719,7 @@ public class Item implements Cloneable {
             list[ROTTEN_FLESH] = ItemRottenFlesh.class;
 
             list[FLOWER_POT] = ItemFlowerPot.class;
+            list[ITEM_FRAME] = ItemItemFrame.class;
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
