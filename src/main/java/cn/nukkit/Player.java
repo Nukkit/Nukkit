@@ -3091,8 +3091,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             	BlockEntityItemFrame tile = (BlockEntityItemFrame) this.getLevel().getBlockEntity(this.temporalVector.setComponents(pk.x, pk.y, pk.z));
             	if (tile instanceof BlockEntityItemFrame){
                     Block block = this.getLevel().getBlock(tile);
-                    Item item = tile.getItem();
-                    this.getLevel().dropItem(tile, item);
+                    Item itemx = tile.getItem();
+                    this.getLevel().dropItem(tile, itemx);
                     tile.setItemRotation(0);
             	}
             	break;
