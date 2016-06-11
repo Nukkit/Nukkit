@@ -488,6 +488,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[WOODEN_PRESSURE_PLATE] = BlockPressurePlateWood.class;
 
             list[SKULL_BLOCK] = BlockSkull.class;
+            list[Item.ITEM_FRAME] = BlockItemFrame.class;
 
             for (int id = 0; id < 256; id++) {
                 Class c = list[id];
