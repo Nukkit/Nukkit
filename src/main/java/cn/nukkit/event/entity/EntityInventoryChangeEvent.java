@@ -12,10 +12,6 @@ import cn.nukkit.item.Item;
 public class EntityInventoryChangeEvent extends EntityEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Item oldItem;
     private Item newItem;
     private int slot;

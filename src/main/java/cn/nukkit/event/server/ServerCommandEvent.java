@@ -32,8 +32,4 @@ public class ServerCommandEvent extends ServerEvent implements Cancellable {
     public void setCommand(String command) {
         this.command = command;
     }
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
 }

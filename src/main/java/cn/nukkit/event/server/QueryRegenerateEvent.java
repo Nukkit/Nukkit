@@ -20,10 +20,6 @@ public class QueryRegenerateEvent extends ServerEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private static final String GAME_ID = "MINECRAFTPE";
 
     private int timeout;

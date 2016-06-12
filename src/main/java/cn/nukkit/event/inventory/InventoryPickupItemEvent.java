@@ -13,10 +13,6 @@ public class InventoryPickupItemEvent extends InventoryEvent implements Cancella
 
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private EntityItem item;
 
     public InventoryPickupItemEvent(Inventory inventory, EntityItem item) {
