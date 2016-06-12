@@ -12,10 +12,6 @@ import cn.nukkit.event.HandlerList;
 public class CreeperPowerEvent extends EntityEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final PowerCause cause;
     private EntityLightningStrike bolt;
 

@@ -7,10 +7,6 @@ import cn.nukkit.event.HandlerList;
 public class PlayerGameModeChangeEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected int gamemode;
 
     public PlayerGameModeChangeEvent(Player player, int newGameMode) {

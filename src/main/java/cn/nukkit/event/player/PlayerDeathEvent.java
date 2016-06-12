@@ -10,10 +10,6 @@ import cn.nukkit.item.Item;
 public class PlayerDeathEvent extends EntityDeathEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private TextContainer deathMessage;
     private boolean keepInventory = false;
     private boolean keepExperience = false;

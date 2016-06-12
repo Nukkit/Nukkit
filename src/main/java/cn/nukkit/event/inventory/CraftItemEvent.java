@@ -15,10 +15,6 @@ public class CraftItemEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Item[] input = new Item[0];
 
     private Recipe recipe;

@@ -12,10 +12,6 @@ public class SpawnChangeEvent extends LevelEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Position previousSpawn;
 
     public SpawnChangeEvent(Level level, Position previousSpawn) {
