@@ -3,6 +3,7 @@ package cn.nukkit;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityItemFrame;
 import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.command.CommandSender;
@@ -18,6 +19,7 @@ import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.entity.projectile.EntitySnowball;
 import cn.nukkit.event.TextContainer;
 import cn.nukkit.event.TranslationContainer;
+import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.block.SignChangeEvent;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.inventory.CraftItemEvent;
@@ -29,10 +31,7 @@ import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.event.server.DataPacketSendEvent;
 import cn.nukkit.inventory.*;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemArrow;
-import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemGlassBottle;
+import cn.nukkit.item.*;
 import cn.nukkit.item.food.Food;
 import cn.nukkit.level.ChunkLoader;
 import cn.nukkit.level.Level;
@@ -182,6 +181,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private PlayerFood foodData = null;
 
     private Entity killer = null;
+
+    public long lastEat;
 
     private final AtomicReference<Locale> locale = new AtomicReference<>(null);
 
@@ -424,6 +425,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.perm = new PermissibleBase(this);
         this.server = Server.getInstance();
         this.lastBreak = Long.MAX_VALUE;
+        this.lastEat = Long.MAX_VALUE;
         this.ip = ip;
         this.port = port;
         this.clientID = clientID;
@@ -1995,7 +1997,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    if (item.getId() == Item.SNOWBALL) {
+                    if(item instanceof ItemEdible){
+                        lastEat = System.currentTimeMillis();
+
+                    } else if (item.getId() == Item.SNOWBALL) {
                         CompoundTag nbt = new CompoundTag()
                                 .putList(new ListTag<DoubleTag>("Pos")
                                         .add(new DoubleTag("", x))
@@ -2569,7 +2574,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 switch (entityEventPacket.event) {
                     case EntityEventPacket.USE_ITEM: //Eating
                         Item itemInHand = this.inventory.getItemInHand();
-                        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
+
+                        boolean fastEat = System.currentTimeMillis() - lastEat < 1800; //2 seconds
+
+                        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand, fastEat);
+                        if(fastEat){
+                            consumeEvent.setCancelled();
+                        }
+
                         this.server.getPluginManager().callEvent(consumeEvent);
                         if (consumeEvent.isCancelled()) {
                             this.inventory.sendContents(this);
@@ -3046,8 +3058,29 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             case ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET:
                 RequestChunkRadiusPacket requestChunkRadiusPacket = (RequestChunkRadiusPacket) packet;
                 ChunkRadiusUpdatePacket chunkRadiusUpdatePacket = new ChunkRadiusUpdatePacket();
-                chunkRadiusUpdatePacket.radius = this.viewDistance;
+                chunkRadiusUpdatePacket.radius = requestChunkRadiusPacket.radius < server.getViewDistance() ? requestChunkRadiusPacket.radius : this.viewDistance;
                 this.dataPacket(chunkRadiusUpdatePacket);
+                break;
+            case ProtocolInfo.ITEM_FRAME_DROP_ITEM_PACKET:
+                ItemFrameDropItemPacket itemFrameDropItemPacket = (ItemFrameDropItemPacket) packet;
+
+                BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) this.level.getBlockEntity(temporalVector.setComponents(itemFrameDropItemPacket.x, itemFrameDropItemPacket.y, itemFrameDropItemPacket.z));
+                if(itemFrame != null) {
+                    Block block = this.level.getBlock(itemFrame);
+                    Item itemDrop = itemFrame.getItem();
+
+                    ItemFrameDropItemEvent itemFrameDropItemEvent = new ItemFrameDropItemEvent(this, block, itemFrame, itemDrop);
+                    this.server.getPluginManager().callEvent(itemFrameDropItemEvent);
+                    if (!itemFrameDropItemEvent.isCancelled()) {
+                        if (itemDrop.getId() != Item.AIR) {
+                            if (((new Random().nextInt(10) - 1) / 10) < itemFrame.getItemDropChance()) {
+                                this.level.dropItem(itemFrame, itemDrop);
+                            }
+                            itemFrame.setItem(new ItemBlock(new BlockAir()));
+                            itemFrame.setItemRotation(0);
+                        }
+                    } else itemFrame.spawnTo(this);
+                }
                 break;
             default:
                 break;

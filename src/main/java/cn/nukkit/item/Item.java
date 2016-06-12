@@ -246,9 +246,7 @@ public class Item implements Cloneable {
     public static final int DAYLIGHT_DETECTOR = 151;
     public static final int REDSTONE_BLOCK = 152;
     public static final int QUARTZ_ORE = 153;
-
     public static final int HOPPER_BLOCK = 154;
-
     public static final int QUARTZ_BLOCK = 155;
     public static final int QUARTZ_STAIRS = 156;
     public static final int DOUBLE_WOOD_SLAB = 157;
@@ -271,7 +269,6 @@ public class Item implements Cloneable {
     public static final int ACACIA_WOODEN_STAIRS = 163;
     public static final int DARK_OAK_WOOD_STAIRS = 164;
     public static final int DARK_OAK_WOODEN_STAIRS = 164;
-
     public static final int SLIME_BLOCK = 165;
 
     public static final int IRON_TRAPDOOR = 167;
@@ -295,8 +292,8 @@ public class Item implements Cloneable {
     public static final int JUNGLE_DOOR_BLOCK = 195;
     public static final int ACACIA_DOOR_BLOCK = 196;
     public static final int DARK_OAK_DOOR_BLOCK = 197;
-
     public static final int GRASS_PATH = 198;
+    public static final int ITEM_FRAME_BLOCK = 199;
 
     public static final int PODZOL = 243;
     public static final int BEETROOT_BLOCK = 244;
@@ -460,9 +457,7 @@ public class Item implements Cloneable {
     public static final int EXPERIENCE_BOTTLE = 384;
 
     public static final int EMERALD = 388;
-
     public static final int ITEM_FRAME = 389;
-
     public static final int FLOWER_POT = 390;
     public static final int CARROT = 391;
     public static final int CARROTS = 391;
@@ -719,6 +714,7 @@ public class Item implements Cloneable {
             list[ROTTEN_FLESH] = ItemRottenFlesh.class;
 
             list[FLOWER_POT] = ItemFlowerPot.class;
+            list[ITEM_FRAME] = ItemItemFrame.class;
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {

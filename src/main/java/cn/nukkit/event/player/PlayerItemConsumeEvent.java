@@ -16,13 +16,23 @@ public class PlayerItemConsumeEvent extends PlayerEvent implements Cancellable {
     }
 
     private Item item;
+    private boolean fastEat;
 
     public PlayerItemConsumeEvent(Player player, Item item) {
+        this(player, item, false);
+    }
+
+    public PlayerItemConsumeEvent(Player player, Item item, boolean fastEat) {
         this.player = player;
         this.item = item;
+        this.fastEat = fastEat;
     }
 
     public Item getItem() {
         return this.item.clone();
+    }
+
+    public boolean isFastEat(){
+        return fastEat;
     }
 }
