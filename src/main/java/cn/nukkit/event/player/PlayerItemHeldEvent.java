@@ -13,10 +13,6 @@ public class PlayerItemHeldEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Item item;
     private int slot;
     private int inventorySlot;

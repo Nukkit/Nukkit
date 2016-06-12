@@ -25,6 +25,7 @@ public abstract class Event {
 
     protected String eventName = null;
     private boolean isCancelled = false;
+    protected static HandlerList handlers = null;
 
     final public String getEventName() {
         return eventName == null ? getClass().getName() : eventName;
@@ -48,5 +49,10 @@ public abstract class Event {
         isCancelled = value;
     }
 
-
+    public HandlerList getHandlers(){
+        if(handlers == null){
+            handlers = new HandlerList();
+        }
+        return handlers;
+    }
 }

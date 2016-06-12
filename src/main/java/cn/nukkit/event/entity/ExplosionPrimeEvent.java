@@ -13,10 +13,6 @@ import cn.nukkit.event.HandlerList;
 public class ExplosionPrimeEvent extends EntityEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected double force;
     private boolean blockBreaking;
 

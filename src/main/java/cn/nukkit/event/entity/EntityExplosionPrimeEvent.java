@@ -11,10 +11,6 @@ public class EntityExplosionPrimeEvent extends EntityEvent implements Cancellabl
 
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private double force;
     private boolean blockBreaking;
 

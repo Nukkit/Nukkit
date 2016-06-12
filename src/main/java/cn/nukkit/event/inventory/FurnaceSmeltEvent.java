@@ -14,10 +14,6 @@ public class FurnaceSmeltEvent extends BlockEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private BlockEntityFurnace furnace;
     private Item source;
     private Item result;

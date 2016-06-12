@@ -14,10 +14,6 @@ public class LightningStrikeEvent extends WeatherEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private final EntityLightningStrike bolt;
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     public LightningStrikeEvent(Level level, final EntityLightningStrike bolt) {
         super(level);
         this.bolt = bolt;

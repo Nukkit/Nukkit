@@ -12,10 +12,6 @@ import cn.nukkit.level.Level;
 public class EntityLevelChangeEvent extends EntityEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Level originLevel;
     private Level targetLevel;
 

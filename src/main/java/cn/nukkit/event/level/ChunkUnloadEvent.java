@@ -12,10 +12,6 @@ public class ChunkUnloadEvent extends ChunkEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     public ChunkUnloadEvent(FullChunk chunk) {
         super(chunk);
     }
