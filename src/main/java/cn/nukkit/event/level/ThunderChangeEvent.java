@@ -14,10 +14,6 @@ public class ThunderChangeEvent extends WeatherEvent implements Cancellable {
 
     private boolean to;
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     public ThunderChangeEvent(Level level, boolean to) {
         super(level);
         this.to = to;

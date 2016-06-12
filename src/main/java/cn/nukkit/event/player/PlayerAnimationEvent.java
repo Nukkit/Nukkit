@@ -7,10 +7,6 @@ import cn.nukkit.event.HandlerList;
 public class PlayerAnimationEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     public static final int ARM_SWING = 1;
 
     private int animationType;

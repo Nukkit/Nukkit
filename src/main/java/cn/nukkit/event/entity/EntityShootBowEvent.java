@@ -14,10 +14,6 @@ import cn.nukkit.item.Item;
 public class EntityShootBowEvent extends EntityEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Item bow;
 
     private EntityProjectile projectile;

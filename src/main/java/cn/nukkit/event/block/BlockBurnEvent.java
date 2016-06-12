@@ -16,8 +16,4 @@ public class BlockBurnEvent extends BlockEvent implements Cancellable {
         super(block);
     }
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
 }
