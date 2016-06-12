@@ -16,10 +16,6 @@ import java.util.Map;
 public class EntityDamageEvent extends EntityEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     public static final int MODIFIER_BASE = 0;
     public static final int MODIFIER_ARMOR = 1;
     public static final int MODIFIER_STRENGTH = 2;

@@ -16,10 +16,6 @@ public class EntityExplodeEvent extends EntityEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected Position position;
     protected List<Block> blocks;
     protected double yield;

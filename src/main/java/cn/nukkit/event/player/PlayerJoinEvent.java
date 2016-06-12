@@ -7,10 +7,6 @@ import cn.nukkit.event.TextContainer;
 public class PlayerJoinEvent extends PlayerEvent {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected TextContainer joinMessage;
 
     public PlayerJoinEvent(Player player, TextContainer joinMessage) {

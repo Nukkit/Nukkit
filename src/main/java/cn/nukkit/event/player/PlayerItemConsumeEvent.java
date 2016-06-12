@@ -11,10 +11,6 @@ import cn.nukkit.item.Item;
 public class PlayerItemConsumeEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Item item;
 
     public PlayerItemConsumeEvent(Player player, Item item) {

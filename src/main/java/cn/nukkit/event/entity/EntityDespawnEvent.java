@@ -16,10 +16,6 @@ import cn.nukkit.level.Position;
 public class EntityDespawnEvent extends EntityEvent {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private int entityType;
 
     public EntityDespawnEvent(Entity entity) {

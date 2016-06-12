@@ -11,10 +11,6 @@ import cn.nukkit.math.Vector3;
 public class PlayerTeleportEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private TeleportCause cause;
     private Location from;
     private Location to;

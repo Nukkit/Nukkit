@@ -12,10 +12,6 @@ public class EntityPortalEnterEvent extends EntityEvent implements Cancellable {
 
     private int type;
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     public EntityPortalEnterEvent(Entity entity, int type) {
         this.entity = entity;
         this.type = type;

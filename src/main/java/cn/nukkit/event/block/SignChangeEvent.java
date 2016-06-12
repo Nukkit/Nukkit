@@ -12,10 +12,6 @@ import cn.nukkit.event.HandlerList;
 public class SignChangeEvent extends BlockEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Player player;
 
     private String[] lines = new String[4];
