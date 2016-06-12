@@ -13,10 +13,6 @@ public class PlayerCreationEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private SourceInterface interfaz;
 
     private Long clientId;

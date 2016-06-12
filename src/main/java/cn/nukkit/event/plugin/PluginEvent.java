@@ -18,10 +18,6 @@ public class PluginEvent extends Event {
         this.plugin = plugin;
     }
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     public Plugin getPlugin() {
         return plugin;
     }

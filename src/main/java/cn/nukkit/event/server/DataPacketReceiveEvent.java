@@ -28,8 +28,4 @@ public class DataPacketReceiveEvent extends ServerEvent implements Cancellable {
     public Player getPlayer() {
         return player;
     }
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
 }

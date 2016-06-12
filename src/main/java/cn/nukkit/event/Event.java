@@ -1,5 +1,6 @@
 package cn.nukkit.event;
 
+import cn.nukkit.event.HandlerList;
 import cn.nukkit.utils.EventException;
 
 /**
@@ -48,5 +49,10 @@ public abstract class Event {
         isCancelled = value;
     }
 
-
+    public HandlerList getHandlers(){
+        if(handlers == null){
+            handlers = new HandlerList();
+        }
+        return handlers;
+    }
 }
