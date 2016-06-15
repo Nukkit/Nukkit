@@ -21,8 +21,8 @@ public class BiomeSelector {
 
     public BiomeSelector(NukkitRandom random, Biome fallback) {
         this.fallback = fallback;
-        this.temperature = new Simplex(random, 2F, 1F / 8F, 1F / 1024F);
-        this.rainfall = new Simplex(random, 2F, 1F / 8F, 1F / 1024F);
+        this.temperature = new Simplex(random, 2F, 1F / 16F, 1F / 512F);
+        this.rainfall = new Simplex(random, 2F, 1F / 8F, 16F / 512F);
     }
 
     public int lookup(double temperature, double rainfall) {
