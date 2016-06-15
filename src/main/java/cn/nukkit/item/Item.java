@@ -722,7 +722,7 @@ public class Item implements Cloneable {
             list[FLOWER_POT] = ItemFlowerPot.class;
 
             list[MAP] = ItemMap.class;
-            list[EMPTY_MAP] = EntityMap.class;
+            list[EMPTY_MAP] = ItemEmptyMap.class;
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
