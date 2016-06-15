@@ -29,10 +29,7 @@ import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.event.server.DataPacketSendEvent;
 import cn.nukkit.inventory.*;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemArrow;
-import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemGlassBottle;
+import cn.nukkit.item.*;
 import cn.nukkit.item.food.Food;
 import cn.nukkit.level.ChunkLoader;
 import cn.nukkit.level.Level;
@@ -2147,6 +2144,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         } else {
                             bottle.spawnToAll();
                         }
+                    } else if (item.getId() == Item.EMPTY_MAP) {
+                        EntityMap mapEntity = new EntityMap(level);
+                        // Initialize a new map and add it.
+                        ItemMap itemMap = new ItemMap(mapEntity.getId());
+                        itemMap.setMapId(mapEntity.getId());
+                        this.getInventory().setItemInHand(itemMap);
+                        mapEntity.addToMapListeners(this, itemMap.getMapId());
                     }
 
                     this.setDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION, true);
@@ -3059,6 +3063,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 chunkRadiusUpdatePacket.radius = this.viewDistance;
                 this.dataPacket(chunkRadiusUpdatePacket);
                 break;
+            case ProtocolInfo.MAP_INFO_REQUEST_PACKET:
+                long mapId = ((MapInfoRequestPacket)packet).mapId;
+                this.getServer().getLogger().debug("Map request from " + this.getName() + ": " + mapId);
+                if (mapId == 0) {
+                    // Should not happen.
+                } else {
+                    Entity mapEntity = this.getLevel().getEntity(mapId);
+                    if (mapEntity instanceof EntityMap) {
+                        ((EntityMap)mapEntity).addToMapListeners(this, mapId);
+                    } else {
+                        this.getServer().getLogger().debug("Unknown map request from " + this.getName() + ": " + mapId);
+                    }
+                }
             default:
                 break;
         }
