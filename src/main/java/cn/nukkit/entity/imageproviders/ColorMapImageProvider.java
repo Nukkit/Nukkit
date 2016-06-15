@@ -24,7 +24,6 @@ public class ColorMapImageProvider extends MapImageProvider {
     @Override
     protected byte[] generateColors(MapInfo map) {
         byte[] bytes = new byte[map.col * map.row * 4];
-        System.out.println(bytes.length);
 
         int i = 0;
         for (int y = 0; y < map.col; y++) {
