@@ -180,8 +180,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private Entity killer = null;
 
-    public long lastEat;
-
     private final AtomicReference<Locale> locale = new AtomicReference<>(null);
 
     private int hash;
@@ -424,7 +422,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.perm = new PermissibleBase(this);
         this.server = Server.getInstance();
         this.lastBreak = Long.MAX_VALUE;
-        this.lastEat = Long.MAX_VALUE;
         this.ip = ip;
         this.port = port;
         this.clientID = clientID;
@@ -1997,10 +1994,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    if(item instanceof ItemEdible){
-                        lastEat = System.currentTimeMillis();
-
-                    } else if (item.getId() == Item.SNOWBALL) {
+                    if (item.getId() == Item.SNOWBALL) {
                         CompoundTag nbt = new CompoundTag()
                                 .putList(new ListTag<DoubleTag>("Pos")
                                         .add(new DoubleTag("", x))
@@ -2522,7 +2516,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         boolean fastEat = System.currentTimeMillis() - lastEat < 1800; //2 seconds
 
                         PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand, fastEat);
-                        if(fastEat){
+                        if (fastEat) {
                             consumeEvent.setCancelled();
                         }
 
