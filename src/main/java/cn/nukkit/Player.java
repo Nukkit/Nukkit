@@ -2513,12 +2513,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     case EntityEventPacket.USE_ITEM: //Eating
                         Item itemInHand = this.inventory.getItemInHand();
 
-                        boolean fastEat = System.currentTimeMillis() - lastEat < 1800; //2 seconds
-
-                        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand, fastEat);
-                        if (fastEat) {
-                            consumeEvent.setCancelled();
-                        }
+                        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
 
                         this.server.getPluginManager().callEvent(consumeEvent);
                         if (consumeEvent.isCancelled()) {
