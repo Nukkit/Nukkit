@@ -11,11 +11,11 @@ public class ItemGlassBottle extends Item {
         this(0, 1);
     }
 
-    public ItemGlassBottle(int meta) {
+    public ItemGlassBottle(Integer meta) {
         this(meta, 1);
     }
 
-    public ItemGlassBottle(int meta, int count) {
+    public ItemGlassBottle(Integer meta, int count) {
         super(GLASS_BOTTLE, meta, count, "Glass Bottle");
     }
 
