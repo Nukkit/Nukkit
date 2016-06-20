@@ -84,7 +84,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final int SPECTATOR = 3;
     public static final int VIEW = SPECTATOR;
 
-    public static final int SURVIVAL_SLOTS = 36;
+    public static final int SURVIVAL_SLOTS = 45;
     public static final int CREATIVE_SLOTS = 112;
 
     protected SourceInterface interfaz;

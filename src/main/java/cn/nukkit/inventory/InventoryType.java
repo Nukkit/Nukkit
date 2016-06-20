@@ -40,7 +40,7 @@ public class InventoryType {
 
         defaults.put(CHEST, new InventoryType(27, "Chest", 0));
         defaults.put(DOUBLE_CHEST, new InventoryType((27 + 27), "Double Chest", 0));
-        defaults.put(PLAYER, new InventoryType(49, "Player", 0)); //36 CONTAINER, 4 ARMOR (9 reference HOTBAR slots)
+        defaults.put(PLAYER, new InventoryType(58, "Player", 0)); //45 CONTAINER, 4 ARMOR (9 reference HOTBAR slots)
         defaults.put(FURNACE, new InventoryType(3, "Furnace", 2));
         defaults.put(CRAFTING, new InventoryType(5, "Crafting", 1)); //4 CRAFTING slots, 1 RESULT
         defaults.put(WORKBENCH, new InventoryType(10, "Crafting", 1)); //9 CRAFTING slots, 1 RESULT
