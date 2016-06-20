@@ -1731,11 +1731,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.dataPacket(containerSetContentPacket);
         }
         
-        SetEntityDataPacket pk = new SetEntityDataPacket();
-        pk.eid = 0;
-        pk.metadata = new EntityMetadata().putLong(DATA_LEAD_HOLDER, -1);
-        		
-        this.dataPacket(pk);
+        SetEntityDataPacket entityDataPacket = new SetEntityDataPacket();
+        entityDataPacket.eid = 0;
+        entityDataPacket.metadata = new EntityMetadata().putLong(DATA_LEAD_HOLDER, -1);
+        this.dataPacket(entityDataPacket);
         
         this.forceMovement = this.teleportPosition = this.getPosition();
 
