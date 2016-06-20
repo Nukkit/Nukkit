@@ -1730,10 +1730,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             containerSetContentPacket.slots = Item.getCreativeItems().stream().toArray(Item[]::new);
             this.dataPacket(containerSetContentPacket);
         }
-
+        
+        SetEntityDataPacket pk = new SetEntityDataPacket();
+        pk.eid = 0;
+        pk.metadata = new EntityMetadata().putLong(DATA_LEAD_HOLDER, -1);
+        		
+        this.dataPacket(pk);
+        
         this.forceMovement = this.teleportPosition = this.getPosition();
 
         this.server.onPlayerLogin(this);
+
     }
 
     public void handleDataPacket(DataPacket packet) {
