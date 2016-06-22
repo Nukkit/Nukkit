@@ -44,7 +44,7 @@ public class RCON {
             return;
         }
 
-        RCONServer.RCONCommand command;
+        RCONCommand command;
         while ((command = serverThread.receive()) != null) {
             RemoteConsoleCommandSender sender = new RemoteConsoleCommandSender();
             RemoteServerCommandEvent event = new RemoteServerCommandEvent(sender, command.getCommand());

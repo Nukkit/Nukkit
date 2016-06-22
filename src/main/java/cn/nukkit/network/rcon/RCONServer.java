@@ -35,33 +35,6 @@ public class RCONServer extends Thread {
     private final List<RCONCommand> receiveQueue = new ArrayList<>();
     private final Map<SocketChannel, List<RCONPacket>> sendQueues = new HashMap<>();
 
-    /**
-     * A data structure to hold sender, request ID and command itself.
-     */
-    public class RCONCommand {
-        private SocketChannel sender;
-        private int id;
-        private String command;
-
-        public RCONCommand(SocketChannel sender, int id, String command) {
-            this.sender = sender;
-            this.id = id;
-            this.command = command;
-        }
-
-        public SocketChannel getSender() {
-            return this.sender;
-        }
-
-        public int getId() {
-            return this.id;
-        }
-
-        public String getCommand() {
-            return this.command;
-        }
-    }
-
     public RCONServer(String address, int port, String password) throws IOException {
         this.setName("RCON");
         this.running = true;
