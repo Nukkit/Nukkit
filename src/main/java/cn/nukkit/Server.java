@@ -1838,6 +1838,8 @@ public class Server {
         Entity.registerEntity("Boat", EntityBoat.class);
 
         Entity.registerEntity("Lightning", EntityLightning.class);
+
+        Entity.registerEntity("Map", EntityMap.class, true);
     }
 
     private void registerBlockEntities() {

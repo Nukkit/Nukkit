@@ -3,6 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.Player;
 import cn.nukkit.block.*;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.item.EntityMap;
 import cn.nukkit.inventory.Fuel;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
@@ -719,6 +720,9 @@ public class Item implements Cloneable {
             list[ROTTEN_FLESH] = ItemRottenFlesh.class;
 
             list[FLOWER_POT] = ItemFlowerPot.class;
+
+            list[MAP] = ItemMap.class;
+            list[EMPTY_MAP] = ItemEmptyMap.class;
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
