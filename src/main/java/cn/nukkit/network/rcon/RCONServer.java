@@ -11,22 +11,59 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
+ * Thread that performs all RCON network work. A server.
  * @author Tee7even
  */
 public class RCONServer extends Thread {
+    private static final int SERVERDATA_AUTH = 3;
+    private static final int SERVERDATA_AUTH_RESPONSE = 2;
+    private static final int SERVERDATA_EXECCOMMAND = 2;
+    private static final int SERVERDATA_RESPONSE_VALUE = 0;
+
     private volatile boolean running;
 
     private ServerSocketChannel serverChannel;
     private Selector selector;
 
-    private final List<Map.Entry<SocketChannel, RCONPacket>> receiveQueue = new ArrayList<>();
+    private String password;
+    private Set<SocketChannel> rconSessions = new HashSet<>();
+
+    private final List<RCONCommand> receiveQueue = new ArrayList<>();
     private final Map<SocketChannel, List<RCONPacket>> sendQueues = new HashMap<>();
 
-    public RCONServer(String address, int port) throws IOException {
-        setName("RCON");
+    /**
+     * A data structure to hold sender, request ID and command itself.
+     */
+    public class RCONCommand {
+        private SocketChannel sender;
+        private int id;
+        private String command;
+
+        public RCONCommand(SocketChannel sender, int id, String command) {
+            this.sender = sender;
+            this.id = id;
+            this.command = command;
+        }
+
+        public SocketChannel getSender() {
+            return this.sender;
+        }
+
+        public int getId() {
+            return this.id;
+        }
+
+        public String getCommand() {
+            return this.command;
+        }
+    }
+
+    public RCONServer(String address, int port, String password) throws IOException {
+        this.setName("RCON");
         this.running = true;
 
         this.serverChannel = ServerSocketChannel.open();
@@ -35,36 +72,29 @@ public class RCONServer extends Thread {
 
         this.selector = SelectorProvider.provider().openSelector();
         this.serverChannel.register(this.selector, SelectionKey.OP_ACCEPT);
+
+        this.password = password;
     }
 
-    public Map.Entry<SocketChannel, RCONPacket> receive() {
+    public RCONCommand receive() {
         synchronized (this.receiveQueue) {
             if (!this.receiveQueue.isEmpty()) {
-                Map.Entry<SocketChannel, RCONPacket> pair = this.receiveQueue.get(0);
+                RCONCommand command = this.receiveQueue.get(0);
                 this.receiveQueue.remove(0);
-                return pair;
+                return command;
             }
 
             return null;
         }
     }
 
-    public void send(SocketChannel channel, RCONPacket packet) {
-        synchronized (this.sendQueues) {
-            List<RCONPacket> queue = sendQueues.get(channel);
-            if (queue == null) {
-                queue = new ArrayList<>();
-                sendQueues.put(channel, queue);
-            }
-
-            queue.add(packet);
-        }
-
-        this.selector.wakeup();
+    public void respond(SocketChannel channel, int id, String response) {
+        this.send(channel, new RCONPacket(id, SERVERDATA_RESPONSE_VALUE, response.getBytes()));
     }
 
     public void close() {
         this.running = false;
+        this.selector.wakeup();
     }
 
     public void run() {
@@ -106,57 +136,103 @@ public class RCONServer extends Thread {
         }
 
         try {
+            this.serverChannel.keyFor(this.selector).cancel();
             this.serverChannel.close();
+            this.selector.close();
         } catch (IOException exception) {
-            Server.getInstance().getLogger().alert(exception.getMessage());
+            Server.getInstance().getLogger().logException(exception);
         }
 
-        this.notify();
+        synchronized (this) {
+            this.notify();
+        }
     }
 
     private void read(SelectionKey key) throws IOException {
-        SocketChannel socketChannel = (SocketChannel) key.channel();
+        SocketChannel channel = (SocketChannel) key.channel();
         ByteBuffer buffer = ByteBuffer.allocate(4096);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
 
         int bytesRead;
         try {
-            bytesRead = socketChannel.read(buffer);
+            bytesRead = channel.read(buffer);
         } catch (IOException exception) {
             key.cancel();
-            socketChannel.close();
-            this.receiveQueue.add(new AbstractMap.SimpleEntry<>(socketChannel, null));
+            channel.close();
+            if (this.rconSessions.contains(channel)) {
+                this.rconSessions.remove(channel);
+            }
             return;
         }
 
         if (bytesRead == -1) {
             key.cancel();
-            socketChannel.close();
-            this.receiveQueue.add(new AbstractMap.SimpleEntry<>(socketChannel, null));
+            channel.close();
+            if (this.rconSessions.contains(channel)) {
+                this.rconSessions.remove(channel);
+            }
             return;
         }
 
         buffer.flip();
-        synchronized (this.receiveQueue) {
-            this.receiveQueue.add(new AbstractMap.SimpleEntry<>(socketChannel, new RCONPacket(buffer)));
+        this.handle(channel, new RCONPacket(buffer));
+    }
+
+    private void handle(SocketChannel channel, RCONPacket packet) {
+        switch (packet.getType()) {
+            case SERVERDATA_AUTH:
+                byte[] payload = new byte[1];
+                payload[0] = 0;
+
+                if (new String(packet.getPayload(), Charset.forName("UTF-8")).equals(this.password)) {
+                    this.rconSessions.add(channel);
+                    this.send(channel, new RCONPacket(packet.getId(), SERVERDATA_AUTH_RESPONSE, payload));
+                    return;
+                }
+
+                this.send(channel, new RCONPacket(-1, SERVERDATA_AUTH_RESPONSE, payload));
+                break;
+            case SERVERDATA_EXECCOMMAND:
+                if (!this.rconSessions.contains(channel)) {
+                    return;
+                }
+
+                String command = new String(packet.getPayload(), Charset.forName("UTF-8")).trim();
+                synchronized (this.receiveQueue) {
+                    this.receiveQueue.add(new RCONCommand(channel, packet.getId(), command));
+                }
+                break;
         }
     }
 
     private void write(SelectionKey key) throws IOException {
-        SocketChannel socketChannel = (SocketChannel) key.channel();
+        SocketChannel channel = (SocketChannel) key.channel();
 
         synchronized (this.sendQueues) {
-            List<RCONPacket> queue = this.sendQueues.get(socketChannel);
+            List<RCONPacket> queue = this.sendQueues.get(channel);
 
             ByteBuffer buffer = queue.get(0).toBuffer();
-            socketChannel.write(buffer);
+            channel.write(buffer);
             queue.remove(0);
 
             if (queue.isEmpty()) {
-                this.sendQueues.remove(socketChannel);
+                this.sendQueues.remove(channel);
             }
 
             key.interestOps(SelectionKey.OP_READ);
         }
+    }
+
+    private void send(SocketChannel channel, RCONPacket packet) {
+        synchronized (this.sendQueues) {
+            List<RCONPacket> queue = sendQueues.get(channel);
+            if (queue == null) {
+                queue = new ArrayList<>();
+                sendQueues.put(channel, queue);
+            }
+            queue.add(packet);
+        }
+
+        this.selector.wakeup();
     }
 }
