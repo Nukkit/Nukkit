@@ -429,8 +429,6 @@ public class Server {
             this.setDefaultLevel(this.getLevelByName(defaultName));
         }
 
-        this.properties.save(true);
-
         if (this.getDefaultLevel() == null) {
             this.getLogger().emergency(this.getLanguage().translateString("nukkit.level.defaultError"));
             this.forceShutdown();
