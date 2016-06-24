@@ -3,6 +3,7 @@ package cn.nukkit;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityItemFrame;
 import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.command.CommandSender;
@@ -18,6 +19,7 @@ import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.entity.projectile.EntitySnowball;
 import cn.nukkit.event.TextContainer;
 import cn.nukkit.event.TranslationContainer;
+import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.block.SignChangeEvent;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.inventory.CraftItemEvent;
@@ -29,10 +31,7 @@ import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.event.server.DataPacketSendEvent;
 import cn.nukkit.inventory.*;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemArrow;
-import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemGlassBottle;
+import cn.nukkit.item.*;
 import cn.nukkit.item.food.Food;
 import cn.nukkit.level.ChunkLoader;
 import cn.nukkit.level.Level;
@@ -3058,6 +3057,25 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 ChunkRadiusUpdatedPacket chunkRadiusUpdatePacket = new ChunkRadiusUpdatedPacket();
                 chunkRadiusUpdatePacket.radius = this.viewDistance;
                 this.dataPacket(chunkRadiusUpdatePacket);
+                break;
+            case ProtocolInfo.ITEM_FRAME_DROP_ITEM_PACKET:
+                ItemFrameDropItemPacket itemFrameDropItemPacket = (ItemFrameDropItemPacket) packet;
+
+                BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) this.level.getBlockEntity(temporalVector.setComponents(itemFrameDropItemPacket.x, itemFrameDropItemPacket.y, itemFrameDropItemPacket.z));
+                if (itemFrame != null) {
+                    Block block = itemFrame.getBlock();
+                    Item itemDrop = itemFrame.getItem();
+
+                    ItemFrameDropItemEvent itemFrameDropItemEvent = new ItemFrameDropItemEvent(this, block, itemFrame, itemDrop);
+                    this.server.getPluginManager().callEvent(itemFrameDropItemEvent);
+                    if (!itemFrameDropItemEvent.isCancelled()) {
+                        if (itemDrop.getId() != Item.AIR) {
+                            this.level.dropItem(temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5), itemDrop);
+                            itemFrame.setItem(new ItemBlock(new BlockAir()));
+                            itemFrame.setItemRotation(0);
+                        }
+                    } else itemFrame.spawnTo(this);
+                }
                 break;
             default:
                 break;

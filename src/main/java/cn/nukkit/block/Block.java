@@ -123,7 +123,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int LIT_REDSTONE_ORE = 74;
 
     public static final int REDSTONE_TORCH = 76;
-
+    public static final int STONE_BUTTON = 77;
     public static final int SNOW = 78;
     public static final int SNOW_LAYER = 78;
     public static final int ICE = 79;
@@ -206,7 +206,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int FLOWER_POT_BLOCK = 140;
     public static final int CARROT_BLOCK = 141;
     public static final int POTATO_BLOCK = 142;
-
+    public static final int WOODEN_BUTTON = 143;
     public static final int SKULL_BLOCK = 144;
     public static final int ANVIL = 145;
     public static final int TRAPPED_CHEST = 146;
@@ -265,8 +265,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int JUNGLE_DOOR_BLOCK = 195;
     public static final int ACACIA_DOOR_BLOCK = 196;
     public static final int DARK_OAK_DOOR_BLOCK = 197;
-
     public static final int GRASS_PATH = 198;
+    public static final int ITEM_FRAME_BLOCK = 199;
 
     public static final int PODZOL = 243;
     public static final int BEETROOT_BLOCK = 244;
@@ -385,6 +385,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[NETHER_PORTAL] = BlockNetherPortal.class;
             list[LIT_PUMPKIN] = BlockPumpkinLit.class;
             list[CAKE_BLOCK] = BlockCake.class;
+            list[ITEM_FRAME_BLOCK] = BlockItemFrame.class;
 
             list[INVISIBLE_BEDROCK] = BlockBedrockInvisible.class;
             list[TRAPDOOR] = BlockTrapdoor.class;
@@ -486,6 +487,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[REDSTONE_LAMP] = BlockRedstoneLamp.class;
             list[STONE_PRESSURE_PLATE] = BlockPressurePlateStone.class;
             list[WOODEN_PRESSURE_PLATE] = BlockPressurePlateWood.class;
+            list[WOODEN_BUTTON] = BlockButtonWooden.class;
+            list[STONE_BUTTON] = BlockButtonStone.class;
 
             list[SKULL_BLOCK] = BlockSkull.class;
 
@@ -541,8 +544,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return get(id, meta, null);
     }
 
-    @SuppressWarnings("unchecked")
     public static Block get(int id, Integer meta, Position pos) {
+        return get(id, meta, pos, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Block get(int id, Integer meta, Position pos, boolean safe) { //due to 0.15 block crash
         Block block;
         try {
             Class c = list[id];
@@ -551,10 +558,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
                 constructor.setAccessible(true);
                 block = (Block) constructor.newInstance(meta);
             } else {
-                block = new BlockUnknown(id, meta);
+                block = new BlockUnknown(safe ? 248 : id, meta);
             }
         } catch (Exception e) {
-            block = new BlockUnknown(id, meta);
+            block = new BlockUnknown(safe ? 248 : id, meta);
         }
 
         if (pos != null) {
@@ -639,7 +646,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     public boolean isSolid() {
-        return true;
+        return false;
     }
 
     public boolean canBeFlowedInto() {
