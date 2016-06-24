@@ -2,7 +2,7 @@ package cn.nukkit.network.protocol;
 
 import cn.nukkit.item.Item;
 
-public class ItemFrameDropItemPacket extends DataPacket{
+public class ItemFrameDropItemPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.ITEM_FRAME_DROP_ITEM_PACKET;
 
@@ -12,7 +12,7 @@ public class ItemFrameDropItemPacket extends DataPacket{
     public Item dropItem;
 
     @Override
-    public void decode(){
+    public void decode() {
         this.z = getInt();
         this.y = getInt();
         this.x = getInt();
@@ -20,12 +20,12 @@ public class ItemFrameDropItemPacket extends DataPacket{
     }
 
     @Override
-    public void encode(){
+    public void encode() {
 
     }
 
     @Override
-    public byte pid(){
+    public byte pid() {
         return NETWORK_ID;
     }
 }

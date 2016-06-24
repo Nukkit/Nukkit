@@ -488,7 +488,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.sleeping != null;
     }
 
-    public int getInAirTicks(){
+    public int getInAirTicks() {
         return this.inAirTicks;
     }
 
@@ -1996,7 +1996,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    if(item instanceof ItemEdible){
+                    if (item instanceof ItemEdible) {
                         lastEat = System.currentTimeMillis();
 
                     } else if (item.getId() == Item.SNOWBALL) {
@@ -2476,7 +2476,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             case InteractPacket.ACTION_RIGHT_CLICK:
                                 cancelled = true;
 
-                                if(((EntityVehicle) targetEntity).linkedEntity != null){
+                                if (((EntityVehicle) targetEntity).linkedEntity != null) {
                                     break;
                                 }
                                 pk = new SetEntityLinkPacket();
@@ -2577,7 +2577,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         boolean fastEat = System.currentTimeMillis() - lastEat < 1800; //2 seconds
 
                         PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand, fastEat);
-                        if(fastEat){
+                        if (fastEat) {
                             consumeEvent.setCancelled();
                         }
 
@@ -2588,8 +2588,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
 
                         if (itemInHand.getId() == Item.POTION) {
-                            Potion potion = Potion.getPotion(itemInHand.getDamage()).setSplash(false);	
-                        	
+                            Potion potion = Potion.getPotion(itemInHand.getDamage()).setSplash(false);
+
                             if (this.getGamemode() == SURVIVAL) {
                                 if (itemInHand.getCount() > 1) {
                                     ItemGlassBottle bottle = new ItemGlassBottle();
@@ -3064,7 +3064,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 ItemFrameDropItemPacket itemFrameDropItemPacket = (ItemFrameDropItemPacket) packet;
 
                 BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) this.level.getBlockEntity(temporalVector.setComponents(itemFrameDropItemPacket.x, itemFrameDropItemPacket.y, itemFrameDropItemPacket.z));
-                if(itemFrame != null) {
+                if (itemFrame != null) {
                     Block block = this.level.getBlock(itemFrame);
                     Item itemDrop = itemFrame.getItem();
 
@@ -3274,7 +3274,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.hasSpawned = new HashMap<>();
             this.spawnPosition = null;
 
-            if(this.riding instanceof EntityVehicle){
+            if (this.riding instanceof EntityVehicle) {
                 ((EntityVehicle) this.riding).linkedEntity = null;
             }
 

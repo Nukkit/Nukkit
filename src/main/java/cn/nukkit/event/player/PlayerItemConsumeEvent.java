@@ -32,7 +32,7 @@ public class PlayerItemConsumeEvent extends PlayerEvent implements Cancellable {
         return this.item.clone();
     }
 
-    public boolean isFastEat(){
+    public boolean isFastEat() {
         return fastEat;
     }
 }

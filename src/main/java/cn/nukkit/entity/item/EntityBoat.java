@@ -101,7 +101,7 @@ public class EntityBoat extends EntityVehicle {
     public void close() {
         super.close();
 
-        if(this.linkedEntity instanceof Player){
+        if (this.linkedEntity instanceof Player) {
             this.linkedEntity.riding = null;
         }
 

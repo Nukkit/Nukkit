@@ -86,6 +86,7 @@ public class BlockEntityItemFrame extends BlockEntitySpawnable {
                     .putInt("x", (int) this.x)
                     .putInt("y", (int) this.y)
                     .putInt("z", (int) this.z)
+                    .putCompound("Item", NBTIO.putItemHelper(new ItemBlock(new BlockAir())))
                     .putByte("ItemRotation", 0)
                     .putFloat("ItemDropChance", getItemDropChance());
         } else {
