@@ -3063,16 +3063,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) this.level.getBlockEntity(temporalVector.setComponents(itemFrameDropItemPacket.x, itemFrameDropItemPacket.y, itemFrameDropItemPacket.z));
                 if (itemFrame != null) {
-                    Block block = this.level.getBlock(itemFrame);
+                    System.out.println("!= null");
+                    Block block = itemFrame.getBlock();
                     Item itemDrop = itemFrame.getItem();
 
                     ItemFrameDropItemEvent itemFrameDropItemEvent = new ItemFrameDropItemEvent(this, block, itemFrame, itemDrop);
                     this.server.getPluginManager().callEvent(itemFrameDropItemEvent);
                     if (!itemFrameDropItemEvent.isCancelled()) {
                         if (itemDrop.getId() != Item.AIR) {
-                            if (((new Random().nextInt(10) - 1) / 10) < itemFrame.getItemDropChance()) {
-                                this.level.dropItem(itemFrame, itemDrop);
-                            }
+                            System.out.println("drop");
+                            this.level.dropItem(temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5), itemDrop);
                             itemFrame.setItem(new ItemBlock(new BlockAir()));
                             itemFrame.setItemRotation(0);
                         }

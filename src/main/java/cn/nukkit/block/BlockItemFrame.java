@@ -3,12 +3,10 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityItemFrame;
-import cn.nukkit.event.level.LevelEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.*;
-import cn.nukkit.network.protocol.LevelEventPacket;
 
 import java.util.Random;
 
@@ -108,12 +106,15 @@ public class BlockItemFrame extends BlockTransparent {
             switch (face) {
                 case Vector3.SIDE_NORTH:
                     this.meta = 3;
+                    break;
                 case Vector3.SIDE_SOUTH:
                     this.meta = 2;
-                case Vector3.SIDE_EAST:
-                    this.meta = 0;
+                    break;
                 case Vector3.SIDE_WEST:
                     this.meta = 1;
+                    break;
+                case Vector3.SIDE_EAST:
+                    this.meta = 0;
                     break;
                 default:
                     return false;
