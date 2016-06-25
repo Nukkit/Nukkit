@@ -52,6 +52,7 @@ import cn.nukkit.network.protocol.CraftingDataPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.PlayerListPacket;
 import cn.nukkit.network.query.QueryHandler;
+import cn.nukkit.network.rcon.RCON;
 import cn.nukkit.permission.BanEntry;
 import cn.nukkit.permission.BanList;
 import cn.nukkit.permission.DefaultPermissions;
@@ -128,6 +129,8 @@ public class Server {
     private int maxPlayers;
 
     private boolean autoSave;
+
+    private RCON rcon;
 
     private EntityMetadataStore entityMetadata;
 
@@ -309,6 +312,10 @@ public class Server {
         this.baseTickRate = (int) this.getConfig("level-settings.base-tick-rate", 1);
 
         this.scheduler = new ServerScheduler();
+
+        if (this.getPropertyBoolean("enable-rcon", false)) {
+            this.rcon = new RCON(this, this.getPropertyString("rcon.password", ""), (!this.getIp().equals("")) ? this.getIp() : "0.0.0.0", this.getPropertyInt("rcon.port", this.getPort()));
+        }
 
         this.entityMetadata = new EntityMetadataStore();
         this.playerMetadata = new PlayerMetadataStore();
@@ -689,6 +696,10 @@ public class Server {
 
             this.shutdown();
 
+            if (this.rcon != null) {
+                this.rcon.close();
+            }
+
             this.getLogger().debug("Disabling all plugins");
             this.pluginManager.disablePlugins();
 
@@ -707,9 +718,6 @@ public class Server {
             this.getLogger().debug("Stopping all tasks");
             this.scheduler.cancelAllTasks();
             this.scheduler.mainThreadHeartbeat(Integer.MAX_VALUE);
-
-            this.getLogger().debug("Saving properties");
-            this.properties.save();
 
             this.getLogger().debug("Closing console");
             this.console.interrupt();
@@ -959,6 +967,10 @@ public class Server {
         ++this.tickCounter;
 
         this.network.processInterfaces();
+
+        if (this.rcon != null) {
+            this.rcon.check();
+        }
 
         this.scheduler.mainThreadHeartbeat(this.tickCounter);
 
@@ -1674,6 +1686,7 @@ public class Server {
 
     public void setPropertyString(String variable, String value) {
         this.properties.set(variable, value);
+        this.properties.save();
     }
 
     public String getPropertyString(String variable) {
@@ -1694,6 +1707,7 @@ public class Server {
 
     public void setPropertyInt(String variable, int value) {
         this.properties.set(variable, value);
+        this.properties.save();
     }
 
     public boolean getPropertyBoolean(String variable) {
@@ -1717,6 +1731,7 @@ public class Server {
 
     public void setPropertyBoolean(String variable, boolean value) {
         this.properties.set(variable, value ? "1" : "0");
+        this.properties.save();
     }
 
     public PluginIdentifiableCommand getPluginCommand(String name) {
