@@ -1408,47 +1408,57 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean teleport(Vector3 pos) {
-        return this.teleport(pos, PlayerTeleportEvent.TeleportCause.PLUGIN);
+        if (pos instanceof Location) {
+            return this.teleportYawAndPitch(pos, ((Location) pos).yaw, ((Location) pos).pitch);
+        } else {
+            return this.teleportYawAndPitch(pos, this.yaw, this.pitch);
+        }
     }
 
-    public boolean teleport(Vector3 pos, PlayerTeleportEvent.TeleportCause cause) {
-        return this.teleport(Location.fromObject(pos, this.level, this.yaw, this.pitch), cause);
+    public boolean teleport(Vector3 pos, double yaw, double pitch) {
+        return this.teleportYawAndPitch(pos, yaw, pitch);
     }
 
-    public boolean teleport(Position pos) {
-        return this.teleport(pos, PlayerTeleportEvent.TeleportCause.PLUGIN);
+    public boolean teleportYaw(Vector3 pos, double yaw) {
+        if (pos instanceof Location) {
+            return this.teleportYawAndPitch(pos, ((Location) pos).yaw, ((Location) pos).pitch);
+        } else {
+            return this.teleportYawAndPitch(pos, yaw, this.pitch);
+        }
     }
 
-    public boolean teleport(Position pos, PlayerTeleportEvent.TeleportCause cause) {
-        return this.teleport(Location.fromObject(pos, pos.level, this.yaw, this.pitch), cause);
+    public boolean teleportPitch(Vector3 pos, double pitch) {
+        if (pos instanceof Location) {
+            return this.teleportYawAndPitch(pos, ((Location) pos).yaw, ((Location) pos).pitch);
+        } else {
+            return this.teleportYawAndPitch(pos, this.yaw, pitch);
+        }
     }
 
-    public boolean teleport(Location location) {
-        return this.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
-    }
-
-    public boolean teleport(Location location, PlayerTeleportEvent.TeleportCause cause) {
-        double yaw = location.yaw;
-        double pitch = location.pitch;
-
-        Location from = this.getLocation();
-        Location to = location;
-        if (cause != null) {
-            EntityTeleportEvent ev = new EntityTeleportEvent(this, from, to);
-            this.server.getPluginManager().callEvent(ev);
-            if (ev.isCancelled()) {
-                return false;
-            }
-            to = ev.getTo();
+    public boolean teleportYawAndPitch(Vector3 pos, double yaw, double pitch) {
+        Position from = Position.fromObject(this, this.level);
+        Position to = Position.fromObject(pos, pos instanceof Position ? ((Position) pos).getLevel() : this.level);
+        EntityTeleportEvent ev = new EntityTeleportEvent(this, from, to);
+        this.server.getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) {
+            return false;
         }
 
         this.ySize = 0;
+        pos = ev.getTo();
 
         this.setMotion(this.temporalVector.setComponents(0, 0, 0));
 
-        if (this.setPositionAndRotation(to, yaw, pitch)) {
+        if (this.setPositionAndRotation(pos, yaw, pitch)) {
             this.resetFallDistance();
             this.onGround = true;
+
+            this.lastX = this.x;
+            this.lastY = this.y;
+            this.lastZ = this.z;
+
+            this.lastYaw = this.yaw;
+            this.lastPitch = this.pitch;
 
             this.updateMovement();
 

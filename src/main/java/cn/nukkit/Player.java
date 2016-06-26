@@ -3729,80 +3729,191 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
-    public boolean teleport(Location location, TeleportCause cause) {
+    public boolean teleport(Vector3 pos) {
+        return teleport(pos, TeleportCause.PLUGIN);
+    }
+
+    public boolean teleport(Vector3 pos, TeleportCause cause) {
+        if (!this.isOnline()) {
+            return false;
+        }
+        if (cause != null) {
+            PlayerTeleportEvent event = new PlayerTeleportEvent(this, this.getLocation(), pos, cause);
+            this.server.getPluginManager().callEvent(event);
+            if (event.isCancelled()) return false;
+        }
+        Position oldPos = this.getPosition();
+        if (super.teleport(pos)) {
+            this.resetAfterTeleport(oldPos);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean teleport(Vector3 pos, double yaw, double pitch) {
+        return teleport(pos, yaw, pitch, TeleportCause.PLUGIN);
+    }
+
+    public boolean teleport(Vector3 pos, double yaw, double pitch, TeleportCause cause) {
+        if (!this.isOnline()) {
+            return false;
+        }
+        if (cause != null) {
+            PlayerTeleportEvent event = new PlayerTeleportEvent(this, this.getLocation(), pos, cause);
+            this.server.getPluginManager().callEvent(event);
+            if (event.isCancelled()) return false;
+        }
+        Position oldPos = this.getPosition();
+        if (super.teleport(pos, yaw, pitch)) {
+            this.resetAfterTeleport(oldPos);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean teleportYaw(Vector3 pos, double yaw) {
+        return teleportYaw(pos, yaw, TeleportCause.PLUGIN);
+    }
+
+    public boolean teleportYaw(Vector3 pos, double yaw, TeleportCause cause) {
         if (!this.isOnline()) {
             return false;
         }
 
-        Location from = this.getLocation();
-        Location to = location;
-
         if (cause != null) {
-            PlayerTeleportEvent event = new PlayerTeleportEvent(this, from, to, cause);
+            PlayerTeleportEvent event = new PlayerTeleportEvent(this, this.getLocation(), pos, cause);
             this.server.getPluginManager().callEvent(event);
             if (event.isCancelled()) return false;
-            to = event.getTo();
         }
-
         Position oldPos = this.getPosition();
-        if (super.teleport(to, null)) { // null to prevent fire of duplicate EntityTeleportEvent
-
-            for (Inventory window : new ArrayList<>(this.windowIndex.values())) {
-                if (window == this.inventory) {
-                    continue;
-                }
-                this.removeWindow(window);
-            }
-
-            this.teleportPosition = new Vector3(this.x, this.y, this.z);
-
-            if (!this.checkTeleportPosition()) {
-                this.forceMovement = oldPos;
-            } else {
-                this.spawnToAll();
-            }
-
-            this.resetFallDistance();
-            this.nextChunkOrderRun = 0;
-            this.newPosition = null;
-
-            //Weather
-            this.getLevel().sendWeather(this);
-            //Update time
-            this.getLevel().sendTime(this);
+        if (super.teleportYaw(pos, yaw)) {
+            this.resetAfterTeleport(oldPos);
             return true;
         }
 
         return false;
     }
 
-    public void teleportImmediate(Location location) {
-        this.teleportImmediate(location, TeleportCause.PLUGIN);
+    @Override
+    public boolean teleportPitch(Vector3 pos, double pitch) {
+        return teleportPitch(pos, pitch, TeleportCause.PLUGIN);
     }
 
-    public void teleportImmediate(Location location, TeleportCause cause) {
-        if (super.teleport(location, cause)) {
-
-            for (Inventory window : new ArrayList<>(this.windowIndex.values())) {
-                if (window == this.inventory) {
-                    continue;
-                }
-                this.removeWindow(window);
-            }
-
-            this.forceMovement = new Vector3(this.x, this.y, this.z);
-            this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);
-
-            this.resetFallDistance();
-            this.orderChunks();
-            this.nextChunkOrderRun = 0;
-            this.newPosition = null;
-
-            //Weather
-            this.getLevel().sendWeather(this);
-            //Update time
-            this.getLevel().sendTime(this);
+    public boolean teleportPitch(Vector3 pos, double pitch, TeleportCause cause) {
+        if (!this.isOnline()) {
+            return false;
         }
+        if (cause != null) {
+            PlayerTeleportEvent event = new PlayerTeleportEvent(this, this.getLocation(), pos, cause);
+            this.server.getPluginManager().callEvent(event);
+            if (event.isCancelled()) return false;
+        }
+        Position oldPos = this.getPosition();
+        if (super.teleportPitch(pos, pitch)) {
+            this.resetAfterTeleport(oldPos);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean teleportYawAndPitch(Vector3 pos, double yaw, double pitch) {
+        return teleportYawAndPitch(pos, yaw, pitch, TeleportCause.PLUGIN);
+    }
+
+    public boolean teleportYawAndPitch(Vector3 pos, double yaw, double pitch, TeleportCause cause) {
+        if (!this.isOnline()) {
+            return false;
+        }
+        if (cause != null) {
+            PlayerTeleportEvent event = new PlayerTeleportEvent(this, this.getLocation(), pos, cause);
+            this.server.getPluginManager().callEvent(event);
+            if (event.isCancelled()) return false;
+        }
+        Position oldPos = this.getPosition();
+        if (super.teleportYawAndPitch(pos, yaw, pitch)) {
+            this.resetAfterTeleport(oldPos);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void resetAfterTeleport(Position oldPos) {
+        for (Inventory window : new ArrayList<>(this.windowIndex.values())) {
+            if (Objects.equals(window, this.inventory)) {
+                continue;
+            }
+            this.removeWindow(window);
+        }
+
+        this.teleportPosition = new Vector3(this.x, this.y, this.z);
+
+        if (!this.checkTeleportPosition()) {
+            this.forceMovement = oldPos;
+        } else {
+            this.spawnToAll();
+        }
+
+
+        this.resetFallDistance();
+        this.nextChunkOrderRun = 0;
+        this.newPosition = null;
+
+        //Weather
+        this.getLevel().sendWeather(this);
+        //Update time
+        this.getLevel().sendTime(this);
+    }
+
+    public void teleportImmediate(Vector3 pos) {
+        if (super.teleport(pos)) {
+            resetAfterTeleportImmediate();
+        }
+    }
+
+    public void teleportImmediate(Vector3 pos, double yaw, double pitch) {
+        if (super.teleport(pos, yaw, pitch)) {
+            resetAfterTeleportImmediate();
+        }
+    }
+
+    public void teleportImmediateYaw(Vector3 pos, double yaw) {
+        if (super.teleportYaw(pos, yaw)) {
+            resetAfterTeleportImmediate();
+        }
+    }
+
+    public void teleportImmediatePitch(Vector3 pos, double pitch) {
+        if (super.teleportPitch(pos, pitch)) {
+            resetAfterTeleportImmediate();
+        }
+    }
+
+    public void teleportImmediateYawAndPitch(Vector3 pos, double yaw, double pitch) {
+        if (super.teleportYawAndPitch(pos, yaw, pitch)) {
+            resetAfterTeleportImmediate();
+        }
+    }
+
+    private void resetAfterTeleportImmediate() {
+        for (Inventory window : new ArrayList<>(this.windowIndex.values())) {
+            if (Objects.equals(window, this.inventory)) {
+                continue;
+            }
+            this.removeWindow(window);
+        }
+
+        this.forceMovement = new Vector3(this.x, this.y, this.z);
+        this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);
+
+        this.resetFallDistance();
+        this.orderChunks();
+        this.nextChunkOrderRun = 0;
+        this.newPosition = null;
     }
 
     public int getWindowId(Inventory inventory) {
