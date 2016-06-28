@@ -6,6 +6,7 @@ import cn.nukkit.entity.data.Skin;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -52,6 +53,10 @@ public class EntityHuman extends EntityCreature implements InventoryHolder {
     @Override
     public float getEyeHeight() {
         return 1.62f;
+    }
+
+    public Location getEyeLocation(){
+        return new Location(this.x, this.y+this.getEyeHeight(), this.z, this.yaw, this.pitch, this.level);
     }
 
     protected Skin skin;

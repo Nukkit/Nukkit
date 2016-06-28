@@ -3,12 +3,16 @@ package cn.nukkit.entity.item;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.EnchantParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.particle.SpellParticle;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.DoubleTag;
+import cn.nukkit.nbt.tag.FloatTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
 /**
@@ -18,6 +22,22 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 public class EntityExpBottle extends EntityProjectile {
 
     public static final int NETWORK_ID = 68;
+
+    public EntityExpBottle(FullChunk chunk, Location loc, int potion, Player player) {
+        super(chunk, new CompoundTag()
+                .putList(new ListTag<DoubleTag>("Pos")
+                        .add(new DoubleTag("", loc.getX()))
+                        .add(new DoubleTag("", loc.getY()))
+                        .add(new DoubleTag("", loc.getZ())))
+                .putList(new ListTag<DoubleTag>("Motion")
+                        .add(new DoubleTag("", -Math.sin(loc.getYaw() / 180 * Math.PI) * Math.cos(loc.getPitch() / 180 * Math.PI)))
+                        .add(new DoubleTag("", -Math.sin(loc.getPitch() / 180 * Math.PI)))
+                        .add(new DoubleTag("", Math.cos(loc.getYaw() / 180 * Math.PI) * Math.cos(loc.getPitch() / 180 * Math.PI))))
+                .putList(new ListTag<FloatTag>("Rotation")
+                        .add(new FloatTag("", (float) loc.getYaw()))
+                        .add(new FloatTag("", (float) loc.getPitch())))
+                .putInt("Potion", potion), player);
+    }
 
     @Override
     public int getNetworkId() {

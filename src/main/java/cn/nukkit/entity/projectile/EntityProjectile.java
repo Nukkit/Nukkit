@@ -4,6 +4,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.data.LongEntityData;
 import cn.nukkit.event.entity.*;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
@@ -28,12 +29,21 @@ public abstract class EntityProjectile extends Entity {
 
     public boolean hadCollision = false;
 
+
     public EntityProjectile(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);
     }
 
     public EntityProjectile(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
         super(chunk, nbt);
+        this.shootingEntity = shootingEntity;
+        if (shootingEntity != null) {
+            this.setDataProperty(new LongEntityData(DATA_SHOOTER_ID, shootingEntity.getId()));
+        }
+    }
+
+    public EntityProjectile(FullChunk chunk, Location loc, Entity shootingEntity) {
+        super (chunk, loc);
         this.shootingEntity = shootingEntity;
         if (shootingEntity != null) {
             this.setDataProperty(new LongEntityData(DATA_SHOOTER_ID, shootingEntity.getId()));

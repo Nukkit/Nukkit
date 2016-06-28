@@ -4,11 +4,15 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.potion.PotionCollideEvent;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.InstantSpellParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.particle.SpellParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.DoubleTag;
+import cn.nukkit.nbt.tag.FloatTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
@@ -31,6 +35,22 @@ public class EntityPotion extends EntityProjectile {
 
     public EntityPotion(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
         super(chunk, nbt, shootingEntity);
+    }
+
+    public EntityPotion(FullChunk chunk, Location loc, int potionId, Player shootingEntity) {
+        super(chunk, new CompoundTag()
+                .putList(new ListTag<DoubleTag>("Pos")
+                        .add(new DoubleTag("", loc.getX()))
+                        .add(new DoubleTag("", loc.getY()))
+                        .add(new DoubleTag("", loc.getZ())))
+                .putList(new ListTag<DoubleTag>("Motion")
+                        .add(new DoubleTag("", -Math.sin(loc.getYaw() / 180 * Math.PI) * Math.cos(loc.getPitch() / 180 * Math.PI)))
+                        .add(new DoubleTag("", -Math.sin(loc.getPitch() / 180 * Math.PI)))
+                        .add(new DoubleTag("", Math.cos(loc.getYaw() / 180 * Math.PI) * Math.cos(loc.getPitch() / 180 * Math.PI))))
+                .putList(new ListTag<FloatTag>("Rotation")
+                        .add(new FloatTag("", (float) loc.getYaw()))
+                        .add(new FloatTag("", (float) loc.getPitch())))
+                .putShort("PotionId", potionId), shootingEntity);
     }
 
     @Override
