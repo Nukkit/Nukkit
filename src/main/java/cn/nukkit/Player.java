@@ -793,7 +793,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * 0 is true
      * -1 is false
-     * other is identifer
+     * other is identifier
      */
     public boolean dataPacket(DataPacket packet) {
         return this.dataPacket(packet, false) != -1;
@@ -823,7 +823,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * 0 is true
      * -1 is false
-     * other is identifer
+     * other is identifier
      */
     public boolean directDataPacket(DataPacket packet) {
         return this.directDataPacket(packet, false) != -1;
@@ -831,12 +831,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public int directDataPacket(DataPacket packet, boolean needACK) {
         if (!this.connected) {
-            return -1;
-        }
-
-        DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
-        this.server.getPluginManager().callEvent(ev);
-        if (ev.isCancelled()) {
             return -1;
         }
 
