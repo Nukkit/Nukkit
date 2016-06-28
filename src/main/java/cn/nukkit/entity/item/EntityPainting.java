@@ -1,10 +1,12 @@
 package cn.nukkit.entity.item;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHanging;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.painting.PaintingBreakEvent;
 import cn.nukkit.item.ItemPainting;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -90,14 +92,22 @@ public class EntityPainting extends EntityHanging {
 
     @Override
     public void attack(EntityDamageEvent source) {
-        super.attack(source);
-        if (source.isCancelled()) return;
         if (source instanceof EntityDamageByEntityEvent) {
             Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
-            if (damager instanceof Player && ((Player) damager).isSurvival()) {
-                this.level.dropItem(this, new ItemPainting());
+            if (damager instanceof Player){
+                Player player = (Player) damager;
+                PaintingBreakEvent event = new PaintingBreakEvent(player, this);
+                Server.getInstance().getPluginManager().callEvent(event);
+                if (event.isCancelled()) {
+                    source.setCancelled();
+                    return;
+                }
+                if (player.isSurvival()) {
+                    this.level.dropItem(this, new ItemPainting());
+                }
             }
-        }
+        } else super.attack(source);
+        if (source.isCancelled()) return;
         this.close();
     }
 

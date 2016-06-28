@@ -1,8 +1,10 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.item.EntityPainting;
+import cn.nukkit.event.painting.PaintingPlaceEvent;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -85,6 +87,13 @@ public class ItemPainting extends Item {
                             .add(new FloatTag("1", 0)));
 
             EntityPainting entity = new EntityPainting(chunk, nbt);
+
+            PaintingPlaceEvent event = new PaintingPlaceEvent(player,entity);
+            Server.getInstance().getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                entity.close();
+                return false;
+            }
 
             if (player.isSurvival()) {
                 Item item = player.getInventory().getItemInHand();
