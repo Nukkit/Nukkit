@@ -208,6 +208,20 @@ public abstract class Entity extends Location implements Metadatable {
         this.init(chunk, nbt);
     }
 
+    public Entity(FullChunk chunk, Location loc) {
+        this(chunk, new CompoundTag()
+                .putList(new ListTag<DoubleTag>("Pos")
+                        .add(new DoubleTag("", loc.getX()))
+                        .add(new DoubleTag("", loc.getY()))
+                        .add(new DoubleTag("", loc.getZ())))
+                .putList(new ListTag<DoubleTag>("Motion")
+                        .add(new DoubleTag("", -Math.sin(loc.getYaw() / 180 * Math.PI) * Math.cos(loc.getPitch() / 180 * Math.PI)))
+                        .add(new DoubleTag("", -Math.sin(loc.getPitch() / 180 * Math.PI)))
+                        .add(new DoubleTag("", Math.cos(loc.getYaw() / 180 * Math.PI) * Math.cos(loc.getPitch() / 180 * Math.PI))))
+                .putList(new ListTag<FloatTag>("Rotation")
+                        .add(new FloatTag("", (float) loc.getYaw()))
+                        .add(new FloatTag("", (float) loc.getPitch()))));
+    }
     protected void initEntity() {
         if (this.namedTag.contains("ActiveEffects")) {
             ListTag<CompoundTag> effects = this.namedTag.getList("ActiveEffects", CompoundTag.class);

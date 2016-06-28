@@ -2,6 +2,7 @@ package cn.nukkit.entity.projectile;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
@@ -12,6 +13,10 @@ import cn.nukkit.network.protocol.AddEntityPacket;
  */
 public class EntitySnowball extends EntityProjectile {
     public static final int NETWORK_ID = 81;
+
+    public EntitySnowball(FullChunk chunk, Location eyeLocation, Player shootingEntity) {
+        super(chunk, eyeLocation, shootingEntity);
+    }
 
     @Override
     public int getNetworkId() {

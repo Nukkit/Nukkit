@@ -2008,25 +2008,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     if (item.getId() == Item.SNOWBALL) {
-                        CompoundTag nbt = new CompoundTag()
-                                .putList(new ListTag<DoubleTag>("Pos")
-                                        .add(new DoubleTag("", x))
-                                        .add(new DoubleTag("", y + this.getEyeHeight()))
-                                        .add(new DoubleTag("", z)))
-                                .putList(new ListTag<DoubleTag>("Motion")
-                                       /* .add(new DoubleTag("", aimPos.x))
-                                        .add(new DoubleTag("", aimPos.y))
-                                        .add(new DoubleTag("", aimPos.z)))*/
-                                        .add(new DoubleTag("", -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)))
-                                        .add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
-                                        .add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
-                                .putList(new ListTag<FloatTag>("Rotation")
-                                        .add(new FloatTag("", (float) yaw))
-                                        .add(new FloatTag("", (float) pitch)));
-
                         float f = 1.5f;
-                        EntitySnowball snowball = new EntitySnowball(this.chunk, nbt, this);
-
+                        EntitySnowball snowball = new EntitySnowball(this.chunk, this.getEyeLocation(), this);
                         snowball.setMotion(snowball.getMotion().multiply(f));
                         if (this.isSurvival()) {
                             item.setCount(item.getCount() - 1);
@@ -2045,25 +2028,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             snowball.spawnToAll();
                         }
                     } else if (item.getId() == Item.EGG) {
-                        CompoundTag nbt = new CompoundTag()
-                                .putList(new ListTag<DoubleTag>("Pos")
-                                        .add(new DoubleTag("", x))
-                                        .add(new DoubleTag("", y + this.getEyeHeight()))
-                                        .add(new DoubleTag("", z)))
-                                .putList(new ListTag<DoubleTag>("Motion")
-                                       /* .add(new DoubleTag("", aimPos.x))
-                                        .add(new DoubleTag("", aimPos.y))
-                                        .add(new DoubleTag("", aimPos.z)))*/
-                                        .add(new DoubleTag("", -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)))
-                                        .add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
-                                        .add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
-                                .putList(new ListTag<FloatTag>("Rotation")
-                                        .add(new FloatTag("", (float) yaw))
-                                        .add(new FloatTag("", (float) pitch)));
-
                         float f = 1.5f;
-                        EntityEgg egg = new EntityEgg(this.chunk, nbt, this);
-
+                        EntityEgg egg = new EntityEgg(this.chunk, this.getEyeLocation(), this);
                         egg.setMotion(egg.getMotion().multiply(f));
                         if (this.isSurvival()) {
                             item.setCount(item.getCount() - 1);
@@ -2082,21 +2048,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             egg.spawnToAll();
                         }
                     } else if (item.getId() == Item.EXPERIENCE_BOTTLE) {
-                        CompoundTag nbt = new CompoundTag()
-                                .putList(new ListTag<DoubleTag>("Pos")
-                                        .add(new DoubleTag("", x))
-                                        .add(new DoubleTag("", y + this.getEyeHeight()))
-                                        .add(new DoubleTag("", z)))
-                                .putList(new ListTag<DoubleTag>("Motion")
-                                        .add(new DoubleTag("", -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)))
-                                        .add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
-                                        .add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
-                                .putList(new ListTag<FloatTag>("Rotation")
-                                        .add(new FloatTag("", (float) yaw))
-                                        .add(new FloatTag("", (float) pitch)))
-                                .putInt("Potion", item.getDamage());
+                        Entity bottle = new EntityExpBottle(this.chunk, this.getEyeLocation(), item.getDamage(), this);
                         double f = 1.5;
-                        Entity bottle = new EntityExpBottle(this.chunk, nbt, this);
                         bottle.setMotion(bottle.getMotion().multiply(f));
                         if (this.isSurvival()) {
                             item.setCount(item.getCount() - 1);
@@ -2116,21 +2069,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             bottle.spawnToAll();
                         }
                     } else if (item.getId() == Item.SPLASH_POTION) {
-                        CompoundTag nbt = new CompoundTag()
-                                .putList(new ListTag<DoubleTag>("Pos")
-                                        .add(new DoubleTag("", x))
-                                        .add(new DoubleTag("", y + this.getEyeHeight()))
-                                        .add(new DoubleTag("", z)))
-                                .putList(new ListTag<DoubleTag>("Motion")
-                                        .add(new DoubleTag("", -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)))
-                                        .add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
-                                        .add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
-                                .putList(new ListTag<FloatTag>("Rotation")
-                                        .add(new FloatTag("", (float) yaw))
-                                        .add(new FloatTag("", (float) pitch)))
-                                .putShort("PotionId", item.getDamage());
+                        Entity bottle = new EntityPotion(this.chunk, this.getEyeLocation(), item.getDamage(), this);
                         double f = 1.5;
-                        Entity bottle = new EntityPotion(this.chunk, nbt, this);
                         bottle.setMotion(bottle.getMotion().multiply(f));
                         if (this.isSurvival()) {
                             item.setCount(item.getCount() - 1);
