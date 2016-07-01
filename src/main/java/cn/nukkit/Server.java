@@ -63,7 +63,6 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
-import cn.nukkit.scheduler.TaskHandler;
 import cn.nukkit.utils.*;
 
 import java.io.*;
@@ -348,7 +347,7 @@ public class Server {
         this.logger.info(this.getLanguage().translateString("nukkit.server.info", new String[]{this.getName(), TextFormat.YELLOW + this.getNukkitVersion() + TextFormat.WHITE, TextFormat.AQUA + this.getCodename() + TextFormat.WHITE, this.getApiVersion()}));
         this.logger.info(this.getLanguage().translateString("nukkit.server.license", this.getName()));
 
-        Timings.init();
+
 
         this.consoleSender = new ConsoleCommandSender();
         this.commandMap = new SimpleCommandMap(this);
@@ -364,6 +363,7 @@ public class Server {
         Potion.init();
         Enchantment.init();
         Attribute.init();
+        Timings.init();
 
         this.craftingManager = new CraftingManager();
 

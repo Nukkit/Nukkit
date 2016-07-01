@@ -312,11 +312,11 @@ public class PluginManager {
                 }
             }
 
-            TimingsCommand.timingStart = System.currentTimeMillis() / 1000;
+            TimingsCommand.timingStart = System.nanoTime();
 
             return loadedPlugins;
         } else {
-            TimingsCommand.timingStart = System.currentTimeMillis() / 1000;
+            TimingsCommand.timingStart = System.nanoTime();
 
             return new HashMap<>();
         }
@@ -641,7 +641,10 @@ public class PluginManager {
         }
 
         try {
-            TimingsHandler timings = new TimingsHandler("Plugin: " + plugin.getDescription().getFullName() + " Event: " + listener.getClass().getName() + "." + (executor instanceof MethodEventExecutor ? ((MethodEventExecutor) executor).getMethod() : "???") + "(" + event.getSimpleName() + ")", pluginParentTimer);
+            TimingsHandler timings = new TimingsHandler("Plugin: " + plugin.getDescription().getFullName()
+                    + " Event: " + listener.getClass().getName() + "."
+                    + (executor instanceof MethodEventExecutor ? ((MethodEventExecutor) executor).getMethod().getName() : "???")
+                    + "(" + event.getSimpleName() + ")", pluginParentTimer);
             this.getEventListeners(event).register(new RegisteredListener(listener, executor, priority, plugin, ignoreCancelled, timings));
         } catch (IllegalAccessException e) {
             Server.getInstance().getLogger().logException(e);
