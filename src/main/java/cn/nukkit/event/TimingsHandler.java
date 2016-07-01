@@ -54,7 +54,7 @@ public class TimingsHandler {
             for (Entity e : level.getEntities())
                 if (e instanceof EntityLiving) livingEntities++;
         }
-        strings.add("# Entities "+ entities+"\n");
+        strings.add("# Entities "+ entities);
         strings.add("# LivingEntities " + livingEntities);
         return strings;
     }

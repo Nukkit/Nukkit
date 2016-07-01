@@ -58,31 +58,10 @@ public class TimingsCommand extends VanillaCommand {
             sender.sendMessage(new TranslationContainer("nukkit.command.timings.reset"));
         } else if (mode.equals("merged") || mode.equals("report") || paste) {
             long sampleTime = System.nanoTime() - timingStart;
-            int index = 0;
-
-            File timingFolder = new File(Server.getInstance().getDataPath()+File.separator+"timings");
-            timingFolder.mkdirs();
-            File timingsFile = new File(timingFolder+File.separator+"timings_"+String.format("%03d", index)+".txt");
-            while (timingsFile.exists()) {
-                index ++;
-                timingsFile = new File(timingFolder+File.separator+"timings_"+String.format("%03d", index)+".txt");
-            }
             List<String> timeStr = TimingsHandler.getTimings();
-
             timeStr.add("Sample time "+sampleTime+" ("+String.format("%.3f",(double)sampleTime / 1.0E9D)+"s)");
-            StringBuilder sb = new StringBuilder();
-            timeStr.forEach(s-> sb.append(s).append("\n"));
-            try {
-                Utils.writeFile(timingsFile, sb.toString());
-                sender.sendMessage(TextFormat.GREEN + "Timings results saved: " + timingsFile.getName());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
-            if (paste) {
-                new PasteThread(sender, sb.toString()).run();
-            }
-
+            new PasteThread(sender, timeStr, paste).run();
         }
         return true;
     }
@@ -90,15 +69,17 @@ public class TimingsCommand extends VanillaCommand {
 
 
     class PasteThread extends Thread {
-
         private final CommandSender sender;
-        private final String str;
+        private List<String> report;
+        private String reportUrl;
+        private boolean paste;
 
-
-        public PasteThread(CommandSender sender, String str) {
+        public PasteThread(CommandSender sender, List<String> report, boolean paste) {
             super("Timings paste thread");
             this.sender = sender;
-            this.str = str;
+            this.report = report;
+            this.paste = paste;
+            this.reportUrl = null;
         }
 
         public synchronized void start() {
@@ -111,22 +92,46 @@ public class TimingsCommand extends VanillaCommand {
         }
 
         public void run() {
+            StringBuilder sb = new StringBuilder();
+            report.forEach(s-> sb.append(s).append("\n"));
+
+            if (paste) {
+                try {
+                    HttpURLConnection ex = (HttpURLConnection) (new URL("http://paste.ubuntu.com/")).openConnection();
+                    ex.setDoOutput(true);
+                    ex.setRequestMethod("POST");
+                    ex.setInstanceFollowRedirects(false);
+                    OutputStream out = ex.getOutputStream();
+                    out.write("poster=Nukkit&syntax=text&content=".getBytes("UTF-8"));
+                    out.write(URLEncoder.encode(sb.toString(), "UTF-8").getBytes("UTF-8"));
+                    out.close();
+                    ex.getInputStream().close();
+                    String location = ex.getHeaderField("Location");
+                    this.sender.sendMessage(new TranslationContainer("nukkit.command.timings.timingsUpload", location));
+                    String pasteID = location.substring("http://paste.ubuntu.com/".length(), location.length() - 1);
+                    reportUrl = "http://timings.aikar.co/?url=" + pasteID;
+                    this.sender.sendMessage(new TranslationContainer("nukkit.command.timings.timingsRead", reportUrl));
+                    sb.append("\nLink: ").append(reportUrl);
+                } catch (IOException e) {
+                    this.sender.sendMessage(TextFormat.RED + new TranslationContainer("nukkit.command.timings.pasteError"));
+                    Server.getInstance().getLogger().info("Could not paste timings", e);
+                }
+            }
+
+            File timingFolder = new File(Server.getInstance().getDataPath()+File.separator+"timings");
+            timingFolder.mkdirs();
+            File timingsFile = null;
+            int index = 0;
+            while (timingsFile == null||timingsFile.exists()) {
+                index ++;
+                timingsFile = new File(timingFolder+File.separator+"timings_"+String.format("%03d", index)+".txt");
+            }
+
             try {
-                HttpURLConnection ex = (HttpURLConnection)(new URL("http://paste.ubuntu.com/")).openConnection();
-                ex.setDoOutput(true);
-                ex.setRequestMethod("POST");
-                ex.setInstanceFollowRedirects(false);
-                OutputStream out = ex.getOutputStream();
-                out.write("poster=Nukkit&syntax=text&content=".getBytes("UTF-8"));
-                out.write(URLEncoder.encode(str, "UTF-8").getBytes("UTF-8"));
-                out.close();
-                ex.getInputStream().close();
-                String location = ex.getHeaderField("Location");
-                String pasteID = location.substring("http://paste.ubuntu.com/".length(), location.length() - 1);
-                this.sender.sendMessage(TextFormat.GREEN + "Timings results can be viewed at http://timings.aikar.co/?url=" + pasteID);
+                Utils.writeFile(timingsFile, sb.toString());
+                sender.sendMessage(new TranslationContainer("nukkit.command.timings.timingsWrite", timingsFile.getName()));
             } catch (IOException e) {
-                this.sender.sendMessage(TextFormat.RED + "Error pasting timings, check your console for more information");
-                Server.getInstance().getLogger().info("Could not paste timings", e);
+                e.printStackTrace();
             }
 
         }
