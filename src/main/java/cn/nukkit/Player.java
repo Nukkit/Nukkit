@@ -2226,6 +2226,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     break;
                                 }
 
+                                if (this.isCreative() && arrow == null){
+                                    arrow = new ItemArrow();
+                                }
+
                                 CompoundTag nbt = new CompoundTag()
                                         .putList(new ListTag<DoubleTag>("Pos")
                                                 .add(new DoubleTag("", x))
