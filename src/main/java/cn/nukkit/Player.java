@@ -600,12 +600,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         int count = 0;
 
         List<Map.Entry<String, Integer>> entryList = new ArrayList<>(this.loadQueue.entrySet());
-        entryList.sort(new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-                return o1.getValue() - o2.getValue();
-            }
-        });
+        entryList.sort((o1, o2) -> o1.getValue() - o2.getValue());
 
         for (Map.Entry<String, Integer> entry : entryList) {
             String index = entry.getKey();
