@@ -72,11 +72,11 @@ public class EntityArrow extends EntityProjectile {
     }
 
     public EntityArrow(FullChunk chunk, CompoundTag nbt, Entity shootingEntity, boolean critical) {
-        super(chunk, nbt, shootingEntity);
         this.isCritical = critical;
         if(!nbt.contains("Potion")){
             nbt.putShort("Potion", 0);
         }
+        super(chunk, nbt, shootingEntity);
         this.potionId = this.namedtag.getShort("Potion");
     }
 
