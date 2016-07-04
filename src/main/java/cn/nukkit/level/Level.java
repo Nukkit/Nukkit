@@ -1068,9 +1068,7 @@ public class Level implements ChunkManager, Metadatable {
 			if (chunk.hasChanged()) {
 				try {
 					this.provider.setChunk(chunk.getX(), chunk.getZ(), chunk);
-					this.provider.saveChunk(chunk.getX(), chunk.getZ());
-
-					chunk.setChanged(false);
+                    new ChunkSaveTask(provider, chunk).start();
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
@@ -2418,7 +2416,7 @@ public class Level implements ChunkManager, Metadatable {
 
 					if (chunk.hasChanged() || !chunk.getBlockEntities().isEmpty() || entities > 0) {
 						this.provider.setChunk(x, z, chunk);
-						this.provider.saveChunk(x, z);
+                        new ChunkSaveTask(this.provider, chunk).start();
 					}
 				}
 				for (ChunkLoader loader : this.getChunkLoaders(x, z)) {
