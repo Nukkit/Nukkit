@@ -2702,7 +2702,15 @@ public class Level implements ChunkManager, Metadatable {
 
 	public void addEntityMovement(int chunkX, int chunkZ, long entityId, double x, double y, double z, double yaw,
 			double pitch, double headYaw) {
-		this.moveToSend.put(entityId, new MoveEntityPacket.Entry(entityId, x, y, z, yaw, headYaw, pitch));
+		MoveEntityPacket pk = new MovePlayerPacket();
+		pk.eid = entityId;
+		pk.x = (float) x;
+		pk.y = (float) y;
+		pk.z = (float) z;
+		pk.yaw = (float) yaw;
+		pk.headYaw = (float) yaw;
+		pk.pitch = (float) pitch;
+		this.moveToSend.put(entityId, pk);
 	}
 
 	public void addPlayerMovement(int chunkX, int chunkZ, long entityId, double x, double y, double z, double yaw,
