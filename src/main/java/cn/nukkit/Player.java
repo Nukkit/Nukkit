@@ -2028,7 +2028,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             part = target.getSide(Vector3.SIDE_UP);
                         }
 
-                        if (part.getId() == target.getId() && part.getDamage() == target.getDamage()) {
+                        if (part.getId() == target.getId()) {
                             additional = part;
                         }
                     }
