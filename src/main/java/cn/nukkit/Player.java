@@ -2016,7 +2016,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     Block target = this.level.getBlock(blockVector);
                     Block block = target.getSide(useItemPacket.face);
                     
-                    if(target instanceof BlockDoor) {
+                    if (target instanceof BlockDoor) {
                         BlockDoor door = (BlockDoor) target;
 
                         Block part;
