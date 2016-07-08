@@ -78,9 +78,8 @@ public class Level implements ChunkManager, Metadatable {
 
 	private Map<Long, BlockEntity> blockEntities = new HashMap<>();
 
-	private Map<Long, SetEntityMotionPacket.Entry> motionToSend = new HashMap<>();
-	private Map<Long, MoveEntityPacket.Entry> moveToSend = new HashMap<>();
-	private Map<Long, MovePlayerPacket> playerMoveToSend = new HashMap<>();
+	private Map<String, List<SetEntityMotionPacket.Entry>> motionToSend = new HashMap<>();
+	private Map<String, Map<Long, MoveEntityPacket>> moveToSend = new HashMap<>();
 
 	private Map<Long, Player> players = new HashMap<>();
 
@@ -742,29 +741,27 @@ public class Level implements ChunkManager, Metadatable {
 			this.checkSleep();
 		}
 
-		List<DataPacket> movementPackets = new ArrayList<>();
-
 		{
-			MoveEntityPacket pk = new MoveEntityPacket();
-			pk.entities = this.moveToSend.values().stream().toArray(MoveEntityPacket.Entry[]::new);
-			movementPackets.add(pk);
+			for (Map.Entry<String, Map<Long, MoveEntityPacket>> entry : moveToSend.entrySet()) {
+				Chunk.Entry chunkEntry = getChunkXZ(entry.getKey());
+
+				for (MoveEntityPacket pk : entry.getValue().values()) {
+					addChunkPacket(chunkEntry.chunkX, chunkEntry.chunkZ, pk);
+				}
+			}
 		}
 		this.moveToSend = new HashMap<>();
 
 		{
-			SetEntityMotionPacket pk = new SetEntityMotionPacket();
-			pk.entities = this.motionToSend.values().stream().toArray(SetEntityMotionPacket.Entry[]::new);
-			movementPackets.add(pk);
+			for(Map.Entry<String, List<SetEntityMotionPacket.Entry>> entry : motionToSend.entrySet()){
+				Chunk.Entry chunkEntry = getChunkXZ(entry.getKey());
+
+				SetEntityMotionPacket pk = new SetEntityMotionPacket();
+				pk.entities = entry.getValue().stream().toArray(SetEntityMotionPacket.Entry[]::new);
+				addChunkPacket(chunkEntry.chunkX, chunkEntry.chunkZ, pk);
+			}
 		}
 		this.motionToSend = new HashMap<>();
-
-		{
-			movementPackets.addAll(this.playerMoveToSend.values());
-		}
-		this.playerMoveToSend = new HashMap<>();
-
-		this.getServer().batchPackets(this.getPlayers().values().stream().toArray(Player[]::new),
-				movementPackets.stream().toArray(DataPacket[]::new), true);
 
 		for (String key : this.chunkPackets.keySet()) {
 			Chunk.Entry chunkEntry = Level.getChunkXZ(key);
@@ -2699,17 +2696,20 @@ public class Level implements ChunkManager, Metadatable {
 	}
 
 	public void addEntityMotion(int chunkX, int chunkZ, long entityId, double x, double y, double z) {
-		this.motionToSend.put(entityId, new SetEntityMotionPacket.Entry(entityId, x, y, z));
+		String index = chunkHash(chunkX, chunkZ);
+		List<SetEntityMotionPacket.Entry> entries = this.motionToSend.get(index);
+
+		if(entries == null){
+			entries = new ArrayList<>();
+			motionToSend.put(index, entries);
+		}
+
+		entries.add(new SetEntityMotionPacket.Entry(entityId, x, y, z));
 	}
 
 	public void addEntityMovement(int chunkX, int chunkZ, long entityId, double x, double y, double z, double yaw,
 			double pitch, double headYaw) {
-		this.moveToSend.put(entityId, new MoveEntityPacket.Entry(entityId, x, y, z, yaw, headYaw, pitch));
-	}
-
-	public void addPlayerMovement(int chunkX, int chunkZ, long entityId, double x, double y, double z, double yaw,
-			double pitch, boolean onGround) {
-		MovePlayerPacket pk = new MovePlayerPacket();
+		MoveEntityPacket pk = new MoveEntityPacket();
 		pk.eid = entityId;
 		pk.x = (float) x;
 		pk.y = (float) y;
@@ -2717,8 +2717,22 @@ public class Level implements ChunkManager, Metadatable {
 		pk.yaw = (float) yaw;
 		pk.headYaw = (float) yaw;
 		pk.pitch = (float) pitch;
-		pk.onGround = onGround;
-		this.playerMoveToSend.put(entityId, pk);
+
+		String index = Level.chunkHash(chunkX, chunkZ);
+
+		Map<Long, MoveEntityPacket> data = this.moveToSend.get(index);
+
+		if(data == null){
+			data = new HashMap<>();
+			moveToSend.put(index, data);
+		}
+
+		data.put(entityId, pk);
+	}
+
+	public void addPlayerMovement(int chunkX, int chunkZ, long entityId, double x, double y, double z, double yaw,
+			double pitch, boolean onGround) {
+		addEntityMovement(chunkX, chunkZ, entityId, x, y, z, yaw, pitch, yaw);
 	}
 
 	public boolean isRaining() {
