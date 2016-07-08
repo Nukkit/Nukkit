@@ -33,11 +33,15 @@ public abstract class Zlib {
         inflater.setInput(data);
         ByteArrayOutputStream o = new ByteArrayOutputStream(data.length);
         byte[] buf = new byte[1024];
-        while (!inflater.finished()) {
-            int i = inflater.inflate(buf);
-            o.write(buf, 0, i);
+        try {
+            while (!inflater.finished()) {
+                int i = 0;
+                i = inflater.inflate(buf);
+                o.write(buf, 0, i);
+            }
+        } finally {
+            inflater.end();
         }
-        inflater.end();
         return o.toByteArray();
     }
 
