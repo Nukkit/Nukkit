@@ -20,11 +20,14 @@ public abstract class Zlib {
         deflater.finish();
         ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
         byte[] buf = new byte[1024];
-        while (!deflater.finished()) {
-            int i = deflater.deflate(buf);
-            bos.write(buf, 0, i);
+        try {
+            while (!deflater.finished()) {
+                int i = deflater.deflate(buf);
+                bos.write(buf, 0, i);
+            }
+        } finally {
+            deflater.end();
         }
-        deflater.end();
         return bos.toByteArray();
     }
 
