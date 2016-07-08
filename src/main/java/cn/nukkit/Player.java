@@ -1429,7 +1429,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void addMovement(double x, double y, double z, double yaw, double pitch, double headYaw) {
-        this.level.addPlayerMovement(this.chunk.getX(), this.chunk.getZ(), this.id, x, y, z, yaw, pitch, this.isOnGround());
+        this.level.addEntityMovement(this.chunk.getX(), this.chunk.getZ(), this.id, x, y, z, yaw, pitch, yaw);
     }
 
     @Override
@@ -2015,7 +2015,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     Block target = this.level.getBlock(blockVector);
                     Block block = target.getSide(useItemPacket.face);
-                    
+
                     if (target instanceof BlockDoor) {
                         BlockDoor door = (BlockDoor) target;
 
@@ -2029,7 +2029,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                         }
                     }
-                    
+
                     this.level.sendBlocks(new Player[]{this}, new Block[]{target, block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
                     break;
                 } else if (useItemPacket.face == 0xff) {
