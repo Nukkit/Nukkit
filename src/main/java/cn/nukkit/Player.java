@@ -2237,10 +2237,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             if (this.inventory.getItemInHand().getId() == Item.BOW) {
 
                                 Item bow = this.inventory.getItemInHand();
-                                ItemArrow itemArrow = new ItemArrow();
-                                if (this.isSurvival() && !this.inventory.contains(itemArrow)) {
+                                Item arrow = null;
+                                for(Item item : this.inventory.getContents().values()){
+                                    if(item.getId() == Item.ARROW) arrow = item;
+                                }
+                                if (this.isSurvival() && arrow == null) {
                                     this.inventory.sendContents(this);
                                     break;
+                                }
+
+                                if (this.isCreative() && arrow == null){
+                                    arrow = new ItemArrow();
                                 }
 
                                 CompoundTag nbt = new CompoundTag()
@@ -2255,7 +2262,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         .putList(new ListTag<FloatTag>("Rotation")
                                                 .add(new FloatTag("", (float) yaw))
                                                 .add(new FloatTag("", (float) pitch)))
-                                        .putShort("Fire", this.isOnFire() ? 45 * 60 : 0);
+                                        .putShort("Fire", this.isOnFire() ? 45 * 60 : 0)
+                                        .putShort("Potion", arrow.getDamage());
 
                                 int diff = (this.server.getTick() - this.startAction);
                                 double p = (double) diff / 20;
@@ -2274,7 +2282,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 } else {
                                     entityShootBowEvent.getProjectile().setMotion(entityShootBowEvent.getProjectile().getMotion().multiply(entityShootBowEvent.getForce()));
                                     if (this.isSurvival()) {
-                                        this.inventory.removeItem(itemArrow);
+                                        this.inventory.removeItem(Item.get(Item.ARROW, arrow.getDamage(), 1));
                                         bow.setDamage(bow.getDamage() + 1);
                                         if (bow.getDamage() >= 385) {
                                             this.inventory.setItemInHand(new ItemBlock(new BlockAir(), 0, 0));
