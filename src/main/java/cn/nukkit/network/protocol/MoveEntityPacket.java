@@ -23,7 +23,15 @@ public class MoveEntityPacket extends DataPacket {
 
     @Override
     public void decode() {
-
+        for (Entry entry : this.entities) {
+            entry.eid = this.getLong();
+            entry.x = this.getFloat();
+            entry.y = this.getFloat();
+            entry.z = this.getFloat();
+            entry.pitch = this.getByte() * (360.0 / 256);
+            entry.headyaw = this.getByte() * (360.0 / 256);
+            entry.yaw = this.getByte() * (360.0 / 256);
+        }
     }
 
     @Override
@@ -34,13 +42,14 @@ public class MoveEntityPacket extends DataPacket {
             this.putFloat((float) entry.x);
             this.putFloat((float) entry.y);
             this.putFloat((float) entry.z);
-            this.putByte((byte) (entry.pitch * 0.71));
-            this.putByte((byte) (entry.headyaw * 0.71));
-            this.putByte((byte) (entry.yaw * 0.71));
+            this.putByte((byte) (entry.pitch / (360.0 / 256)));
+            this.putByte((byte) (entry.headyaw / (360.0 / 256)));
+            this.putByte((byte) (entry.yaw / (360.0 / 256)));
         }
     }
 
     public static class Entry {
+
         public long eid;
         public double x;
         public double y;
