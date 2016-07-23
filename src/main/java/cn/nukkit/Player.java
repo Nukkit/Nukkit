@@ -163,7 +163,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected Vector3 newPosition = null;
 
-    protected final int viewDistance;
+    protected int viewDistance;
     protected final int chunksPerTick;
     protected final int spawnThreshold;
 
