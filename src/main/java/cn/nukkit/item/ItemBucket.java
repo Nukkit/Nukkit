@@ -38,9 +38,22 @@ public class ItemBucket extends Item {
         }
     }
 
+    protected int getDamageByTarget(int target) {
+        switch (target) {
+            case 8:
+            case 9:
+                return 8;
+            case 10:
+            case 11:
+                return 10;
+            default:
+                return 0;
+        }
+    }
+
     @Override
     public int getMaxStackSize() {
-        return 1;
+        return this.meta == 0 ? 16 : 1;
     }
 
     @Override
@@ -54,14 +67,15 @@ public class ItemBucket extends Item {
 
         if (targetBlock instanceof BlockAir) {
             if (target instanceof BlockLiquid && target.getDamage() == 0) {
-                Item result = this.clone();
-                result.setDamage(target.getId());
+                Item result = Item.get(BUCKET, this.getDamageByTarget(target.getId()), 1);
                 PlayerBucketFillEvent ev;
                 player.getServer().getPluginManager().callEvent(ev = new PlayerBucketFillEvent(player, block, face, this, result));
                 if (!ev.isCancelled()) {
                     player.getLevel().setBlock(target, new BlockAir(), true, true);
                     if (player.isSurvival()) {
-                        player.getInventory().setItemInHand(ev.getItem());
+                        this.setCount(this.getCount() - 1);
+                        player.getInventory().setItemInHand(this.getCount() >= 1 ? this : Item.get(0));
+                        player.getInventory().addItem(ev.getItem());
                     }
                     return true;
                 } else {
@@ -69,14 +83,15 @@ public class ItemBucket extends Item {
                 }
             }
         } else if (targetBlock instanceof BlockLiquid) {
-            Item result = this.clone();
-            result.setDamage(0);
+            Item result = Item.get(BUCKET, 0, 1);
             PlayerBucketFillEvent ev;
             player.getServer().getPluginManager().callEvent(ev = new PlayerBucketFillEvent(player, block, face, this, result));
             if (!ev.isCancelled()) {
                 player.getLevel().setBlock(block, targetBlock, true, true);
                 if (player.isSurvival()) {
-                    player.getInventory().setItemInHand(ev.getItem());
+                    this.setCount(this.getCount() - 1);
+                    player.getInventory().setItemInHand(this.getCount() >= 1 ? this : Item.get(0));
+                    player.getInventory().addItem(ev.getItem());
                 }
                 return true;
             } else {
