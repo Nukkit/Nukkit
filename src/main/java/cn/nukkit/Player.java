@@ -176,6 +176,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean autoJump = true;
 
     protected boolean allowFlight = false;
+    
+    public boolean movable = true;
 
     private final Map<Integer, Boolean> needACK = new HashMap<>();
 
@@ -1886,7 +1888,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
 
                 boolean revert = false;
-                if (!this.isAlive() || !this.spawned) {
+                if (!this.isAlive() || !this.spawned || !this.movable) {
                     revert = true;
                     this.forceMovement = new Vector3(this.x, this.y, this.z);
                 }
