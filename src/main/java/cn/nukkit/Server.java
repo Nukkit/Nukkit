@@ -674,7 +674,7 @@ public class Server {
         this.pluginManager.loadPlugins(this.pluginPath);
         this.enablePlugins(PluginLoadOrder.STARTUP);
         this.enablePlugins(PluginLoadOrder.POSTWORLD);
-        TimingsManager.reset();
+        Timings.reset();
     }
 
     public void shutdown() {
