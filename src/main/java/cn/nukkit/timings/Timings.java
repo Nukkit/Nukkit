@@ -35,13 +35,13 @@ public final class Timings {
 
     public static final FullServerTickTiming fullServerTickTimer;
     public static final Timing timingsTickTimer;
-    public static final Timing pluginTimer;
     public static final Timing pluginEventTimer;
 
     public static final Timing connectionTimer;
     public static final Timing schedulerTimer;
     public static final Timing schedulerAsyncTimer;
     public static final Timing schedulerSyncTimer;
+    public static final Timing commandTimer;
     public static final Timing serverCommandTimer;
     public static final Timing levelSaveTimer;
 
@@ -65,8 +65,8 @@ public final class Timings {
     public static final Timing permissionDefaultTimer;
 
     static {
-        setTimingsEnabled((boolean) Server.getInstance().getConfig("timings.enabled", true));
-        setVerboseEnabled((boolean) Server.getInstance().getConfig("timings.verbose", true));
+        setTimingsEnabled((boolean) Server.getInstance().getConfig("timings.enabled", false));
+        setVerboseEnabled((boolean) Server.getInstance().getConfig("timings.verbose", false));
         setHistoryInterval((int) Server.getInstance().getConfig("timings.history-interval", 6000));
         setHistoryLength((int) Server.getInstance().getConfig("timings.history-length", 72000));
 
@@ -81,13 +81,13 @@ public final class Timings {
 
         fullServerTickTimer = new FullServerTickTiming();
         timingsTickTimer = TimingsManager.getTiming(DEFAULT_GROUP.name, "Timings Tick", fullServerTickTimer);
-        pluginTimer = TimingsManager.getTiming("Plugins");
-        pluginEventTimer = TimingsManager.getTiming(DEFAULT_GROUP.name, "Plugin Events", pluginTimer);
+        pluginEventTimer = TimingsManager.getTiming("Plugin Events");
 
         connectionTimer = TimingsManager.getTiming("Connection Handler");
         schedulerTimer = TimingsManager.getTiming("Scheduler");
         schedulerAsyncTimer = TimingsManager.getTiming("## Scheduler - Async Tasks");
         schedulerSyncTimer = TimingsManager.getTiming("## Scheduler - Sync Tasks");
+        commandTimer = TimingsManager.getTiming("Commands");
         serverCommandTimer = TimingsManager.getTiming("Server Command");
         levelSaveTimer = TimingsManager.getTiming("Level Save");
 
@@ -185,11 +185,7 @@ public final class Timings {
 
 
     public static Timing getCommandTiming(Command command) {
-        if (command instanceof PluginCommand) {
-            return TimingsManager.getTiming(((PluginCommand) command).getPlugin().getName(), "Command: " + command.getLabel(), pluginTimer);
-        } else {
-            return TimingsManager.getTiming("Command: " + command.getLabel());
-        }
+        return TimingsManager.getTiming(DEFAULT_GROUP.name, "Command: " + command.getLabel(), commandTimer);
     }
 
     public static Timing getTaskTiming(TaskHandler handler, long period) {
