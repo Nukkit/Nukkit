@@ -163,7 +163,7 @@ public class SimpleCommandMap implements CommandMap {
 
             if (sb.charAt(i) == ' ' && notQuoted) {
                 String arg = sb.substring(start, i);
-                if(!arg.isEmpty()) {
+                if (!arg.isEmpty()) {
                     args.add(arg);
                 }
                 start = i + 1;
@@ -175,7 +175,7 @@ public class SimpleCommandMap implements CommandMap {
         }
 
         String arg = sb.substring(start);
-        if(!arg.isEmpty()) {
+        if (!arg.isEmpty()) {
             args.add(arg);
         }
         return args.toArray(new String[0]);
