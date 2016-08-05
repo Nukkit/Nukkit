@@ -34,8 +34,12 @@ public abstract class SimpleConfig {
         this.configFile = file;
         configFile.getParentFile().mkdirs();
     }
-
+    
     public boolean save() {
+        save(false);
+    }
+
+    public boolean save(boolean async) {
         if (configFile.exists()) try {
             configFile.createNewFile();
         } catch (Exception e) {
@@ -51,7 +55,7 @@ public abstract class SimpleConfig {
                 return false;
             }
         }
-        cfg.save();
+        cfg.save(async);
         return true;
     }
 
