@@ -9,6 +9,7 @@ import cn.nukkit.inventory.DoubleChestInventory;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -81,37 +82,51 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
         return -1;
     }
 
-    @Override
-    public Item getItem(int index) {
-        int i = this.getSlotIndex(index);
-        if (i < 0) {
-            return new ItemBlock(new BlockAir(), 0, 0);
-        } else {
-            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
-            return Item.get(data.getShort("id"), data.getShort("Damage"), data.getByte("Count"));
-        }
-    }
+	@Override
+	public Item getItem(int index) {
+		int i = this.getSlotIndex(index);
+		if (i < 0) {
+			return new ItemBlock(new BlockAir(), 0, 0);
+		} else {
+			CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
+			Item item = Item.get(data.getShort("id"), data.getShort("Damage"), data.getByte("Count")).clone();
+			if (data.contains("ench")) {
+				for (CompoundTag tag : data.getList("ench", CompoundTag.class).getAll()) {
+					Enchantment enchantment = Enchantment.getEnchantment(tag.getShort("ench"));
+					if (enchantment != null) {
+						enchantment.setLevel(tag.getShort("lvl"));
+						item.addEnchantment(enchantment);
+					}
+				}
+			}
+			return item;
+		}
+	}
 
-    @Override
-    public void setItem(int index, Item item) {
-        int i = this.getSlotIndex(index);
+	@Override
+	public void setItem(int index, Item item) {
+		int i = this.getSlotIndex(index);
 
-        CompoundTag d = new CompoundTag()
-                .putByte("Count", item.getCount())
-                .putByte("Slot", index)
-                .putShort("id", item.getId())
-                .putShort("Damage", item.getDamage());
+		CompoundTag d = new CompoundTag().putByte("Count", item.getCount()).putByte("Slot", index)
+				.putShort("id", item.getId()).putShort("Damage", item.getDamage());
+		if (item.hasEnchantments()) {
+			d.putList(new ListTag<CompoundTag>("ench"));
+			for (Enchantment enchantment : item.getEnchantments()) {
+				d.getList("ench", CompoundTag.class).add(
+						new CompoundTag().putShort("id", enchantment.getId()).putShort("lvl", enchantment.getLevel()));
+			}
+		}
 
-        if (item.getId() == Item.AIR || item.getCount() <= 0) {
-            if (i >= 0) {
-                this.namedTag.getList("Items").remove(i);
-            }
-        } else if (i < 0) {
-            (this.namedTag.getList("Items", CompoundTag.class)).add(d);
-        } else {
-            (this.namedTag.getList("Items", CompoundTag.class)).add(i, d);
-        }
-    }
+		if (item.getId() == Item.AIR || item.getCount() <= 0) {
+			if (i >= 0) {
+				this.namedTag.getList("Items").remove(i);
+			}
+		} else if (i < 0) {
+			(this.namedTag.getList("Items", CompoundTag.class)).add(d);
+		} else {
+			(this.namedTag.getList("Items", CompoundTag.class)).add(i, d);
+		}
+	}
 
     @Override
     public BaseInventory getInventory() {
