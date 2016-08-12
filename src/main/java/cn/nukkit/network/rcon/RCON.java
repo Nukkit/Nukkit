@@ -55,7 +55,7 @@ public class RCON {
                 this.server.dispatchCommand(sender, command.getCommand());
             }
 
-            this.serverThread.respond(command.getSender(), command.getId(), TextFormat.stripColor(sender.getMessages()));
+            this.serverThread.respond(command.getSender(), command.getId(), TextFormat.clean(sender.getMessages()));
         }
     }
 
