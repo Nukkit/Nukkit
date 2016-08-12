@@ -175,7 +175,7 @@ public class MainLogger extends ThreadedLogger {
         CommandReader.getInstance().stashLine();
         System.out.println(colorize(message));
         CommandReader.getInstance().unstashLine();
-        String str = new SimpleDateFormat("Y-M-d").format(now) + " " + TextFormat.stripColor(message) + "" + "\r\n";
+        String str = new SimpleDateFormat("Y-M-d").format(now) + " " + TextFormat.clean(message) + "" + "\r\n";
         this.logStream += str;
 
         synchronized (this) {
@@ -195,7 +195,7 @@ public class MainLogger extends ThreadedLogger {
                 }
             }
         } else {
-            return TextFormat.stripColor(string);
+            return TextFormat.clean(string);
         }
         return string + Ansi.ansi().reset();
     }

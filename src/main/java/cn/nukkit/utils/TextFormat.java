@@ -131,7 +131,7 @@ public enum TextFormat {
      * Gets the color represented by the specified color code
      *
      * @param code Code to check
-     * @return Associative {@link cn.nukkit.utils.TextFormat} with the given code,
+     * @return Associative {@link TextFormat} with the given code,
      * or null if it doesn't exist
      */
     public static TextFormat getByChar(char code) {
@@ -142,7 +142,7 @@ public enum TextFormat {
      * Gets the color represented by the specified color code
      *
      * @param code Code to check
-     * @return Associative {@link cn.nukkit.utils.TextFormat} with the given code,
+     * @return Associative {@link TextFormat} with the given code,
      * or null if it doesn't exist
      */
     public static TextFormat getByChar(String code) {
@@ -159,7 +159,7 @@ public enum TextFormat {
      * @param input String to strip of color
      * @return A copy of the input string, without any coloring
      */
-    public static String stripColor(final String input) {
+    public static String clean(final String input) {
         if (input == null) {
             return null;
         }
@@ -169,13 +169,13 @@ public enum TextFormat {
 
     /**
      * Translates a string using an alternate color code character into a
-     * string that uses the internal TextFormat.COLOR_CODE color code
+     * string that uses the internal TextFormat.ESCAPE color code
      * character. The alternate color code character will only be replaced if
      * it is immediately followed by 0-9, A-F, a-f, K-O, k-o, R or r.
      *
      * @param altColorChar    The alternate color code character to replace. Ex: &
      * @param textToTranslate Text containing the alternate color code character.
-     * @return Text containing the TextFormat.COLOR_CODE color code character.
+     * @return Text containing the TextFormat.ESCAPE color code character.
      */
     public static String colorize(char altColorChar, String textToTranslate) {
         char[] b = textToTranslate.toCharArray();
@@ -190,12 +190,12 @@ public enum TextFormat {
 
     /**
      * Translates a string using an alternate color code character into a
-     * string that uses the internal TextFormat.COLOR_CODE color code
+     * string that uses the internal TextFormat.ESCAPE color code
      * character. The alternate color code character will only be replaced if
      * it is immediately followed by 0-9, A-F, a-f, K-O, k-o, R or r.
      *
      * @param textToTranslate Text containing the alternate color code character.
-     * @return Text containing the TextFormat.COLOR_CODE color code character.
+     * @return Text containing the TextFormat.ESCAPE color code character.
      */
     public static String colorize(String textToTranslate) {
         return colorize('&', textToTranslate);
