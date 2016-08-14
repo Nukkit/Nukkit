@@ -194,17 +194,33 @@ public class EnchantInventory extends ContainerInventory {
         }
     }
 
+    public boolean EnchantsEqual(Enchantment[] before,Enchantment[] after){
+        boolean hasResult;
+        for(Enchantment b1 : before){
+            hasResult = false;
+            for(Enchantment a1 : after){
+                if(a1.getLevel() == b1.getLevel() && a1.getId() == b1.getId()){
+                    hasResult = true;
+                }
+            }
+            if(!hasResult){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void onEnchant(Player who, Item before, Item after) {
         Item result = (before.getId() == Item.BOOK) ? new ItemBookEnchanted() : before;
         if (!before.hasEnchantments() && after.hasEnchantments() && after.getId() == result.getId() && this.levels != null && this.entries != null) {
             Enchantment[] enchantments = after.getEnchantments();
             for (int i = 0; i < 3; i++) {
-                if (Arrays.equals(enchantments, this.entries[i].getEnchantments())) {
+                if (EnchantsEqual(enchantments, this.entries[i].getEnchantments())) {
                     Item lapis = this.getItem(1);
                     int level = who.getExperienceLevel();
                     int exp = who.getExperience();
                     int cost = this.entries[i].getCost();
-                    if (lapis.getId() == Item.DYE && lapis.getDamage() == ItemDye.BLUE && lapis.getCount() > i && level >= cost) {
+                    if (lapis.getId() == Item.DYE && lapis.getDamage() == ItemDye.LAPIS && lapis.getCount() > i && level >= cost) {
                         result.addEnchantment(enchantments);
                         this.setItem(0, result);
                         lapis.setCount(lapis.getCount() - i - 1);

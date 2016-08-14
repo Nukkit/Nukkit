@@ -13,6 +13,7 @@ public class ItemDye extends Item {
     public static final int MAGENTA = 2;
     public static final int LIGHT_BLUE = 3;
     public static final int YELLOW = 4;
+    public static final int LAPIS = 4;
     public static final int LIME = 5;
     public static final int PINK = 6;
     public static final int GRAY = 7;
