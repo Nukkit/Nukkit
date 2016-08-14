@@ -3564,6 +3564,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.exp = exp;
         this.expLevel = level;
 
+        int most = calculateRequireExperience(level);
+        while (exp >= most) {  //Level Up!
+            exp = exp - most;
+            level++;
+        }
+
         this.sendExperienceLevel(level);
         this.sendExperience(exp);
     }

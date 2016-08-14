@@ -204,7 +204,7 @@ public class EnchantInventory extends ContainerInventory {
                     int level = who.getExperienceLevel();
                     int exp = who.getExperience();
                     int cost = this.entries[i].getCost();
-                    if (lapis.getId() == Item.DYE && lapis.getDamage() == ItemDye.BLUE && lapis.getCount() > i && level >= cost) {
+                    if (lapis.getId() == Item.DYE && lapis.getDamage() == ItemDye.YELLOW && lapis.getCount() > i && level >= cost) {
                         result.addEnchantment(enchantments);
                         this.setItem(0, result);
                         lapis.setCount(lapis.getCount() - i - 1);
