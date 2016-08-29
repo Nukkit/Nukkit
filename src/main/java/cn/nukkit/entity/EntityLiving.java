@@ -287,7 +287,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     public Block getTargetBlock(int maxDistance) {
-        return getTargetBlock(maxDistance, new Integer[]{});
+        return getTargetBlock(maxDistance, new Integer[]{Block.AIR});
     }
 
     @Deprecated
@@ -299,7 +299,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         try {
             Block[] blocks = this.getLineOfSight(maxDistance, 1, transparent);
             Block block = blocks[0];
-            if (block != null && transparent.length != 0 && Arrays.binarySearch(transparent, block.getId()) < 0) {
+            if (block != null && Arrays.binarySearch(transparent, block.getId()) < 0) {
                 return block;
             }
         } catch (Exception ignored) {
