@@ -20,7 +20,7 @@ import cn.nukkit.item.enchantment.protection.*;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.particle.*;
 import cn.nukkit.level.*;
-import cn.nukkit.level.Level as World;
+import cn.nukkit.level.generator.Normal;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
@@ -42,7 +42,7 @@ public class Explosion {
     private final boolean a;
     private final boolean b;
     private final NukkitRandom c = new NukkitRandom();
-    private final World world;
+    private final Normal world;
     private final double posX;
     private final double posY;
     private final double posZ;
