@@ -226,21 +226,21 @@ public class Explosion {
                 block.wasExploded(this.world, blockposition, this);
             }
         }
-        if (this.a) {
+        /*if (this.a) {
             for (BlockPosition blockposition : this.blocks) {
-                if (this.world.getType(blockposition).getMaterial() != Material.AIR || !this.world.getType(blockposition.down()).b() || this.c.nextInt(3) != 0 /*|| CraftEventFactory.callBlockIgniteEvent(this.world, blockposition.getX(), blockposition.getY(), blockposition.getZ(), this).isCancelled())*/ continue;
+                if (this.world.getType(blockposition).getMaterial() != Material.AIR || !this.world.getType(blockposition.down()).b() || this.c.nextInt(3) != 0 /*|| CraftEventFactory.callBlockIgniteEvent(this.world, blockposition.getX(), blockposition.getY(), blockposition.getZ(), this).isCancelled()) continue;
                 this.world.setTypeUpdate(blockposition, Blocks.FIRE.getBlockData());
             }
-        }
+        }*/
     }
 
-    public Map<EntityHuman, Vec3D> b() {
+    public Map<EntityHuman, Vector3> b() {
         return this.k;
     }
 
-    public EntityLiving getSource() {
-        return this.source == null ? null : (this.source instanceof EntityTNTPrimed ? ((EntityTNTPrimed)this.source).getSource() : (this.source instanceof EntityLiving ? (EntityLiving)this.source : (this.source instanceof EntityFireball ? ((EntityFireball)this.source).shooter : null)));
-    }
+    /*public EntityLiving getSource() {
+        return this.source == null ? null : (this.source instanceof EntityPrimedTNT ? ((EntityPrimedTNT)this.source).getSource() : (this.source instanceof EntityLiving ? (EntityLiving)this.source : (this.source instanceof EntityFireball ? ((EntityFireball)this.source).shooter : null)));
+    }*/
 
     public void clearBlocks() {
         this.blocks.clear();
