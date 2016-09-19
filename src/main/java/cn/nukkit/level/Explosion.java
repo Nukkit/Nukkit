@@ -20,6 +20,7 @@ import cn.nukkit.item.enchantment.protection.*;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.particle.*;
 import cn.nukkit.level.*;
+import cn.nukkit.level.Level as World;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
