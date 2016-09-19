@@ -46,13 +46,13 @@ public class Explosion {
     public final Entity source;
     private final float size;
     private final List<BlockPosition> blocks = Lists.newArrayList();
-    private final Map<EntityHuman, Vec3D> k = Maps.newHashMap();
+    private final Map<EntityHuman, Vector3> k = Maps.newHashMap();
     public boolean wasCanceled = false;
 
     public Explosion(World world, Entity entity, double d0, double d1, double d2, float f, boolean flag, boolean flag1) {
         this.world = world;
         this.source = entity;
-        this.size = (float)Math.max((double)f, 0.0);
+        this.size = (float)NukkitMath.max((double)f, 0.0);
         this.posX = d0;
         this.posY = d1;
         this.posZ = d2;
