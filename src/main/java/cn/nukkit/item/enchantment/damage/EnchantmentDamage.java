@@ -26,7 +26,7 @@ public abstract class EnchantmentDamage extends Enchantment {
     protected final TYPE damageType;
 
     protected EnchantmentDamage(int id, String name, int weight, TYPE type) {
-        super(id, name, weight, EnchantmentType.WEAPON);
+        super(id, name, weight, EnchantmentType.SWORD);
         this.damageType = type;
     }
 
@@ -77,5 +77,10 @@ public abstract class EnchantmentDamage extends Enchantment {
     @Override
     public String getName() {
         return "%enchantment.damage." + this.name;
+    }
+
+    @Override
+    public boolean isBasic() {
+        return true;
     }
 }

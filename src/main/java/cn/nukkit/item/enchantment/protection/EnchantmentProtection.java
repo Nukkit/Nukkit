@@ -71,4 +71,9 @@ public abstract class EnchantmentProtection extends Enchantment {
     public String getName() {
         return "%enchantment.protect." + this.name;
     }
+
+    @Override
+    public boolean isBasic() {
+        return true;
+    }
 }

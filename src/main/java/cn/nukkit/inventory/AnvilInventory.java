@@ -2,7 +2,12 @@ package cn.nukkit.inventory;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Position;
+import cn.nukkit.nbt.tag.ListTag;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * author: MagicDroidX
@@ -28,12 +33,12 @@ public class AnvilInventory extends ContainerInventory {
         Item local = getItem(TARGET);
         Item second = getItem(SACRIFICE);
 
-        if(!resultItem.deepEquals(local, true, false) || resultItem.getCount() != local.getCount()){
+        if (!resultItem.deepEquals(local, true, false) || resultItem.getCount() != local.getCount()) {
             //Item does not match target item. Everything must match except the tags.
             return false;
         }
 
-        if(local.getId() != 0 && second.getId() == 0){ //only rename
+        if (local.getId() != 0 && second.getId() == 0) { //only rename
             local.setCustomName(resultItem.getCustomName());
             setItem(RESULT, local);
             player.getInventory().addItem(local);
@@ -41,8 +46,73 @@ public class AnvilInventory extends ContainerInventory {
             player.getInventory().sendContents(player);
             sendContents(player);
             return true;
-        } else if(local.getId() != 0 && second.getId() != 0){
-            //TODO: unit enchants
+        } else if (local.getId() != 0 && second.getId() != 0) { //enchants combining
+            if (!local.equals(second, true, false)) {
+                return false;
+            }
+
+            if (local.getId() != 0 && second.getId() != 0) {
+                Item result = Item.get(local.getId(), local.getDamage());
+                int enchants = 0;
+
+                ArrayList<Enchantment> enchantments = new ArrayList<>(Arrays.asList(second.getEnchantments()));
+                ArrayList<Enchantment> localEnchantments = new ArrayList<>(Arrays.asList(local.getEnchantments()));
+
+                ArrayList<Enchantment> baseEnchants = new ArrayList<>();
+
+                for (Enchantment ench : localEnchantments) {
+                    if (ench.isBasic()) {
+                        baseEnchants.add(ench);
+                    }
+                }
+
+                for (Enchantment enchantment : enchantments) {
+                    if (enchantment.getLevel() < 0 || enchantment.getId() < 0) {
+                        continue;
+                    }
+
+                    if (enchantment.isBasic()) {
+                        boolean same = false;
+                        boolean another = false;
+
+                        for (Enchantment baseEnchant : baseEnchants) {
+                            if (baseEnchant.getId() == enchantment.getId())
+                                same = true;
+                            else {
+                                another = true;
+                            }
+                        }
+
+                        if (!same && another) {
+                            continue;
+                        }
+                    }
+
+                    Enchantment localEnchantment = local.getEnchantment(enchantment.getId());
+
+                    if (localEnchantment != null) {
+                        int level = Math.max(localEnchantment.getLevel(), enchantment.getLevel());
+
+                        if (localEnchantment.getLevel() == enchantment.getLevel())
+                            level++;
+
+                        enchantment.setLevel(level);
+                        result.addEnchantment(enchantment);
+                        continue;
+                    }
+
+                    result.addEnchantment(enchantment);
+                    enchants++;
+                }
+
+                result.setCustomName(resultItem.getCustomName());
+
+                player.getInventory().addItem(result);
+                player.getInventory().sendContents(player);
+                clearAll();
+                sendContents(player);
+                return true;
+            }
         }
 
         return false;
@@ -62,6 +132,6 @@ public class AnvilInventory extends ContainerInventory {
     @Override
     public void onOpen(Player who) {
         super.onOpen(who);
-        who.craftingType = 3;
+        who.craftingType = Player.CRAFTING_ANVIL;
     }
 }
