@@ -2,15 +2,23 @@ package cn.nukkit.level;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
+import cn.nukkit.block.BlockFire;
+//import cn.nukkit.block.BlockPosition;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityHuman;
+import cn.nukkit.entity.EntityLiving;
+import cn.nukkit.entity.item.EntityFallingBlock;
 import cn.nukkit.entity.item.EntityPrimedTNT;
 import cn.nukkit.event.block.BlockUpdateEvent;
+import cn.nukkit.entity.item.EntityFallingBlock;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.enchantment.protection.*;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.level.particle.*;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
@@ -28,205 +36,217 @@ import java.util.concurrent.ThreadLocalRandom;
  * Nukkit Project
  */
 public class Explosion {
+    private final boolean a;
+    private final boolean b;
+    private final Random c = new Random();
+    private final World world;
+    private final double posX;
+    private final double posY;
+    private final double posZ;
+    public final Entity source;
+    private final float size;
+    private final List<BlockPosition> blocks = Lists.newArrayList();
+    private final Map<EntityHuman, Vec3D> k = Maps.newHashMap();
+    public boolean wasCanceled = false;
 
-    private final int rays = 16; //Rays
-    private final Level level;
-    private final Position source;
-    private final double size;
-
-    private List<Block> affectedBlocks = new ArrayList<>();
-    private final double stepLen = 0.3d;
-
-    private final Object what;
-
-    public Explosion(Position center, double size, Entity what) {
-        this.level = center.getLevel();
-        this.source = center;
-        this.size = Math.max(size, 0);
-        this.what = what;
+    public Explosion(World world, Entity entity, double d0, double d1, double d2, float f, boolean flag, boolean flag1) {
+        this.world = world;
+        this.source = entity;
+        this.size = (float)Math.max((double)f, 0.0);
+        this.posX = d0;
+        this.posY = d1;
+        this.posZ = d2;
+        this.a = flag;
+        this.b = flag1;
     }
 
-    /**
-     * @return bool
-     * @deprecated
-     */
-    public boolean explode() {
-        if (explodeA()) {
-            return explodeB();
+    public void a() {
+        int j;
+        int i;
+        if (this.size < 0.1f) {
+            return;
         }
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public boolean explodeA() {
-        if (this.size < 0.1) {
-            return false;
-        }
-
-        Vector3 vector = new Vector3(0, 0, 0);
-        Vector3 vBlock = new Vector3(0, 0, 0);
-
-        int mRays = this.rays - 1;
-        for (int i = 0; i < this.rays; ++i) {
-            for (int j = 0; j < this.rays; ++j) {
-                for (int k = 0; k < this.rays; ++k) {
-                    if (i == 0 || i == mRays || j == 0 || j == mRays || k == 0 || k == mRays) {
-                        vector.setComponents((double) i / (double) mRays * 2d - 1, (double) j / (double) mRays * 2d - 1, (double) k / (double) mRays * 2d - 1);
-                        double len = vector.length();
-                        vector.setComponents((vector.x / len) * this.stepLen, (vector.y / len) * this.stepLen, (vector.z / len) * this.stepLen);
-                        double pointerX = this.source.x;
-                        double pointerY = this.source.y;
-                        double pointerZ = this.source.z;
-
-                        for (double blastForce = this.size * (ThreadLocalRandom.current().nextInt(700, 1301)) / 1000d; blastForce > 0; blastForce -= this.stepLen * 0.75d) {
-                            int x = (int) pointerX;
-                            int y = (int) pointerY;
-                            int z = (int) pointerZ;
-                            vBlock.x = pointerX >= x ? x : x - 1;
-                            vBlock.y = pointerY >= y ? y : y - 1;
-                            vBlock.z = pointerZ >= z ? z : z - 1;
-                            if (vBlock.y < 0 || vBlock.y > 127) {
-                                break;
+        HashSet<BlockPosition> hashset = Sets.newHashSet();
+        int k = 0;
+        while (k < 16) {
+            i = 0;
+            while (i < 16) {
+                j = 0;
+                while (j < 16) {
+                    if (k == 0 || k == 15 || i == 0 || i == 15 || j == 0 || j == 15) {
+                        double d0 = (float)k / 15.0f * 2.0f - 1.0f;
+                        double d1 = (float)i / 15.0f * 2.0f - 1.0f;
+                        double d2 = (float)j / 15.0f * 2.0f - 1.0f;
+                        double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
+                        d0 /= d3;
+                        d1 /= d3;
+                        d2 /= d3;
+                        float f = this.size * (0.7f + this.world.random.nextFloat() * 0.6f);
+                        double d4 = this.posX;
+                        double d5 = this.posY;
+                        double d6 = this.posZ;
+                        while (f > 0.0f) {
+                            BlockPosition blockposition = new BlockPosition(d4, d5, d6);
+                            IBlockData iblockdata = this.world.getType(blockposition);
+                            if (iblockdata.getMaterial() != Material.AIR) {
+                                float f2 = this.source != null ? this.source.a(this, this.world, blockposition, iblockdata) : iblockdata.getBlock().a((Entity)null);
+                                f -= (f2 + 0.3f) * 0.3f;
                             }
-                            Block block = this.level.getBlock(vBlock);
-
-                            if (block.getId() != 0) {
-                                blastForce -= (block.getResistance() / 5 + 0.3d) * this.stepLen;
-                                if (blastForce > 0) {
-                                    String index = Level.blockHash((int) block.x, (int) block.y, (int) block.z);
-                                    if (!this.affectedBlocks.contains(block)) {
-                                        this.affectedBlocks.add(block);
-                                    }
-                                }
+                            if (f > 0.0f && (this.source == null || this.source.a(this, this.world, blockposition, iblockdata, f)) && blockposition.getY() < 256 && blockposition.getY() >= 0) {
+                                hashset.add(blockposition);
                             }
-                            pointerX += vector.x;
-                            pointerY += vector.y;
-                            pointerZ += vector.z;
+                            d4 += d0 * 0.30000001192092896;
+                            d5 += d1 * 0.30000001192092896;
+                            d6 += d2 * 0.30000001192092896;
+                            f -= 0.22500001f;
                         }
                     }
+                    ++j;
                 }
+                ++i;
             }
+            ++k;
         }
-
-        return true;
-    }
-
-    public boolean explodeB() {
-
-        HashMap<String, Boolean> updateBlocks = new HashMap<>();
-        List<Vector3> send = new ArrayList<>();
-
-        Vector3 source = (new Vector3(this.source.x, this.source.y, this.source.z)).floor();
-        double yield = (1d / this.size) * 100d;
-
-        if (this.what instanceof Entity) {
-            EntityExplodeEvent ev = new EntityExplodeEvent((Entity) this.what, this.source, this.affectedBlocks, yield);
-            this.level.getServer().getPluginManager().callEvent(ev);
-            if (ev.isCancelled()) {
-                return false;
-            } else {
-                yield = ev.getYield();
-                this.affectedBlocks = ev.getBlockList();
-            }
-        }
-
-        double explosionSize = this.size * 2d;
-        double minX = NukkitMath.floorDouble(this.source.x - explosionSize - 1);
-        double maxX = NukkitMath.ceilDouble(this.source.x + explosionSize + 1);
-        double minY = NukkitMath.floorDouble(this.source.y - explosionSize - 1);
-        double maxY = NukkitMath.ceilDouble(this.source.y + explosionSize + 1);
-        double minZ = NukkitMath.floorDouble(this.source.z - explosionSize - 1);
-        double maxZ = NukkitMath.ceilDouble(this.source.z + explosionSize + 1);
-
-        AxisAlignedBB explosionBB = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
-
-        Entity[] list = this.level.getNearbyEntities(explosionBB, this.what instanceof Entity ? (Entity) this.what : null);
-        for (Entity entity : list) {
-            double distance = entity.distance(this.source) / explosionSize;
-
-            if (distance <= 1) {
-                Vector3 motion = entity.subtract(this.source).normalize();
-                int exposure = 1;
-                double impact = (1 - distance) * exposure;
-                int damage = (int) (((impact * impact + impact) / 2) * 8 * explosionSize + 1);
-
-                if (this.what instanceof Entity) {
-                    EntityDamageByEntityEvent ev = new EntityDamageByEntityEvent((Entity) this.what, entity, EntityDamageEvent.CAUSE_ENTITY_EXPLOSION, damage);
-                    entity.attack(ev);
-                } else if (this.what instanceof Block) {
-                    EntityDamageByBlockEvent ev = new EntityDamageByBlockEvent((Block) this.what, entity, EntityDamageEvent.CAUSE_BLOCK_EXPLOSION, damage);
-                    entity.attack(ev);
-                } else {
-                    EntityDamageEvent ev = new EntityDamageEvent(entity, EntityDamageEvent.CAUSE_BLOCK_EXPLOSION, damage);
-                    entity.attack(ev);
-                }
-
-                entity.setMotion(motion.multiply(impact));
-            }
-        }
-
-        ItemBlock air = new ItemBlock(new BlockAir());
-
-        Iterator iter = this.affectedBlocks.iterator();
-        //Iterator iter = this.affectedBlocks.entrySet().iterator();
-        while (iter.hasNext()) {
-            Block block = (Block) iter.next();
-            //Block block = (Block) ((HashMap.Entry) iter.next()).getValue();
-            if (block.getId() == Block.TNT) {
-                double mot = Math.random() * Math.PI * 2;
-                EntityPrimedTNT tnt = new EntityPrimedTNT(this.level.getChunk((int) block.x >> 4, (int) block.z >> 4),
-                        new CompoundTag()
-                                .putList(new ListTag<DoubleTag>("Pos")
-                                        .add(new DoubleTag("", block.x + 0.5))
-                                        .add(new DoubleTag("", block.y))
-                                        .add(new DoubleTag("", block.z + 0.5)))
-                                .putList(new ListTag<DoubleTag>("Motion")
-                                        .add(new DoubleTag("", -Math.sin(mot) * 0.02))
-                                        .add(new DoubleTag("", 0.2))
-                                        .add(new DoubleTag("", -Math.cos(mot) * 0.02)))
-                                .putList(new ListTag<FloatTag>("Rotation")
-                                        .add(new FloatTag("", 0))
-                                        .add(new FloatTag("", 0)))
-                                .put("Fuse", new ByteTag("", (byte) (10 + (Math.random() * 30) + 1))
-                                ));
-                tnt.spawnToAll();
-            } else if (Math.random() * 100 < yield) {
-                for (int[] drop : block.getDrops(air)) {
-                    this.level.dropItem(block.add(0.5, 0.5, 0.5), Item.get(drop[0], drop[1], drop[2]));
-                }
-            }
-
-            this.level.setBlockIdAt((int) block.x, (int) block.y, (int) block.z, 0);
-
-            Vector3 pos = new Vector3(block.x, block.y, block.z);
-
-            for (int side = 0; side < 5; side++) {
-                Vector3 sideBlock = pos.getSide(side);
-                String index = Level.blockHash((int) sideBlock.x, (int) sideBlock.y, (int) sideBlock.z);
-                if (!this.affectedBlocks.contains(sideBlock) && !updateBlocks.containsKey(index)) {
-                    BlockUpdateEvent ev = new BlockUpdateEvent(this.level.getBlock(sideBlock));
-                    this.level.getServer().getPluginManager().callEvent(ev);
-                    if (!ev.isCancelled()) {
-                        ev.getBlock().onUpdate(Level.BLOCK_UPDATE_NORMAL);
+        this.blocks.addAll(hashset);
+        float f3 = this.size * 2.0f;
+        i = NukkitMath.floor(this.posX - (double)f3 - 1.0);
+        j = NukkitMath.floor(this.posX + (double)f3 + 1.0);
+        int l = NukkitMath.floor(this.posY - (double)f3 - 1.0);
+        int i1 = NukkitMath.floor(this.posY + (double)f3 + 1.0);
+        int j1 = NukkitMath.floor(this.posZ - (double)f3 - 1.0);
+        int k1 = NukkitMath.floor(this.posZ + (double)f3 + 1.0);
+        List<Entity> list = this.world.getEntities(this.source, new AxisAlignedBB(i, l, j1, j, i1, k1));
+        Vector3 vector3 = new Vector3(this.posX, this.posY, this.posZ);
+        int l1 = 0;
+        while (l1 < list.size()) {
+            double d10;
+            double d7;
+            double d9;
+            double d8;
+            double d11;
+            Entity entity = list.get(l1);
+            if (!entity.bt() && (d7 = entity.f(this.posX, this.posY, this.posZ) / (double)f3) <= 1.0 && (d11 = (double)NukkitMath.sqrt((d8 = entity.locX - this.posX) * d8 + (d9 = entity.locY + (double)entity.getHeadHeight() - this.posY) * d9 + (d10 = entity.locZ - this.posZ) * d10)) != 0.0) {
+                d8 /= d11;
+                d9 /= d11;
+                d10 /= d11;
+                double d12 = this.world.a(vector3, entity.getBoundingBox());
+                double d13 = (1.0 - d7) * d12;
+                //CraftEventFactory.entityDamage = this.source;
+                //entity.forceExplosionKnockback = false;
+                boolean wasDamaged = entity.damageEntity(DamageSource.explosion(this), (int)((d13 * d13 + d13) / 2.0 * 7.0 * (double)f3 + 1.0));
+                //CraftEventFactory.entityDamage = null;
+                if (wasDamaged || entity instanceof EntityPrimedTNT || entity instanceof EntityFallingBlock/* || entity.forceExplosionKnockback*/) {
+                    EntityHuman entityhuman;
+                    double d14 = 1.0;
+                    if (entity instanceof EntityLiving) {
+                        d14 = EnchantmentProtection.a((EntityLiving)entity, d13);
                     }
-                    updateBlocks.put(index, true);
+                    entity.motX += d8 * d14;
+                    entity.motY += d9 * d14;
+                    entity.motZ += d10 * d14;
+                    if (!(!(entity instanceof EntityHuman) || (entityhuman = (EntityHuman)entity).isSpectator() || entityhuman.z() && entityhuman.abilities.isFlying)) {
+                        this.k.put(entityhuman, new Vec3D(d8 * d13, d9 * d13, d10 * d13));
+                    }
                 }
             }
-            send.add(new Vector3(block.x - source.x, block.y - source.y, block.z - source.z));
+            ++l1;
         }
-
-        ExplodePacket pk = new ExplodePacket();
-        pk.x = (float) this.source.x;
-        pk.y = (float) this.source.y;
-        pk.z = (float) this.source.z;
-        pk.radius = (float) this.size;
-        pk.records = send.stream().toArray(Vector3[]::new);
-
-        this.level.addChunkPacket((int) source.x >> 4, (int) source.z >> 4, pk);
-
-        return true;
     }
 
+    public void a(boolean flag) {
+        this.world.a(null, this.posX, this.posY, this.posZ, SoundEffects.bF, SoundCategory.BLOCKS, 4.0f, (1.0f + (this.world.random.nextFloat() - this.world.random.nextFloat()) * 0.2f) * 0.7f);
+        if (this.size >= 2.0f && this.b) {
+            this.world.addParticle(EnumParticle.EXPLOSION_HUGE, this.posX, this.posY, this.posZ, 1.0, 0.0, 0.0, new int[0]);
+        } else {
+            this.world.addParticle(EnumParticle.EXPLOSION_LARGE, this.posX, this.posY, this.posZ, 1.0, 0.0, 0.0, new int[0]);
+        }
+        if (this.b) {
+            boolean cancelled;
+            float yield;
+            List<cn.nukkit.block.Block> bukkitBlocks;
+            EntityExplodeEvent event;
+            //CraftWorld bworld = this.world.getWorld();
+            //CraftEntity explode = this.source == null ? null : this.source.getBukkitEntity();
+            Location location = new Location(bworld, this.posX, this.posY, this.posZ);
+            ArrayList<cn.nukkit.block.Block> blockList = Lists.newArrayList();
+            int i1 = this.blocks.size() - 1;
+            while (i1 >= 0) {
+                BlockPosition cpos = this.blocks.get(i1);
+                cn.nukkit.block.Block bblock = bworld.getBlockAt(cpos.getX(), cpos.getY(), cpos.getZ());
+                if (bblock.getType() != cn.nukkit.Material.AIR) {
+                    blockList.add(bblock);
+                }
+                --i1;
+            }
+            if (explode != null) {
+                event = new EntityExplodeEvent(explode, location, blockList, 1.0f / this.size);
+                this.world.getServer().getPluginManager().callEvent(event);
+                cancelled = event.isCancelled();
+                bukkitBlocks = event.blockList();
+                yield = event.getYield();
+            } else {
+                event = new BlockExplodeEvent(location.getBlock(), blockList, 1.0f / this.size);
+                this.world.getServer().getPluginManager().callEvent(event);
+                cancelled = event.isCancelled();
+                bukkitBlocks = event.blockList();
+                yield = event.getYield();
+            }
+            this.blocks.clear();
+            for (cn.nukkit.block.Block bblock : bukkitBlocks) {
+                BlockPosition coords = new BlockPosition(bblock.getX(), bblock.getY(), bblock.getZ());
+                this.blocks.add(coords);
+            }
+            if (cancelled) {
+                this.wasCanceled = true;
+                return;
+            }
+            for (BlockPosition blockposition : this.blocks) {
+                IBlockData iblockdata = this.world.getType(blockposition);
+                Block block = iblockdata.getBlock();
+                if (flag) {
+                    double d0 = (float)blockposition.getX() + this.world.random.nextFloat();
+                    double d1 = (float)blockposition.getY() + this.world.random.nextFloat();
+                    double d2 = (float)blockposition.getZ() + this.world.random.nextFloat();
+                    double d3 = d0 - this.posX;
+                    double d4 = d1 - this.posY;
+                    double d5 = d2 - this.posZ;
+                    double d6 = NukkitMath.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
+                    d3 /= d6;
+                    d4 /= d6;
+                    d5 /= d6;
+                    double d7 = 0.5 / (d6 / (double)this.size + 0.1);
+                    this.world.addParticle(EnumParticle.EXPLOSION_NORMAL, (d0 + this.posX) / 2.0, (d1 + this.posY) / 2.0, (d2 + this.posZ) / 2.0, d3 *= (d7 *= (double)(this.world.random.nextFloat() * this.world.random.nextFloat() + 0.3f)), d4 *= d7, d5 *= d7, new int[0]);
+                    this.world.addParticle(EnumParticle.SMOKE_NORMAL, d0, d1, d2, d3, d4, d5, new int[0]);
+                }
+                if (iblockdata.getMaterial() == Material.AIR) continue;
+                if (block.a(this)) {
+                    block.dropNaturally(this.world, blockposition, this.world.getType(blockposition), yield, 0);
+                }
+                this.world.setTypeAndData(blockposition, Blocks.AIR.getBlockData(), 3);
+                block.wasExploded(this.world, blockposition, this);
+            }
+        }
+        if (this.a) {
+            for (BlockPosition blockposition : this.blocks) {
+                if (this.world.getType(blockposition).getMaterial() != Material.AIR || !this.world.getType(blockposition.down()).b() || this.c.nextInt(3) != 0 /*|| CraftEventFactory.callBlockIgniteEvent(this.world, blockposition.getX(), blockposition.getY(), blockposition.getZ(), this).isCancelled())*/ continue;
+                this.world.setTypeUpdate(blockposition, Blocks.FIRE.getBlockData());
+            }
+        }
+    }
+
+    public Map<EntityHuman, Vec3D> b() {
+        return this.k;
+    }
+
+    public EntityLiving getSource() {
+        return this.source == null ? null : (this.source instanceof EntityTNTPrimed ? ((EntityTNTPrimed)this.source).getSource() : (this.source instanceof EntityLiving ? (EntityLiving)this.source : (this.source instanceof EntityFireball ? ((EntityFireball)this.source).shooter : null)));
+    }
+
+    public void clearBlocks() {
+        this.blocks.clear();
+    }
+
+    public List<BlockPosition> getBlocks() {
+        return this.blocks;
+    }
 }
