@@ -108,7 +108,7 @@ public abstract class Enchantment implements Cloneable {
     private final int weight;
     public EnchantmentType type;
 
-    protected int level;
+    protected int level = 1;
 
     protected final String name;
 

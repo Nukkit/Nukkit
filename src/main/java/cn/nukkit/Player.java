@@ -2721,34 +2721,32 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     Recipe recipe = this.server.getCraftingManager().getRecipe(craftingEventPacket.id);
 
-
-                    if(this.craftingType == CRAFTING_ANVIL) {
+                    if (this.craftingType == CRAFTING_ANVIL) {
                         Inventory inv = this.windowIndex.get(craftingEventPacket.windowId);
                         AnvilInventory anvilInventory = inv instanceof AnvilInventory ? (AnvilInventory) inv : null;
 
-                        if(anvilInventory == null) {
+                        if (anvilInventory == null) {
                             anvilInventory = null;
 
-                            for(Inventory window : this.windowIndex.values()){
-                                if(window instanceof AnvilInventory){
+                            for (Inventory window : this.windowIndex.values()) {
+                                if (window instanceof AnvilInventory) {
                                     anvilInventory = (AnvilInventory) window;
                                     break;
                                 }
                             }
 
-                            if(anvilInventory == null){ //If it'sf _still_ null, then the player doesn't have a valid anvil window, cannot proceed.
-                                this.getServer().getLogger().debug("Couldn't find an anvil window for "+this.getName()+", exiting");
+                            if (anvilInventory == null) { //If it'sf _still_ null, then the player doesn't have a valid anvil window, cannot proceed.
+                                this.getServer().getLogger().debug("Couldn't find an anvil window for " + this.getName() + ", exiting");
                                 this.inventory.sendContents(this);
                                 break;
                             }
                         }
 
-                        if(recipe == null){
+                        if (recipe == null) {
                             //Item renamed
 
-                            //craftingEventPacket.output[0].getNamedTag().print(System.out);
-                            if(!anvilInventory.onRename(this, craftingEventPacket.output[0])){
-                                this.getServer().getLogger().debug(this.getName()+" failed to rename an item in an anvil");
+                            if (!anvilInventory.onRename(this, craftingEventPacket.output[0])) {
+                                this.getServer().getLogger().debug(this.getName() + " failed to rename an item in an anvil");
                                 this.inventory.sendContents(this);
                             }
                         } else {
@@ -2781,7 +2779,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     boolean canCraft = true;
 
-                    if(craftingEventPacket.input.length == 0) {
+                    if (craftingEventPacket.input.length == 0) {
                         Recipe[] recipes = getServer().getCraftingManager().getRecipesByResult(craftingEventPacket.output[0]);
 
                         recipe = null;
@@ -3057,8 +3055,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         transaction = new BaseTransaction(this.inventory, containerSetSlotPacket.slot + this.inventory.getSize(), this.inventory.getArmorItem(containerSetSlotPacket.slot), containerSetSlotPacket.item);
                     } else if (this.windowIndex.containsKey(containerSetSlotPacket.windowid)) {
-                        this.craftingType = CRAFTING_SMALL;
                         Inventory inv = this.windowIndex.get(containerSetSlotPacket.windowid);
+
+                        if (!(inv instanceof AnvilInventory)) {
+                            this.craftingType = CRAFTING_SMALL;
+                        }
 
                         if (inv instanceof EnchantInventory && containerSetSlotPacket.item.hasEnchantments()) {
                             ((EnchantInventory) inv).onEnchant(this, inv.getItem(containerSetSlotPacket.slot), containerSetSlotPacket.item);

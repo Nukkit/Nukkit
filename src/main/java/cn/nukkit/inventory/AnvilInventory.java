@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.sound.AnvilUseSound;
 import cn.nukkit.nbt.tag.ListTag;
 
 import java.util.ArrayList;
@@ -35,7 +36,13 @@ public class AnvilInventory extends ContainerInventory {
 
         if (!resultItem.deepEquals(local, true, false) || resultItem.getCount() != local.getCount()) {
             //Item does not match target item. Everything must match except the tags.
+            System.out.println("deep equals local: " + local.toString() + "    client: " + resultItem.toString());
             return false;
+        }
+
+        if (local.deepEquals(resultItem)) {
+            //just item transaction
+            return true;
         }
 
         if (local.getId() != 0 && second.getId() == 0) { //only rename
@@ -45,6 +52,8 @@ public class AnvilInventory extends ContainerInventory {
             clearAll();
             player.getInventory().sendContents(player);
             sendContents(player);
+
+            player.getLevel().addSound(new AnvilUseSound(player));
             return true;
         } else if (local.getId() != 0 && second.getId() != 0) { //enchants combining
             if (!local.equals(second, true, false)) {
@@ -52,15 +61,14 @@ public class AnvilInventory extends ContainerInventory {
             }
 
             if (local.getId() != 0 && second.getId() != 0) {
-                Item result = Item.get(local.getId(), local.getDamage());
+                Item result = local.clone();
                 int enchants = 0;
 
                 ArrayList<Enchantment> enchantments = new ArrayList<>(Arrays.asList(second.getEnchantments()));
-                ArrayList<Enchantment> localEnchantments = new ArrayList<>(Arrays.asList(local.getEnchantments()));
 
                 ArrayList<Enchantment> baseEnchants = new ArrayList<>();
 
-                for (Enchantment ench : localEnchantments) {
+                for (Enchantment ench : local.getEnchantments()) {
                     if (ench.isBasic()) {
                         baseEnchants.add(ench);
                     }
@@ -111,6 +119,8 @@ public class AnvilInventory extends ContainerInventory {
                 player.getInventory().sendContents(player);
                 clearAll();
                 sendContents(player);
+
+                player.getLevel().addSound(new AnvilUseSound(player));
                 return true;
             }
         }
@@ -121,7 +131,7 @@ public class AnvilInventory extends ContainerInventory {
     @Override
     public void onClose(Player who) {
         super.onClose(who);
-        who.craftingType = 0;
+        who.craftingType = Player.CRAFTING_SMALL;
 
         for (int i = 0; i < 2; ++i) {
             this.getHolder().getLevel().dropItem(this.getHolder().add(0.5, 0.5, 0.5), this.getItem(i));
