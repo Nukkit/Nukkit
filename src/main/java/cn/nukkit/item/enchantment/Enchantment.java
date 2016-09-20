@@ -160,7 +160,7 @@ public abstract class Enchantment implements Cloneable {
     }
 
     public int getMaxEnchantableLevel() {
-        return 1;
+        return getMaxLevel();
     }
 
     public int getMinEnchantAbility(int level) {

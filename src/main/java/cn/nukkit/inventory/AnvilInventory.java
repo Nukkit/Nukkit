@@ -36,7 +36,6 @@ public class AnvilInventory extends ContainerInventory {
 
         if (!resultItem.deepEquals(local, true, false) || resultItem.getCount() != local.getCount()) {
             //Item does not match target item. Everything must match except the tags.
-            System.out.println("deep equals local: " + local.toString() + "    client: " + resultItem.toString());
             return false;
         }
 
