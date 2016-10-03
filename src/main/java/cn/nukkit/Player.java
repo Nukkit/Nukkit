@@ -2455,7 +2455,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         HashMap<Integer, Float> damage = new HashMap<>();
                         damage.put(EntityDamageEvent.MODIFIER_BASE, itemDamage);
 
-                        if (!this.canInteract(targetEntity, isCreative() ? 8 : 3)) {
+                        if (!this.canInteract(targetEntity, isCreative() ? 8 : 5)) {
                             cancelled = true;
                         } else if (targetEntity instanceof Player) {
                             if ((((Player) targetEntity).getGamemode() & 0x01) > 0) {
