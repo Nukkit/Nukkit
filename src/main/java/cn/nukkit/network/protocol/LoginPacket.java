@@ -37,6 +37,9 @@ public class LoginPacket extends DataPacket {
     @Override
     public void decode() {
         this.protocol = this.getInt();
+        if (this.protocol != ProtocolInfo.CURRENT_PROTOCOL) {
+        	return; // Do not attempt to decode for non-accepted protocols
+        }
         byte[] str;
         try {
             str = Zlib.inflate(this.get(this.getInt()), 64*1024*1024);
