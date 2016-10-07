@@ -85,7 +85,7 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
         namedTag.putByte("Fuse", fuse);
     }
 
-    public boolean onUpdate(int currentTick) {
+    public synchronized boolean onUpdate(int currentTick) {
 
         if (closed) {
             return false;

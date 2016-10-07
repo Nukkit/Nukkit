@@ -13,13 +13,12 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Zlib;
-
 import java.io.ByteArrayInputStream;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -86,7 +85,7 @@ public class Chunk extends BaseFullChunk {
             this.nbt.putByteArray("BlockLight", new byte[16384]);
         }
 
-        Map<Integer, Integer> extraData = new HashMap<>();
+        Map<Integer, Integer> extraData = new ConcurrentHashMap<>();
 
         if (!this.nbt.contains("ExtraData") || !(this.nbt.get("ExtraData") instanceof ByteArrayTag)) {
             this.nbt.putByteArray("ExtraData", Binary.writeInt(0));

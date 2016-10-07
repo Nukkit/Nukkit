@@ -51,12 +51,12 @@ public class Session {
 
     private boolean isActive;
 
-    private Map<Integer, Integer> ACKQueue = new HashMap<>();
-    private Map<Integer, Integer> NACKQueue = new HashMap<>();
+    private Map<Integer, Integer> ACKQueue = new ConcurrentHashMap<>();
+    private Map<Integer, Integer> NACKQueue = new ConcurrentHashMap<>();
 
     private final Map<Integer, DataPacket> recoveryQueue = new TreeMap<>();
 
-    private final Map<Integer, Map<Integer, EncapsulatedPacket>> splitPackets = new HashMap<>();
+    private final Map<Integer, Map<Integer, EncapsulatedPacket>> splitPackets = new ConcurrentHashMap<>();
 
     private final Map<Integer, Map<Integer, Integer>> needACK = new TreeMap<>();
 
@@ -114,14 +114,14 @@ public class Session {
             ACK pk = new ACK();
             pk.packets = new TreeMap<>(this.ACKQueue);
             this.sendPacket(pk);
-            this.ACKQueue = new HashMap<>();
+            this.ACKQueue = new ConcurrentHashMap<>();
         }
 
         if (!this.NACKQueue.isEmpty()) {
             NACK pk = new NACK();
             pk.packets = new TreeMap<>(this.NACKQueue);
             this.sendPacket(pk);
-            this.NACKQueue = new HashMap<>();
+            this.NACKQueue = new ConcurrentHashMap<>();
         }
 
         if (!this.packetToSend.isEmpty()) {
@@ -205,7 +205,7 @@ public class Session {
         int priority = flags & 0b0000111;
         if (pk.needACK && pk.messageIndex != null) {
             if (!this.needACK.containsKey(pk.identifierACK)) {
-                this.needACK.put(pk.identifierACK, new HashMap<>());
+                this.needACK.put(pk.identifierACK, new ConcurrentHashMap<>());
             }
             this.needACK.get(pk.identifierACK).put(pk.messageIndex, pk.messageIndex);
         }
@@ -245,7 +245,7 @@ public class Session {
 
     public void addEncapsulatedToQueue(EncapsulatedPacket packet, int flags) throws Exception {
         if ((packet.needACK = (flags & RakNet.FLAG_NEED_ACK) > 0)) {
-            this.needACK.put(packet.identifierACK, new HashMap<>());
+            this.needACK.put(packet.identifierACK, new ConcurrentHashMap<>());
         }
 
         if (packet.reliability == 2 ||
@@ -299,7 +299,7 @@ public class Session {
             if (this.splitPackets.size() >= MAX_SPLIT_COUNT) {
                 return;
             }
-            this.splitPackets.put(packet.splitID, new HashMap<Integer, EncapsulatedPacket>() {{
+            this.splitPackets.put(packet.splitID, new ConcurrentHashMap<Integer, EncapsulatedPacket>() {{
                 put(packet.splitIndex, packet);
             }});
         } else {

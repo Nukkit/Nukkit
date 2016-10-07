@@ -9,12 +9,12 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import java.lang.management.ManagementFactory;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 import static cn.nukkit.timings.Timings.fullServerTickTimer;
 import static cn.nukkit.timings.TimingsManager.MINUTE_REPORTS;
@@ -31,9 +31,9 @@ public class TimingsHistory {
     public static long activatedEntityTicks;
 
     private static int levelIdPool = 1;
-    static Map<String, Integer> levelMap = new HashMap<>();
-    static Map<Integer, String> entityMap = new HashMap<>();
-    static Map<Integer, String> blockEntityMap = new HashMap<>();
+    static Map<String, Integer> levelMap = new ConcurrentHashMap<>();
+    static Map<Integer, String> entityMap = new ConcurrentHashMap<>();
+    static Map<Integer, String> blockEntityMap = new ConcurrentHashMap<>();
 
     private final long endTime;
     private final long startTime;
@@ -70,8 +70,8 @@ public class TimingsHistory {
             this.entries[i++] = new TimingsHistoryEntry(timing);
         }
 
-        final Map<Integer, AtomicInteger> entityCounts = new HashMap<>();
-        final Map<Integer, AtomicInteger> blockEntityCounts = new HashMap<>();
+        final Map<Integer, AtomicInteger> entityCounts = new ConcurrentHashMap<>();
+        final Map<Integer, AtomicInteger> blockEntityCounts = new ConcurrentHashMap<>();
         final Gson GSON = new Gson();
         // Information about all loaded entities/block entities
         for (Level level : Server.getInstance().getLevels().values()) {

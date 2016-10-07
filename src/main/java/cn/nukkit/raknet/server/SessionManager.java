@@ -8,11 +8,11 @@ import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.ThreadedLogger;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.socket.DatagramPacket;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -28,7 +28,7 @@ public class SessionManager {
     protected int receiveBytes = 0;
     protected int sendBytes = 0;
 
-    protected final Map<String, Session> sessions = new HashMap<>();
+    protected final Map<String, Session> sessions = new ConcurrentHashMap<>();
 
     protected String name = "";
 
@@ -39,8 +39,8 @@ public class SessionManager {
     protected long ticks = 0;
     protected long lastMeasure;
 
-    protected final Map<String, Long> block = new HashMap<>();
-    protected final Map<String, Integer> ipSec = new HashMap<>();
+    protected final Map<String, Long> block = new ConcurrentHashMap<>();
+    protected final Map<String, Integer> ipSec = new ConcurrentHashMap<>();
 
     public boolean portChecking = true;
 

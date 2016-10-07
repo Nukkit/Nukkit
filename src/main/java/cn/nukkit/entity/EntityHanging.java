@@ -50,7 +50,7 @@ public abstract class EntityHanging extends Entity {
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
+    public synchronized boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;
         }

@@ -1,9 +1,8 @@
 package cn.nukkit.utils;
 
 import com.google.common.collect.Maps;
-
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -109,7 +108,7 @@ public enum TextFormat {
 
     private static final Pattern CLEAN_PATTERN = Pattern.compile("(?i)" + String.valueOf(ESCAPE) + "[0-9A-FK-OR]");
     private final static Map<Integer, TextFormat> BY_ID = Maps.newTreeMap();
-    private final static Map<Character, TextFormat> BY_CHAR = new HashMap<>();
+    private final static Map<Character, TextFormat> BY_CHAR = new ConcurrentHashMap<>();
 
     static {
         for (TextFormat color : values()) {

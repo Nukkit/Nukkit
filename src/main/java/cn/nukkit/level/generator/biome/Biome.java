@@ -4,10 +4,9 @@ import cn.nukkit.block.Block;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.generator.populator.Populator;
 import cn.nukkit.math.NukkitRandom;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -39,7 +38,7 @@ public abstract class Biome {
 
     public static final int MAX_BIOMES = 256;
 
-    private static final Map<Integer, Biome> biomes = new HashMap<>();
+    private static final Map<Integer, Biome> biomes = new ConcurrentHashMap<>();
 
     private int id;
     private boolean registered = false;

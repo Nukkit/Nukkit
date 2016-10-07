@@ -64,8 +64,8 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
 
     @Override
     public boolean isBlockEntityValid() {
-        // TODO: 2016/2/4 TRAPPED_CHEST?
-        return getBlock().getId() == Block.CHEST;
+        int blockID = this.level.getBlockIdAt((int) x, (int) y, (int) z);
+        return blockID == Block.CHEST || blockID == Block.TRAPPED_CHEST;
     }
 
     @Override

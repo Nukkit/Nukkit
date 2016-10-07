@@ -16,13 +16,16 @@ import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.*;
+import java.io.*;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
 import org.iq80.leveldb.impl.Iq80DBFactory;
-
-import java.io.*;
-import java.nio.ByteOrder;
-import java.util.*;
 
 /**
  * author: MagicDroidX
@@ -30,7 +33,7 @@ import java.util.*;
  */
 public class LevelDB implements LevelProvider {
 
-    protected Map<Long, Chunk> chunks = new HashMap<>();
+    protected Map<Long, Chunk> chunks = new ConcurrentHashMap<>();
 
     protected DB db;
 
@@ -92,7 +95,7 @@ public class LevelDB implements LevelProvider {
     }
 
     public static void generate(String path, String name, long seed, Class<? extends Generator> generator) throws IOException {
-        generate(path, name, seed, generator, new HashMap<>());
+        generate(path, name, seed, generator, new ConcurrentHashMap<>());
     }
 
     public static void generate(String path, String name, long seed, Class<? extends Generator> generator, Map<String, String> options) throws IOException {
@@ -216,7 +219,7 @@ public class LevelDB implements LevelProvider {
         for (Chunk chunk : new ArrayList<>(this.chunks.values())) {
             this.unloadChunk(chunk.getX(), chunk.getZ(), false);
         }
-        this.chunks = new HashMap<>();
+        this.chunks = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -226,7 +229,7 @@ public class LevelDB implements LevelProvider {
 
     @Override
     public Map<String, Object> getGeneratorOptions() {
-        return new HashMap<String, Object>() {
+        return new ConcurrentHashMap<String, Object>() {
             {
                 put("preset", levelData.getString("generatorOptions"));
             }

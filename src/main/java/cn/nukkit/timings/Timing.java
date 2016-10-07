@@ -1,7 +1,7 @@
 package cn.nukkit.timings;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Tee7even
@@ -13,7 +13,7 @@ public class Timing implements AutoCloseable {
     final String name;
     private final boolean verbose;
 
-    final Map<Integer, TimingData> children = new HashMap<>();
+    final Map<Integer, TimingData> children = new ConcurrentHashMap<>();
     private Timing parent;
 
     private final Timing groupTiming;

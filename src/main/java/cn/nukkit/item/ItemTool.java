@@ -2,13 +2,9 @@ package cn.nukkit.item;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.item.enchantment.EnchantmentDurability;
-import cn.nukkit.item.enchantment.EnchantmentFireAspect;
 import cn.nukkit.nbt.tag.ByteTag;
 import cn.nukkit.nbt.tag.Tag;
-
 import java.util.Random;
 
 /**
@@ -60,7 +56,7 @@ public abstract class ItemTool extends Item {
     }
 
     @Override
-    public boolean useOn(Block block) {
+    public synchronized boolean useOn(Block block) {
         if (this.isUnbreakable() || !canReduceDamage()) {
             return true;
         }
@@ -85,7 +81,7 @@ public abstract class ItemTool extends Item {
     }
 
     @Override
-    public boolean useOn(Entity entity) {
+    public synchronized boolean useOn(Entity entity) {
         if (this.isUnbreakable() || !canReduceDamage()) {
             return true;
         }

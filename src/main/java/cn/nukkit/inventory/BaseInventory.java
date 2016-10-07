@@ -10,8 +10,8 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.network.protocol.ContainerSetContentPacket;
 import cn.nukkit.network.protocol.ContainerSetSlotPacket;
-
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -29,14 +29,14 @@ public abstract class BaseInventory implements Inventory {
 
     protected final String title;
 
-    protected final Map<Integer, Item> slots = new HashMap<>();
+    protected final Map<Integer, Item> slots = new ConcurrentHashMap<>();
 
     protected final Set<Player> viewers = new HashSet<>();
 
     protected InventoryHolder holder;
 
     public BaseInventory(InventoryHolder holder, InventoryType type) {
-        this(holder, type, new HashMap<>());
+        this(holder, type, new ConcurrentHashMap<>());
     }
 
     public BaseInventory(InventoryHolder holder, InventoryType type, Map<Integer, Item> items) {
@@ -102,7 +102,7 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public Map<Integer, Item> getContents() {
-        return new HashMap<>(this.slots);
+        return new ConcurrentHashMap<>(this.slots);
     }
 
     @Override
@@ -185,7 +185,7 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public Map<Integer, Item> all(Item item) {
-        Map<Integer, Item> slots = new HashMap<>();
+        Map<Integer, Item> slots = new ConcurrentHashMap<>();
         boolean checkDamage = item.hasMeta();
         boolean checkTag = item.getCompoundTag() != null;
         for (Map.Entry<Integer, Item> entry : this.getContents().entrySet()) {

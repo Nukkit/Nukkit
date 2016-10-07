@@ -11,23 +11,22 @@ import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.NumberTag;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
 public abstract class BaseFullChunk implements FullChunk {
-    protected final Map<Long, Entity> entities = new HashMap<>();
+    protected final Map<Long, Entity> entities = new ConcurrentHashMap<>();
 
-    protected final Map<Long, BlockEntity> tiles = new HashMap<>();
+    protected final Map<Long, BlockEntity> tiles = new ConcurrentHashMap<>();
 
-    protected final Map<Integer, BlockEntity> tileList = new HashMap<>();
+    protected final Map<Integer, BlockEntity> tileList = new ConcurrentHashMap<>();
 
     protected int[] biomeColors;
 
@@ -45,7 +44,7 @@ public abstract class BaseFullChunk implements FullChunk {
 
     protected List<CompoundTag> NBTentities;
 
-    protected Map<Integer, Integer> extraData = new HashMap<>();
+    protected Map<Integer, Integer> extraData = new ConcurrentHashMap<>();
 
     protected LevelProvider provider;
     protected Class<? extends LevelProvider> providerClass;

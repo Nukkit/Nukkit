@@ -531,13 +531,13 @@ public class Item implements Cloneable {
 
     protected Block block = null;
     protected final int id;
-    protected int meta;
-    protected boolean hasMeta = true;
-    private byte[] tags = new byte[0];
-    private CompoundTag cachedNBT = null;
-    public int count;
-    protected int durability = 0;
-    protected String name;
+    protected volatile int meta;
+    protected volatile boolean hasMeta = true;
+    private volatile byte[] tags = new byte[0];
+    private volatile CompoundTag cachedNBT = null;
+    public volatile int count;
+    protected volatile int durability = 0;
+    protected volatile String name;
 
     public Item(int id) {
         this(id, 0, 1, "Unknown");
@@ -1706,11 +1706,11 @@ public class Item implements Cloneable {
         return null;
     }
 
-    public boolean useOn(Entity entity) {
+    public synchronized boolean useOn(Entity entity) {
         return false;
     }
 
-    public boolean useOn(Block block) {
+    public synchronized boolean useOn(Block block) {
         return false;
     }
 

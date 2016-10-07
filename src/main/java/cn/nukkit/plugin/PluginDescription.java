@@ -2,10 +2,10 @@ package cn.nukkit.plugin;
 
 import cn.nukkit.permission.Permission;
 import cn.nukkit.utils.PluginException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-
-import java.util.*;
 
 /* TODO Add these to Javadoc：
  *     <li><i>softdepend</i><br>
@@ -117,7 +117,7 @@ public class PluginDescription {
     private List<String> softDepend = new ArrayList<>();
     private List<String> loadBefore = new ArrayList<>();
     private String version;
-    private Map<String, Object> commands = new HashMap<>();
+    private Map<String, Object> commands = new ConcurrentHashMap<>();
     private String description;
     private final List<String> authors = new ArrayList<>();
     private String website;

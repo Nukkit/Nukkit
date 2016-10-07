@@ -11,12 +11,12 @@ import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.PluginException;
 import cn.nukkit.utils.Utils;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -30,19 +30,19 @@ public class PluginManager {
 
     protected final Map<String, Plugin> plugins = new LinkedHashMap<>();
 
-    protected final Map<String, Permission> permissions = new HashMap<>();
+    protected final Map<String, Permission> permissions = new ConcurrentHashMap<>();
 
-    protected final Map<String, Permission> defaultPerms = new HashMap<>();
+    protected final Map<String, Permission> defaultPerms = new ConcurrentHashMap<>();
 
-    protected final Map<String, Permission> defaultPermsOp = new HashMap<>();
+    protected final Map<String, Permission> defaultPermsOp = new ConcurrentHashMap<>();
 
-    protected final Map<String, WeakHashMap<Permissible, Permissible>> permSubs = new HashMap<>();
+    protected final Map<String, WeakHashMap<Permissible, Permissible>> permSubs = new ConcurrentHashMap<>();
 
     protected final Map<Permissible, Permissible> defSubs = new WeakHashMap<>();
 
     protected final Map<Permissible, Permissible> defSubsOp = new WeakHashMap<>();
 
-    protected final Map<String, PluginLoader> fileAssociations = new HashMap<>();
+    protected final Map<String, PluginLoader> fileAssociations = new ConcurrentHashMap<>();
 
     public PluginManager(Server server, SimpleCommandMap commandMap) {
         this.server = server;
@@ -311,7 +311,7 @@ public class PluginManager {
 
             return loadedPlugins;
         } else {
-            return new HashMap<>();
+            return new ConcurrentHashMap<>();
         }
     }
 
@@ -576,7 +576,7 @@ public class PluginManager {
             throw new PluginException("Plugin attempted to register " + listener.getClass().getName() + " while not enabled");
         }
 
-        Map<Class<? extends Event>, Set<RegisteredListener>> ret = new HashMap<>();
+        Map<Class<? extends Event>, Set<RegisteredListener>> ret = new ConcurrentHashMap<>();
         Set<Method> methods;
         try {
             Method[] publicMethods = listener.getClass().getMethods();

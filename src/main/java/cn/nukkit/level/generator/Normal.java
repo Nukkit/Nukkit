@@ -13,11 +13,10 @@ import cn.nukkit.level.generator.populator.PopulatorGroundCover;
 import cn.nukkit.level.generator.populator.PopulatorOre;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -59,7 +58,7 @@ public class Normal extends Generator {
     private final int basegroundHeight = 3;
 
     public Normal() {
-        this(new HashMap<>());
+        this(new ConcurrentHashMap<>());
     }
 
     public Normal(Map<String, Object> options) {
@@ -78,7 +77,7 @@ public class Normal extends Generator {
 
     @Override
     public Map<String, Object> getSettings() {
-        return new HashMap<>();
+        return new ConcurrentHashMap<>();
     }
 
     public Biome pickBiome(int x, int z) {

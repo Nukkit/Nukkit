@@ -2,11 +2,10 @@ package cn.nukkit.lang;
 
 import cn.nukkit.Server;
 import cn.nukkit.utils.Utils;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -17,8 +16,8 @@ public class BaseLang {
 
     protected final String langName;
 
-    protected Map<String, String> lang = new HashMap<>();
-    protected Map<String, String> fallbackLang = new HashMap<>();
+    protected Map<String, String> lang = new ConcurrentHashMap<>();
+    protected Map<String, String> fallbackLang = new ConcurrentHashMap<>();
 
 
     public BaseLang(String lang) {
@@ -55,7 +54,7 @@ public class BaseLang {
     protected Map<String, String> loadLang(String path) {
         try {
             String content = Utils.readFile(path);
-            Map<String, String> d = new HashMap<>();
+            Map<String, String> d = new ConcurrentHashMap<>();
             for (String line : content.split("\n")) {
                 line = line.trim();
                 if (line.equals("") || line.charAt(0) == '#') {
@@ -86,7 +85,7 @@ public class BaseLang {
     protected Map<String, String> loadLang(InputStream stream) {
         try {
             String content = Utils.readFile(stream);
-            Map<String, String> d = new HashMap<>();
+            Map<String, String> d = new ConcurrentHashMap<>();
             for (String line : content.split("\n")) {
                 line = line.trim();
                 if (line.equals("") || line.charAt(0) == '#') {

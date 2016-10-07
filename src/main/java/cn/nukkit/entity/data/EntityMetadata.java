@@ -4,9 +4,8 @@ import cn.nukkit.block.BlockAir;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.Vector3;
-
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -14,7 +13,7 @@ import java.util.Map;
  */
 public class EntityMetadata {
 
-    private final Map<Integer, EntityData> map = new HashMap<>();
+    private final Map<Integer, EntityData> map = new ConcurrentHashMap<>();
 
     public EntityData get(int id) {
         return this.getOrDefault(id, null);
@@ -113,6 +112,6 @@ public class EntityMetadata {
     }
 
     public Map<Integer, EntityData> getMap() {
-        return new HashMap<>(map);
+        return new ConcurrentHashMap<>(map);
     }
 }

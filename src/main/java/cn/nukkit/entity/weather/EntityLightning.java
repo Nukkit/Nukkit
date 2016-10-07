@@ -14,6 +14,9 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.DoubleTag;
+import cn.nukkit.nbt.tag.FloatTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
 /**
@@ -32,6 +35,16 @@ public class EntityLightning extends Entity implements EntityLightningStrike {
 
     public EntityLightning(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    public EntityLightning(FullChunk chunk, int x, int y, int z) {
+        super(chunk, new CompoundTag()
+                .putList(new ListTag<DoubleTag>("Pos").add(new DoubleTag("", x + 16 * chunk.getX()))
+                        .add(new DoubleTag("", y)).add(new DoubleTag("", z + 16 * chunk.getZ())))
+                .putList(new ListTag<DoubleTag>("Motion").add(new DoubleTag("", 0))
+                        .add(new DoubleTag("", 0)).add(new DoubleTag("", 0)))
+                .putList(new ListTag<FloatTag>("Rotation").add(new FloatTag("", 0))
+                        .add(new FloatTag("", 0))));
     }
 
     @Override
@@ -77,7 +90,7 @@ public class EntityLightning extends Entity implements EntityLightningStrike {
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
+    public synchronized boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;
         }

@@ -6,12 +6,11 @@ import cn.nukkit.event.plugin.PluginEnableEvent;
 import cn.nukkit.plugin.certification.PluginCertificateTask;
 import cn.nukkit.utils.PluginException;
 import cn.nukkit.utils.Utils;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
@@ -23,8 +22,8 @@ public class JavaPluginLoader implements PluginLoader {
 
     private final Server server;
 
-    private final Map<String, Class> classes = new HashMap<>();
-    private final Map<String, PluginClassLoader> classLoaders = new HashMap<>();
+    private final Map<String, Class> classes = new ConcurrentHashMap<>();
+    private final Map<String, PluginClassLoader> classLoaders = new ConcurrentHashMap<>();
 
     public JavaPluginLoader(Server server) {
         this.server = server;

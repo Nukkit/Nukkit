@@ -4,16 +4,15 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockSapling;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.NukkitRandom;
-
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
 public abstract class ObjectTree {
-    public final Map<Integer, Boolean> overridable = new HashMap<Integer, Boolean>() {
+    public final Map<Integer, Boolean> overridable = new ConcurrentHashMap<Integer, Boolean>() {
         {
             put(Block.AIR, true);
             put(Block.SAPLING, true);

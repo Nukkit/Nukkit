@@ -75,7 +75,7 @@ public class SimpleChunkManager implements ChunkManager {
     }
 
     public void cleanChunks() {
-        this.chunks = new HashMap<>();
+        this.chunks = new ConcurrentHashMap<>();
     }
 
     @Override

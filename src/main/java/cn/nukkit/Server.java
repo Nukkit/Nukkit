@@ -67,10 +67,12 @@ import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.*;
-
 import java.io.*;
 import java.nio.ByteOrder;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author MagicDroidX
@@ -83,81 +85,83 @@ public class Server {
 
     private static Server instance = null;
 
-    private BanList banByName = null;
+    private final Thread mainThread;
 
-    private BanList banByIP = null;
+    private final BanList banByName;
 
-    private Config operators = null;
+    private final BanList banByIP;
 
-    private Config whitelist = null;
+    private final Config operators;
 
-    private boolean isRunning = true;
+    private final Config whitelist;
 
-    private boolean hasStopped = false;
+    private volatile boolean isRunning = true;
 
-    private PluginManager pluginManager = null;
+    private volatile boolean hasStopped = false;
 
-    private int profilingTickrate = 20;
+    private final PluginManager pluginManager;
 
-    private ServerScheduler scheduler = null;
+    private volatile int profilingTickrate = 20;
 
-    private int tickCounter;
+    private final ServerScheduler scheduler;
 
-    private long nextTick;
+    private volatile int tickCounter;
+
+    private volatile long nextTick;
 
     private final float[] tickAverage = {20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20};
 
     private final float[] useAverage = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    private float maxTick = 20;
+    private volatile float maxTick = 20;
 
-    private float maxUse = 0;
+    private volatile float maxUse = 0;
 
-    private int sendUsageTicker = 0;
+    private volatile int sendUsageTicker = 0;
 
-    private boolean dispatchSignals = false;
+    private volatile boolean dispatchSignals = false;
 
     private final MainLogger logger;
 
     private final CommandReader console;
 
-    private SimpleCommandMap commandMap;
+    private final SimpleCommandMap commandMap;
 
-    private CraftingManager craftingManager;
+    private final CraftingManager craftingManager;
 
-    private ConsoleCommandSender consoleSender;
+    private final ConsoleCommandSender consoleSender;
 
-    private int maxPlayers;
+    private volatile int maxPlayers;
 
-    private boolean autoSave;
+    private volatile boolean autoSave;
 
-    private RCON rcon;
+    private final RCON rcon;
 
-    private EntityMetadataStore entityMetadata;
+    private final EntityMetadataStore entityMetadata;
 
-    private PlayerMetadataStore playerMetadata;
+    private final PlayerMetadataStore playerMetadata;
 
-    private LevelMetadataStore levelMetadata;
+    private final LevelMetadataStore levelMetadata;
 
-    private Network network;
+    private final Network network;
 
-    private boolean networkCompressionAsync = true;
-    public int networkCompressionLevel = 7;
+    private volatile boolean networkCompressionAsync = true;
+    public volatile int networkCompressionLevel = 7;
 
-    private boolean autoTickRate = true;
-    private int autoTickRateLimit = 20;
-    private boolean alwaysTickPlayers = false;
-    private int baseTickRate = 1;
-    private Boolean getAllowFlight = null;
+    private volatile boolean autoTickRate = true;
+    private volatile int autoTickRateLimit = 20;
+    private volatile boolean alwaysTickPlayers = false;
+    private volatile int baseTickRate = 1;
+    private volatile Boolean getAllowFlight = null;
 
     private int autoSaveTicker = 0;
     private int autoSaveTicks = 6000;
 
-    private BaseLang baseLang;
+    private final BaseLang baseLang;
 
-    private boolean forceLanguage = false;
+    private volatile boolean forceLanguage = false;
 
-    private UUID serverID;
+    private final UUID serverID;
 
     private final String filePath;
     private final String dataPath;
@@ -165,26 +169,27 @@ public class Server {
 
     private final Set<UUID> uniquePlayers = new HashSet<>();
 
-    private QueryHandler queryHandler;
+    private volatile QueryHandler queryHandler;
 
-    private QueryRegenerateEvent queryRegenerateEvent;
+    private volatile QueryRegenerateEvent queryRegenerateEvent;
 
-    private Config properties;
-    private Config config;
+    private final Config properties;
+    private final Config config;
 
-    private final Map<String, Player> players = new HashMap<>();
+    private final Map<String, Player> players = new ConcurrentHashMap<>();
 
-    private final Map<UUID, Player> playerList = new HashMap<>();
+    private final Map<UUID, Player> playerList = new ConcurrentHashMap<>();
 
-    private final Map<Integer, String> identifier = new HashMap<>();
+    private final Map<Integer, String> identifier = new ConcurrentHashMap<>();
 
-    private final Map<Integer, Level> levels = new HashMap<>();
+    private final Map<Integer, Level> levels = new ConcurrentHashMap<>();
 
-    private Level defaultLevel = null;
+    private volatile Level defaultLevel = null;
 
     public Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
         instance = this;
         this.logger = logger;
+        this.mainThread = Thread.currentThread();
 
         this.filePath = filePath;
         if (!new File(dataPath + "worlds/").exists()) {
@@ -317,6 +322,8 @@ public class Server {
 
         if (this.getPropertyBoolean("enable-rcon", false)) {
             this.rcon = new RCON(this, this.getPropertyString("rcon.password", ""), (!this.getIp().equals("")) ? this.getIp() : "0.0.0.0", this.getPropertyInt("rcon.port", this.getPort()));
+        } else {
+            rcon = null;
         }
 
         this.entityMetadata = new EntityMetadataStore();
@@ -390,7 +397,7 @@ public class Server {
         Generator.addGenerator(Normal.class, "default", Generator.TYPE_INFINITE);
         //todo: add old generator and hell generator
 
-        for (String name : ((Map<String, Object>) this.getConfig("worlds", new HashMap<>())).keySet()) {
+        for (String name : ((Map<String, Object>) this.getConfig("worlds", new ConcurrentHashMap<>())).keySet()) {
             if (!this.loadLevel(name)) {
                 long seed;
                 try {
@@ -399,7 +406,7 @@ public class Server {
                     seed = System.currentTimeMillis();
                 }
 
-                Map<String, Object> options = new HashMap<>();
+                Map<String, Object> options = new ConcurrentHashMap<>();
                 String[] opts = ((String) this.getConfig("worlds." + name + ".generator", Generator.getGenerator("default").getSimpleName())).split(":");
                 Class<? extends Generator> generator = Generator.getGenerator(opts[0]);
                 if (opts.length > 1) {
@@ -454,6 +461,10 @@ public class Server {
         this.enablePlugins(PluginLoadOrder.POSTWORLD);
 
         this.start();
+    }
+
+    public final Thread getMainThread() {
+        return mainThread;
     }
 
     public int broadcastMessage(String message) {
@@ -914,45 +925,52 @@ public class Server {
                 p.onUpdate(currentTick);
             }
         }
-
         //Do level ticks
-        for (Level level : this.getLevels().values()) {
-            if (level.getTickRate() > this.baseTickRate && --level.tickRateCounter > 0) {
-                continue;
-            }
-
-            try {
-                long levelTime = System.currentTimeMillis();
-                level.doTick(currentTick);
-                int tickMs = (int) (System.currentTimeMillis() - levelTime);
-                level.tickRateTime = tickMs;
-
-                if (this.autoTickRate) {
-                    if (tickMs < 50 && level.getTickRate() > this.baseTickRate) {
-                        int r;
-                        level.setTickRate(r = level.getTickRate() - 1);
-                        if (r > this.baseTickRate) {
-                            level.tickRateCounter = level.getTickRate();
+        final ForkJoinPool pool = new ForkJoinPool();
+        ArrayList<Level> levelsToTick = new ArrayList(getLevels().values());
+        for (Level level : levelsToTick) {
+            level.timings.doTick.startTiming();
+        }
+        for (Level level : levelsToTick) {
+            pool.submit((Runnable) () -> {
+                if (level.getTickRate() > baseTickRate && level.tickRateCounter.decrementAndGet() > 0) {
+                    return;
+                }
+                try {
+                    long levelTime = System.currentTimeMillis();
+                    level.doTick(currentTick, pool);
+                    int tickMs = (int) (System.currentTimeMillis() - levelTime);
+                    level.tickRateTime.set(tickMs);
+                    if (autoTickRate) {
+                        if (tickMs < 50 && level.getTickRate() > baseTickRate) {
+                            int r;
+                            level.setTickRate(r = level.getTickRate() - 1);
+                            if (r > baseTickRate) {
+                                level.tickRateCounter.set(level.getTickRate());
+                            }
+                            getLogger().debug("Raising level \"" + level.getName() + "\" tick rate to " + level.getTickRate() + " ticks");
+                        } else if (tickMs >= 50) {
+                            if (level.getTickRate() == baseTickRate) {
+                                level.setTickRate((int) Math.max(baseTickRate + 1, Math.min(autoTickRateLimit, Math.floor(tickMs / 50))));
+                                getLogger().debug("Level \"" + level.getName() + "\" took " + NukkitMath.round(tickMs, 2) + "ms, setting tick rate to " + level.getTickRate() + " ticks");
+                            } else if ((tickMs / level.getTickRate()) >= 50 && level.getTickRate() < autoTickRateLimit) {
+                                level.setTickRate(level.getTickRate() + 1);
+                                getLogger().debug("Level \"" + level.getName() + "\" took " + NukkitMath.round(tickMs, 2) + "ms, setting tick rate to " + level.getTickRate() + " ticks");
+                            }
+                            level.tickRateCounter.set(level.getTickRate());
                         }
-                        this.getLogger().debug("Raising level \"" + level.getName() + "\" tick rate to " + level.getTickRate() + " ticks");
-                    } else if (tickMs >= 50) {
-                        if (level.getTickRate() == this.baseTickRate) {
-                            level.setTickRate((int) Math.max(this.baseTickRate + 1, Math.min(this.autoTickRateLimit, Math.floor(tickMs / 50))));
-                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + NukkitMath.round(tickMs, 2) + "ms, setting tick rate to " + level.getTickRate() + " ticks");
-                        } else if ((tickMs / level.getTickRate()) >= 50 && level.getTickRate() < this.autoTickRateLimit) {
-                            level.setTickRate(level.getTickRate() + 1);
-                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + NukkitMath.round(tickMs, 2) + "ms, setting tick rate to " + level.getTickRate() + " ticks");
-                        }
-                        level.tickRateCounter = level.getTickRate();
                     }
+                } catch (Exception e) {
+                    if (Nukkit.DEBUG > 1 && logger != null) {
+                        logger.logException(e);
+                    }
+                    logger.critical(getLanguage().translateString("nukkit.level.tickError", new String[]{level.getName(), e.toString()}));
                 }
-            } catch (Exception e) {
-                if (Nukkit.DEBUG > 1 && this.logger != null) {
-                    this.logger.logException(e);
-                }
-
-                this.logger.critical(this.getLanguage().translateString("nukkit.level.tickError", new String[]{level.getName(), e.toString()}));
-            }
+            });
+        }
+        pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+        for (Level level : levelsToTick) {
+            level.timings.doTick.stopTiming();
         }
     }
 
@@ -1342,7 +1360,7 @@ public class Server {
     }
 
     public Map<UUID, Player> getOnlinePlayers() {
-        return new HashMap<>(playerList);
+        return new ConcurrentHashMap<>(playerList);
     }
 
     public void addRecipe(Recipe recipe) {
@@ -1585,7 +1603,7 @@ public class Server {
     }
 
     public boolean generateLevel(String name, long seed, Class<? extends Generator> generator) {
-        return this.generateLevel(name, seed, generator, new HashMap<>());
+        return this.generateLevel(name, seed, generator, new ConcurrentHashMap<>());
     }
 
     public boolean generateLevel(String name, long seed, Class<? extends Generator> generator, Map<String, Object> options) {

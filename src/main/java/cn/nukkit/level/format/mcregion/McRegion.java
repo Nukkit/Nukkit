@@ -14,16 +14,15 @@ import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -32,9 +31,9 @@ import java.util.regex.Pattern;
  */
 public class McRegion extends BaseLevelProvider {
 
-    protected final Map<Long, RegionLoader> regions = new HashMap<>();
+    protected final Map<Long, RegionLoader> regions = new ConcurrentHashMap<>();
 
-    protected Map<Long, Chunk> chunks = new HashMap<>();
+    protected Map<Long, Chunk> chunks = new ConcurrentHashMap<>();
 
     public McRegion(Level level, String path) throws IOException {
         super(level, path);
@@ -71,7 +70,7 @@ public class McRegion extends BaseLevelProvider {
     }
 
     public static void generate(String path, String name, long seed, Class<? extends Generator> generator) throws IOException {
-        generate(path, name, seed, generator, new HashMap<>());
+        generate(path, name, seed, generator, new ConcurrentHashMap<>());
     }
 
     public static void generate(String path, String name, long seed, Class<? extends Generator> generator, Map<String, String> options) throws IOException {
@@ -178,7 +177,7 @@ public class McRegion extends BaseLevelProvider {
         for (Chunk chunk : new ArrayList<>(this.chunks.values())) {
             this.unloadChunk(chunk.getX(), chunk.getZ(), false);
         }
-        this.chunks = new HashMap<>();
+        this.chunks = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -188,7 +187,7 @@ public class McRegion extends BaseLevelProvider {
 
     @Override
     public Map<String, Object> getGeneratorOptions() {
-        return new HashMap<String, Object>() {
+        return new ConcurrentHashMap<String, Object>() {
             {
                 put("preset", levelData.getString("generatorOptions"));
             }

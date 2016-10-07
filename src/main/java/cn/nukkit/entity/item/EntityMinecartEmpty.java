@@ -57,7 +57,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
+    public synchronized boolean onUpdate(int currentTick) {
         // TODO: 2016/1/30 run run run!
         // TODO: 2016/1/30 split to onXXXRailPass, such as, protected void onActivatorRailPass(...)
         return super.onUpdate(currentTick);

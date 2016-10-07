@@ -33,7 +33,7 @@ public class EntityItem extends Entity {
 
     protected Item item;
 
-    protected int pickupDelay = 0;
+    protected int pickupDelay = 20;
 
     @Override
     public float getWidth() {
@@ -110,7 +110,7 @@ public class EntityItem extends Entity {
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
+    public synchronized boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;
         }
@@ -126,9 +126,9 @@ public class EntityItem extends Entity {
         this.timing.startTiming();
 
 
-        boolean hasUpdate = this.entityBaseTick(tickDiff);
+        boolean hasUpdate = this.entityBaseTick(tickDiff) && this.isAlive();
 
-        if (this.isAlive()) {
+        if ((hasUpdate || !this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001)) {
 
             if (this.pickupDelay > 0 && this.pickupDelay < 32767) {
                 this.pickupDelay -= tickDiff;
@@ -148,7 +148,7 @@ public class EntityItem extends Entity {
             double friction = 1 - this.getDrag();
 
             if (this.onGround && (Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionZ) > 0.00001)) {
-                friction *= this.getLevel().getBlock(this.temporalVector.setComponents((int) Math.floor(this.x), (int) Math.floor(this.y - 1), (int) Math.floor(this.z) - 1)).getFrictionFactor();
+                friction *= this.getLevel().getTemporalBlock((int) Math.floor(this.x), (int) Math.floor(this.y - 1), (int) Math.floor(this.z) - 1).getFrictionFactor();
             }
 
             this.motionX *= friction;
@@ -171,11 +171,11 @@ public class EntityItem extends Entity {
                     hasUpdate = true;
                 }
             }
+        } else {
+            hasUpdate = false;
         }
-
         this.timing.stopTiming();
-
-        return hasUpdate || !this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001;
+        return hasUpdate;
     }
 
     @Override

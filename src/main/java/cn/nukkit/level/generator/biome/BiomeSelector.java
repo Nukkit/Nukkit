@@ -2,9 +2,8 @@ package cn.nukkit.level.generator.biome;
 
 import cn.nukkit.level.generator.noise.Simplex;
 import cn.nukkit.math.NukkitRandom;
-
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -15,7 +14,7 @@ public class BiomeSelector {
     private final Simplex temperature;
     private final Simplex rainfall;
 
-    private final Map<Integer, Biome> biomes = new HashMap<>();
+    private final Map<Integer, Biome> biomes = new ConcurrentHashMap<>();
 
     private int[] map = new int[64 * 64];
 

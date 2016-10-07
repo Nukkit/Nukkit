@@ -6,10 +6,10 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.plugin.PluginDescription;
 import cn.nukkit.utils.Binary;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -42,7 +42,7 @@ public class QueryRegenerateEvent extends ServerEvent {
     private final int port;
     private final String ip;
 
-    private Map<String, String> extraData = new HashMap<>();
+    private Map<String, String> extraData = new ConcurrentHashMap<>();
 
     public QueryRegenerateEvent(Server server) {
         this(server, 5);
