@@ -19,7 +19,7 @@ public class PopulatorMineshaft extends Populator {
     
     private double chance = 0.004D;
 
-    public MapGenMineshaft()
+    public PopulatorMineshaft()
     {
     }
     
