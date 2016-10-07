@@ -605,7 +605,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void checkTime() {
         if (!this.stopTime.get()) {
-            this.time.incrementAndGet();
+            this.time.addAndGet(tickRate.get());
         }
     }
 
@@ -655,8 +655,7 @@ public class Level implements ChunkManager, Metadatable {
         });
 
         // Weather
-        this.rainTime.decrementAndGet();
-        if (this.rainTime.get() <= 0) {
+        if (this.rainTime.decrementAndGet() <= 0) {
             if (!this.setRaining(!this.raining.get())) {
                 if (this.raining.get()) {
                     setRainTime(rand.nextInt(12000) + 12000);
