@@ -1,4 +1,4 @@
-package net.minecraft.util.math;
+package cn.nukkit.utils;
 
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Lists;
