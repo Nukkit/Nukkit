@@ -4,11 +4,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockRedstoneWire;
 import cn.nukkit.block.BlockSolid;
 import cn.nukkit.math.Vector3;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 /**
  * author: Angelic47
@@ -83,8 +79,8 @@ public class Redstone {
         //Step 1: find blocks which need to update
         Queue<UpdateObject> updateQueue = new PriorityQueue<>(1, orderIsdn);
         Queue<UpdateObject> sourceList = new PriorityQueue<>(1, orderIsdn);
-        Map<String, Block> updateMap = new ConcurrentHashMap<>();
-        Map<String, Block> closedMap = new ConcurrentHashMap<>();
+        Map<String, Block> updateMap = new HashMap<>();
+        Map<String, Block> closedMap = new HashMap<>();
         int currentLevel = updateLevel;
         if (currentLevel <= 0) {
             return;

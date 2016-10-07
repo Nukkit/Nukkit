@@ -1076,7 +1076,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.level.getTemporalBlock(x, y, z);
+                        Block block = this.level.getBlock(x, y, z);
                         if (!block.canPassThrough() && block.collidesWithBB(realBB)) {
                             onGround = true;
                             break;
@@ -3669,7 +3669,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } else if (this.getAdventureSettings().canFly() && source.getCause() == EntityDamageEvent.CAUSE_FALL) {
             source.setCancelled();
         } else if (source.getCause() == EntityDamageEvent.CAUSE_FALL) {
-            if (this.getLevel().getTemporalBlock(this.getPosition().floor().add(0.5, -1, 0.5)).getId() == Block.SLIME_BLOCK) {
+            Position pos = getPosition().floor();
+            if (this.getLevel().getBlockIdAt((int) pos.x, (int) pos.y - 1, (int) pos.z) == Block.SLIME_BLOCK) {
                 if (!this.isSneaking()) {
                     source.setCancelled();
                     this.resetFallDistance();

@@ -1423,9 +1423,6 @@ public class Level implements ChunkManager, Metadatable {
             fullState = 0;
         }
         Block block = this.blockStates[fullState & 0xFFF];
-        if (Thread.currentThread() != server.getMainThread()) {
-            block = block.clone();
-        }
         block.x = x;
         block.y = y;
         block.z = z;
