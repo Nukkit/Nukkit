@@ -140,16 +140,11 @@ public class McRegion extends BaseLevelProvider {
         }
 
         Map<Integer, Integer> extra = chunk.getBlockExtraDataArray();
-        BinaryStream extraData;
-        if (!extra.isEmpty()) {
-            extraData = new BinaryStream();
-            extraData.putLInt(extra.size());
-            for (Map.Entry<Integer, Integer> entry : extra.entrySet()) {
-                extraData.putLInt(entry.getKey());
-                extraData.putLShort(entry.getValue());
-            }
-        } else {
-            extraData = null;
+        BinaryStream extraData = new BinaryStream();
+        extraData.putLInt(extra.size());
+        for (Map.Entry<Integer, Integer> entry : extra.entrySet()) {
+            extraData.putLInt(entry.getKey());
+            extraData.putLShort(entry.getValue());
         }
 
         BinaryStream stream = new BinaryStream();
@@ -163,9 +158,7 @@ public class McRegion extends BaseLevelProvider {
         for (int color : chunk.getBiomeColorArray()) {
             stream.put(Binary.writeInt(color));
         }
-        if (extraData != null) {
-            stream.put(extraData.getBuffer());
-        }
+        stream.put(extraData.getBuffer());
         stream.put(tiles);
 
         this.getLevel().chunkRequestCallback(x, z, stream.getBuffer());
