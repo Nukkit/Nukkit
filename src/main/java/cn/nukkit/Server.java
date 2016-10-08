@@ -173,6 +173,8 @@ public class Server {
 
     private volatile QueryRegenerateEvent queryRegenerateEvent;
 
+    private final ForkJoinPool executor;
+
     private final Config properties;
     private final Config config;
 
@@ -190,6 +192,7 @@ public class Server {
         instance = this;
         this.logger = logger;
         this.mainThread = Thread.currentThread();
+        this.executor = new ForkJoinPool();
 
         this.filePath = filePath;
         if (!new File(dataPath + "worlds/").exists()) {
@@ -926,19 +929,18 @@ public class Server {
             }
         }
         //Do level ticks
-        final ForkJoinPool pool = new ForkJoinPool();
         ArrayList<Level> levelsToTick = new ArrayList(getLevels().values());
         for (Level level : levelsToTick) {
             level.timings.doTick.startTiming();
         }
         for (Level level : levelsToTick) {
-            pool.submit((Runnable) () -> {
+            executor.submit((Runnable) () -> {
                 if (level.getTickRate() > baseTickRate && level.tickRateCounter.decrementAndGet() > 0) {
                     return;
                 }
                 try {
                     long levelTime = System.currentTimeMillis();
-                    level.doTick(currentTick, pool);
+                    level.doTick(currentTick, executor);
                     int tickMs = (int) (System.currentTimeMillis() - levelTime);
                     level.tickRateTime.set(tickMs);
                     if (autoTickRate) {
@@ -968,7 +970,7 @@ public class Server {
                 }
             });
         }
-        pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+        executor.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         for (Level level : levelsToTick) {
             level.timings.doTick.stopTiming();
         }
