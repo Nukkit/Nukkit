@@ -42,7 +42,7 @@ public class QueryRegenerateEvent extends ServerEvent {
     private final int port;
     private final String ip;
 
-    private Map<String, String> extraData = new ConcurrentHashMap<>();
+    private Map<String, String> extraData = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public QueryRegenerateEvent(Server server) {
         this(server, 5);

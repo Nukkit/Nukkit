@@ -50,20 +50,20 @@ public class Permission {
 
     private String description;
 
-    private Map<String, Boolean> children = new ConcurrentHashMap<>();
+    private Map<String, Boolean> children = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private String defaultValue;
 
     public Permission(String name) {
-        this(name, null, null, new ConcurrentHashMap<>());
+        this(name, null, null, new ConcurrentHashMap<>(8, 0.9f, 1));
     }
 
     public Permission(String name, String description) {
-        this(name, description, null, new ConcurrentHashMap<>());
+        this(name, description, null, new ConcurrentHashMap<>(8, 0.9f, 1));
     }
 
     public Permission(String name, String description, String defualtValue) {
-        this(name, description, defualtValue, new ConcurrentHashMap<>());
+        this(name, description, defualtValue, new ConcurrentHashMap<>(8, 0.9f, 1));
     }
 
     public Permission(String name, String description, String defualtValue, Map<String, Boolean> children) {
@@ -159,7 +159,7 @@ public class Permission {
 
     public static Permission loadPermission(String name, Map<String, Object> data, String defaultValue, List<Permission> output) {
         String desc = null;
-        Map<String, Boolean> children = new ConcurrentHashMap<>();
+        Map<String, Boolean> children = new ConcurrentHashMap<>(8, 0.9f, 1);
         if (data.containsKey("default")) {
             String value = Permission.getByName(String.valueOf(data.get("default")));
             if (value != null) {

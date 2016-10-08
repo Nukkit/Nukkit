@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class MetadataStore {
 
-    private final Map<String, Map<Plugin, MetadataValue>> metadataMap = new ConcurrentHashMap<>();
+    private final Map<String, Map<Plugin, MetadataValue>> metadataMap = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public void setMetadata(Object subject, String metadataKey, MetadataValue newMetadataValue) {
         if (newMetadataValue == null) {

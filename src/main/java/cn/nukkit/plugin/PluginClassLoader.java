@@ -16,7 +16,7 @@ public class PluginClassLoader extends URLClassLoader {
 
     private JavaPluginLoader loader;
 
-    private final Map<String, Class> classes = new ConcurrentHashMap<>();
+    private final Map<String, Class> classes = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public PluginClassLoader(JavaPluginLoader loader, ClassLoader parent, File file) throws MalformedURLException {
         super(new URL[]{file.toURI().toURL()}, parent);

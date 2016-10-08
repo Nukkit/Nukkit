@@ -22,7 +22,7 @@ public class PermissibleBase implements Permissible {
 
     private final Set<PermissionAttachment> attachments = new HashSet<>();
 
-    private final Map<String, PermissionAttachmentInfo> permissions = new ConcurrentHashMap<>();
+    private final Map<String, PermissionAttachmentInfo> permissions = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public PermissibleBase(ServerOperator opable) {
         this.opable = opable;

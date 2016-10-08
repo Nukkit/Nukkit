@@ -31,9 +31,9 @@ public class TimingsHistory {
     public static long activatedEntityTicks;
 
     private static int levelIdPool = 1;
-    static Map<String, Integer> levelMap = new ConcurrentHashMap<>();
-    static Map<Integer, String> entityMap = new ConcurrentHashMap<>();
-    static Map<Integer, String> blockEntityMap = new ConcurrentHashMap<>();
+    static Map<String, Integer> levelMap = new ConcurrentHashMap<>(8, 0.9f, 1);
+    static Map<Integer, String> entityMap = new ConcurrentHashMap<>(8, 0.9f, 1);
+    static Map<Integer, String> blockEntityMap = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private final long endTime;
     private final long startTime;
@@ -70,8 +70,8 @@ public class TimingsHistory {
             this.entries[i++] = new TimingsHistoryEntry(timing);
         }
 
-        final Map<Integer, AtomicInteger> entityCounts = new ConcurrentHashMap<>();
-        final Map<Integer, AtomicInteger> blockEntityCounts = new ConcurrentHashMap<>();
+        final Map<Integer, AtomicInteger> entityCounts = new ConcurrentHashMap<>(8, 0.9f, 1);
+        final Map<Integer, AtomicInteger> blockEntityCounts = new ConcurrentHashMap<>(8, 0.9f, 1);
         final Gson GSON = new Gson();
         // Information about all loaded entities/block entities
         for (Level level : Server.getInstance().getLevels().values()) {

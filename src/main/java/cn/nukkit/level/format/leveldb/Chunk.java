@@ -108,7 +108,7 @@ public class Chunk extends BaseFullChunk {
 
         this.NBTentities = entityData == null ? new ArrayList<>() : entityData;
         this.NBTtiles = tileData == null ? new ArrayList<>() : tileData;
-        this.extraData = extraData == null ? new ConcurrentHashMap<>() : extraData;
+        this.extraData = extraData == null ? new ConcurrentHashMap<>(8, 0.9f, 1) : extraData;
     }
 
     @Override
@@ -333,7 +333,7 @@ public class Chunk extends BaseFullChunk {
             List<CompoundTag> entities = new ArrayList<>();
             List<CompoundTag> tiles = new ArrayList<>();
 
-            Map<Integer, Integer> extraDataMap = new ConcurrentHashMap<>();
+            Map<Integer, Integer> extraDataMap = new ConcurrentHashMap<>(8, 0.9f, 1);
 
             if (provider instanceof LevelDB) {
                 byte[] entityData = ((LevelDB) provider).getDatabase().get(EntitiesKey.create(chunkX, chunkZ).toArray());

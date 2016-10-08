@@ -30,19 +30,19 @@ public class PluginManager {
 
     protected final Map<String, Plugin> plugins = new LinkedHashMap<>();
 
-    protected final Map<String, Permission> permissions = new ConcurrentHashMap<>();
+    protected final Map<String, Permission> permissions = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<String, Permission> defaultPerms = new ConcurrentHashMap<>();
+    protected final Map<String, Permission> defaultPerms = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<String, Permission> defaultPermsOp = new ConcurrentHashMap<>();
+    protected final Map<String, Permission> defaultPermsOp = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<String, WeakHashMap<Permissible, Permissible>> permSubs = new ConcurrentHashMap<>();
+    protected final Map<String, WeakHashMap<Permissible, Permissible>> permSubs = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected final Map<Permissible, Permissible> defSubs = new WeakHashMap<>();
 
     protected final Map<Permissible, Permissible> defSubsOp = new WeakHashMap<>();
 
-    protected final Map<String, PluginLoader> fileAssociations = new ConcurrentHashMap<>();
+    protected final Map<String, PluginLoader> fileAssociations = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public PluginManager(Server server, SimpleCommandMap commandMap) {
         this.server = server;
@@ -311,7 +311,7 @@ public class PluginManager {
 
             return loadedPlugins;
         } else {
-            return new ConcurrentHashMap<>();
+            return new ConcurrentHashMap<>(8, 0.9f, 1);
         }
     }
 
@@ -576,7 +576,7 @@ public class PluginManager {
             throw new PluginException("Plugin attempted to register " + listener.getClass().getName() + " while not enabled");
         }
 
-        Map<Class<? extends Event>, Set<RegisteredListener>> ret = new ConcurrentHashMap<>();
+        Map<Class<? extends Event>, Set<RegisteredListener>> ret = new ConcurrentHashMap<>(8, 0.9f, 1);
         Set<Method> methods;
         try {
             Method[] publicMethods = listener.getClass().getMethods();

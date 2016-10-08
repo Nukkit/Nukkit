@@ -16,8 +16,8 @@ public class BaseLang {
 
     protected final String langName;
 
-    protected Map<String, String> lang = new ConcurrentHashMap<>();
-    protected Map<String, String> fallbackLang = new ConcurrentHashMap<>();
+    protected Map<String, String> lang = new ConcurrentHashMap<>(8, 0.9f, 1);
+    protected Map<String, String> fallbackLang = new ConcurrentHashMap<>(8, 0.9f, 1);
 
 
     public BaseLang(String lang) {
@@ -54,7 +54,7 @@ public class BaseLang {
     protected Map<String, String> loadLang(String path) {
         try {
             String content = Utils.readFile(path);
-            Map<String, String> d = new ConcurrentHashMap<>();
+            Map<String, String> d = new ConcurrentHashMap<>(8, 0.9f, 1);
             for (String line : content.split("\n")) {
                 line = line.trim();
                 if (line.equals("") || line.charAt(0) == '#') {
@@ -85,7 +85,7 @@ public class BaseLang {
     protected Map<String, String> loadLang(InputStream stream) {
         try {
             String content = Utils.readFile(stream);
-            Map<String, String> d = new ConcurrentHashMap<>();
+            Map<String, String> d = new ConcurrentHashMap<>(8, 0.9f, 1);
             for (String line : content.split("\n")) {
                 line = line.trim();
                 if (line.equals("") || line.charAt(0) == '#') {

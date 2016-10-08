@@ -33,7 +33,7 @@ public class Config {
 
     //private LinkedHashMap<String, Object> config = new LinkedHashMap<>();
     private ConfigSection config = new ConfigSection();
-    private final Map<String, Object> nestedCache = new ConcurrentHashMap<>();
+    private final Map<String, Object> nestedCache = new ConcurrentHashMap<>(8, 0.9f, 1);
     private File file;
     private boolean correct = false;
     private int type = Config.DETECT;

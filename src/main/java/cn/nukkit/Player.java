@@ -108,9 +108,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected volatile int windowCnt = 2;
 
-    protected final Map<Inventory, Integer> windows = new ConcurrentHashMap<>();
+    protected final Map<Inventory, Integer> windows = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<Integer, Inventory> windowIndex = new ConcurrentHashMap<>();
+    protected final Map<Integer, Inventory> windowIndex = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected volatile int messageCounter = 2;
 
@@ -158,13 +158,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected volatile float stepHeight = 0.6f;
 
-    public final Map<Long, Boolean> usedChunks = new ConcurrentHashMap<>();
+    public final Map<Long, Boolean> usedChunks = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected volatile int chunkLoadCount = 0;
-    protected final Map<Long, Integer> loadQueue = new ConcurrentHashMap<>();
+    protected final Map<Long, Integer> loadQueue = new ConcurrentHashMap<>(8, 0.9f, 1);
     protected volatile int nextChunkOrderRun = 5;
 
-    protected final Map<UUID, Player> hiddenPlayers = new ConcurrentHashMap<>();
+    protected final Map<UUID, Player> hiddenPlayers = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected volatile Vector3 newPosition = null;
 
@@ -180,7 +180,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected volatile AdventureSettings adventureSettings;
 
-    private final Map<Integer, Boolean> needACK = new ConcurrentHashMap<>();
+    private final Map<Integer, Boolean> needACK = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private final Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();
 
@@ -2439,7 +2439,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             itemDamage += enchantment.getDamageBonus(targetEntity);
                         }
 
-                        Map<Integer, Float> damage = new ConcurrentHashMap<>();
+                        Map<Integer, Float> damage = new ConcurrentHashMap<>(8, 0.9f, 1);
                         damage.put(EntityDamageEvent.MODIFIER_BASE, itemDamage);
 
                         if (!this.canInteract(targetEntity, isCreative() ? 8 : 5)) {
@@ -3240,27 +3240,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         this.close("");
     }
 
-    public void close(String message) {
+    public synchronized void close(String message) {
         this.close(message, "generic");
     }
 
-    public void close(String message, String reason) {
+    public synchronized void close(String message, String reason) {
         this.close(message, reason, true);
     }
 
-    public void close(String message, String reason, boolean notify) {
+    public synchronized void close(String message, String reason, boolean notify) {
         this.close(new TextContainer(message), reason, notify);
     }
 
-    public void close(TextContainer message) {
+    public synchronized void close(TextContainer message) {
         this.close(message, "generic");
     }
 
-    public void close(TextContainer message, String reason) {
+    public synchronized void close(TextContainer message, String reason) {
         this.close(message, reason, true);
     }
 

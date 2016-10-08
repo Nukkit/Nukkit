@@ -37,7 +37,7 @@ public class ServerScheduler {
             }
             return i;
         });
-        this.taskMap = new ConcurrentHashMap<>();
+        this.taskMap = new ConcurrentHashMap<>(8, 0.9f, 1);
         this.asyncPool = new AsyncPool(Server.getInstance(), WORKERS);
     }
 

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Package cn.nukkit.item.randomitem in project nukkit.
  */
 public final class RandomItem {
-    private static final Map<Selector, Float> selectors = new ConcurrentHashMap<>();
+    private static final Map<Selector, Float> selectors = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public static final Selector ROOT = new Selector(null);
 
@@ -25,7 +25,7 @@ public final class RandomItem {
 
     static Object selectFrom(Selector selector) {
         Objects.requireNonNull(selector);
-        Map<Selector, Float> child = new ConcurrentHashMap<>();
+        Map<Selector, Float> child = new ConcurrentHashMap<>(8, 0.9f, 1);
         selectors.forEach((s, f) -> {
             if (s.getParent() == selector) child.put(s, f);
         });

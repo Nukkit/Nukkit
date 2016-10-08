@@ -47,7 +47,7 @@ public class ServerHandler {
         this.server.pushMainToThreadPacket(buffer);
     }
 
-    public void closeSession(String identifier, String reason) {
+    public synchronized void closeSession(String identifier, String reason) {
         byte[] buffer = Binary.appendBytes(
                 RakNet.PACKET_CLOSE_SESSION,
                 new byte[]{(byte) (identifier.length() & 0xff)},

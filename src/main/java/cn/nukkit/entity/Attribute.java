@@ -26,7 +26,7 @@ public class Attribute implements Cloneable {
     public static final int EXPERIENCE_LEVEL = 9;
     public static final int EXPERIENCE = 10;
 
-    protected static Map<Integer, Attribute> attributes = new ConcurrentHashMap<>();
+    protected static Map<Integer, Attribute> attributes = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected float minValue;
     protected float maxValue;

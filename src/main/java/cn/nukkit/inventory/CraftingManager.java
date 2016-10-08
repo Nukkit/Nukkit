@@ -14,13 +14,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CraftingManager {
 
-    public final Map<UUID, Recipe> recipes = new ConcurrentHashMap<>();
+    public final Map<UUID, Recipe> recipes = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<String, Map<String, Recipe>> recipeLookup = new ConcurrentHashMap<>();
+    protected final Map<String, Map<String, Recipe>> recipeLookup = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    public final Map<String, FurnaceRecipe> furnaceRecipes = new ConcurrentHashMap<>();
+    public final Map<String, FurnaceRecipe> furnaceRecipes = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    public final Map<String, BrewingRecipe> brewingRecipes = new ConcurrentHashMap<>();
+    public final Map<String, BrewingRecipe> brewingRecipes = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private static int RECIPE_COUNT = 0;
 
@@ -1012,7 +1012,7 @@ public class CraftingManager {
 
         String index = result.getId() + ":" + (result.hasMeta() ? result.getDamage() : "");
         if (!this.recipeLookup.containsKey(index)) {
-            this.recipeLookup.put(index, new ConcurrentHashMap<>());
+            this.recipeLookup.put(index, new ConcurrentHashMap<>(8, 0.9f, 1));
         }
 
         this.recipeLookup.get(index).put(hash, recipe);
@@ -1029,7 +1029,7 @@ public class CraftingManager {
         }
 
         if (!this.recipeLookup.containsKey(result.getId() + ":" + result.getDamage())) {
-            this.recipeLookup.put(result.getId() + ":" + result.getDamage(), new ConcurrentHashMap<>());
+            this.recipeLookup.put(result.getId() + ":" + result.getDamage(), new ConcurrentHashMap<>(8, 0.9f, 1));
         }
         this.recipeLookup.get(result.getId() + ":" + result.getDamage()).put(hash, recipe);
     }

@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Nukkit Project
  */
 public abstract class ObjectTree {
-    public final Map<Integer, Boolean> overridable = new ConcurrentHashMap<Integer, Boolean>() {
+    public final Map<Integer, Boolean> overridable = new ConcurrentHashMap<Integer, Boolean>(8, 0.9f, 1) {
         {
             put(Block.AIR, true);
             put(Block.SAPLING, true);

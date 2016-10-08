@@ -178,13 +178,13 @@ public class Server {
     private final Config properties;
     private final Config config;
 
-    private final Map<String, Player> players = new ConcurrentHashMap<>();
+    private final Map<String, Player> players = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    private final Map<UUID, Player> playerList = new ConcurrentHashMap<>();
+    private final Map<UUID, Player> playerList = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    private final Map<Integer, String> identifier = new ConcurrentHashMap<>();
+    private final Map<Integer, String> identifier = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    private final Map<Integer, Level> levels = new ConcurrentHashMap<>();
+    private final Map<Integer, Level> levels = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private volatile Level defaultLevel = null;
 
@@ -400,7 +400,7 @@ public class Server {
         Generator.addGenerator(Normal.class, "default", Generator.TYPE_INFINITE);
         //todo: add old generator and hell generator
 
-        for (String name : ((Map<String, Object>) this.getConfig("worlds", new ConcurrentHashMap<>())).keySet()) {
+        for (String name : ((Map<String, Object>) this.getConfig("worlds", new ConcurrentHashMap<>(8, 0.9f, 1))).keySet()) {
             if (!this.loadLevel(name)) {
                 long seed;
                 try {
@@ -409,7 +409,7 @@ public class Server {
                     seed = System.currentTimeMillis();
                 }
 
-                Map<String, Object> options = new ConcurrentHashMap<>();
+                Map<String, Object> options = new ConcurrentHashMap<>(8, 0.9f, 1);
                 String[] opts = ((String) this.getConfig("worlds." + name + ".generator", Generator.getGenerator("default").getSimpleName())).split(":");
                 Class<? extends Generator> generator = Generator.getGenerator(opts[0]);
                 if (opts.length > 1) {
@@ -1605,7 +1605,7 @@ public class Server {
     }
 
     public boolean generateLevel(String name, long seed, Class<? extends Generator> generator) {
-        return this.generateLevel(name, seed, generator, new ConcurrentHashMap<>());
+        return this.generateLevel(name, seed, generator, new ConcurrentHashMap<>(8, 0.9f, 1));
     }
 
     public boolean generateLevel(String name, long seed, Class<? extends Generator> generator, Map<String, Object> options) {

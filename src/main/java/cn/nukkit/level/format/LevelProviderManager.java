@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Nukkit Project
  */
 public abstract class LevelProviderManager {
-    protected static final Map<String, Class<? extends LevelProvider>> providers = new ConcurrentHashMap<>();
+    protected static final Map<String, Class<? extends LevelProvider>> providers = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public static void addProvider(Server server, Class<? extends LevelProvider> clazz) {
         try {

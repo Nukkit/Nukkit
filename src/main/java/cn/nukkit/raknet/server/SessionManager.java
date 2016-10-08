@@ -28,7 +28,7 @@ public class SessionManager {
     protected int receiveBytes = 0;
     protected int sendBytes = 0;
 
-    protected final Map<String, Session> sessions = new ConcurrentHashMap<>();
+    protected final Map<String, Session> sessions = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected String name = "";
 
@@ -39,8 +39,8 @@ public class SessionManager {
     protected long ticks = 0;
     protected long lastMeasure;
 
-    protected final Map<String, Long> block = new ConcurrentHashMap<>();
-    protected final Map<String, Integer> ipSec = new ConcurrentHashMap<>();
+    protected final Map<String, Long> block = new ConcurrentHashMap<>(8, 0.9f, 1);
+    protected final Map<String, Integer> ipSec = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public boolean portChecking = true;
 

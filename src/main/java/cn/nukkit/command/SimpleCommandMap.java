@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Nukkit Project
  */
 public class SimpleCommandMap implements CommandMap {
-    protected final Map<String, Command> knownCommands = new ConcurrentHashMap<>();
+    protected final Map<String, Command> knownCommands = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private final Server server;
 

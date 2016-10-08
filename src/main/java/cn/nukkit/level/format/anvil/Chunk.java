@@ -97,7 +97,7 @@ public class Chunk extends BaseChunk {
             }
         }
 
-        Map<Integer, Integer> extraData = new ConcurrentHashMap<>();
+        Map<Integer, Integer> extraData = new ConcurrentHashMap<>(8, 0.9f, 1);
 
         if (!this.nbt.contains("ExtraData") || !(this.nbt.get("ExtraData") instanceof ByteArrayTag)) {
             this.nbt.putByteArray("ExtraData", Binary.writeInt(0));

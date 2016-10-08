@@ -79,12 +79,12 @@ public abstract class Entity extends Location implements Metadatable, Runnable {
 
     public static long entityCount = 1;
 
-    private static final Map<String, Class<? extends Entity>> knownEntities = new ConcurrentHashMap<>();
-    private static final Map<String, String> shortNames = new ConcurrentHashMap<>();
+    private static final Map<String, Class<? extends Entity>> knownEntities = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private static final Map<String, String> shortNames = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<Integer, Player> hasSpawned = new ConcurrentHashMap<>();
+    protected final Map<Integer, Player> hasSpawned = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<Integer, Effect> effects = new ConcurrentHashMap<>();
+    protected final Map<Integer, Effect> effects = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected volatile long id;
 

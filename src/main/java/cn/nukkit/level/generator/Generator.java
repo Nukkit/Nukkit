@@ -18,9 +18,9 @@ public abstract class Generator {
 
     public abstract int getId();
 
-    private static final Map<String, Class<? extends Generator>> nameList = new ConcurrentHashMap<>();
+    private static final Map<String, Class<? extends Generator>> nameList = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    private static final Map<Integer, Class<? extends Generator>> typeList = new ConcurrentHashMap<>();
+    private static final Map<Integer, Class<? extends Generator>> typeList = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public static boolean addGenerator(Class<? extends Generator> clazz, String name, int type) {
         name = name.toLowerCase();

@@ -31,9 +31,9 @@ import java.util.regex.Pattern;
  */
 public class Anvil extends BaseLevelProvider {
 
-    protected final Map<Long, RegionLoader> regions = new ConcurrentHashMap<>();
+    protected final Map<Long, RegionLoader> regions = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected Map<Long, Chunk> chunks = new ConcurrentHashMap<>();
+    protected Map<Long, Chunk> chunks = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public Anvil(Level level, String path) throws IOException {
         super(level, path);
@@ -70,7 +70,7 @@ public class Anvil extends BaseLevelProvider {
     }
 
     public static void generate(String path, String name, long seed, Class<? extends Generator> generator) throws IOException {
-        generate(path, name, seed, generator, new ConcurrentHashMap<>());
+        generate(path, name, seed, generator, new ConcurrentHashMap<>(8, 0.9f, 1));
     }
 
     public static void generate(String path, String name, long seed, Class<? extends Generator> generator, Map<String, String> options) throws IOException {
@@ -169,7 +169,7 @@ public class Anvil extends BaseLevelProvider {
         for (Chunk chunk : new ArrayList<>(this.chunks.values())) {
             this.unloadChunk(chunk.getX(), chunk.getZ(), false);
         }
-        this.chunks = new ConcurrentHashMap<>();
+        this.chunks = new ConcurrentHashMap<>(8, 0.9f, 1);
     }
 
     @Override
@@ -179,7 +179,7 @@ public class Anvil extends BaseLevelProvider {
 
     @Override
     public Map<String, Object> getGeneratorOptions() {
-        return new ConcurrentHashMap<String, Object>() {
+        return new ConcurrentHashMap<String, Object>(8, 0.9f, 1) {
             {
                 put("preset", levelData.getString("generatorOptions"));
             }
@@ -354,7 +354,7 @@ public class Anvil extends BaseLevelProvider {
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         this.unloadChunks();
         for (long index : new ArrayList<>(this.regions.keySet())) {
             RegionLoader region = this.regions.get(index);

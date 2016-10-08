@@ -108,7 +108,7 @@ public enum TextFormat {
 
     private static final Pattern CLEAN_PATTERN = Pattern.compile("(?i)" + String.valueOf(ESCAPE) + "[0-9A-FK-OR]");
     private final static Map<Integer, TextFormat> BY_ID = Maps.newTreeMap();
-    private final static Map<Character, TextFormat> BY_CHAR = new ConcurrentHashMap<>();
+    private final static Map<Character, TextFormat> BY_CHAR = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     static {
         for (TextFormat color : values()) {

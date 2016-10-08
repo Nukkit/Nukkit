@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class EntityMetadata {
 
-    private final Map<Integer, EntityData> map = new ConcurrentHashMap<>();
+    private final Map<Integer, EntityData> map = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public EntityData get(int id) {
         return this.getOrDefault(id, null);

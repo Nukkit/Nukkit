@@ -22,8 +22,8 @@ public class JavaPluginLoader implements PluginLoader {
 
     private final Server server;
 
-    private final Map<String, Class> classes = new ConcurrentHashMap<>();
-    private final Map<String, PluginClassLoader> classLoaders = new ConcurrentHashMap<>();
+    private final Map<String, Class> classes = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private final Map<String, PluginClassLoader> classLoaders = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public JavaPluginLoader(Server server) {
         this.server = server;

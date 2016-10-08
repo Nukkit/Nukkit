@@ -33,8 +33,8 @@ public abstract class BlockEntity extends Position implements Runnable {
 
     public static long count = 1;
 
-    private static final Map<String, Class<? extends BlockEntity>> knownBlockEntities = new ConcurrentHashMap<>();
-    private static final Map<String, String> shortNames = new ConcurrentHashMap<>();
+    private static final Map<String, Class<? extends BlockEntity>> knownBlockEntities = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private static final Map<String, String> shortNames = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public FullChunk chunk;
     public String name;
@@ -159,7 +159,7 @@ public abstract class BlockEntity extends Position implements Runnable {
         this.level.updateBlockEntities.put(this.id, this);
     }
 
-    public void close() {
+    public synchronized void close() {
         if (!this.closed) {
             this.closed = true;
             this.level.updateBlockEntities.remove(this.id);

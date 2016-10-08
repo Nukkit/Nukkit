@@ -33,13 +33,13 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
 
     private final RakNetServer raknet;
 
-    private final Map<String, Player> players = new ConcurrentHashMap<>();
+    private final Map<String, Player> players = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    private final Map<String, Integer> networkLatency = new ConcurrentHashMap<>();
+    private final Map<String, Integer> networkLatency = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    private final Map<Integer, String> identifiers = new ConcurrentHashMap<>();
+    private final Map<Integer, String> identifiers = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    private final Map<String, Integer> identifiersACK = new ConcurrentHashMap<>();
+    private final Map<String, Integer> identifiersACK = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private final ServerHandler handler;
 
@@ -71,7 +71,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     }
 
     @Override
-    public void closeSession(String identifier, String reason) {
+    public synchronized void closeSession(String identifier, String reason) {
         if (this.players.containsKey(identifier)) {
             Player player = this.players.get(identifier);
             this.identifiers.remove(player.rawHashCode());
@@ -88,12 +88,12 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     }
 
     @Override
-    public void close(Player player) {
+    public synchronized void close(Player player) {
         this.close(player, "unknown reason");
     }
 
     @Override
-    public void close(Player player, String reason) {
+    public synchronized void close(Player player, String reason) {
         if (this.identifiers.containsKey(player.rawHashCode())) {
             String id = this.identifiers.get(player.rawHashCode());
             this.players.remove(id);

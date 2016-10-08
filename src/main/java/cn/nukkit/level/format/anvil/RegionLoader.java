@@ -149,7 +149,7 @@ public class RegionLoader extends BaseRegionLoader {
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         this.writeLocationTable();
         this.randomAccessFile.close();
         this.levelProvider = null;

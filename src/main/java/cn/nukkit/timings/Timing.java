@@ -13,7 +13,7 @@ public class Timing implements AutoCloseable {
     final String name;
     private final boolean verbose;
 
-    final Map<Integer, TimingData> children = new ConcurrentHashMap<>();
+    final Map<Integer, TimingData> children = new ConcurrentHashMap<>(8, 0.9f, 1);
     private Timing parent;
 
     private final Timing groupTiming;
@@ -139,7 +139,7 @@ public class Timing implements AutoCloseable {
 
     //For try-with-resources
     @Override
-    public void close() {
+    public synchronized void close() {
         this.stopTiming();
     }
 

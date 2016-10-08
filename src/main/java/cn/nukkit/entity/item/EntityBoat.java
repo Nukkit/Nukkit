@@ -105,7 +105,7 @@ public class EntityBoat extends EntityVehicle {
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         super.close();
 
         if (this.linkedEntity instanceof Player) {

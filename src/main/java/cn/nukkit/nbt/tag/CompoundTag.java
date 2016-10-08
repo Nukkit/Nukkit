@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CompoundTag extends Tag {
-    private final Map<String, Tag> tags = new ConcurrentHashMap<>();
+    private final Map<String, Tag> tags = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public CompoundTag() {
         super("");

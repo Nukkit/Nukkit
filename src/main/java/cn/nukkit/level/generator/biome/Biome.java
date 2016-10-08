@@ -38,7 +38,7 @@ public abstract class Biome {
 
     public static final int MAX_BIOMES = 256;
 
-    private static final Map<Integer, Biome> biomes = new ConcurrentHashMap<>();
+    private static final Map<Integer, Biome> biomes = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private int id;
     private boolean registered = false;

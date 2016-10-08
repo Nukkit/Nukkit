@@ -60,7 +60,7 @@ public class Normal extends Generator {
     private final int basegroundHeight = 3;
 
     public Normal() {
-        this(new ConcurrentHashMap<>());
+        this(new ConcurrentHashMap<>(8, 0.9f, 1));
     }
 
     public Normal(Map<String, Object> options) {
@@ -79,7 +79,7 @@ public class Normal extends Generator {
 
     @Override
     public Map<String, Object> getSettings() {
-        return new ConcurrentHashMap<>();
+        return new ConcurrentHashMap<>(8, 0.9f, 1);
     }
 
     public Biome pickBiome(int x, int z) {

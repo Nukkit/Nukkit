@@ -117,7 +117,7 @@ public class PluginDescription {
     private List<String> softDepend = new ArrayList<>();
     private List<String> loadBefore = new ArrayList<>();
     private String version;
-    private Map<String, Object> commands = new ConcurrentHashMap<>();
+    private Map<String, Object> commands = new ConcurrentHashMap<>(8, 0.9f, 1);
     private String description;
     private final List<String> authors = new ArrayList<>();
     private String website;

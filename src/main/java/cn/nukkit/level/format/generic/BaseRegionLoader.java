@@ -26,7 +26,7 @@ abstract public class BaseRegionLoader {
     protected RandomAccessFile randomAccessFile;
     protected int lastSector;
     protected LevelProvider levelProvider;
-    protected final Map<Integer, Integer[]> locationTable = new ConcurrentHashMap<>();
+    protected final Map<Integer, Integer[]> locationTable = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public long lastUsed;
 

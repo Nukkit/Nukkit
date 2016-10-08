@@ -29,14 +29,14 @@ public abstract class BaseInventory implements Inventory {
 
     protected final String title;
 
-    protected final Map<Integer, Item> slots = new ConcurrentHashMap<>();
+    protected final Map<Integer, Item> slots = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected final Set<Player> viewers = new HashSet<>();
 
     protected InventoryHolder holder;
 
     public BaseInventory(InventoryHolder holder, InventoryType type) {
-        this(holder, type, new ConcurrentHashMap<>());
+        this(holder, type, new ConcurrentHashMap<>(8, 0.9f, 1));
     }
 
     public BaseInventory(InventoryHolder holder, InventoryType type, Map<Integer, Item> items) {
@@ -185,7 +185,7 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public Map<Integer, Item> all(Item item) {
-        Map<Integer, Item> slots = new ConcurrentHashMap<>();
+        Map<Integer, Item> slots = new ConcurrentHashMap<>(8, 0.9f, 1);
         boolean checkDamage = item.hasMeta();
         boolean checkTag = item.getCompoundTag() != null;
         for (Map.Entry<Integer, Item> entry : this.getContents().entrySet()) {
@@ -412,7 +412,7 @@ public abstract class BaseInventory implements Inventory {
     }
 
     @Override
-    public void close(Player who) {
+    public synchronized void close(Player who) {
         this.onClose(who);
     }
 

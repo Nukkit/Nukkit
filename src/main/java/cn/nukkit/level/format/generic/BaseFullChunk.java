@@ -22,11 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * Nukkit Project
  */
 public abstract class BaseFullChunk implements FullChunk {
-    protected final Map<Long, Entity> entities = new ConcurrentHashMap<>();
+    protected final Map<Long, Entity> entities = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<Long, BlockEntity> tiles = new ConcurrentHashMap<>();
+    protected final Map<Long, BlockEntity> tiles = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<Integer, BlockEntity> tileList = new ConcurrentHashMap<>();
+    protected final Map<Integer, BlockEntity> tileList = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected int[] biomeColors;
 
@@ -44,7 +44,7 @@ public abstract class BaseFullChunk implements FullChunk {
 
     protected List<CompoundTag> NBTentities;
 
-    protected Map<Integer, Integer> extraData = new ConcurrentHashMap<>();
+    protected Map<Integer, Integer> extraData = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected LevelProvider provider;
     protected Class<? extends LevelProvider> providerClass;

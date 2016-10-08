@@ -14,7 +14,7 @@ public class BiomeSelector {
     private final Simplex temperature;
     private final Simplex rainfall;
 
-    private final Map<Integer, Biome> biomes = new ConcurrentHashMap<>();
+    private final Map<Integer, Biome> biomes = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private int[] map = new int[64 * 64];
 

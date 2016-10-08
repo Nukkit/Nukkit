@@ -41,7 +41,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         if (!this.closed) {
             for (Player player : new HashSet<>(this.getInventory().getViewers())) {
                 player.removeWindow(this.getInventory());

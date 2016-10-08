@@ -14,7 +14,7 @@ public class PermissionAttachment {
 
     private PermissionRemovedExecutor removed = null;
 
-    private final Map<String, Boolean> permissions = new ConcurrentHashMap<>();
+    private final Map<String, Boolean> permissions = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private Permissible permissible;
 

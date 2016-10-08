@@ -49,7 +49,7 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
     private final Map<Integer, Float> originals;
 
     public EntityDamageEvent(Entity entity, int cause, float damage) {
-        this(entity, cause, new ConcurrentHashMap<Integer, Float>() {
+        this(entity, cause, new ConcurrentHashMap<Integer, Float>(8, 0.9f, 1) {
             {
                 put(MODIFIER_BASE, damage);
             }

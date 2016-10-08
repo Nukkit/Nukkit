@@ -70,7 +70,7 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         if (!closed) {
             for (Player player : new HashSet<>(getInventory().getViewers())) {
                 player.removeWindow(getInventory());

@@ -115,7 +115,7 @@ public class Explosion {
 
     public boolean explodeB() {
 
-        Map<BlockVector3, Boolean> updateBlocks = new ConcurrentHashMap<>();
+        Map<BlockVector3, Boolean> updateBlocks = new ConcurrentHashMap<>(8, 0.9f, 1);
         List<Vector3> send = new ArrayList<>();
 
         Vector3 source = (new Vector3(this.source.x, this.source.y, this.source.z)).floor();
