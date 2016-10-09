@@ -46,7 +46,7 @@ public class BinaryStream {
     }
 
     public void setBuffer(byte[] buffer) {
-        if (buffers.isEmpty()) {
+        if (!buffers.isEmpty()) {
             buffers.clear();
         }
         this.offset = 0;
@@ -61,8 +61,8 @@ public class BinaryStream {
 
     private void addBuffer() {
         buffers.addLast(buffer);
+        count += buffer.length;
         buffer = new byte[DEFAULT_BLOCK_SIZE];
-        count += offset;
         offset = 0;
     }
 
