@@ -7,8 +7,8 @@ import cn.nukkit.block.BlockDirt;
 import cn.nukkit.block.BlockFire;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.data.*;
-import cn.nukkit.event.block.CropTrampleEvent;
 import cn.nukkit.event.entity.*;
+import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
@@ -1028,11 +1028,15 @@ public abstract class Entity extends Location implements Metadatable {
             Block down = this.level.getBlock(this.temporalVector.setComponents(getFloorX(), getFloorY() - 1, getFloorZ()));
 
             if (down.getId() == Item.FARMLAND) {
-                CropTrampleEvent ev = new CropTrampleEvent(this, this.level.getBlock(this.temporalVector.setComponents(down.x, down.y, down.z)));
-                this.server.getPluginManager().callEvent(ev);
-                if (!ev.isCancelled()) {
-                    this.level.setBlock(this.temporalVector.setComponents(down.x, down.y, down.z), new BlockDirt(), true, true);
+                if (this instanceof Player) {
+                    Player p = (Player) this;
+                    PlayerInteractEvent ev = new PlayerInteractEvent(p, p.getInventory().getItemInHand(), this.temporalVector.setComponents(down.x, down.y, down.z), PlayerInteractEvent.PHYSICAL);
+                    this.server.getPluginManager().callEvent(ev);
+                    if (ev.isCancelled()) {
+                        return;
+                    }
                 }
+                this.level.setBlock(this.temporalVector.setComponents(down.x, down.y, down.z), new BlockDirt(), true, true);
             }
         }
     }
