@@ -7,6 +7,7 @@ import cn.nukkit.block.BlockDirt;
 import cn.nukkit.block.BlockFire;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.data.*;
+import cn.nukkit.event.block.CropTrampleEvent;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.item.Item;
@@ -1027,7 +1028,11 @@ public abstract class Entity extends Location implements Metadatable {
             Block down = this.level.getBlock(this.temporalVector.setComponents(getFloorX(), getFloorY() - 1, getFloorZ()));
 
             if (down.getId() == Item.FARMLAND) {
-                this.level.setBlock(this.temporalVector.setComponents(down.x, down.y, down.z), new BlockDirt(), true, true);
+            	CropTrampleEvent ev = new CropTrampleEvent(this, this.level.getBlock(this.temporalVector.setComponents(down.x, down.y, down.z)));
+            	this.server.getPluginManager().callEvent(ev);
+            	if (!ev.isCancelled()) {
+            	    this.level.setBlock(this.temporalVector.setComponents(down.x, down.y, down.z), new BlockDirt(), true, true);
+                }
             }
         }
     }
