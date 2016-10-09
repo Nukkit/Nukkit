@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BinaryStream {
     public static final int DEFAULT_BLOCK_SIZE = 1024;
-    private static final ForkJoinPool POOL = new ForkJoinPool();
+    public static final ForkJoinPool POOL = new ForkJoinPool();
 
     public int offset;
     private byte[] buffer;
@@ -24,13 +24,12 @@ public class BinaryStream {
     private final byte[] shortBuffer = new byte[2];
     private final byte[] intBuffer = new byte[4];
     private final byte[] longBuffer = new byte[8];
-    private int blockSize;
     private int count;
 
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
     public BinaryStream() {
-        this.buffer = new byte[32];
+        this.buffer = new byte[35];
     }
 
     public BinaryStream(byte[] buffer) {
@@ -43,13 +42,15 @@ public class BinaryStream {
     }
 
     public void reset() {
-        setBuffer(new byte[32]);
+        setBuffer(new byte[35]);
     }
 
     public void setBuffer(byte[] buffer) {
         if (buffers.isEmpty()) {
             buffers.clear();
         }
+        this.offset = 0;
+        this.count = 0;
         this.buffer = buffer;
     }
 
@@ -60,7 +61,7 @@ public class BinaryStream {
 
     private void addBuffer() {
         buffers.addLast(buffer);
-        buffer = new byte[blockSize];
+        buffer = new byte[DEFAULT_BLOCK_SIZE];
         count += offset;
         offset = 0;
     }
@@ -117,20 +118,16 @@ public class BinaryStream {
         final byte[] data = new byte[getCount()];
         // Check if we have a list of buffers
         int pos = 0;
-        int count = 0;
-        if (buffers != null) {
-            for (final byte[] bytes : buffers) {
-                final int finalPos = pos;
-                count++;
-                POOL.submit(new Callable() {
-                    @Override
-                    public Object call() throws Exception {
-                        System.arraycopy(bytes, 0, data, finalPos, bytes.length);
-                        return null;
-                    }
-                });
-                pos += bytes.length;
-            }
+        for (final byte[] bytes : buffers) {
+            final int finalPos = pos;
+            POOL.submit(new Callable() {
+                @Override
+                public Object call() throws Exception {
+                    System.arraycopy(bytes, 0, data, finalPos, bytes.length);
+                    return null;
+                }
+            });
+            pos += bytes.length;
         }
         POOL.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         // write the internal buffer directly
@@ -171,7 +168,7 @@ public class BinaryStream {
     }
 
     public void put(byte[] b) {
-        if (b.length > blockSize) {
+        if (b.length > buffer.length) {
             if (offset > 0) {
                 byte[] buf2 = new byte[offset];
                 System.arraycopy(buffer, 0, buf2, 0, offset);
@@ -186,7 +183,7 @@ public class BinaryStream {
     }
 
     public void put(int datum) {
-        if (offset == blockSize) {
+        if (offset == buffer.length) {
             addBuffer();
         }
         // store the byte
@@ -197,29 +194,23 @@ public class BinaryStream {
         if ((offset < 0) || ((offset + length) > data.length) || (length < 0)) {
             throw new IndexOutOfBoundsException();
         } else {
-            if ((offset + length) > blockSize) {
+            if ((this.offset + length) > buffer.length) {
                 int copyLength;
 
                 do {
-                    if (offset == blockSize) {
+                    if (this.offset == buffer.length) {
                         addBuffer();
                     }
-
-                    copyLength = blockSize - offset;
-
-                    if (length < copyLength) {
-                        copyLength = length;
-                    }
-
-                    System.arraycopy(data, offset, buffer, offset, copyLength);
+                    copyLength = Math.min(buffer.length - this.offset, length);
+                    System.arraycopy(data, offset, buffer, this.offset, copyLength);
                     offset += copyLength;
-                    offset += copyLength;
+                    this.offset += copyLength;
                     length -= copyLength;
                 } while (length > 0);
             } else {
                 // Copy in the subarray
-                System.arraycopy(data, offset, buffer, offset, length);
-                offset += length;
+                System.arraycopy(data, offset, buffer, this.offset, length);
+                this.offset += length;
             }
         }
     }
@@ -428,28 +419,6 @@ public class BinaryStream {
 
     public boolean feof() {
         return this.offset < 0 || this.offset >= this.buffer.length;
-    }
-
-    private void ensureCapacity(int minCapacity) {
-        // overflow-conscious code
-        if (minCapacity - buffer.length > 0) {
-            grow(minCapacity);
-        }
-    }
-
-    private void grow(int minCapacity) {
-        // overflow-conscious code
-        int oldCapacity = buffer.length;
-        int newCapacity = oldCapacity << 1;
-
-        if (newCapacity - minCapacity < 0) {
-            newCapacity = minCapacity;
-        }
-
-        if (newCapacity - MAX_ARRAY_SIZE > 0) {
-            newCapacity = hugeCapacity(minCapacity);
-        }
-        this.buffer = Arrays.copyOf(buffer, newCapacity);
     }
 
     private static int hugeCapacity(int minCapacity) {
