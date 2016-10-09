@@ -511,7 +511,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
                     transparent[id] = block.isTransparent();
                     hardness[id] = block.getHardness();
                     light[id] = block.getLightLevel();
-                    lightFilter[$id] = 1;
+                    lightFilter[id] = 1;
 
                     if (block.isSolid()) {
                         if (block.isTransparent()) {
