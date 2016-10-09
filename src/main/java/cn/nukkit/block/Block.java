@@ -511,21 +511,19 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
                     transparent[id] = block.isTransparent();
                     hardness[id] = block.getHardness();
                     light[id] = block.getLightLevel();
+                    lightFilter[$id] = 1;
 
                     if (block.isSolid()) {
                         if (block.isTransparent()) {
                             if (block instanceof BlockLiquid || block instanceof BlockIce) {
                                 lightFilter[id] = 2;
-                            } else {
-                                lightFilter[id] = 1;
                             }
                         } else {
                             lightFilter[id] = 15;
                         }
-                    } else {
-                        lightFilter[id] = 1;
                     }
-                } else {
+                }
+                else {
                     lightFilter[id] = 1;
                     for (int data = 0; data < 16; ++data) {
                         fullList[(id) << 4 | data] = new BlockUnknown(id, data);
