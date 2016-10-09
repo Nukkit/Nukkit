@@ -1376,7 +1376,7 @@ public class Level implements ChunkManager, Metadatable {
         Map<BlockVector3, Boolean> removalVisited = new HashMap<>();
 
         int oldLevel = this.getBlockLightAt(x, y, z);
-        newLevel = Block.light[this.getBlockIdAt(x, y, z)];
+        int newLevel = Block.light[this.getBlockIdAt(x, y, z)];
 
         if (oldLevel != newLevel) {
             this.setBlockLightAt(x, y, z, newLevel);
