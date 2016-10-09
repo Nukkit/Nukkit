@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.block.BlockFormEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.SmokeParticle;
@@ -457,9 +458,17 @@ public abstract class BlockLiquid extends BlockTransparent {
 
             if (colliding) {
                 if (this.getDamage() == 0) {
-                    this.getLevel().setBlock(this, new BlockObsidian(), true);
+                    BlockFormEvent ev = new BlockFormEvent(this, new BlockObsidian());
+                    this.getLevel().getServer().getPluginManager().callEvent(ev);
+                    if (!ev.isCancelled()) {
+                        this.getLevel().setBlock(this, new BlockObsidian(), true);
+                    }
                 } else if (this.getDamage() <= 4) {
-                    this.getLevel().setBlock(this, new BlockCobblestone(), true);
+                    BlockFormEvent ev = new BlockFormEvent(this, new BlockCobblestone());
+                    this.getLevel().getServer().getPluginManager().callEvent(ev);
+                    if (!ev.isCancelled()) {
+                        this.getLevel().setBlock(this, new BlockCobblestone(), true);
+                    }
                 }
 
                 this.triggerLavaMixEffects(this);
