@@ -3405,6 +3405,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.username;
     }
 
+    public String getLowerCaseName() {
+        return this.iusername;
+    }
+
     @Override
     public void kill() {
         if (!this.spawned) {
