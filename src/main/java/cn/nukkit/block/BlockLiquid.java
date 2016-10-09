@@ -458,16 +458,21 @@ public abstract class BlockLiquid extends BlockTransparent {
 
             if (colliding) {
                 if (this.getDamage() == 0) {
-                    BlockFormEvent ev = new BlockFormEvent(this, new BlockObsidian());
+                    Block newState = new BlockObsidian();
+                    newState.setComponents(this.getX(), this.getY(), this.getZ());
+                    newState.setLevel(this.getLevel());
+                    BlockFormEvent ev = new BlockFormEvent(this, newState);
                     this.getLevel().getServer().getPluginManager().callEvent(ev);
                     if (!ev.isCancelled()) {
                         this.getLevel().setBlock(this, new BlockObsidian(), true);
                     }
                 } else if (this.getDamage() <= 4) {
-                    BlockFormEvent ev = new BlockFormEvent(this, new BlockCobblestone());
-                    this.getLevel().getServer().getPluginManager().callEvent(ev);
+                    Block newState = new BlockObsidian();
+                    newState.setComponents(this.getX(), this.getY(), this.getZ());
+                    newState.setLevel(this.getLevel());
+                    BlockFormEvent ev = new BlockFormEvent(this, newState);
                     if (!ev.isCancelled()) {
-                        this.getLevel().setBlock(this, new BlockCobblestone(), true);
+                        this.getLevel().setBlock(this, newState, true);
                     }
                 }
 
