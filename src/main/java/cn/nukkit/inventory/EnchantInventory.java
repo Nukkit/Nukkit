@@ -93,6 +93,7 @@ public class EnchantInventory extends ContainerInventory {
                                     if (modifiedLevel >= enchantment.getMinEnchantAbility(enchLevel) && modifiedLevel <= enchantment.getMaxEnchantAbility(enchLevel)) {
                                         enchantment.setLevel(enchLevel);
                                         possible.add(enchantment);
+                                        System.out.println("Possible add: "+ enchantment.getName());
                                     }
                                 }
 
@@ -120,23 +121,28 @@ public class EnchantInventory extends ContainerInventory {
                             }
                         }
                         key--;
-
-                        Enchantment enchantment = possible.get(key);
-                        result.add(enchantment);
-                        possible.remove(key);
-
+                        
+                        Enchantment enchantment = null;
+                        if(key >= 0){
+	                        enchantment = possible.get(key);
+	                        result.add(enchantment);
+	                        possible.remove(key);
+                        }
+                        
                         //Extra enchantment
-                        while (!possible.isEmpty()) {
+                        while (!possible.isEmpty() && enchantment != null) {
                             modifiedLevel = Math.round(modifiedLevel / 2f);
                             v = ThreadLocalRandom.current().nextInt(0, 51);
                             if (v <= (modifiedLevel + 1)) {
 
                                 for (Enchantment e : new ArrayList<>(possible)) {
-                                    if (!e.isCompatibleWith(enchantment)) {
+                                    if (e.getName().equals(enchantment.getName())) {
                                         possible.remove(e);
                                     }
                                 }
 
+                                System.out.println("Possible lenght: "+possible.size());
+                                
                                 weights = new int[possible.size()];
                                 total = 0;
 
@@ -157,9 +163,11 @@ public class EnchantInventory extends ContainerInventory {
                                 }
                                 key--;
 
-                                enchantment = possible.get(key);
-                                result.add(enchantment);
-                                possible.remove(key);
+                                if(key >= 0){
+	                                enchantment = possible.get(key);
+	                                result.add(enchantment);
+	                                possible.remove(key);
+                                }
                             } else {
                                 break;
                             }
