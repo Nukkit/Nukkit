@@ -30,8 +30,9 @@ public class AnvilInventory extends ContainerInventory {
     }
 
     public boolean onRename(Player player, Item resultItem) {
-        Item local = getItem(TARGET);
-        Item second = getItem(SACRIFICE);
+        Item local = sendItem(TARGET);
+        Item second = sendItem(SACRIFICE);
+        Item result = getItem(RESULT);
 
         if (!resultItem.deepEquals(local, true, false) || resultItem.getCount() != local.getCount()) {
             //Item does not match target item. Everything must match except the tags.
@@ -44,9 +45,9 @@ public class AnvilInventory extends ContainerInventory {
         }
 
         if (local.getId() != 0 && second.getId() == 0) { //only rename
+            player.getInventory().addItem(local);
             local.setCustomName(resultItem.getCustomName());
             setItem(RESULT, local);
-            player.getInventory().addItem(local);
             clearAll();
             player.getInventory().sendContents(player);
             sendContents(player);
