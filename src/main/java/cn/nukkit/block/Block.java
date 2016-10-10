@@ -273,6 +273,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int BEETROOT_BLOCK = 244;
     public static final int STONECUTTER = 245;
     public static final int GLOWING_OBSIDIAN = 246;
+    //TODO: Move to blockId class
 
     public static Class[] list = null;
     public static Block[] fullList = null;

@@ -15,7 +15,6 @@ import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.block.BlockUpdateEvent;
 import cn.nukkit.event.level.*;
 import cn.nukkit.event.player.PlayerInteractEvent;
-import cn.nukkit.event.redstone.RedstoneUpdateEvent;
 import cn.nukkit.event.weather.LightningStrikeEvent;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
@@ -42,7 +41,6 @@ import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
-import cn.nukkit.redstone.Redstone;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.timings.LevelTimings;
 import cn.nukkit.timings.Timings;
@@ -1157,36 +1155,6 @@ public class Level implements ChunkManager, Metadatable {
         }
     }
 
-    public void updateAroundRedstone(Block block) {
-        BlockUpdateEvent ev = new BlockUpdateEvent(block);
-        this.server.getPluginManager().callEvent(ev);
-        if (!ev.isCancelled()) {
-            for (Entity entity : this.getNearbyEntities(
-                    new AxisAlignedBB(block.x - 1, block.y - 1, block.z - 1, block.x + 1, block.y + 1, block.z + 1))) {
-                entity.scheduleUpdate();
-            }
-            ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
-
-            RedstoneUpdateEvent rsEv = new RedstoneUpdateEvent(ev.getBlock());
-            this.server.getPluginManager().callEvent(rsEv);
-            if (!rsEv.isCancelled()) {
-                Block redstoneWire = rsEv.getBlock().getSide(Vector3.SIDE_DOWN);
-                if (redstoneWire instanceof BlockRedstoneWire) {
-                    if (rsEv.getBlock() instanceof BlockSolid) {
-                        int level = redstoneWire.getPowerLevel();
-                        redstoneWire.setPowerLevel(redstoneWire.getNeighborPowerLevel() - 1);
-                        redstoneWire.getLevel().setBlock(redstoneWire, redstoneWire, true, true);
-                        Redstone.deactive(redstoneWire, level);
-                    } else {
-                        redstoneWire.setPowerLevel(redstoneWire.getNeighborPowerLevel() - 1);
-                        redstoneWire.getLevel().setBlock(redstoneWire, redstoneWire, true, true);
-                        Redstone.active(redstoneWire);
-                    }
-                }
-            }
-        }
-    }
-
     public void scheduleUpdate(Vector3 pos, int delay) {
         BlockVector3 index = Level.blockHash((int) pos.x, (int) pos.y, (int) pos.z);
         if (this.updateQueueIndex.containsKey(index) && this.updateQueueIndex.get(index) <= delay) {
@@ -1519,7 +1487,6 @@ public class Level implements ChunkManager, Metadatable {
                     }
                     ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
                 }
-                this.updateAroundRedstone(block);
                 this.updateAround(position);
             }
 
