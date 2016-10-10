@@ -69,6 +69,7 @@ import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
+
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.*;
@@ -181,6 +182,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected volatile AdventureSettings adventureSettings;
 
     private final Map<Integer, Boolean> needACK = new ConcurrentHashMap<>(8, 0.9f, 1);
+    
+    protected boolean checkMovement = true;
 
     private final Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();
 
@@ -1241,7 +1244,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             double diff = (diffX * diffX + diffY * diffY + diffZ * diffZ) / ((double) (tickDiff * tickDiff));
 
-            if (!server.getAllowFlight() && this.isSurvival()) {
+            if (this.checkMovement && !server.getAllowFlight() && this.isSurvival()) {
                 if (!this.isSleeping()) {
                     if (diff > 0.125) {
                         PlayerInvalidMoveEvent ev;
@@ -1275,7 +1278,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.level);
         Location to = this.getLocation();
 
-        if (!revert && (Math.pow(this.lastX - to.x, 2) + Math.pow(this.lastY - to.y, 2) + Math.pow(this.lastZ - to.z, 2)) > (1/16) || (Math.abs(this.lastYaw - to.yaw) + Math.abs(this.lastPitch - to.pitch)) > 10) {
+        if (!revert && (Math.pow(this.lastX - to.x, 2) + Math.pow(this.lastY - to.y, 2) + Math.pow(this.lastZ - to.z, 2)) > (1d / 16d) || (Math.abs(this.lastYaw - to.yaw) + Math.abs(this.lastPitch - to.pitch)) > 10) {
             boolean isFirst = this.firstMove;
 
             this.firstMove = false;
@@ -1565,13 +1568,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.playedBefore = (nbt.getLong("lastPlayed") - nbt.getLong("firstPlayed")) > 1;
 
         boolean alive = true;
-        
+
         nbt.putString("NameTag", this.username);
 
         if (0 >= nbt.getShort("Health")) {
-        	alive = false;
+            alive = false;
         }
-        
+
         int exp = nbt.getInt("EXP");
         int expLevel = nbt.getInt("expLevel");
         this.setExperience(exp, expLevel);
@@ -2756,16 +2759,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         for (Recipe r : recipes) {
                             if (r instanceof ShapedRecipe) {
                                 Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) r).getIngredientMap();
-
                                 for (Map<Integer, Item> map : ingredients.values()) {
                                     for (Item ingredient : map.values()) {
-                                        if (!this.inventory.contains(ingredient)) {
-                                            canCraft = false;
-                                            break;
-                                        }
+                                        if (ingredient != null && ingredient.getId() != Item.AIR) {
+                                            if (!this.inventory.contains(ingredient)) {
+                                                canCraft = false;
+                                                break;
+                                            }
 
-                                        ingredientz.add(ingredient);
-                                        this.inventory.removeItem(ingredient);
+                                            ingredientz.add(ingredient);
+                                            this.inventory.removeItem(ingredient);
+                                        }
                                     }
                                 }
 
@@ -2787,7 +2791,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             this.inventory.addItem(recipe.getResult());
                         } else {
-                            this.server.getLogger().debug("Unmatched desktop recipe " + craftingEventPacket.id + " from player " + this.getName());
+                            this.server.getLogger().debug("(1) Unmatched desktop recipe " + craftingEventPacket.id + " from player " + this.getName());
                             this.inventory.sendContents(this);
                         }
                     } else {
@@ -2927,7 +2931,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         Item result = craftingEventPacket.output[0];
 
                         if (!canCraft || !recipe.getResult().deepEquals(result)) {
-                            this.server.getLogger().debug("Unmatched recipe " + recipe.getId() + " from player " + this.getName() + ": expected " + recipe.getResult() + ", got " + result + ", using: " + Arrays.asList(ingredients).toString());
+                            this.server.getLogger().debug("(2) Unmatched recipe " + recipe.getId() + " from player " + this.getName() + ": expected " + recipe.getResult() + ", got " + result + ", using: " + Arrays.asList(ingredients).toString());
                             this.inventory.sendContents(this);
                             break;
                         }
@@ -2952,7 +2956,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
 
                         if (!canCraft) {
-                            this.server.getLogger().debug("Unmatched recipe " + recipe.getId() + " from player " + this.getName() + ": client does not have enough items, using: " + Arrays.asList(ingredients).toString());
+                            this.server.getLogger().debug("(3) Unmatched recipe " + recipe.getId() + " from player " + this.getName() + ": client does not have enough items, using: " + Arrays.asList(ingredients).toString());
                             this.inventory.sendContents(this);
                             break;
                         }
@@ -4038,6 +4042,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         ChangeDimensionPacket pk = new ChangeDimensionPacket();
         pk.dimension = (byte) (getLevel().getDimension() & 0xff);
         this.dataPacket(pk);
+    }
+
+    public void setCheckMovement(boolean checkMovement) {
+        this.checkMovement = checkMovement;
     }
 
     public synchronized void setLocale(Locale locale) {
