@@ -1,5 +1,8 @@
 package cn.nukkit.inventory;
 
+import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
+
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.item.Item;
@@ -12,18 +15,11 @@ import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.network.protocol.CraftingDataPacket;
 import cn.nukkit.utils.DyeColor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
 public class EnchantInventory extends ContainerInventory {
-
-    private final Random random = new Random();
 
     private int bookshelfAmount = 0;
 
@@ -199,7 +195,7 @@ public class EnchantInventory extends ContainerInventory {
         if (!before.hasEnchantments() && after.hasEnchantments() && after.getId() == result.getId() && this.levels != null && this.entries != null) {
             Enchantment[] enchantments = after.getEnchantments();
             for (int i = 0; i < 3; i++) {
-                if (Arrays.equals(enchantments, this.entries[i].getEnchantments())) {
+                if (enchantsCheck(enchantments, this.entries[i].getEnchantments())) {
                     Item lapis = this.getItem(1);
                     int level = who.getExperienceLevel();
                     int exp = who.getExperience();
@@ -215,6 +211,16 @@ public class EnchantInventory extends ContainerInventory {
                 }
             }
         }
+    }
+    
+    public boolean enchantsCheck(Enchantment[] ench, Enchantment[] ench2){
+    	if(ench.length != ench2.length)
+    		return false;
+    	for(int i = 0; i < ench.length; i++){
+    		if(!ench[i].getName().equals(ench2[i].getName()) || ench[i].getLevel() != ench2[i].getLevel())
+    			return false;
+    	}
+    	return true;
     }
 
     public int countBookshelf() {
