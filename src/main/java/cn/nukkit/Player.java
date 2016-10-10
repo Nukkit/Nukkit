@@ -1401,7 +1401,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.blocksAround = null;
                 this.blocksUnder = null;
                 getBlocksAround();
-                getBlocksUnder();
             }
 
             this.processMovement(tickDiff);
