@@ -1397,9 +1397,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (this.spawned) {
-            if(this.newPosition == null || !this.newPosition.equals(this)) {
+            if(this.newPosition != null && this.newPosition.equals(this)) {
                 this.blocksAround = null;
                 this.blocksUnder = null;
+                getBlocksAround();
+                getBlocksUnder();
             }
 
             this.processMovement(tickDiff);
@@ -1848,6 +1850,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
 
                         this.setRotation(movePlayerPacket.yaw, movePlayerPacket.pitch);
+                        this.newPosition = newPos;
                         this.newPosition = newPos;
                         this.forceMovement = null;
                     }
