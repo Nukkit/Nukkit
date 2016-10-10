@@ -2467,8 +2467,19 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isChunkInUse(int x, int z) {
-        Long index = Level.chunkHash(x, z);
-        return this.chunkLoaders.containsKey(index) && !this.chunkLoaders.get(index).isEmpty();
+        return isChunkInUse(Level.chunkHash(x, z));
+    }
+
+    public boolean isChunkInUse(long hash) {
+        return this.chunkLoaders.containsKey(hash) && !this.chunkLoaders.get(hash).isEmpty();
+    }
+
+    public void loadRadius(int rad) {
+        for (int x = -rad; x <= rad; x++) {
+            for (int z = -rad; z <= rad; z++) {
+                loadChunk(x, z);
+            }
+        }
     }
 
     public boolean loadChunk(int x, int z) {
@@ -2483,8 +2494,6 @@ public class Level implements ChunkManager, Metadatable {
 
         this.timings.syncChunkLoadTimer.startTiming();
 
-        this.cancelUnloadChunkRequest(x, z);
-
         BaseFullChunk chunk = this.provider.getChunk(x, z, generate);
 
         if (chunk == null) {
@@ -2494,9 +2503,6 @@ public class Level implements ChunkManager, Metadatable {
             return false;
         }
 
-        this.chunks.put(index, chunk);
-        chunk.initChunk();
-
         if (chunk.getProvider() != null) {
             this.server.getPluginManager().callEvent(new ChunkLoadEvent(chunk, !chunk.isGenerated()));
         } else {
@@ -2505,17 +2511,21 @@ public class Level implements ChunkManager, Metadatable {
             return false;
         }
 
+        this.chunks.put(index, chunk);
+        chunk.initChunk();
+
         if (!chunk.isLightPopulated() && chunk.isPopulated()
                 && (boolean) this.getServer().getConfig("chunk-ticking.light-updates", false)) {
             this.getServer().getScheduler().scheduleAsyncTask(new LightPopulationTask(this, chunk));
         }
 
-        if (this.isChunkInUse(x, z)) {
+        if (this.isChunkInUse(index)) {
+            this.unloadQueue.remove(index);
             for (ChunkLoader loader : this.getChunkLoaders(x, z)) {
                 loader.onChunkLoaded(chunk);
             }
         } else {
-            this.unloadChunkRequest(x, z);
+            this.unloadQueue.put(index, System.currentTimeMillis());
         }
         this.timings.syncChunkLoadTimer.stopTiming();
         return true;

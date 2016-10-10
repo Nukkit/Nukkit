@@ -182,7 +182,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected volatile AdventureSettings adventureSettings;
 
     private final Map<Integer, Boolean> needACK = new ConcurrentHashMap<>(8, 0.9f, 1);
-    
+
     protected boolean checkMovement = true;
 
     private final Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();

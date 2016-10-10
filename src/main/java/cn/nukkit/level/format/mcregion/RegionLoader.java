@@ -44,7 +44,6 @@ public class RegionLoader extends BaseRegionLoader {
         Integer[] table = this.locationTable.get(index);
         this.randomAccessFile.seek(table[0] << 12);
         int length = this.randomAccessFile.readInt();
-        byte compression = this.randomAccessFile.readByte();
         if (length <= 0 || length >= MAX_SECTOR_LENGTH) {
             if (length >= MAX_SECTOR_LENGTH) {
                 table[0] = ++this.lastSector;
@@ -54,7 +53,7 @@ public class RegionLoader extends BaseRegionLoader {
             }
             return null;
         }
-
+        byte compression = this.randomAccessFile.readByte();
         if (length > (table[1] << 12)) {
             MainLogger.getLogger().error("Corrupted bigger chunk detected");
             table[1] = length >> 12;

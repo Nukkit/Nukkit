@@ -6,9 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 
 /**
  * author: MagicDroidX
@@ -16,7 +13,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class BinaryStream {
     public static final int DEFAULT_BLOCK_SIZE = 1024;
-    public static final ForkJoinPool POOL = new ForkJoinPool();
 
     public int offset;
     private byte[] buffer;
@@ -91,45 +87,22 @@ public class BinaryStream {
     }
 
     public byte[] getBuffer() {
-        if (buffers.size() < 8) {
-            if (buffers.isEmpty()) {
-                buffer = Arrays.copyOfRange(buffer, 0, offset);
-                return buffer;
-            }
-            byte[] data = new byte[getCount()];
-
-            // Check if we have a list of buffers
-            int pos = 0;
-
-            if (buffers != null) {
-                for (byte[] bytes : buffers) {
-                    System.arraycopy(bytes, 0, data, pos, bytes.length);
-                    pos += bytes.length;
-                }
-            }
-
-            // write the internal buffer directly
-            System.arraycopy(buffer, 0, data, pos, offset);
-
-            this.buffer = data;
-            this.buffers.clear();
-            return this.buffer;
+        if (buffers.isEmpty()) {
+            buffer = Arrays.copyOfRange(buffer, 0, offset);
+            return buffer;
         }
-        final byte[] data = new byte[getCount()];
+        byte[] data = new byte[getCount()];
+
         // Check if we have a list of buffers
         int pos = 0;
-        for (final byte[] bytes : buffers) {
-            final int finalPos = pos;
-            POOL.submit(new Callable() {
-                @Override
-                public Object call() throws Exception {
-                    System.arraycopy(bytes, 0, data, finalPos, bytes.length);
-                    return null;
-                }
-            });
-            pos += bytes.length;
+
+        if (buffers != null) {
+            for (byte[] bytes : buffers) {
+                System.arraycopy(bytes, 0, data, pos, bytes.length);
+                pos += bytes.length;
+            }
         }
-        POOL.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+
         // write the internal buffer directly
         System.arraycopy(buffer, 0, data, pos, offset);
 

@@ -107,8 +107,7 @@ public abstract class BaseFullChunk implements FullChunk {
 
     public void initChunk() {
         if (this.getProvider() != null && !this.isInit) {
-            boolean changed = false;
-            if (this.NBTentities != null) {
+            if (this.NBTentities != null && !this.NBTentities.isEmpty()) {
                 this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer.startTiming();
                 for (CompoundTag nbt : NBTentities) {
                     if (!nbt.contains("id")) {
@@ -117,46 +116,44 @@ public abstract class BaseFullChunk implements FullChunk {
                     }
                     ListTag pos = nbt.getList("Pos");
                     if ((((NumberTag) pos.get(0)).getData().intValue() >> 4) != this.x || ((((NumberTag) pos.get(2)).getData().intValue() >> 4) != this.z)) {
-                        changed = true;
+                        this.hasChanged = true;
                         continue;
                     }
                     Entity entity = Entity.createEntity(nbt.getString("id"), this, nbt);
                     if (entity != null) {
                         entity.spawnToAll();
                     } else {
-                        changed = true;
+                        this.hasChanged = true;
                         continue;
                     }
                 }
                 this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer.stopTiming();
+            }
 
+            if (this.NBTtiles != null && !this.NBTtiles.isEmpty()) {
                 this.getProvider().getLevel().timings.syncChunkLoadBlockEntitiesTimer.startTiming();
                 for (CompoundTag nbt : NBTtiles) {
                     if (nbt != null) {
                         if (!nbt.contains("id")) {
-                            changed = true;
+                            this.hasChanged = true;
                             continue;
                         }
                         if ((nbt.getInt("x") >> 4) != this.x || ((nbt.getInt("z") >> 4) != this.z)) {
-                            changed = true;
+                            this.hasChanged = true;
                             continue;
                         }
                         BlockEntity blockEntity = BlockEntity.createBlockEntity(nbt.getString("id"), this, nbt);
                         if (blockEntity == null) {
-                            changed = true;
+                            this.hasChanged = true;
                             continue;
                         }
                     }
                 }
 
                 this.getProvider().getLevel().timings.syncChunkLoadBlockEntitiesTimer.stopTiming();
-
-                this.NBTentities = null;
-                this.NBTtiles = null;
             }
-
-            this.setChanged(changed);
-
+            this.NBTentities = null;
+            this.NBTtiles = null;
             this.isInit = true;
         }
     }

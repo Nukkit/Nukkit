@@ -241,27 +241,30 @@ public class McRegion extends BaseLevelProvider {
         if (this.chunks.containsKey(index)) {
             return true;
         }
+        return loadChunk(index, chunkX, chunkZ, create) != null;
+    }
+
+    private Chunk loadChunk(long index, int chunkX, int chunkZ, boolean create) {
         int regionX = getRegionIndexX(chunkX);
         int regionZ = getRegionIndexZ(chunkZ);
-        this.loadRegion(regionX, regionZ);
+        RegionLoader region = this.loadRegion(regionX, regionZ);
         this.level.timings.syncChunkLoadDataTimer.startTiming();
         Chunk chunk;
         try {
-            chunk = this.getRegion(regionX, regionZ).readChunk(chunkX - regionX * 32, chunkZ - regionZ * 32);
+            chunk = region.readChunk(chunkX - regionX * 32, chunkZ - regionZ * 32);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        if (chunk == null && create) {
-            chunk = this.getEmptyChunk(chunkX, chunkZ);
+        if (chunk == null) {
+            if (create) {
+                chunk = this.getEmptyChunk(chunkX, chunkZ);
+                this.chunks.put(index, chunk);
+            }
+        } else {
+            this.chunks.put(index, chunk);
         }
         this.level.timings.syncChunkLoadDataTimer.stopTiming();
-
-        if (chunk != null) {
-            this.chunks.put(index, chunk);
-            return true;
-        }
-        return false;
+        return chunk;
     }
 
     public Chunk getEmptyChunk(int chunkX, int chunkZ) {
@@ -308,11 +311,11 @@ public class McRegion extends BaseLevelProvider {
     @Override
     public Chunk getChunk(int chunkX, int chunkZ, boolean create) {
         long index = Level.chunkHash(chunkX, chunkZ);
-        if (this.chunks.containsKey(index)) {
-            return this.chunks.get(index);
+        Chunk chunk = chunks.get(index);
+        if (chunk != null) {
+            return chunk;
         } else {
-            this.loadChunk(chunkX, chunkZ, create);
-            return this.chunks.containsKey(index) ? this.chunks.get(index) : null;
+            return this.loadChunk(index, chunkX, chunkZ, create);
         }
     }
 
@@ -350,10 +353,20 @@ public class McRegion extends BaseLevelProvider {
         return chunk != null && chunk.isPopulated();
     }
 
-    protected void loadRegion(int x, int z) {
+    private RegionLoader lastRegion;
+
+    protected RegionLoader loadRegion(int x, int z) {
+        if (x == lastRegion.getX() && z == lastRegion.getZ()) {
+            return lastRegion;
+        }
         long index = Level.chunkHash(x, z);
-        if (!this.regions.containsKey(index)) {
-            this.regions.put(index, new RegionLoader(this, x, z));
+        RegionLoader region = this.regions.get(index);
+        if (region == null) {
+            region = new RegionLoader(this, x, z);
+            this.regions.put(index, region);
+            return region;
+        } else {
+            return region;
         }
     }
 
