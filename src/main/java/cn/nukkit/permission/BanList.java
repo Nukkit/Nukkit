@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class BanList {
 
-    private LinkedHashMap<String, BanEntry> list = new LinkedHashMap<>();
+    private volatile LinkedHashMap<String, BanEntry> list;
 
     private final String file;
 
@@ -37,6 +37,13 @@ public class BanList {
     }
 
     public LinkedHashMap<String, BanEntry> getEntires() {
+        if (this.list == null) {
+            synchronized (this) {
+                if (list == null) {
+                    load();
+                }
+            }
+        }
         removeExpired();
         return this.list;
     }
@@ -46,14 +53,12 @@ public class BanList {
         if (!this.isEnable()) {
             return false;
         } else {
-            this.removeExpired();
-
-            return this.list.containsKey(name);
+            return getEntires().containsKey(name);
         }
     }
 
     public void add(BanEntry entry) {
-        this.list.put(entry.getName(), entry);
+        getEntires().put(entry.getName(), entry);
         this.save();
     }
 
@@ -82,18 +87,21 @@ public class BanList {
 
     public void remove(String name) {
         name = name.toLowerCase();
-        if (this.list.containsKey(name)) {
-            this.list.remove(name);
+        if (getEntires().containsKey(name)) {
+            getEntires().remove(name);
             this.save();
         }
     }
 
 
     public void removeExpired() {
+        if (list == null) {
+            return;
+        }
         for (String name : new ArrayList<>(this.list.keySet())) {
             BanEntry entry = this.list.get(name);
             if (entry.hasExpired()) {
-                list.remove(name);
+                getEntires().remove(name);
             }
         }
     }
@@ -121,8 +129,9 @@ public class BanList {
     }
 
     public void save() {
-        this.removeExpired();
-
+        if (list == null) {
+            return;
+        }
         try {
             File file = new File(this.file);
             if (!file.exists()) {
@@ -130,7 +139,7 @@ public class BanList {
             }
 
             LinkedList<LinkedHashMap<String, String>> list = new LinkedList<>();
-            for (BanEntry entry : this.list.values()) {
+            for (BanEntry entry : getEntires().values()) {
                 list.add(entry.getMap());
             }
             Utils.writeFile(this.file, new ByteArrayInputStream(new GsonBuilder().setPrettyPrinting().create().toJson(list).getBytes(StandardCharsets.UTF_8)));

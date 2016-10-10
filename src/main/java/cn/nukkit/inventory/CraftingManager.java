@@ -25,6 +25,9 @@ public class CraftingManager {
     private static int RECIPE_COUNT = 0;
 
     public CraftingManager() {
+    }
+
+    public void init() {
         this.registerFurnace();
         this.registerBrewing();
         this.registerDyes();

@@ -38,7 +38,6 @@ public class Nukkit {
     public static int DEBUG = 1;
 
     public static void main(String[] args) {
-
         //Shorter title for windows 8/2012
         String osName = System.getProperty("os.name").toLowerCase();
         if (osName.contains("windows")) {
@@ -55,12 +54,10 @@ public class Nukkit {
                     break;
             }
         }
-
         MainLogger logger = new MainLogger(DATA_PATH + "server.log");
-
         try {
             if (ANSI) {
-                System.out.print((char) 0x1b + "]0;Starting Nukkit Server For Minecraft: PE" + (char) 0x07);
+                System.out.println((char) 0x1b + "]0;Starting Nukkit Server For Minecraft: PE" + (char) 0x07);
             }
             Server server = new Server(logger, PATH, DATA_PATH, PLUGIN_PATH);
         } catch (Exception e) {
@@ -68,7 +65,7 @@ public class Nukkit {
         }
 
         if (ANSI) {
-            System.out.print((char) 0x1b + "]0;Stopping Server..." + (char) 0x07);
+            System.out.println((char) 0x1b + "]0;Stopping Server..." + (char) 0x07);
         }
         logger.info("Stopping other threads");
 
