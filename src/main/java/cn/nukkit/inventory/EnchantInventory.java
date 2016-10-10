@@ -93,7 +93,6 @@ public class EnchantInventory extends ContainerInventory {
                                     if (modifiedLevel >= enchantment.getMinEnchantAbility(enchLevel) && modifiedLevel <= enchantment.getMaxEnchantAbility(enchLevel)) {
                                         enchantment.setLevel(enchLevel);
                                         possible.add(enchantment);
-                                        System.out.println("Possible add: "+ enchantment.getName());
                                     }
                                 }
 
@@ -140,8 +139,6 @@ public class EnchantInventory extends ContainerInventory {
                                         possible.remove(e);
                                     }
                                 }
-
-                                System.out.println("Possible lenght: "+possible.size());
                                 
                                 weights = new int[possible.size()];
                                 total = 0;
