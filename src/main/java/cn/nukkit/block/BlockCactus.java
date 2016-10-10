@@ -58,6 +58,11 @@ public class BlockCactus extends BlockTransparent {
     }
 
     @Override
+    public AxisAlignedBB getCollisionBoundingBox() {
+        return new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1);
+    }
+
+    @Override
     public void onEntityCollide(Entity entity) {
         entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.CAUSE_CONTACT, 1));
     }

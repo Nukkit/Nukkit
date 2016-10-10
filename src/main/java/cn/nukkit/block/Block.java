@@ -774,6 +774,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return this.boundingBox;
     }
 
+    public AxisAlignedBB getCollisionBoundingBox() {
+        return getBoundingBox();
+    }
+
     protected AxisAlignedBB recalculateBoundingBox() {
         return new AxisAlignedBB(
                 this.x,

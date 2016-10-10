@@ -109,7 +109,8 @@ public abstract class Entity extends Location implements Metadatable {
 
     protected EntityDamageEvent lastDamageCause = null;
 
-    private List<Block> blocksAround = new ArrayList<>();
+    protected List<Block> blocksAround = new ArrayList<>();
+    protected List<Block> blocksUnder = new ArrayList<>();
 
     public double lastX;
     public double lastY;
@@ -836,6 +837,9 @@ public abstract class Entity extends Location implements Metadatable {
 
         boolean hasUpdate = false;
 
+        if (!this.isPlayer) {
+            this.blocksAround = null;
+        }
         this.checkBlockCollision();
 
         if (this.y <= -16 && this.isAlive()) {
@@ -1296,7 +1300,7 @@ public abstract class Entity extends Location implements Metadatable {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
                         Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z));
-                        if (block.hasEntityCollision()) {
+                        if (block.hasEntityCollision() && block.getCollisionBoundingBox().intersectsWith(this.getBoundingBox())) {
                             this.blocksAround.add(block);
                         }
                     }
@@ -1305,6 +1309,33 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         return this.blocksAround;
+    }
+
+    public List<Block> getBlocksUnder() {
+        if (blocksUnder == null || blocksUnder.isEmpty()) {
+            blocksUnder = new ArrayList<>();
+
+            AxisAlignedBB bb = this.boundingBox.clone();
+            bb.maxY = bb.minY + 0.5;
+            bb.minY -= 1;
+
+            int minX = NukkitMath.floorDouble(bb.minX);
+            int minY = NukkitMath.floorDouble(bb.minY);
+            int minZ = NukkitMath.floorDouble(bb.minZ);
+            int maxX = NukkitMath.ceilDouble(bb.maxX);
+            int maxY = NukkitMath.ceilDouble(bb.maxY);
+            int maxZ = NukkitMath.ceilDouble(bb.maxZ);
+
+            for (int z = minZ; z <= maxZ; ++z) {
+                for (int x = minX; x <= maxX; ++x) {
+                    for (int y = minY; y <= maxY; ++y) {
+                        blocksUnder.add(this.level.getBlock(this.temporalVector.setComponents(x, y, z)));
+                    }
+                }
+            }
+        }
+
+        return new ArrayList<>(blocksUnder);
     }
 
     protected void checkBlockCollision() {
