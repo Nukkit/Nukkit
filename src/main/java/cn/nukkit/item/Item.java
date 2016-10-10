@@ -1687,6 +1687,14 @@ public class Item implements Cloneable {
     public void setCount(int count) {
         this.count = count;
     }
+    
+    public int sendCount() {
+        return count;
+    }
+
+    public void sendCount(int count) {
+        this.count = count;
+    }
 
     final public String getName() {
         return this.hasCustomName() ? this.getCustomName() : this.name;
@@ -1712,6 +1720,14 @@ public class Item implements Cloneable {
         return meta;
     }
 
+    public int sendId() { //send id of item to other inventory
+        return id;
+    }
+
+    public int sendDamage() { //send damage of item to other inventory
+        return meta;
+    }
+    
     public void setDamage(Integer meta) {
         if (meta != null) {
             this.meta = meta & 0xffff;
