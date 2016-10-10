@@ -1850,7 +1850,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         this.setRotation(movePlayerPacket.yaw, movePlayerPacket.pitch);
                         this.newPosition = newPos;
-                        this.newPosition = newPos;
                         this.forceMovement = null;
                     }
 
