@@ -6,6 +6,7 @@ import cn.nukkit.nbt.stream.NBTOutputStream;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
 
+import cn.nukkit.utils.BinaryStream;
 import java.io.*;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
@@ -107,7 +108,7 @@ public class NBTIO {
     }
 
     public static byte[] write(CompoundTag tag, ByteOrder endianness) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        BinaryStream baos = new BinaryStream();
         try (NBTOutputStream stream = new NBTOutputStream(baos, endianness)) {
             Tag.writeNamedTag(tag, stream);
             return baos.toByteArray();
@@ -119,7 +120,7 @@ public class NBTIO {
     }
 
     public static byte[] write(Collection<CompoundTag> tags, ByteOrder endianness) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        BinaryStream baos = new BinaryStream();
         try (NBTOutputStream stream = new NBTOutputStream(baos, endianness)) {
             for (CompoundTag tag : tags) {
                 Tag.writeNamedTag(tag, stream);
@@ -151,7 +152,7 @@ public class NBTIO {
     }
 
     public static byte[] writeGZIPCompressed(CompoundTag tag, ByteOrder endianness) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        BinaryStream baos = new BinaryStream();
         writeGZIPCompressed(tag, baos, endianness);
         return baos.toByteArray();
     }

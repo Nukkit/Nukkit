@@ -2,6 +2,8 @@ package cn.nukkit.utils;
 
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.item.Item;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -11,12 +13,12 @@ import java.util.UUID;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class BinaryStream {
+public class BinaryStream extends OutputStream{
     public static final int DEFAULT_BLOCK_SIZE = 1024;
 
     public int offset;
     private byte[] buffer;
-    private ArrayDeque<byte[]> buffers = new ArrayDeque<>();
+    private final ArrayDeque<byte[]> buffers = new ArrayDeque<>();
     private final byte[] shortBuffer = new byte[2];
     private final byte[] intBuffer = new byte[4];
     private final byte[] longBuffer = new byte[8];
@@ -27,6 +29,11 @@ public class BinaryStream {
     public BinaryStream() {
         this.buffer = new byte[35];
     }
+
+    public BinaryStream(int buffer) {
+        this(new byte[buffer]);
+    }
+
 
     public BinaryStream(byte[] buffer) {
         this(buffer, 0);
@@ -41,7 +48,7 @@ public class BinaryStream {
         setBuffer(new byte[35]);
     }
 
-    public void setBuffer(byte[] buffer) {
+    public final void setBuffer(byte[] buffer) {
         if (!buffers.isEmpty()) {
             buffers.clear();
         }
@@ -50,27 +57,27 @@ public class BinaryStream {
         this.buffer = buffer;
     }
 
-    public void setBuffer(byte[] buffer, int offset) {
+    public final void setBuffer(byte[] buffer, int offset) {
         this.setBuffer(buffer);
         this.setOffset(offset);
     }
 
-    private void addBuffer() {
+    private final void addBuffer() {
         buffers.addLast(buffer);
         count += buffer.length;
         buffer = new byte[DEFAULT_BLOCK_SIZE];
         offset = 0;
     }
 
-    public int getOffset() {
+    public final int getOffset() {
         return offset;
     }
 
-    public void setOffset(int offset) {
+    public final void setOffset(int offset) {
         this.offset = offset;
     }
 
-    public byte[][] getBuffers() {
+    public final byte[][] getBuffers() {
         if (offset > 0) {
             byte[] buf2 = new byte[offset];
             System.arraycopy(buffer, 0, buf2, 0, offset);
@@ -84,6 +91,10 @@ public class BinaryStream {
             res[i++] = bytes;
         }
         return res;
+    }
+
+    public final byte[] toByteArray() {
+        return getBuffer();
     }
 
     public byte[] getBuffer() {
@@ -111,15 +122,15 @@ public class BinaryStream {
         return this.buffer;
     }
 
-    public int getCount() {
+    public final int getCount() {
         return count + offset;
     }
 
-    public byte[] get() {
+    public final byte[] get() {
         return this.get(this.buffer.length - this.offset);
     }
 
-    public byte[] get(int len) {
+    public final byte[] get(int len) {
         if (len < 0) {
             this.offset = this.buffer.length - 1;
             return new byte[0];
@@ -129,7 +140,7 @@ public class BinaryStream {
         return Arrays.copyOfRange(this.buffer, this.offset - len, this.offset);
     }
 
-    public byte[] get(int len, byte[] useBuffer) {
+    public final byte[] get(int len, byte[] useBuffer) {
         if (len < 0) {
             this.offset = this.buffer.length - 1;
             return new byte[0];
@@ -140,7 +151,7 @@ public class BinaryStream {
         return useBuffer;
     }
 
-    public void put(byte[] b) {
+    public final void put(byte[] b) {
         if (b.length > buffer.length) {
             if (offset > 0) {
                 byte[] buf2 = new byte[offset];
@@ -155,7 +166,22 @@ public class BinaryStream {
         }
     }
 
-    public void put(int datum) {
+    @Override
+    public final void write(int b) {
+        put(b);
+    }
+
+    @Override
+    public final void write(byte[] b) throws IOException {
+        put(b);
+    }
+
+    @Override
+    public final void write(byte[] b, int off, int len) throws IOException {
+        put(b, off, len);
+    }
+
+    public final void put(int datum) {
         if (offset == buffer.length) {
             addBuffer();
         }
@@ -163,7 +189,7 @@ public class BinaryStream {
         buffer[offset++] = (byte) datum;
     }
 
-    public void put(byte[] data, int offset, int length) {
+    public final void put(byte[] data, int offset, int length) {
         if ((offset < 0) || ((offset + length) > data.length) || (length < 0)) {
             throw new IndexOutOfBoundsException();
         } else {
@@ -188,127 +214,127 @@ public class BinaryStream {
         }
     }
 
-    public long getLong() {
+    public final long getLong() {
         return Binary.readLong(this.get(8, longBuffer));
     }
 
-    public void putLong(long l) {
+    public final void putLong(long l) {
         this.put(Binary.writeLong(l));
     }
 
-    public int getInt() {
+    public final int getInt() {
         return Binary.readInt(this.get(4, intBuffer));
     }
 
-    public void putInt(int i) {
+    public final void putInt(int i) {
         this.put(Binary.writeInt(i));
     }
 
-    public long getLLong() {
+    public final long getLLong() {
         return Binary.readLLong(this.get(8, longBuffer));
     }
 
-    public void putLLong(long l) {
+    public final void putLLong(long l) {
         this.put(Binary.writeLLong(l));
     }
 
-    public int getLInt() {
+    public final int getLInt() {
         return Binary.readLInt(this.get(4, intBuffer));
     }
 
-    public void putLInt(int i) {
+    public final void putLInt(int i) {
         this.put(Binary.writeLInt(i));
     }
 
-    public int getShort() {
+    public final int getShort() {
         return Binary.readShort(this.get(2, shortBuffer));
     }
 
-    public void putShort(int s) {
+    public final void putShort(int s) {
         this.put(Binary.writeShort(s));
     }
 
-    public short getSignedShort() {
+    public final short getSignedShort() {
         return Binary.readSignedShort(this.get(2, shortBuffer));
     }
 
-    public void putSignedShort(short s) {
+    public final void putSignedShort(short s) {
         this.put(Binary.writeShort(s));
     }
 
-    public int getLShort() {
+    public final int getLShort() {
         return Binary.readLShort(this.get(2, shortBuffer));
     }
 
-    public void putLShort(int s) {
+    public final void putLShort(int s) {
         this.put(Binary.writeLShort(s));
     }
 
-    public short getSignedLShort() {
+    public final short getSignedLShort() {
         return Binary.readSignedLShort(this.get(2, shortBuffer));
     }
 
-    public void putSignedLShort(short s) {
+    public final void putSignedLShort(short s) {
         this.put(Binary.writeLShort(s));
     }
 
-    public float getFloat() {
+    public final float getFloat() {
         return Binary.readFloat(this.get(4, intBuffer));
     }
 
-    public void putFloat(float v) {
+    public final void putFloat(float v) {
         this.put(Binary.writeFloat(v));
     }
 
-    public float getLFloat() {
+    public final float getLFloat() {
         return Binary.readLFloat(this.get(4, intBuffer));
     }
 
-    public void putLFloat(float v) {
+    public final void putLFloat(float v) {
         this.put(Binary.writeLFloat(v));
     }
 
-    public int getTriad() {
+    public final int getTriad() {
         return Binary.readTriad(this.get(3));
     }
 
-    public void putTriad(int triad) {
+    public final void putTriad(int triad) {
         this.put(Binary.writeTriad(triad));
     }
 
-    public int getLTriad() {
+    public final int getLTriad() {
         return Binary.readLTriad(this.get(3));
     }
 
-    public void putLTriad(int triad) {
+    public final void putLTriad(int triad) {
         this.put(Binary.writeLTriad(triad));
     }
 
-    public byte getSignedByte() {
+    public final byte getSignedByte() {
         return this.buffer[this.offset++];
     }
 
-    public boolean getBoolean() {
+    public final boolean getBoolean() {
         return this.getByte() == 0x01;
     }
 
-    public void putBoolean(boolean bool) {
+    public final void putBoolean(boolean bool) {
         this.putByte((byte) (bool ? 1 : 0));
     }
 
-    public int getByte() {
+    public final int getByte() {
         return this.buffer[this.offset++] & 0xff;
     }
 
-    public void putByte(byte b) {
+    public final void putByte(byte b) {
         this.put(new byte[]{b});
     }
 
-    public byte[][] getDataArray() {
+    public final byte[][] getDataArray() {
         return this.getDataArray(10);
     }
 
-    public byte[][] getDataArray(int len) {
+    public final byte[][] getDataArray(int len) {
         byte[][] data = new byte[len][];
         for (int i = 0; i < len && !this.feof(); ++i) {
             data[i] = this.get(this.getTriad());
@@ -316,22 +342,22 @@ public class BinaryStream {
         return data;
     }
 
-    public void putDataArray(byte[][] data) {
+    public final void putDataArray(byte[][] data) {
         for (byte[] v : data) {
             this.putTriad(v.length);
             this.put(v);
         }
     }
 
-    public void putUUID(UUID uuid) {
+    public final void putUUID(UUID uuid) {
         this.put(Binary.writeUUID(uuid));
     }
 
-    public UUID getUUID() {
+    public final UUID getUUID() {
         return Binary.readUUID(this.get(16));
     }
 
-    public void putSkin(Skin skin) {
+    public final void putSkin(Skin skin) {
         this.putString(skin.getModel());
         this.putShort(skin.getData().length);
         this.put(skin.getData());
@@ -343,7 +369,7 @@ public class BinaryStream {
         return new Skin(skinData, modelId);
     }
 
-    public Item getSlot() {
+    public final Item getSlot() {
         short id = this.getSignedShort();
 
         if (id <= 0) {
@@ -365,7 +391,7 @@ public class BinaryStream {
         );
     }
 
-    public void putSlot(Item item) {
+    public final void putSlot(Item item) {
         if (item == null || item.getId() == 0) {
             this.putShort(0);
             return;
@@ -380,26 +406,17 @@ public class BinaryStream {
         this.put(nbt);
     }
 
-    public String getString() {
+    public final String getString() {
         return new String(this.get(this.getShort()), StandardCharsets.UTF_8);
     }
 
-    public void putString(String string) {
+    public final void putString(String string) {
         byte[] b = string.getBytes(StandardCharsets.UTF_8);
         this.putShort(b.length);
         this.put(b);
     }
 
-    public boolean feof() {
+    public final boolean feof() {
         return this.offset < 0 || this.offset >= this.buffer.length;
-    }
-
-    private static int hugeCapacity(int minCapacity) {
-        if (minCapacity < 0) { // overflow
-            throw new OutOfMemoryError();
-        }
-        return (minCapacity > MAX_ARRAY_SIZE) ?
-                Integer.MAX_VALUE :
-                MAX_ARRAY_SIZE;
     }
 }

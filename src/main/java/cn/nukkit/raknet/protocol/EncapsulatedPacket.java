@@ -1,8 +1,7 @@
 package cn.nukkit.raknet.protocol;
 
 import cn.nukkit.utils.Binary;
-
-import java.io.ByteArrayOutputStream;
+import cn.nukkit.utils.BinaryStream;
 import java.io.IOException;
 
 /**
@@ -90,7 +89,7 @@ public class EncapsulatedPacket implements Cloneable {
     }
 
     public byte[] toBinary(boolean internal) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        BinaryStream stream = new BinaryStream();
         try {
             stream.write((reliability << 5) | (hasSplit ? 0b00010000 : 0));
             if (internal) {

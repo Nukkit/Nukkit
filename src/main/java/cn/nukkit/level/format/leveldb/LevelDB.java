@@ -129,7 +129,7 @@ public class LevelDB implements LevelProvider {
                 .putLong("worldStartCount", ((long) Integer.MAX_VALUE) & 0xffffffffL);
 
         byte[] data = NBTIO.write(levelData, ByteOrder.LITTLE_ENDIAN);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        BinaryStream outputStream = new BinaryStream();
         outputStream.write(Binary.writeLInt(3));
         outputStream.write(Binary.writeLInt(data.length));
         outputStream.write(data);
@@ -144,7 +144,7 @@ public class LevelDB implements LevelProvider {
     public void saveLevelData() {
         try {
             byte[] data = NBTIO.write(levelData, ByteOrder.LITTLE_ENDIAN);
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            BinaryStream outputStream = new BinaryStream();
             outputStream.write(Binary.writeLInt(3));
             outputStream.write(Binary.writeLInt(data.length));
             outputStream.write(data);

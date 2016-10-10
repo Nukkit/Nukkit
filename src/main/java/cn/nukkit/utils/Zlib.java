@@ -1,7 +1,6 @@
 package cn.nukkit.utils;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.Deflater;
@@ -19,7 +18,7 @@ public abstract class Zlib {
         deflater.reset();
         deflater.setInput(data);
         deflater.finish();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
+        BinaryStream bos = new BinaryStream(data.length);
         byte[] buf = new byte[1024];
         try {
             while (!deflater.finished()) {
@@ -34,7 +33,7 @@ public abstract class Zlib {
 
     public static byte[] inflate(InputStream stream) throws IOException {
         InflaterInputStream inputStream = new InflaterInputStream(stream);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        BinaryStream outputStream = new BinaryStream();
         byte[] buffer = new byte[1024];
         int length;
 

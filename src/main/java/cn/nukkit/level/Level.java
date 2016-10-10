@@ -48,7 +48,7 @@ import cn.nukkit.timings.LevelTimings;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.timings.TimingsHistory;
 import cn.nukkit.utils.*;
-import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -101,7 +101,7 @@ public class Level implements ChunkManager, Metadatable {
     public final Map<Long, BlockEntity> updateBlockEntities = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     // Use a weak map to avoid OOM
-    private final Map<Long, DataPacket> chunkCache = new WeakHashMap<>();
+    private final Map<Long, WeakReference<DataPacket>> chunkCache = new ConcurrentHashMap<>();
 
     private final boolean cacheChunks;
 
@@ -134,7 +134,7 @@ public class Level implements ChunkManager, Metadatable {
     private BaseFullChunk lastChunk;
 
     // Avoid OOM, gc'd references result in whole chunk being sent (possibly higher cpu)
-    private Map<Long, SoftReference<Map<Short, Object>>> changedBlocks = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private Map<Long, WeakReference<Map<Short, Object>>> changedBlocks = new ConcurrentHashMap<>(8, 0.9f, 1);
     // Storing the vector is redundant
     private final Object present = new Object();
     // Storing extra blocks past 512 is redundant
@@ -774,9 +774,9 @@ public class Level implements ChunkManager, Metadatable {
             pool.submit((Runnable) () -> {
                 int size = changedBlocks.size();
                 if (size != 0) {
-                    Iterator<Map.Entry<Long, SoftReference<Map<Short, Object>>>> iter = changedBlocks.entrySet().iterator();
+                    Iterator<Map.Entry<Long, WeakReference<Map<Short, Object>>>> iter = changedBlocks.entrySet().iterator();
                     while (iter.hasNext() && size-- > 0) {
-                        Map.Entry<Long, SoftReference<Map<Short, Object>>> entry = iter.next();
+                        Map.Entry<Long, WeakReference<Map<Short, Object>>> entry = iter.next();
                         iter.remove();
                         long index = entry.getKey();
                         Map<Short, Object> blocks = entry.getValue().get();
@@ -1630,15 +1630,15 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private void addBlockChange(long index, int x, int y, int z) {
-        SoftReference<Map<Short, Object>> current = changedBlocks.get(index);
+        WeakReference<Map<Short, Object>> current = changedBlocks.get(index);
         if (current == null) {
-            current = new SoftReference(new ConcurrentHashMap<>(8, 0.9f, 1));
+            current = new WeakReference(new ConcurrentHashMap<>(8, 0.9f, 1));
             this.changedBlocks.put(index, current);
         }
         Map<Short, Object> currentMap = current.get();
         if (currentMap != changeBlocksFullMap && currentMap != null) {
             if (currentMap.size() > MAX_BLOCK_CACHE) {
-                this.changedBlocks.put(index, new SoftReference(changeBlocksFullMap));
+                this.changedBlocks.put(index, new WeakReference(changeBlocksFullMap));
             } else {
                 currentMap.put(Level.localBlockHash(x, y, z), present);
             }
@@ -2353,7 +2353,11 @@ public class Level implements ChunkManager, Metadatable {
         if (this.chunkSendTasks.containsKey(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
-                    player.sendChunk(x, z, this.chunkCache.get(index));
+                    WeakReference<DataPacket> chunk = this.chunkCache.get(index);
+                    DataPacket packet = chunk.get();
+                    if (packet != null) {
+                        player.sendChunk(x, z, packet);
+                    }
                 }
             }
 
@@ -2372,7 +2376,8 @@ public class Level implements ChunkManager, Metadatable {
                 int x = getHashX(index);
                 int z = getHashZ(index);
                 this.chunkSendTasks.put(index, true);
-                if (this.chunkCache.containsKey(index)) {
+                WeakReference<DataPacket> chunk = this.chunkCache.get(index);
+                if (chunk != null && chunk.get() != null) {
                     this.sendChunkFromCache(x, z);
                     continue;
                 }
@@ -2395,11 +2400,14 @@ public class Level implements ChunkManager, Metadatable {
         this.timings.syncChunkSendTimer.startTiming();
         Long index = Level.chunkHash(x, z);
 
-        if (this.cacheChunks && !this.chunkCache.containsKey(index)) {
-            this.chunkCache.put(index, Player.getChunkCacheFromData(x, z, payload, ordering));
-            this.sendChunkFromCache(x, z);
-            this.timings.syncChunkSendTimer.stopTiming();
-            return;
+        if (this.cacheChunks) {
+            WeakReference<DataPacket> chunk = chunkCache.get(index);
+            if (chunk == null || chunk.get() == null) {
+                this.chunkCache.put(index, new WeakReference<DataPacket>(Player.getChunkCacheFromData(x, z, payload, ordering)));
+                this.sendChunkFromCache(x, z);
+                this.timings.syncChunkSendTimer.stopTiming();
+                return;
+            }
         }
 
         if (this.chunkSendTasks.containsKey(index)) {
