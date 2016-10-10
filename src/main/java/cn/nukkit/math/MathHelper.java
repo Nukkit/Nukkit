@@ -4,8 +4,6 @@ import java.util.Random;
 
 public class MathHelper {private static float[] a = new float[65536];
 
-    private static final Random random = new Random();
-
     public static float sqrt(float paramFloat) {
         return (float) Math.sqrt(paramFloat);
     }
@@ -37,11 +35,15 @@ public class MathHelper {private static float[] a = new float[65536];
         }
     }
 
-    public static boolean rand(){
-        return random.nextBoolean();
-    }
-
-    public static int rand(int min, int max) {
+    /**
+     * Returns a random number between min and max, inclusive.
+     *
+     * @param random The random number generator.
+     * @param min    The minimum value.
+     * @param max    The maximum value.
+     * @return A random number between min and max, inclusive.
+     */
+    public static int getRandomNumberInRange(Random random, int min, int max) {
         return min + random.nextInt(max - min + 1);
     }
 
@@ -70,20 +72,6 @@ public class MathHelper {private static float[] a = new float[65536];
 
     public static int clamp(int check, int min, int max) {
         return check > max ? max : (check < min ? min : check);
-    }
-
-    public static double getAirthmeticMean(double[] numbers) {
-        if (numbers.length == 0) {
-            return 0;
-        }
-
-        double count = 0;
-
-        for (double i : numbers) {
-            count += i;
-        }
-
-        return count / numbers.length;
     }
 
     private MathHelper() {

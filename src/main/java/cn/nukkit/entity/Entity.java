@@ -8,13 +8,17 @@ import cn.nukkit.block.BlockFire;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.event.entity.*;
+import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.math.*;
+import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.NukkitMath;
+import cn.nukkit.math.Vector2;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -950,10 +954,6 @@ public abstract class Entity extends Location implements Metadatable {
         return hasUpdate;
     }
 
-    public boolean onActivate(Item item, Player player) {
-        return false;
-    }
-
     public final void scheduleUpdate() {
         this.level.updateEntities.put(this.id, this);
     }
@@ -1024,10 +1024,18 @@ public abstract class Entity extends Location implements Metadatable {
             this.attack(ev);
         }
 
-        if (fallDistance > 1) {
+        if (fallDistance > 0.75) {
             Block down = this.level.getBlock(this.temporalVector.setComponents(getFloorX(), getFloorY() - 1, getFloorZ()));
 
             if (down.getId() == Item.FARMLAND) {
+                if (this instanceof Player) {
+                    Player p = (Player) this;
+                    PlayerInteractEvent ev = new PlayerInteractEvent(p, p.getInventory().getItemInHand(), this.temporalVector.setComponents(down.x, down.y, down.z), PlayerInteractEvent.PHYSICAL);
+                    this.server.getPluginManager().callEvent(ev);
+                    if (ev.isCancelled()) {
+                        return;
+                    }
+                }
                 this.level.setBlock(this.temporalVector.setComponents(down.x, down.y, down.z), new BlockDirt(), true, true);
             }
         }
@@ -1314,23 +1322,6 @@ public abstract class Entity extends Location implements Metadatable {
             this.motionY += vector.y * d;
             this.motionZ += vector.z * d;
         }
-    }
-
-    protected void checkEntityCollision() {
-        /*ArrayList<Double> x = new ArrayList<>();
-        ArrayList<Double> z = new ArrayList<>();
-
-        for (Entity entity : this.level.getCollidingEntities(this.getBoundingBox(), this)) {
-            x.add(entity.x - this.x);
-            z.add(entity.z - this.z);
-        }
-
-        if (x.size() == 0 && z.size() == 0) {
-            return;
-        }
-
-        this.motionX += MathHelper.getAirthmeticMean(x.stream().mapToDouble(i -> i).toArray());
-        this.motionZ += MathHelper.getAirthmeticMean(z.stream().mapToDouble(i -> i).toArray());*/
     }
 
     public boolean setPositionAndRotation(Vector3 pos, double yaw, double pitch) {

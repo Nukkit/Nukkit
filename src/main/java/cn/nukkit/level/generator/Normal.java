@@ -31,8 +31,8 @@ public class Normal extends Generator {
     private Random random;
     private NukkitRandom nukkitRandom;
 
-    private long worldLong1;
-    private long worldLong2;
+    private long localSeed1;
+    private long localSeed2;
 
     private final List<Populator> generationPopulators = new ArrayList<>();
 
@@ -102,8 +102,8 @@ public class Normal extends Generator {
         this.nukkitRandom = random;
         this.random = new Random();
         this.nukkitRandom.setSeed(this.level.getSeed());
-        this.worldLong1 = this.random.nextLong();
-        this.worldLong2 = this.random.nextLong();
+        this.localSeed1 = this.random.nextLong();
+        this.localSeed2 = this.random.nextLong();
         this.noiseSeaFloor = new Simplex(this.nukkitRandom, 1F, 1F / 8F, 1F / 64F);
         this.noiseLand = new Simplex(this.nukkitRandom, 2F, 1F / 8F, 1F / 512F);
         this.noiseMountains = new Simplex(this.nukkitRandom, 4F, 1F, 1F / 500F);
@@ -157,7 +157,7 @@ public class Normal extends Generator {
 
     @Override
     public void generateChunk(int chunkX, int chunkZ) {
-        this.nukkitRandom.setSeed(chunkX * worldLong1 ^ chunkZ * worldLong2 ^ this.level.getSeed());
+        this.nukkitRandom.setSeed(chunkX * localSeed1 ^ chunkZ * localSeed2 ^ this.level.getSeed());
 
         double[][] seaFloorNoise = Generator.getFastNoise2D(this.noiseSeaFloor, 16, 16, 4, chunkX * 16, 0, chunkZ * 16);
         double[][] landNoise = Generator.getFastNoise2D(this.noiseLand, 16, 16, 4, chunkX * 16, 0, chunkZ * 16);

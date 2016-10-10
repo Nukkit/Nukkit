@@ -10,7 +10,7 @@ import cn.nukkit.level.generator.populator.PopulatorDeadBush;
  * author: MagicDroidX
  * Nukkit Project
  */
-public abstract class SandyBiome extends NormalBiome {
+public abstract class SandyBiome extends NormalBiome implements CaveBiome{
     public SandyBiome() {
 
         PopulatorCactus cactus = new PopulatorCactus();
@@ -29,9 +29,20 @@ public abstract class SandyBiome extends NormalBiome {
                 new BlockSandstone(),
                 new BlockSandstone()
         });
+    }
 
-        this.surfaceBlock = Block.SAND;
-        this.groundBlock = Block.SAND;
-        this.stoneBlock = Block.SANDSTONE;
+    @Override
+    public int getSurfaceBlock() {
+        return Block.SAND;
+    }
+
+    @Override
+    public int getGroundBlock() {
+        return Block.SAND;
+    }
+
+    @Override
+    public int getStoneBlock() {
+        return Block.SANDSTONE;
     }
 }
