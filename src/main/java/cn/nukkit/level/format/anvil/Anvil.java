@@ -28,9 +28,9 @@ import java.util.regex.Pattern;
  */
 public class Anvil extends BaseLevelProvider {
 
-    protected final Map<String, RegionLoader> regions = new HashMap<>();
+    protected final Map<Long, RegionLoader> regions = new HashMap<>();
 
-    protected Map<String, Chunk> chunks = new HashMap<>();
+    protected Map<Long, Chunk> chunks = new HashMap<>();
 
     public Anvil(Level level, String path) throws IOException {
         super(level, path);
@@ -135,11 +135,17 @@ public class Anvil extends BaseLevelProvider {
             }
         }
 
-        BinaryStream extraData = new BinaryStream();
-        extraData.putLInt(chunk.getBlockExtraDataArray().size());
-        for (Integer key : chunk.getBlockExtraDataArray().values()) {
-            extraData.putLInt(key);
-            extraData.putLShort(chunk.getBlockExtraDataArray().get(key));
+        Map<Integer, Integer> extra = chunk.getBlockExtraDataArray();
+        BinaryStream extraData;
+        if (!extra.isEmpty()) {
+            extraData = new BinaryStream();
+            extraData.putLInt(extra.size());
+            for (Map.Entry<Integer, Integer> entry : extra.entrySet()) {
+                extraData.putLInt(entry.getKey());
+                extraData.putLShort(entry.getValue());
+            }
+        } else {
+            extraData = null;
         }
 
         BinaryStream stream = new BinaryStream();
@@ -153,7 +159,11 @@ public class Anvil extends BaseLevelProvider {
         for (int color : chunk.getBiomeColorArray()) {
             stream.put(Binary.writeInt(color));
         }
-        stream.put(extraData.getBuffer());
+        if (extraData != null) {
+            stream.put(extraData.getBuffer());
+        } else {
+            stream.putLInt(0);
+        }
         stream.put(blockEntities);
 
         this.getLevel().chunkRequestCallback(x, z, stream.getBuffer(), FullChunkDataPacket.ORDER_LAYERED);
@@ -184,7 +194,7 @@ public class Anvil extends BaseLevelProvider {
     }
 
     @Override
-    public Map<String, Chunk> getLoadedChunks() {
+    public Map<Long, Chunk> getLoadedChunks() {
         return this.chunks;
     }
 
@@ -202,10 +212,10 @@ public class Anvil extends BaseLevelProvider {
 
     @Override
     public void doGarbageCollection() {
-        int limit = (int) (System.currentTimeMillis() - 300);
-        for (Map.Entry entry : this.regions.entrySet()) {
-            String index = (String) entry.getKey();
-            RegionLoader region = (RegionLoader) entry.getValue();
+        int limit = (int) (System.currentTimeMillis() - 50);
+        for (Map.Entry<Long, RegionLoader> entry : this.regions.entrySet()) {
+            long index = entry.getKey();
+            RegionLoader region = entry.getValue();
             if (region.lastUsed <= limit) {
                 try {
                     region.close();
@@ -224,7 +234,7 @@ public class Anvil extends BaseLevelProvider {
 
     @Override
     public boolean loadChunk(int chunkX, int chunkZ, boolean create) {
-        String index = Level.chunkHash(chunkX, chunkZ);
+        long index = Level.chunkHash(chunkX, chunkZ);
         if (this.chunks.containsKey(index)) {
             return true;
         }
@@ -258,7 +268,7 @@ public class Anvil extends BaseLevelProvider {
 
     @Override
     public boolean unloadChunk(int X, int Z, boolean safe) {
-        String index = Level.chunkHash(X, Z);
+        long index = Level.chunkHash(X, Z);
         Chunk chunk = this.chunks.containsKey(index) ? this.chunks.get(index) : null;
         if (chunk != null && chunk.unload(false, safe)) {
             this.chunks.remove(index);
@@ -279,7 +289,7 @@ public class Anvil extends BaseLevelProvider {
     }
 
     protected RegionLoader getRegion(int x, int z) {
-        String index = Level.chunkHash(x, z);
+        long index = Level.chunkHash(x, z);
         return this.regions.containsKey(index) ? this.regions.get(index) : null;
     }
 
@@ -290,7 +300,7 @@ public class Anvil extends BaseLevelProvider {
 
     @Override
     public Chunk getChunk(int chunkX, int chunkZ, boolean create) {
-        String index = Level.chunkHash(chunkX, chunkZ);
+        long index = Level.chunkHash(chunkX, chunkZ);
         if (this.chunks.containsKey(index)) {
             return this.chunks.get(index);
         } else {
@@ -311,7 +321,7 @@ public class Anvil extends BaseLevelProvider {
 
         chunk.setX(chunkX);
         chunk.setZ(chunkZ);
-        String index = Level.chunkHash(chunkX, chunkZ);
+        long index = Level.chunkHash(chunkX, chunkZ);
         this.chunks.put(index, (Chunk) chunk);
     }
 
@@ -340,7 +350,7 @@ public class Anvil extends BaseLevelProvider {
     }
 
     protected void loadRegion(int x, int z) {
-        String index = Level.chunkHash(x, z);
+        long index = Level.chunkHash(x, z);
         if (!this.regions.containsKey(index)) {
             try {
                 this.regions.put(index, new RegionLoader(this, x, z));
@@ -353,7 +363,7 @@ public class Anvil extends BaseLevelProvider {
     @Override
     public void close() {
         this.unloadChunks();
-        for (String index : new ArrayList<>(this.regions.keySet())) {
+        for (long index : new ArrayList<>(this.regions.keySet())) {
             RegionLoader region = this.regions.get(index);
             try {
                 region.close();

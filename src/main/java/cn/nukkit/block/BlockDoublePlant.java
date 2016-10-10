@@ -6,8 +6,6 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.BlockColor;
 
-import java.util.Vector;
-
 /**
  * Created on 2015/11/23 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
@@ -49,13 +47,13 @@ public class BlockDoublePlant extends BlockFlowable {
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if ((this.meta & 0x08) == 8) {
-                //top
+                // Top
                 if (!(this.getSide(0).getId() == DOUBLE_PLANT)) {
-                    this.getLevel().useBreakOn(this);
+                    this.getLevel().setBlock(this, new BlockAir(), true, true);
                     return Level.BLOCK_UPDATE_NORMAL;
                 }
             } else {
-                //botom
+                // Bottom
                 if (this.getSide(0).isTransparent() || !(this.getSide(1).getId() == DOUBLE_PLANT)) {
                     this.getLevel().useBreakOn(this);
                     return Level.BLOCK_UPDATE_NORMAL;
@@ -71,8 +69,8 @@ public class BlockDoublePlant extends BlockFlowable {
         Block up = getSide(Vector3.SIDE_UP);
 
         if (up.getId() == 0 && (down.getId() == GRASS || down.getId() == DIRT)) {
-            this.getLevel().setBlock(block, this, true);
-            this.getLevel().setBlock(up, new BlockDoublePlant(meta ^ 0x08), true);
+            this.getLevel().setBlock(block, this, true, false); // If we update the bottom half, it will drop the item because there isn't a flower block above
+            this.getLevel().setBlock(up, new BlockDoublePlant(meta ^ 0x08), true, true);
             return true;
         }
 
@@ -82,20 +80,11 @@ public class BlockDoublePlant extends BlockFlowable {
     @Override
     public boolean onBreak(Item item) {
         Block down = getSide(Vector3.SIDE_DOWN);
-        Block up = getSide(Vector3.SIDE_UP);
 
-        if ((this.meta & 0x08) == 0x08) { // top part
-            if (up.getId() == this.getId() && up.meta != 0x08) {
-                this.getLevel().setBlock(up, new BlockAir(), true, true);
-            } else if (down.getId() == this.getId() && down.meta != 0x08) {
-                this.getLevel().setBlock(down, new BlockAir(), true, true);
-            }
-        } else { // Bottom Part
-            if (up.getId() == this.getId() && (up.meta & 0x08) == 0x08) {
-                this.getLevel().setBlock(up, new BlockAir(), true, true);
-            } else if (down.getId() == this.getId() && (down.meta & 0x08) == 0x08) {
-                this.getLevel().setBlock(down, new BlockAir(), true, true);
-            }
+        if ((this.meta & 0x08) == 0x08) { // Top half
+            this.getLevel().useBreakOn(down);
+        } else {
+            this.getLevel().setBlock(this, new BlockAir(), true, true);
         }
 
         return true;

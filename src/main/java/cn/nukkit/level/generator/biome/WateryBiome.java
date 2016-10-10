@@ -7,7 +7,7 @@ import cn.nukkit.block.BlockDirt;
  * author: Angelic47
  * Nukkit Project
  */
-public abstract class WateryBiome extends NormalBiome {
+public abstract class WateryBiome extends NormalBiome implements CaveBiome {
     public WateryBiome() {
         this.setGroundCover(new Block[]{
                 new BlockDirt(),
@@ -16,5 +16,20 @@ public abstract class WateryBiome extends NormalBiome {
                 new BlockDirt(),
                 new BlockDirt()
         });
+    }
+
+    @Override
+    public int getSurfaceBlock() {
+        return Block.DIRT;
+    }
+
+    @Override
+    public int getGroundBlock() {
+        return Block.DIRT;
+    }
+
+    @Override
+    public int getStoneBlock() {
+        return Block.STONE;
     }
 }

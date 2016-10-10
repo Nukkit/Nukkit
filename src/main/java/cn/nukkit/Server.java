@@ -148,6 +148,7 @@ public class Server {
     private int autoTickRateLimit = 20;
     private boolean alwaysTickPlayers = false;
     private int baseTickRate = 1;
+    private Boolean getAllowFlight = null;
 
     private int autoSaveTicker = 0;
     private int autoSaveTicks = 6000;
@@ -779,18 +780,24 @@ public class Server {
 
     public void tickProcessor() {
         this.nextTick = System.currentTimeMillis();
-        while (this.isRunning) {
-            try {
-                this.tick();
-            } catch (RuntimeException e) {
-                this.getLogger().logException(e);
-            }
+        try {
+            while (this.isRunning) {
+                try {
+                    this.tick();
+                } catch (RuntimeException e) {
+                    this.getLogger().logException(e);
+                }
 
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                Server.getInstance().getLogger().logException(e);
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    Server.getInstance().getLogger().logException(e);
+                }
             }
+        } catch (Throwable e) {
+            this.logger.emergency("Exception happened while ticking server");
+            this.logger.alert(Utils.getExceptionMessage(e));
+            this.logger.alert(Utils.getAllThreadDumps());
         }
     }
 
@@ -1028,13 +1035,9 @@ public class Server {
         if (this.tickCounter % 100 == 0) {
             for (Level level : this.levels.values()) {
                 level.clearCache();
-            }
-
-            if (this.getTicksPerSecondAverage() < 12) {
-                this.logger.warning(this.getLanguage().translateString("nukkit.server.tickOverload"));
+                level.doChunkGarbageCollection();
             }
         }
-
 
         Timings.fullServerTickTimer.stopTiming();
         //long now = System.currentTimeMillis();
@@ -1258,7 +1261,10 @@ public class Server {
     }
 
     public boolean getAllowFlight() {
-        return this.getPropertyBoolean("allow-flight", false);
+        if (getAllowFlight == null) {
+            getAllowFlight = this.getPropertyBoolean("allow-flight", false);
+        }
+        return getAllowFlight;
     }
 
     public boolean isHardcore() {
@@ -1357,7 +1363,7 @@ public class Server {
         String path = this.getDataPath() + "players/";
         File file = new File(path + name + ".dat");
 
-        if (file.exists()) {
+        if (this.shouldSavePlayerData() && file.exists()) {
             try {
                 return NBTIO.readCompressed(new FileInputStream(file));
             } catch (Exception e) {
@@ -1403,16 +1409,18 @@ public class Server {
     }
 
     public void saveOfflinePlayerData(String name, CompoundTag tag, boolean async) {
-        try {
-            if (async) {
-                this.getScheduler().scheduleAsyncTask(new FileWriteTask(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
-            } else {
-                Utils.writeFile(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", new ByteArrayInputStream(NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
-            }
-        } catch (Exception e) {
-            this.logger.critical(this.getLanguage().translateString("nukkit.data.saveError", new String[]{name, e.getMessage()}));
-            if (Nukkit.DEBUG > 1) {
-                this.logger.logException(e);
+        if (this.shouldSavePlayerData()) {
+            try {
+                if (async) {
+                    this.getScheduler().scheduleAsyncTask(new FileWriteTask(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
+                } else {
+                    Utils.writeFile(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", new ByteArrayInputStream(NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
+                }
+            } catch (Exception e) {
+                this.logger.critical(this.getLanguage().translateString("nukkit.data.saveError", new String[]{name, e.getMessage()}));
+                if (Nukkit.DEBUG > 1) {
+                    this.logger.logException(e);
+                }
             }
         }
     }
@@ -1850,6 +1858,10 @@ public class Server {
 
     }
 
+    public boolean shouldSavePlayerData() {
+        return this.getPropertyBoolean("player.save-player-data", true);
+    }
+    
     private void registerEntities() {
         Entity.registerEntity("Arrow", EntityArrow.class);
         Entity.registerEntity("Item", EntityItem.class);
