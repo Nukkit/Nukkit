@@ -1,6 +1,7 @@
 package cn.nukkit.level.format.mcregion;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.LevelProvider;
@@ -171,12 +172,16 @@ public class Chunk extends BaseFullChunk {
     @Override
     public int getFullBlock(int x, int y, int z) {
         int i = (x << 11) | (z << 7) | y;
-        int block = this.blocks[i] & 0xff;
-        int data = this.data[i >> 1] & 0xff;
-        if ((y & 1) == 0) {
-            return (block << 4) | (data & 0x0f);
+        int block = this.blocks[i] & 0xFF;
+        if (Block.mightHaveData(block)) {
+            int data = this.data[i >> 1] & 0xff;
+            if ((y & 1) == 0) {
+                return (block << 4) | (data & 0x0f);
+            } else {
+                return (block << 4) | (data >> 4);
+            }
         } else {
-            return (block << 4) | (data >> 4);
+            return block << 4;
         }
     }
 

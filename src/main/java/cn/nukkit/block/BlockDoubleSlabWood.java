@@ -8,7 +8,7 @@ import cn.nukkit.utils.BlockColor;
  * Created on 2015/12/2 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockDoubleSlabWood extends BlockSolid {
+public class BlockDoubleSlabWood extends BlockSolidMeta {
 
     public BlockDoubleSlabWood() {
         this(0);

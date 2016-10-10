@@ -9,13 +9,13 @@ import cn.nukkit.utils.BlockColor;
  * Created on 2015/12/8 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockPumpkin extends BlockSolid {
+public class BlockPumpkin extends BlockSolidMeta {
     public BlockPumpkin() {
         this(0);
     }
 
     public BlockPumpkin(int meta) {
-        super(0);
+        super(meta);
     }
 
     @Override

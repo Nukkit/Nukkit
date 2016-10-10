@@ -12,7 +12,7 @@ import cn.nukkit.utils.BlockColor;
  * Created on 2015/11/23 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockFenceGate extends BlockTransparent {
+public class BlockFenceGate extends BlockTransparentMeta {
 
     public BlockFenceGate() {
         this(0);

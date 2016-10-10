@@ -207,6 +207,7 @@ public class Server {
                 @Override
                 public void run() {
                     Block.init();
+                    Item.init();
                 }
             });
             this.executor.submit(new Runnable() {
@@ -220,13 +221,6 @@ public class Server {
                 @Override
                 public void run() {
                     registerEntities();
-                }
-            });
-
-            this.executor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    Item.init();
                 }
             });
 

@@ -1064,7 +1064,7 @@ public class Level implements ChunkManager, Metadatable {
                             if (this.randomTickBlocks.containsKey(blockId)) {
                                 Class<? extends Block> clazz = this.randomTickBlocks.get(blockId);
                                 try {
-                                    Block block = clazz.getConstructor(int.class).newInstance(section.getBlockData(x, y, z));
+                                    Block block = Block.get(blockId, section.getBlockData(x, y, z));
                                     block.x = chunkX * 16 + x;
                                     block.y = (Y << 4) + y;
                                     block.z = chunkZ * 16 + z;
@@ -1094,7 +1094,7 @@ public class Level implements ChunkManager, Metadatable {
 
                             Block block;
                             try {
-                                block = clazz.getConstructor(int.class).newInstance(chunk.getBlockData(x, y + (Y << 4), z));
+                                block = Block.get(blockId, chunk.getBlockData(x, y + (Y << 4), z));
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
@@ -2203,10 +2203,11 @@ public class Level implements ChunkManager, Metadatable {
         }
         Long index = Level.chunkHash(chunkX, chunkZ);
         lastChunk = tmp = chunks.get(index);
-        if (tmp == null && create && this.loadChunk(chunkX, chunkZ, create)) {
+        if (tmp == null && create && this.forceLoadChunk(index, chunkX, chunkZ, create)) {
             return lastChunk = this.chunks.get(index);
+        } else {
+            return tmp;
         }
-        return tmp;
     }
 
     public void generateChunkCallback(int x, int z, BaseFullChunk chunk) {
@@ -2487,15 +2488,16 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean loadChunk(int x, int z, boolean generate) {
-        Long index = Level.chunkHash(x, z);
+        long index = Level.chunkHash(x, z);
         if (this.chunks.containsKey(index)) {
             return true;
         }
+        return forceLoadChunk(index, x, z, generate);
+    }
 
+    private boolean forceLoadChunk(long index, int x, int z, boolean generate) {
         this.timings.syncChunkLoadTimer.startTiming();
-
         BaseFullChunk chunk = this.provider.getChunk(x, z, generate);
-
         if (chunk == null) {
             if (generate) {
                 throw new IllegalStateException("Could not create new Chunk");

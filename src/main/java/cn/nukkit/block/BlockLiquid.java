@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * author: MagicDroidX
  * Nukkit Project
  */
-public abstract class BlockLiquid extends BlockTransparent {
+public abstract class BlockLiquid extends BlockTransparentMeta {
 
     public int adjacentSources = 0;
     public final boolean[] isOptimalFlowDirection = {false, false, false, false};

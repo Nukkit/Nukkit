@@ -9,12 +9,8 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockGlowstone extends BlockTransparent {
     public BlockGlowstone() {
-        this(0);
     }
 
-    public BlockGlowstone(int meta) {
-        super(0);
-    }
 
     @Override
     public String getName() {

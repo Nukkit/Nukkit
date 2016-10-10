@@ -18,7 +18,6 @@ public class BlockFarmland extends BlockTransparent {
     }
 
     public BlockFarmland(int meta) {
-        super(meta);
     }
 
     @Override

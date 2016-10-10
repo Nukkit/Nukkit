@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * Created by Pub4Game on 03.07.2016.
  */
-public class BlockItemFrame extends BlockTransparent {
+public class BlockItemFrame extends BlockTransparentMeta {
 
     public BlockItemFrame() {
         this(0);

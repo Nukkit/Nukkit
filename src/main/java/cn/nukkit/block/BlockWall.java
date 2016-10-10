@@ -8,7 +8,7 @@ import cn.nukkit.math.Vector3;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class BlockWall extends BlockTransparent {
+public class BlockWall extends BlockTransparentMeta {
     public static final int NONE_MOSSY_WALL = 0;
     public static final int MOSSY_WALL = 1;
 

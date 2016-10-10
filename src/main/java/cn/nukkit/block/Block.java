@@ -281,13 +281,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static boolean[] solid = null;
     public static double[] hardness = null;
     public static boolean[] transparent = null;
-    public AxisAlignedBB boundingBox = null;
-    protected int meta = 0;
-    protected int powerLevel = 0;
-    protected boolean powerSource = false;
 
-    protected Block(Integer meta) {
-        this.meta = (meta != null ? meta : 0);
+    protected Block() {
     }
 
     @SuppressWarnings("unchecked")
@@ -497,10 +492,18 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
                     Block block;
                     try {
                         block = (Block) c.newInstance();
-                        Constructor constructor = c.getDeclaredConstructor(int.class);
-                        constructor.setAccessible(true);
-                        for (int data = 0; data < 16; ++data) {
-                            fullList[(id << 4) | data] = (Block) constructor.newInstance(data);
+                        try {
+                            Constructor constructor = c.getDeclaredConstructor(int.class);
+                            constructor.setAccessible(true);
+                            for (int data = 0; data < 16; ++data) {
+                                fullList[(id << 4) | data] = (Block) constructor.newInstance(data);
+                            }
+                        } catch (NoSuchMethodException ignore) {
+                            Constructor constructor = c.getDeclaredConstructor();
+                            constructor.setAccessible(true);
+                            for (int data = 0; data < 16; ++data) {
+                                fullList[(id << 4) | data] = (Block) constructor.newInstance();
+                            }
                         }
                     } catch (Exception e) {
                         Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
@@ -545,20 +548,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
     @SuppressWarnings("unchecked")
     public static Block get(int id, Integer meta, Position pos) {
-        Block block;
-        try {
-            Class c = list[id];
-            if (c != null) {
-                Constructor constructor = c.getDeclaredConstructor(int.class);
-                constructor.setAccessible(true);
-                block = (Block) constructor.newInstance(meta);
-            } else {
-                block = new BlockUnknown(id, meta);
-            }
-        } catch (Exception e) {
-            block = new BlockUnknown(id, meta);
-        }
-
+        Block block = fullList[(id << 4) | (meta == null ? 0 : meta)].clone();
         if (pos != null) {
             block.x = pos.x;
             block.y = pos.y;
@@ -566,6 +556,70 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             block.level = pos.level;
         }
         return block;
+    }
+
+    public static final boolean mightHaveData(int id) {
+        switch (id) {
+            case 0:
+            case 2:
+            case 4:
+            case 13:
+            case 14:
+            case 15:
+            case 20:
+            case 21:
+            case 22:
+            case 25:
+            case 32:
+            case 37:
+            case 39:
+            case 40:
+            case 41:
+            case 42:
+            case 45:
+            case 46:
+            case 47:
+            case 48:
+            case 49:
+            case 51:
+            case 52:
+            case 56:
+            case 57:
+            case 58:
+            case 60:
+            case 7:
+            case 9:
+            case 11:
+            case 73:
+            case 74:
+            case 79:
+            case 80:
+            case 81:
+            case 82:
+            case 83:
+            case 85:
+            case 87:
+            case 88:
+            case 101:
+            case 102:
+            case 103:
+            case 110:
+            case 112:
+            case 113:
+            case 121:
+            case 123:
+            case 124:
+            case 129:
+            case 133:
+            case 165:
+            case 170:
+            case 172:
+            case 173:
+            case 174:
+                return false;
+            default:
+                return true;
+        }
     }
 
     public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz) {
@@ -672,12 +726,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
     }
 
-    public final int getDamage() {
-        return this.meta;
+    public int getDamage() {
+        return 0;
     }
 
-    public final void setDamage(Integer meta) {
-        this.meta = (meta == null ? 0 : meta & 0x0f);
+    public void setDamage(Integer meta) {
+        // Do nothing
     }
 
     final public void position(Position v) {
@@ -685,7 +739,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         this.y = (int) v.y;
         this.z = (int) v.z;
         this.level = v.level;
-        this.boundingBox = null;
     }
 
     public int[][] getDrops(Item item) {
@@ -768,10 +821,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     public AxisAlignedBB getBoundingBox() {
-        if (this.boundingBox == null) {
-            this.boundingBox = this.recalculateBoundingBox();
-        }
-        return this.boundingBox;
+        return this.recalculateBoundingBox();
     }
 
     protected AxisAlignedBB recalculateBoundingBox() {
@@ -901,11 +951,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     public int getPowerLevel() {
-        return powerLevel;
+        return 0;
     }
 
     public void setPowerLevel(int powerLevel) {
-        this.powerLevel = powerLevel;
+        // Do nothing
     }
 
     public int getPowerLevel(int side) {
@@ -931,15 +981,15 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     public boolean isPowered() {
-        return this.powerLevel > 0;
+        return getPowerLevel() > 0;
     }
 
     public boolean isPowerSource() {
-        return this.powerSource;
+        return false;
     }
 
     public void setPowerSource(boolean isSource) {
-        this.powerSource = isSource;
+        // Do nothing
     }
 
     public String getLocationHash() {

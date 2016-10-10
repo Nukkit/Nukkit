@@ -225,6 +225,7 @@ public class McRegion extends BaseLevelProvider {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+                lastRegion = null;
                 this.regions.remove(index);
             }
         }
@@ -356,17 +357,18 @@ public class McRegion extends BaseLevelProvider {
     private RegionLoader lastRegion;
 
     protected RegionLoader loadRegion(int x, int z) {
-        if (x == lastRegion.getX() && z == lastRegion.getZ()) {
-            return lastRegion;
+        RegionLoader tmp = lastRegion;
+        if (tmp != null && x == tmp.getX() && z == tmp.getZ()) {
+            return tmp;
         }
         long index = Level.chunkHash(x, z);
         RegionLoader region = this.regions.get(index);
         if (region == null) {
             region = new RegionLoader(this, x, z);
             this.regions.put(index, region);
-            return region;
+            return lastRegion = region;
         } else {
-            return region;
+            return lastRegion = region;
         }
     }
 
@@ -380,6 +382,7 @@ public class McRegion extends BaseLevelProvider {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            lastRegion = null;
             this.regions.remove(index);
         }
         this.level = null;

@@ -9,13 +9,13 @@ import cn.nukkit.utils.DyeColor;
  * Created on 2015/11/24 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockClayHardened extends BlockSolid {
+public class BlockClayHardened extends BlockSolidMeta {
     public BlockClayHardened() {
-        this(0);
+        super(0);
     }
 
     public BlockClayHardened(int meta) {
-        super(0);
+        super(meta);
     }
 
     public BlockClayHardened(DyeColor dyeColor) {

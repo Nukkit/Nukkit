@@ -12,12 +12,24 @@ public class BlockSand extends BlockFallable {
     public static final int DEFAULT = 0;
     public static final int RED = 1;
 
+    public int meta;
+
+    @Override
+    public final int getDamage() {
+        return this.meta;
+    }
+
+    @Override
+    public final void setDamage(Integer meta) {
+        this.meta = (meta == null ? 0 : meta & 0x0f);
+    }
+
     public BlockSand() {
         this(0);
     }
 
     public BlockSand(int meta) {
-        super(meta);
+        this.meta = meta;
     }
 
     @Override

@@ -1330,13 +1330,12 @@ public class Item implements Cloneable {
 
     public static Item get(int id, Integer meta, int count, byte[] tags) {
         try {
-            Class c = list[id];
-            if (c == null) {
+            if (list == null || list[id] == null) {
                 return new Item(id, meta, count).setCompoundTag(tags);
             } else if (id < 256) {
-                return new ItemBlock((Block) c.getConstructor(int.class).newInstance(meta), meta, count).setCompoundTag(tags);
+                return new ItemBlock(Block.get(id, meta), meta, count).setCompoundTag(tags);
             } else {
-                return ((Item) c.getConstructor(Integer.class, int.class).newInstance(meta, count)).setCompoundTag(tags);
+                return ((Item) list[id].getConstructor(Integer.class, int.class).newInstance(meta, count)).setCompoundTag(tags);
             }
         } catch (Exception e) {
             return new Item(id, meta, count).setCompoundTag(tags);

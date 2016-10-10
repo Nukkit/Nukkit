@@ -16,7 +16,6 @@ public class BlockIron extends BlockSolid {
     }
 
     public BlockIron(int meta) {
-        super(meta);
     }
 
     @Override

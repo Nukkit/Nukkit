@@ -7,6 +7,19 @@ import cn.nukkit.item.Item;
  * Package cn.nukkit.block in project nukkit
  */
 public class BlockRailPowered extends BlockRail {
+
+    private byte powerLevel;
+
+    @Override
+    public int getPowerLevel() {
+        return powerLevel;
+    }
+
+    @Override
+    public void setPowerLevel(int powerLevel) {
+        this.powerLevel = (byte) powerLevel;
+    }
+
     public BlockRailPowered() {
         this(0);
     }

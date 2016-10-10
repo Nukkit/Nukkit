@@ -12,11 +12,6 @@ public class BlockOreDiamond extends BlockSolid {
 
 
     public BlockOreDiamond() {
-        this(0);
-    }
-
-    public BlockOreDiamond(int meta) {
-        super(0);
     }
 
     @Override

@@ -19,7 +19,7 @@ import java.util.Map;
  * author: Angelic47
  * Nukkit Project
  */
-public class BlockChest extends BlockTransparent {
+public class BlockChest extends BlockTransparentMeta {
 
     public BlockChest() {
         this(0);

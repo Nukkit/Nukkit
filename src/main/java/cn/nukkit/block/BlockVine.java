@@ -9,7 +9,7 @@ import cn.nukkit.math.AxisAlignedBB;
 /**
  * Created by Pub4Game on 15.01.2016.
  */
-public class BlockVine extends BlockTransparent {
+public class BlockVine extends BlockTransparentMeta {
 
     public BlockVine(int meta) {
         super(meta);

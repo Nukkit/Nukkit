@@ -12,12 +12,34 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockRedstone extends BlockSolid {
 
+    private byte powerLevel;
+    private boolean powerSource;
+
+    @Override
+    public int getPowerLevel() {
+        return powerLevel;
+    }
+
+    @Override
+    public void setPowerLevel(int powerLevel) {
+        this.powerLevel = (byte) powerLevel;
+    }
+
+    @Override
+    public void setPowerSource(boolean powerSource) {
+        this.powerSource = powerSource;
+    }
+
+    @Override
+    public boolean isPowerSource() {
+        return powerSource;
+    }
+
     public BlockRedstone() {
         this(0);
     }
 
     public BlockRedstone(int meta) {
-        super(0);
         this.setPowerSource(true);
         this.setPowerLevel(Redstone.POWER_STRONGEST);
     }

@@ -10,11 +10,6 @@ import cn.nukkit.item.ItemTool;
 public class BlockPackedIce extends BlockIce {
 
     public BlockPackedIce() {
-        this(0);
-    }
-
-    public BlockPackedIce(int meta) {
-        super(0);
     }
 
     @Override

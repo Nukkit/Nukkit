@@ -1,7 +1,6 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityCauldron;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
@@ -10,9 +9,7 @@ import cn.nukkit.item.*;
 import cn.nukkit.level.sound.ExplodeSound;
 import cn.nukkit.level.sound.SplashSound;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.Tag;
-
 import java.util.Iterator;
 import java.util.Map;
 
@@ -20,7 +17,7 @@ import java.util.Map;
  * author: CreeperFace
  * Nukkit Project
  */
-public class BlockCauldron extends BlockSolid {
+public class BlockCauldron extends BlockSolidMeta {
 
     public BlockCauldron() {
         super(0);

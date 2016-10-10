@@ -8,6 +8,29 @@ import cn.nukkit.item.ItemTool;
  */
 public class BlockWeightedPressurePlateLight extends BlockWeightedPressurePlate {
 
+    private byte powerLevel;
+    private boolean powerSource;
+
+    @Override
+    public int getPowerLevel() {
+        return powerLevel;
+    }
+
+    @Override
+    public void setPowerLevel(int powerLevel) {
+        this.powerLevel = (byte) powerLevel;
+    }
+
+    @Override
+    public void setPowerSource(boolean powerSource) {
+        this.powerSource = powerSource;
+    }
+
+    @Override
+    public boolean isPowerSource() {
+        return powerSource;
+    }
+
     public BlockWeightedPressurePlateLight(int meta) {
         super(meta);
     }

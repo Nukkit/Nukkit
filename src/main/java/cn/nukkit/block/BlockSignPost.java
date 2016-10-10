@@ -15,7 +15,7 @@ import cn.nukkit.utils.BlockColor;
 /**
  * @author Nukkit Project Team
  */
-public class BlockSignPost extends BlockTransparent {
+public class BlockSignPost extends BlockTransparentMeta {
 
     public BlockSignPost() {
         this(0);

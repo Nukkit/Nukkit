@@ -10,7 +10,7 @@ import cn.nukkit.math.Vector3;
  * Created by Snake1999 on 2016/1/17.
  * Package cn.nukkit.block in project nukkit.
  */
-public class BlockNoteblock extends BlockSolid {
+public class BlockNoteblock extends BlockSolidMeta {
 
     public BlockNoteblock() {
         this(0);

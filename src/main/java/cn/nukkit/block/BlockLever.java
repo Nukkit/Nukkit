@@ -11,6 +11,29 @@ import cn.nukkit.redstone.Redstone;
  */
 public class BlockLever extends BlockFlowable {
 
+    private byte powerLevel;
+    private boolean powerSource;
+
+    @Override
+    public int getPowerLevel() {
+        return powerLevel;
+    }
+
+    @Override
+    public void setPowerLevel(int powerLevel) {
+        this.powerLevel = (byte) powerLevel;
+    }
+
+    @Override
+    public void setPowerSource(boolean powerSource) {
+        this.powerSource = powerSource;
+    }
+
+    @Override
+    public boolean isPowerSource() {
+        return powerSource;
+    }
+
     public BlockLever() {
         this(0);
     }
@@ -53,12 +76,13 @@ public class BlockLever extends BlockFlowable {
     }
 
     public boolean isPowerOn() {
-        return (this.meta & 0x08) > 0;
+        return (getDamage() & 0x08) > 0;
     }
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        this.meta ^= 0x08;
+
+         this.setDamage(this.getDamage() ^ 0x08);
 
         this.getLevel().setBlock(this, this, true, true);
         this.getLevel().addSound(new LeverSound(this, this.isPowerOn()));
@@ -85,7 +109,7 @@ public class BlockLever extends BlockFlowable {
                     0,
                     1
             };
-            int face = this.isPowerOn() ? this.meta ^ 0x08 : this.meta;
+            int face = this.isPowerOn() ? getDamage() ^ 0x08 : getDamage();
             if (this.getSide(faces[face]).isTransparent()) {
                 this.onBreak(null);
                 for (int[] item : this.getDrops(null)) {
@@ -111,12 +135,12 @@ public class BlockLever extends BlockFlowable {
 
             if (face == 0) {
                 to = player != null ? player.getDirection() : 0;
-                this.meta = (to % 2 == 0 ? 0 : 7);
+                setDamage(to % 2 == 0 ? 0 : 7);
             } else if (face == 1) {
                 to = player != null ? player.getDirection() : 0;
-                this.meta = (to % 2 == 0 ? 6 : 5);
+                setDamage(to % 2 == 0 ? 6 : 5);
             } else {
-                this.meta = faces[face];
+                setDamage(faces[face]);
             }
             this.getLevel().setBlock(block, this, true, true);
             return true;

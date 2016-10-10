@@ -40,7 +40,7 @@ public class BlockStemMelon extends BlockCrops {
             NukkitRandom random = new NukkitRandom();
             if (random.nextRange(1, 2) == 1) {
                 if (this.meta < 0x07) {
-                    Block block = this.clone();
+                    BlockStemMelon block = (BlockStemMelon) this.clone();
                     ++block.meta;
                     BlockGrowEvent ev = new BlockGrowEvent(this, block);
                     Server.getInstance().getPluginManager().callEvent(ev);

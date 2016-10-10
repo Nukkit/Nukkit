@@ -19,12 +19,19 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockTNT extends BlockSolid {
 
-    public BlockTNT() {
-        this(0);
+    private byte powerLevel;
+
+    @Override
+    public int getPowerLevel() {
+        return powerLevel;
     }
 
-    public BlockTNT(int meta) {
-        super(0);
+    @Override
+    public void setPowerLevel(int powerLevel) {
+        this.powerLevel = (byte) powerLevel;
+    }
+
+    public BlockTNT() {
     }
 
     @Override

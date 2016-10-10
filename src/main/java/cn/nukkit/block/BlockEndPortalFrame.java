@@ -9,11 +9,6 @@ import cn.nukkit.math.AxisAlignedBB;
 public class BlockEndPortalFrame extends BlockTransparent {
 
     public BlockEndPortalFrame() {
-        this(0);
-    }
-
-    public BlockEndPortalFrame(int meta) {
-        super(meta);
     }
 
     @Override
