@@ -2,7 +2,6 @@ package cn.nukkit.level.format.generic;
 
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
-import cn.nukkit.utils.BufferedRandomAccessFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -42,10 +41,14 @@ abstract public class BaseRegionLoader {
             if (!exists) {
                 file.createNewFile();
             }
-            this.randomAccessFile = new BufferedRandomAccessFile(this.filePath, "rw", 8192);
+            this.randomAccessFile = new RandomAccessFile(this.filePath, "rw");
             if (!exists) {
                 this.createBlank();
             } else {
+                if (randomAccessFile.length() < 8192) {
+                    randomAccessFile.setLength(0);
+                    randomAccessFile.setLength(8192);
+                }
                 this.loadLocationTable();
             }
 

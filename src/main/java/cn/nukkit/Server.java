@@ -506,7 +506,6 @@ public class Server {
                                         }
                                         generateLevel(defaultName, seed == 0 ? System.currentTimeMillis() : seed);
                                     }
-
                                     setDefaultLevel(getLevelByName(defaultName));
                                 }
                                 properties.save(true);
@@ -1681,7 +1680,6 @@ public class Server {
             return true;
         } else if (!this.isLevelGenerated(name)) {
             this.logger.notice(this.getLanguage().translateString("nukkit.level.notFound", name));
-
             return false;
         }
 
