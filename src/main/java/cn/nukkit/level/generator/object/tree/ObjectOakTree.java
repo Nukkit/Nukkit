@@ -10,7 +10,7 @@ import cn.nukkit.math.NukkitRandom;
  * Nukkit Project
  */
 public class ObjectOakTree extends ObjectTree {
-    private int treeHeight = 7;
+    private int treeHeight = 5;
 
     @Override
     public int getTrunkBlock() {
