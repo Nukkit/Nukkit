@@ -10,7 +10,7 @@ import cn.nukkit.math.NukkitRandom;
  * Nukkit Project
  */
 public class ObjectSpruceTree extends ObjectTree {
-    private int treeHeight = 15;
+    private int treeHeight = 10;
 
     @Override
     public int getTrunkBlock() {
