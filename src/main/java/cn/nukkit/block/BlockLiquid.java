@@ -1,15 +1,17 @@
 package cn.nukkit.block;
 
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
+import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.block.BlockFromToEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.level.sound.FizzSound;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.Vector3;
-
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * author: MagicDroidX
@@ -193,6 +195,8 @@ public abstract class BlockLiquid extends BlockTransparent {
 
     @Override
     public int onUpdate(int type) {
+        BlockFromToEvent event;
+        
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             this.checkForHarden();
             this.getLevel().scheduleUpdate(this, this.tickRate());
@@ -247,10 +251,25 @@ public abstract class BlockLiquid extends BlockTransparent {
 
                 if (k != decay) {
                     decay = k;
+                    Block b;
                     if (decay < 0) {
-                        this.getLevel().setBlock(this, new BlockAir(), true);
+                        event = new BlockFromToEvent(this, this);
+                        b = new BlockAir();
+                        b.setLevel(this.getLevel());
+                        b.setComponents(this.getX(), this.getY(), this.getZ());
+                        Server.getInstance().getPluginManager().callEvent(event);
+                        if (!event.isCancelled()) {
+                            this.getLevel().setBlock(this, b, true);
+                        }     
                     } else {
-                        this.getLevel().setBlock(this, this.getBlock(decay), true);
+                        event = new BlockFromToEvent(this, this);
+                        Server.getInstance().getPluginManager().callEvent(event);
+                        b = this.getBlock(decay);
+                        b.setLevel(this.getLevel());
+                        b.setComponents(this.getX(), this.getY(), this.getZ());
+                        if (!event.isCancelled()) {
+                            this.getLevel().setBlock(this, b, true);
+                        }
                     }
                 } else if (flag) {
                     //this.getLevel().scheduleUpdate(this, this.tickRate());
@@ -264,8 +283,12 @@ public abstract class BlockLiquid extends BlockTransparent {
 
             if (bottomBlock.canBeFlowedInto() || bottomBlock instanceof BlockLiquid) {
                 if (this instanceof BlockLava && bottomBlock instanceof BlockWater) {
-                    this.getLevel().setBlock(bottomBlock, new BlockStone(), true);
-                    this.triggerLavaMixEffects(bottomBlock);
+                    event = new BlockFromToEvent(this, bottomBlock);
+                    Server.getInstance().getPluginManager().callEvent(event);
+                    if (!event.isCancelled()) {
+                        this.getLevel().setBlock(bottomBlock, new BlockStone(), true);
+                        this.triggerLavaMixEffects(bottomBlock);
+                    }
                     return 0;
                 }
 
@@ -322,8 +345,11 @@ public abstract class BlockLiquid extends BlockTransparent {
                 }
                 this.getLevel().useBreakOn(block);
             }
-
-            this.getLevel().setBlock(block, this.getBlock(newFlowDecay), true);
+            BlockFromToEvent event = new BlockFromToEvent(this, block);
+            Server.getInstance().getPluginManager().callEvent(event);
+            if (!event.isCancelled()) {
+                this.getLevel().setBlock(block, this.getBlock(newFlowDecay), true);
+            }
         }
     }
 
@@ -456,12 +482,21 @@ public abstract class BlockLiquid extends BlockTransparent {
             }
 
             if (colliding) {
-                if (this.getDamage() == 0) {
-                    this.getLevel().setBlock(this, new BlockObsidian(), true);
-                } else if (this.getDamage() <= 4) {
-                    this.getLevel().setBlock(this, new BlockCobblestone(), true);
+                Block block = this.getDamage() == 0 ? new BlockObsidian()
+                        : (this.getDamage() <= 4 ? new BlockCobblestone() : null);
+                if (block != null) {
+                    block.setLevel(this.getLevel());
+                    block.setComponents(this.getX(), this.getY(), this.getZ());
+                    BlockFromToEvent event = new BlockFromToEvent(this, block);
+                    Server.getInstance().getPluginManager().callEvent(event);
+                    if (!event.isCancelled()) {
+                        if (block.getId() == Block.OBSIDIAN) {
+                            this.getLevel().setBlock(this, block, true);
+                        } else if (block.getId() == Block.COBBLESTONE) {
+                            this.getLevel().setBlock(this, block, true);
+                        }
+                    }
                 }
-
                 this.triggerLavaMixEffects(this);
             }
         }
