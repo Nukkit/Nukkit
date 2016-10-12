@@ -5,6 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBookEnchanted;
 import cn.nukkit.item.enchantment.Enchantment;
@@ -23,12 +24,15 @@ public class EnchantInventory extends ContainerInventory {
 
     private int bookshelfAmount = 0;
 
+    private Position position;
+    
     private int[] levels = null;
     private EnchantmentEntry[] entries = null;
 
     public EnchantInventory(Position position) {
         super(null, InventoryType.ENCHANT_TABLE);
         this.holder = new FakeBlockMenu(this, position);
+        this.position = position;
     }
 
     @Override
@@ -229,8 +233,18 @@ public class EnchantInventory extends ContainerInventory {
     }
 
     public int countBookshelf() {
-        return 15;
-        //todo calculate bookshelf
+    	int count = 0;
+    	
+    	for(int x = -2; x < 3; x++){
+    		for(int y = 0; y < 2; y++){
+    			for(int z = -2; z < 3; z++){
+    				if(position.clone().add(x, y, z).getLevelBlock().getId() == Block.BOOKSHELF)
+    					count++;
+    			}
+    		}
+    	}
+    	
+        return count;
     }
 
     public void sendEnchantmentList() {
