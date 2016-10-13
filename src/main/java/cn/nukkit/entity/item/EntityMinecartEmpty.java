@@ -145,7 +145,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
     
     @Override
     private void isRail(rail) {
-		return (rail != null && rail.getId(), {Block::RAIL, Block::ACTIVATOR_RAIL, Block::DETECTOR_RAIL, Block::POWERED_RAIL}));
+		return (rail != null && rail.getId(), {Block::RAIL, Block::ACTIVATOR_RAIL, Block::DETECTOR_RAIL, Block::POWERED_RAIL});
 	}
     
     @Override
@@ -170,7 +170,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 	 * @return boolean True if minecart moved, false otherwise.
 	 */
     @Override
-	private void forwardOnRail(Player player) {
+    private void forwardOnRail(Player player) {
 		if (this.direction == -1) {
 			candidateDirection = player.getDirection();
 		} else {
@@ -208,7 +208,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 	 * @return Direction The direction the minecart should move.
 	 */
     @Override
-	private void getDirectionToMove(railType, candidateDirection) {
+    private void getDirectionToMove(railType, candidateDirection) {
 		switch(railType) {
 			case Rail::STRAIGHT_NORTH_SOUTH:
 			case Rail::SLOPED_ASCENDING_NORTH:
@@ -274,7 +274,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 				break;
 		}
 		return -1;
-	}
+    }
     
     	/**
 	 * Need to alter direction on curves halfway through the turn and reset the minecart to be in the middle of
@@ -285,7 +285,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 	 * minecart is.
 	 */
     @Override
-	private void checkForTurn(currentDirection, newDirection) {
+    private void checkForTurn(currentDirection, newDirection) {
 		switch(currentDirection) {
 			case Entity::NORTH:
 				diff = this.x - this.getFloorX();
@@ -321,13 +321,13 @@ public class EntityMinecartEmpty extends EntityVehicle {
 				break;
 		}
 		return currentDirection;
-	}
+    }
     
     @Override
     private void checkForVertical(railType, currentDirection) {
 		switch (railType) {
 			case Rail::SLOPED_ASCENDING_NORTH:
-				switch(currentDirection){
+				switch(currentDirection) {
 					case Entity::NORTH:
 						// Headed north up
 						diff = this.x - this.getFloorX();
@@ -340,75 +340,75 @@ public class EntityMinecartEmpty extends EntityVehicle {
 					case ENTITY::SOUTH:
 						// Headed south down
 						diff = this.x - this.getFloorX();
-						if ($diff !== 0 and $diff >= .5) {
-							$dx = ($this->getFloorX() + 1 ) - $this->x;
-							$this->move($dx, -1, 0);
+						if (diff != 0 && diff >= .5) {
+							dx = (this.getFloorX() + 1 ) - this.x;
+							this.move(dx, -1, 0);
 							return true;
 						}
 						break;
 				}
 				break;
 			case Rail::SLOPED_ASCENDING_SOUTH:
-				switch($currentDirection){
+				switch(currentDirection) {
 					case Entity::SOUTH:
 						// Headed south up
-						$diff = $this->x - $this->getFloorX();
-						if ($diff !== 0 and $diff >= .5) {
-							$dx = ($this->getFloorX() + 1 ) - $this->x;
-							$this->move($dx, 1, 0);
+						diff = this.x - this.getFloorX();
+						if (diff != 0 && diff >= .5) {
+							dx = (this.getFloorX() + 1 ) - this.x;
+							this.move(dx, 1, 0);
 							return true;
 						}
 						break;
 					case Entity::NORTH:
 						// Headed north down
-						$diff = $this->x - $this->getFloorX();
-						if ($diff !== 0 and $diff <= .5) {
-							$dx = ($this->getFloorX() - .1) - $this->x;
-							$this->move($dx, -1, 0);
+						diff = this.x - this.getFloorX();
+						if (diff != 0 && diff <= .5) {
+							dx = (this.getFloorX() - .1) - this.x;
+							this.move(dx, -1, 0);
 							return true;
 						}
 						break;
 				}
 				break;
 			case Rail::SLOPED_ASCENDING_EAST:
-				switch($currentDirection){
+				switch(currentDirection) {
 					case Entity::EAST:
 						// Headed east up
-						$diff = $this->z - $this->getFloorZ();
-						if ($diff !== 0 and $diff <= .5) {
-							$dz = ($this->getFloorZ() - .1) - $this->z;
-							$this->move(0, 1, $dz);
+						diff = this.z - this.getFloorZ();
+						if (diff != 0 && diff <= .5) {
+							dz = (this.getFloorZ() - .1) - this.z;
+							this.move(0, 1, dz);
 							return true;
 						}
 						break;
 					case Entity::WEST:
 						// Headed west down
-						$diff = $this->z - $this->getFloorZ();
-						if ($diff !== 0 and $diff >= .5) {
-							$dz = ($this->getFloorZ() + 1) - $this->z;
-							$this->move(0, -1, $dz);
+						diff = this.z - this.getFloorZ();
+						if (diff != 0 && diff >= .5) {
+							dz = (this.getFloorZ() + 1) - this.z;
+							this.move(0, -1, dz);
 							return true;
 						}
 						break;
 				}
 				break;
 			case Rail::SLOPED_ASCENDING_WEST:
-				switch($currentDirection){
+				switch(currentDirection) {
 					case Entity::WEST:
 						// Headed west up
-						$diff = $this->z - $this->getFloorZ();
-						if ($diff !== 0 and $diff >= .5) {
-							$dz = ($this->getFloorZ() + 1) - $this->z;
-							$this->move(0, 1, $dz);
+						diff = this.z - this.getFloorZ();
+						if (diff != 0 && diff >= .5) {
+							dz = (this.getFloorZ() + 1) - this.z;
+							this.move(0, 1, dz);
 							return true;
 						}
 						break;
 					case Entity::EAST:
 						// Headed east down
-						$diff = $this->z - $this->getFloorZ();
-						if ($diff !== 0 and $diff <= .5) {
-							$dz = ($this->getFloorZ() - .1) - $this->z;
-							$this->move(0, -1, $dz);
+						diff = this.z - this.getFloorZ();
+						if (diff != 0 && diff <= .5) {
+							dz = (this.getFloorZ() - .1) - this.z;
+							this.move(0, -1, dz);
 							return true;
 						}
 						break;
@@ -416,9 +416,65 @@ public class EntityMinecartEmpty extends EntityVehicle {
 				break;
 		}
 		return false;
+    }
+	
+	/**
+	 * Move the minecart as long as it will still be moving on to another piece of rail.
+	 * @return boolean True if the minecart moved.
+	 */
+    @Override
+    private void moveIfRail() {
+		nextMoveVector = this.moveVector[this.direction];
+		nextMoveVector = nextMoveVector.multiply(this.moveSpeed);
+		newVector = this.add(nextMoveVector.x, nextMoveVector.y, nextMoveVector.z);
+		possibleRail = this.getCurrentRail();
+		if (possibleRail.getId(), {Block::RAIL, Block::ACTIVATOR_RAIL, Block::DETECTOR_RAIL, Block::POWERED_RAIL}) {
+			this.moveUsingVector(newVector);
+			return true;
+		}
+    }
+	
+	/**
+	 * Invoke the normal move code, but first need to convert the desired position vector into the
+	 * delta values from the current position.
+	 * @param Vector3 $desiredPosition
+	 */
+    @Override
+    private void moveUsingVector(Vector3 desiredPosition){
+		dx = desiredPosition.x - this.x;
+		dy = desiredPosition.y - this.y;
+		dz = desiredPosition.z - this.z;
+		this.move(dx, dy, dz);
+    }
+	
+    @Override
+    public void getNearestRail() {
+		minX = NukkitMath.floorFloat(this.boundingBox.minX);
+		minY = NukkitMath.floorFloat(this.boundingBox.minY);
+		minZ = NukkitMath.floorFloat(this.boundingBox.minZ);
+		maxX = NukkitMath.ceilFloat(this.boundingBox.maxX);
+		maxY = NukkitMath.ceilFloat(this.boundingBox.maxY);
+		maxZ = NukkitMath.ceilFloat(this.boundingBox.maxZ);
+		rails = [];
+		for (z = minZ; z <= maxZ; ++z) {
+			for (x = minX; x <= maxX; ++x) {
+				for (y = minY; y <= maxY; ++y) {
+					Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z));
+					if (block.getId(), {Block::RAIL, Block::ACTIVATOR_RAIL, Block::DETECTOR_RAIL, Block::POWERED_RAIL}) rails[] = block;
+				}
+			}
+		}
+		minDistance = PHP_INT_MAX;
+		nearestRail = null;
+		foreach (rails as rail) {
+			dis = this.distance(rail);
+			if (dis < minDistance) {
+				nearestRail = rail;
+				minDistance = dis;
+			}
+		}
+		return nearestRail;
 	}
-
-
     @Override
     public void spawnTo(Player player) {
         AddEntityPacket pk = new AddEntityPacket();
