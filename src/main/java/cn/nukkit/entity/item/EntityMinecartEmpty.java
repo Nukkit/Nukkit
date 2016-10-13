@@ -12,6 +12,11 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 
+import java.io.IOException;
+import java.nio.ByteOrder;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * Created by Snake1999 on 2016/1/30.
  * Package cn.nukkit.entity.item in project Nukkit.
@@ -34,10 +39,10 @@ public class EntityMinecartEmpty extends EntityVehicle {
     public static final int DATA_VEHICLE_DISPLAY_OFFSET = 21;
     public static final int DATA_VEHICLE_CUSTOM_DISPLAY = 22;
     
-    private int state = Minecart.STATE_INITIAL;
-    private int direction = -1;
-    private moveVector = [];
-    private int requestedPosition = null;
+    private String state = Minecart.STATE_INITIAL;
+    private String direction = -1;
+    private String moveVector = [];
+    private String requestedPosition = null;
     
     @Override
     public float getHeight() {
@@ -76,7 +81,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
     
     @Override
     public String getName() {
-        return this.getNameTag();
+        return "Minecart";
     }
     
     @Override
