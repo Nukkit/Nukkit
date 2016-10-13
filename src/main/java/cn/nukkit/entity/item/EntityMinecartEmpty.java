@@ -39,10 +39,10 @@ public class EntityMinecartEmpty extends EntityVehicle {
     public static final int DATA_VEHICLE_DISPLAY_OFFSET = 21;
     public static final int DATA_VEHICLE_CUSTOM_DISPLAY = 22;
     
-    private String state = Minecart.STATE_INITIAL;
-    private String direction = -1;
-    private String moveVector = [];
-    private String requestedPosition = null;
+    private String int state = Minecart.STATE_INITIAL;
+    private String int direction = -1;
+    private String int moveVector = [];
+    private String int requestedPosition = null;
     
     @Override
     public float getHeight() {
