@@ -36,7 +36,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
     
     private int state = Minecart.STATE_INITIAL;
     private int direction = -1;
-    private int moveVector = [];
+    private moveVector = [];
     private int requestedPosition = null;
     
     @Override
