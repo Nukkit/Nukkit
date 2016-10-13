@@ -464,7 +464,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 				}
 			}
 		}
-		minDistance = PHP_INT_MAX;
+		minDistance = Integer.MAX_VALUE;
 		nearestRail = null;
 		foreach (rails as rail) {
 			dis = this.distance(rail);
