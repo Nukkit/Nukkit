@@ -34,7 +34,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
     public static final int DATA_VEHICLE_DISPLAY_OFFSET = 21;
     public static final int DATA_VEHICLE_CUSTOM_DISPLAY = 22;
     
-    private state = Minecart::STATE_INITIAL;
+    private state = Minecart.STATE_INITIAL;
     private direction = -1;
     private moveVector = [];
     private requestedPosition = null;
@@ -92,16 +92,16 @@ public class EntityMinecartEmpty extends EntityVehicle {
     protected void initEntity() {
         setMaxHealth(1);
         setHealth(this->getMaxHealth());
-        moveVector[Entity::NORTH] = new Vector3(-1, 0, 0);
-        moveVector[Entity::SOUTH] = new Vector3(1, 0, 0);
-		moveVector[Entity::EAST] = new Vector3(0, 0, -1);
-		moveVector[Entity::WEST] = new Vector3(0, 0, 1);
+        moveVector[Entity.NORTH] = new Vector3(-1, 0, 0);
+        moveVector[Entity.SOUTH] = new Vector3(1, 0, 0);
+	moveVector[Entity.EAST] = new Vector3(0, 0, -1);
+	moveVector[Entity.WEST] = new Vector3(0, 0, 1);
         super.initEntity();
     }
 
     @Override
     public boolean onUpdate(int currentTick) {
-        if (this.closed !== false) {
+        if (this.closed != false) {
 			return false;
 		}
         tickDiff = currentTick - this.lastUpdate;
@@ -114,9 +114,9 @@ public class EntityMinecartEmpty extends EntityVehicle {
         if (this.isAlive()) {
 			p = this.getLinkedEntity();
 			if (p instanceof Player) {
-				if (this.state == Minecart::STATE_INITIAL) {
+				if (this.state == Minecart.STATE_INITIAL) {
 					this.checkIfOnRail();
-				} else if (this.state == Minecart::STATE_ON_RAIL) {
+				} else if (this.state == Minecart.STATE_ON_RAIL) {
 					hasUpdate = this.forwardOnRail(p);
 					this.updateMovement();
 				}
@@ -129,7 +129,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
     
     @Override
     private void checkIfOnRail() {
-		for (y = -1; y != 2 && this.state == Minecart::STATE_INITIAL; y++) {
+		for (y = -1; y != 2 && this.state == Minecart.STATE_INITIAL; y++) {
 			positionToCheck = this.temporalVector.setComponents(this.x, this.y + y, this.z);
 			Block block = this.level.getBlock(positionToCheck);
 			if (this.isRail(block)) {
@@ -145,7 +145,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
     
     @Override
     private void isRail(rail) {
-		return (rail != null && rail.getId(), {Block::RAIL, Block::ACTIVATOR_RAIL, Block::DETECTOR_RAIL, Block::POWERED_RAIL});
+		return (rail != null && rail.getId(), {Block.RAIL, Block.ACTIVATOR_RAIL, Block.DETECTOR_RAIL, Block.POWERED_RAIL});
 	}
     
     @Override
@@ -193,7 +193,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 			}
 		} else {
 			// Not able to find rail
-			this.state = Minecart::STATE_INITIAL;
+			this.state = Minecart.STATE_INITIAL;
 		}
 		return false;
 	}
@@ -210,66 +210,66 @@ public class EntityMinecartEmpty extends EntityVehicle {
     @Override
     private void getDirectionToMove(railType, candidateDirection) {
 		switch(railType) {
-			case Rail::STRAIGHT_NORTH_SOUTH:
-			case Rail::SLOPED_ASCENDING_NORTH:
-			case Rail::SLOPED_ASCENDING_SOUTH:
+			case Rail.STRAIGHT_NORTH_SOUTH:
+			case Rail.SLOPED_ASCENDING_NORTH:
+			case Rail.SLOPED_ASCENDING_SOUTH:
 				switch(candidateDirection){
-					case Entity::NORTH:
-					case Entity::SOUTH:
+					case Entity.NORTH:
+					case Entity.SOUTH:
 						return candidateDirection;
 				}
 				break;
-			case Rail::STRAIGHT_EAST_WEST:
-			case Rail::SLOPED_ASCENDING_EAST:
-			case Rail::SLOPED_ASCENDING_WEST:
+			case Rail.STRAIGHT_EAST_WEST:
+			case Rail.SLOPED_ASCENDING_EAST:
+			case Rail.SLOPED_ASCENDING_WEST:
 				switch(candidateDirection){
-					case Entity::WEST:
-					case Entity::EAST:
+					case Entity.WEST:
+					case Entity.EAST:
 						return candidateDirection;
 				}
 				break;
-			case Rail::CURVED_SOUTH_EAST:
+			case Rail.CURVED_SOUTH_EAST:
 				switch(candidateDirection){
-					case Entity::SOUTH:
-					case Entity::EAST:
+					case Entity.SOUTH:
+					case Entity.EAST:
 						return candidateDirection;
-					case Entity::NORTH:
-						return this.checkForTurn(candidateDirection, Entity::EAST);
-					case Entity::WEST:
-						return this.checkForTurn(candidateDirection, Entity::SOUTH);
+					case Entity.NORTH:
+						return this.checkForTurn(candidateDirection, Entity.EAST);
+					case Entity.WEST:
+						return this.checkForTurn(candidateDirection, Entity.SOUTH);
 				}
 				break;
-			case Rail::CURVED_SOUTH_WEST:
+			case Rail.CURVED_SOUTH_WEST:
 				switch(candidateDirection){
-					case Entity::SOUTH:
-					case Entity::WEST:
+					case Entity.SOUTH:
+					case Entity.WEST:
 						return candidateDirection;
-					case Entity::NORTH:
-						return this->checkForTurn(candidateDirection, Entity::WEST);
-					case Entity::EAST:
-						return this.checkForTurn(candidateDirection, Entity::SOUTH);
+					case Entity.NORTH:
+						return this.checkForTurn(candidateDirection, Entity.WEST);
+					case Entity.EAST:
+						return this.checkForTurn(candidateDirection, Entity.SOUTH);
 				}
 				break;
-			case Rail::CURVED_NORTH_WEST:
+			case Rail.CURVED_NORTH_WEST:
 				switch (candidateDirection) {
-					case Entity::NORTH:
-					case Entity::WEST:
+					case Entity.NORTH:
+					case Entity.WEST:
 						return candidateDirection;
-					case Entity::SOUTH:
-						return this->checkForTurn(candidateDirection, Entity::WEST);
-					case Entity::EAST:
-						return this->checkForTurn(candidateDirection, Entity::NORTH);
+					case Entity.SOUTH:
+						return this.checkForTurn(candidateDirection, Entity.WEST);
+					case Entity.EAST:
+						return this.checkForTurn(candidateDirection, Entity.NORTH);
 				}
 				break;
-			case Rail::CURVED_NORTH_EAST:
+			case Rail.CURVED_NORTH_EAST:
 				switch (candidateDirection) {
-					case Entity::NORTH:
-					case Entity::EAST:
+					case Entity.NORTH:
+					case Entity.EAST:
 						return candidateDirection;
-					case Entity::SOUTH:
-						return this->checkForTurn(candidateDirection, Entity::EAST);
-					case Entity::WEST:
-						return this->checkForTurn(candidateDirection, Entity::NORTH);
+					case Entity.SOUTH:
+						return this.checkForTurn(candidateDirection, Entity.EAST);
+					case Entity.WEST:
+						return this.checkForTurn(candidateDirection, Entity.NORTH);
 				}
 				break;
 		}
@@ -287,7 +287,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
     @Override
     private void checkForTurn(currentDirection, newDirection) {
 		switch(currentDirection) {
-			case Entity::NORTH:
+			case Entity.NORTH:
 				diff = this.x - this.getFloorX();
 				if (diff != 0 && diff <= .5) {
 					dx = (this.getFloorX() + .5) - this.x;
@@ -295,7 +295,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 					return newDirection;
 				}
 				break;
-			case Entity::SOUTH:
+			case Entity.SOUTH:
 				diff = this.x - this.getFloorX();
 				if (diff != 0 && diff >= .5) {
 					dx = (this.getFloorX() + .5) - this.x;
@@ -303,7 +303,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 					return newDirection;
 				}
 				break;
-			case Entity::EAST:
+			case Entity.EAST:
 				diff = this.z - this.getFloorZ();
 				if (diff != 0 && diff <= .5) {
 					dz = (this.getFloorZ() + .5) - this.z;
@@ -311,7 +311,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 					return newDirection;
 				}
 				break;
-			case Entity::WEST:
+			case Entity.WEST:
 				diff = this.z - this.getFloorZ();
 				if (diff != 0 && diff >= .5) {
 					dz = dz = (this.getFloorZ() + .5) - this.z;
@@ -326,9 +326,9 @@ public class EntityMinecartEmpty extends EntityVehicle {
     @Override
     private void checkForVertical(railType, currentDirection) {
 		switch (railType) {
-			case Rail::SLOPED_ASCENDING_NORTH:
+			case Rail.SLOPED_ASCENDING_NORTH:
 				switch(currentDirection) {
-					case Entity::NORTH:
+					case Entity.NORTH:
 						// Headed north up
 						diff = this.x - this.getFloorX();
 						if (diff != 0 && diff <= .5) {
@@ -337,7 +337,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 							return true;
 						}
 						break;
-					case ENTITY::SOUTH:
+					case ENTITY.SOUTH:
 						// Headed south down
 						diff = this.x - this.getFloorX();
 						if (diff != 0 && diff >= .5) {
@@ -348,9 +348,9 @@ public class EntityMinecartEmpty extends EntityVehicle {
 						break;
 				}
 				break;
-			case Rail::SLOPED_ASCENDING_SOUTH:
+			case Rail.SLOPED_ASCENDING_SOUTH:
 				switch(currentDirection) {
-					case Entity::SOUTH:
+					case Entity.SOUTH:
 						// Headed south up
 						diff = this.x - this.getFloorX();
 						if (diff != 0 && diff >= .5) {
@@ -359,7 +359,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 							return true;
 						}
 						break;
-					case Entity::NORTH:
+					case Entity.NORTH:
 						// Headed north down
 						diff = this.x - this.getFloorX();
 						if (diff != 0 && diff <= .5) {
@@ -370,9 +370,9 @@ public class EntityMinecartEmpty extends EntityVehicle {
 						break;
 				}
 				break;
-			case Rail::SLOPED_ASCENDING_EAST:
+			case Rail.SLOPED_ASCENDING_EAST:
 				switch(currentDirection) {
-					case Entity::EAST:
+					case Entity.EAST:
 						// Headed east up
 						diff = this.z - this.getFloorZ();
 						if (diff != 0 && diff <= .5) {
@@ -381,7 +381,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 							return true;
 						}
 						break;
-					case Entity::WEST:
+					case Entity.WEST:
 						// Headed west down
 						diff = this.z - this.getFloorZ();
 						if (diff != 0 && diff >= .5) {
@@ -392,9 +392,9 @@ public class EntityMinecartEmpty extends EntityVehicle {
 						break;
 				}
 				break;
-			case Rail::SLOPED_ASCENDING_WEST:
+			case Rail.SLOPED_ASCENDING_WEST:
 				switch(currentDirection) {
-					case Entity::WEST:
+					case Entity.WEST:
 						// Headed west up
 						diff = this.z - this.getFloorZ();
 						if (diff != 0 && diff >= .5) {
@@ -403,7 +403,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 							return true;
 						}
 						break;
-					case Entity::EAST:
+					case Entity.EAST:
 						// Headed east down
 						diff = this.z - this.getFloorZ();
 						if (diff != 0 && diff <= .5) {
@@ -428,7 +428,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 		nextMoveVector = nextMoveVector.multiply(this.moveSpeed);
 		newVector = this.add(nextMoveVector.x, nextMoveVector.y, nextMoveVector.z);
 		possibleRail = this.getCurrentRail();
-		if (possibleRail.getId(), {Block::RAIL, Block::ACTIVATOR_RAIL, Block::DETECTOR_RAIL, Block::POWERED_RAIL}) {
+		if (possibleRail.getId(), {Block.RAIL, Block.ACTIVATOR_RAIL, Block.DETECTOR_RAIL, Block.POWERED_RAIL}) {
 			this.moveUsingVector(newVector);
 			return true;
 		}
@@ -460,7 +460,7 @@ public class EntityMinecartEmpty extends EntityVehicle {
 			for (x = minX; x <= maxX; ++x) {
 				for (y = minY; y <= maxY; ++y) {
 					Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z));
-					if (block.getId(), {Block::RAIL, Block::ACTIVATOR_RAIL, Block::DETECTOR_RAIL, Block::POWERED_RAIL}) rails[] = block;
+					if (block.getId(), {Block.RAIL, Block.ACTIVATOR_RAIL, Block.DETECTOR_RAIL, Block.POWERED_RAIL}) rails[] = block;
 				}
 			}
 		}
