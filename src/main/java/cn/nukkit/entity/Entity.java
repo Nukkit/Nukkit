@@ -75,10 +75,10 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_ACTION = 4;
     public static final int DATA_FLAG_INVISIBLE = 5;
       
-	public static final int SOUTH = 0;
-	public static final int WEST = 1;
-	public static final int NORTH = 2;
-	public static final int EAST = 3;
+    public static final int SOUTH = 0;
+    public static final int WEST = 1;
+    public static final int NORTH = 2;
+    public static final int EAST = 3;
 
     public static final int DATA_LEAD_HOLDER = 23;
     public static final int DATA_LEAD = 24;
