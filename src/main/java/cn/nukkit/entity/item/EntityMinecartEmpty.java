@@ -140,11 +140,11 @@ public class EntityMinecartEmpty extends EntityVehicle {
 			if (this.isRail(block)) {
 				minecartPosition = positionToCheck.floor().add(0.5, 0, 0.5);
 				this.setPosition(minecartPosition);    // Move minecart to center of rail
-				this.state = Minecart::STATE_ON_RAIL;
+				this.state = Minecart.STATE_ON_RAIL;
 			}
 		}
-		if (this.state != Minecart::STATE_ON_RAIL) {
-			this.state = Minecart::STATE_OFF_RAIL;
+		if (this.state != Minecart.STATE_ON_RAIL) {
+			this.state = Minecart.STATE_OFF_RAIL;
 		}
 	}
     
