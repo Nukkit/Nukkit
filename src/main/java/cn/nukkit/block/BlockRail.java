@@ -18,15 +18,15 @@ public class BlockRail extends BlockFlowable {
     
     
     public static final int STRAIGHT_EAST_WEST = 0;
-	public static final int STRAIGHT_NORTH_SOUTH = 1;
-	public static final int SLOPED_ASCENDING_NORTH = 2;
-	public static final int SLOPED_ASCENDING_SOUTH = 3;
-	public static final int SLOPED_ASCENDING_EAST = 4;
-	public static final int SLOPED_ASCENDING_WEST = 5;
-	public static final int CURVED_NORTH_WEST = 7;
-	public static final int CURVED_SOUTH_WEST = 6;
-	public static final int CURVED_SOUTH_EAST = 9;
-	public static final int CURVED_NORTH_EAST = 8;
+    public static final int STRAIGHT_NORTH_SOUTH = 1;
+    public static final int SLOPED_ASCENDING_NORTH = 2;
+    public static final int SLOPED_ASCENDING_SOUTH = 3;
+    public static final int SLOPED_ASCENDING_EAST = 4;
+    public static final int SLOPED_ASCENDING_WEST = 5;
+    public static final int CURVED_NORTH_WEST = 7;
+    public static final int CURVED_SOUTH_WEST = 6;
+    public static final int CURVED_SOUTH_EAST = 9;
+    public static final int CURVED_NORTH_EAST = 8;
 
     public BlockRail() {
         this(0);
