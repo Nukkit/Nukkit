@@ -1,5 +1,6 @@
 package cn.nukkit.level.format.anvil;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 import java.nio.ByteBuffer;
@@ -71,43 +72,78 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z) {
-        return setBlock(x, y, z, null, null);
+    public boolean setBlock(int x, int y, int z, int blockId) {
+        return setBlock(x, y, z, blockId, 0);
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, Integer blockId) {
-        return setBlock(x, y, z, blockId, null);
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, Integer blockId, Integer meta) {
+    public Block getAndSetBlock(int x, int y, int z, Block block) {
         int i = (y << 8) + (z << 4) + x;
-        boolean changed = false;
-        if (blockId != null) {
-            byte id = (byte) (blockId & 0xff);
-            if (this.blocks[i] != id) {
-                this.blocks[i] = id;
-                changed = true;
+        int idPrevious = this.blocks[i] & 0xFF;
+        if (idPrevious != block.getId()) {
+            this.blocks[i] = (byte) block.getId();
+            if (Block.mightHaveMeta(block.getId())) {
+                i >>= 1;
+                int old = this.data[i] & 0xff;
+                if ((x & 1) == 0) {
+                    int previousData = (old & 0xf0);
+                    this.data[i] = (byte) ((old & 0xf0) | (block.getDamage() & 0x0f));
+                    return Block.fullList[(idPrevious << 4) + previousData];
+                } else {
+                    int previousData = (old & 0x0f);
+                    this.data[i] = (byte) (((block.getDamage() & 0x0f) << 4) | previousData);
+                    return Block.fullList[(idPrevious << 4) + previousData];
+                }
             }
-        }
-
-        if (meta != null) {
+            return Block.fullList[idPrevious << 4];
+        } else if (Block.mightHaveMeta(idPrevious & 0xFF)) {
             i >>= 1;
             int old = this.data[i] & 0xff;
             if ((x & 1) == 0) {
-                this.data[i] = (byte) ((((old & 0xf0) | meta & 0x0f)) & 0xff);
-                if (!meta.equals(old & 0x0f)) {
+                int previousData = (old & 0xf0);
+                this.data[i] = (byte) ((old & 0xf0) | (block.getDamage() & 0x0f));
+                return Block.fullList[(idPrevious << 4) + previousData];
+            } else {
+                int previousData = (old & 0x0f);
+                this.data[i] = (byte) (((block.getDamage() & 0x0f) << 4) | previousData);
+                return Block.fullList[(idPrevious << 4) + previousData];
+            }
+        }
+        return block;
+    }
+
+    @Override
+    public boolean setBlock(int x, int y, int z, int blockId, int meta) {
+        int i = (y << 8) + (z << 4) + x;
+        boolean changed = false;
+        int idPrevious = this.blocks[i] & 0xFF;
+        if (idPrevious != blockId) {
+            this.blocks[i] = (byte) blockId;
+            changed = true;
+            if (Block.mightHaveMeta(blockId)) {
+                i >>= 1;
+                int old = this.data[i] & 0xff;
+                if ((x & 1) == 0) {
+                    this.data[i] = (byte) ((old & 0xf0) | (meta & 0x0f));
+                } else {
+                    this.data[i] = (byte) (((meta & 0x0f) << 4) | (old & 0x0f));
+                }
+            }
+        } else if (Block.mightHaveMeta(idPrevious & 0xFF)) {
+            i >>= 1;
+            int old = this.data[i] & 0xff;
+            if ((x & 1) == 0) {
+                this.data[i] = (byte) ((old & 0xf0) | (meta & 0x0f));
+                if ((old & 0x0f) != meta) {
                     changed = true;
                 }
             } else {
-                this.data[i] = (byte) ((((meta & 0x0f) << 4) | (old & 0x0f)) & 0xff);
-                if (!meta.equals((old & 0xf0) >> 4)) {
+                this.data[i] = (byte) (((meta & 0x0f) << 4) | (old & 0x0f));
+                if (meta != ((old & 0xf0) >> 4)) {
                     changed = true;
                 }
             }
         }
-
         return changed;
     }
 

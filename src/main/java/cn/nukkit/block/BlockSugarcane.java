@@ -78,7 +78,7 @@ public class BlockSugarcane extends BlockFlowable {
                     for (y = 1; y < 3; ++y) {
                         Block b = this.getLevel().getTemporalBlock((int) this.x, (int) (this.y + y), (int) this.z);
                         if (b.getId() == AIR) {
-                            this.getLevel().setBlock((int) this.x, (int) (this.y + y), (int) this.z, new BlockSugarcane(), true, true);
+                            this.getLevel().setBlock((int) this.x, (int) (this.y + y), (int) this.z, new BlockSugarcane(), false, true);
                             break;
                         }
                     }

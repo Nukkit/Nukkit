@@ -88,7 +88,7 @@ public class BlockFarmland extends BlockTransparent {
                 return Level.BLOCK_UPDATE_RANDOM;
             }
 
-            this.level.setBlock(this, new BlockDirt(), true, true);
+            this.level.setBlock(this, new BlockDirt(), false, true);
 
             return Level.BLOCK_UPDATE_RANDOM;
         }

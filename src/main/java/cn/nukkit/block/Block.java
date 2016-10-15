@@ -558,7 +558,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return block;
     }
 
-    public static final boolean mightHaveData(int id) {
+    public static final boolean mightHaveMeta(int id) {
         switch (id) {
             case AIR:
             case GRASS:
@@ -728,6 +728,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public abstract String getName();
 
     public abstract int getId();
+
+    public final int getFullId() {
+        return (getId() << 4) + getDamage();
+    }
 
     public void addVelocityToEntity(Entity entity, Vector3 vector) {
 

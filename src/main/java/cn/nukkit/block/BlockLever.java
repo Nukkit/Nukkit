@@ -84,7 +84,7 @@ public class BlockLever extends BlockFlowable {
 
          this.setDamage(this.getDamage() ^ 0x08);
 
-        this.getLevel().setBlock(this, this, true, true);
+        this.getLevel().setBlock(this, this, false, true);
         this.getLevel().addSound(new LeverSound(this, this.isPowerOn()));
         if (this.isPowerOn()) {
             this.setPowerSource(true);

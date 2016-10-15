@@ -151,7 +151,7 @@ public class BlockRail extends BlockFlowable {
                 this.meta = subtract[0].x == 0 ? 0 : 1;
             }
         }
-        this.getLevel().setBlock(this, Block.get(this.getId(), this.getDamage()), true, true);
+        this.getLevel().setBlock(this, Block.get(this.getId(), this.getDamage()), false, true);
     }
 
     protected static Vector3[] checkRail(Block rail) {

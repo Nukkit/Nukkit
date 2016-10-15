@@ -1,8 +1,8 @@
 package cn.nukkit.level.format;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -26,11 +26,11 @@ public interface FullChunk extends Cloneable {
 
     int getFullBlock(int x, int y, int z);
 
-    boolean setBlock(int x, int y, int z);
+    Block getAndSetBlock(int x, int y, int z, Block block);
 
-    boolean setBlock(int x, int y, int z, Integer blockId);
+    boolean setBlock(int x, int y, int z, int blockId);
 
-    boolean setBlock(int x, int y, int z, Integer blockId, Integer meta);
+    boolean setBlock(int x, int y, int z, int blockId, int meta);
 
     int getBlockId(int x, int y, int z);
 

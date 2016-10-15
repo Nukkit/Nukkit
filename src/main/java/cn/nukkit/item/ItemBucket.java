@@ -88,7 +88,7 @@ public class ItemBucket extends Item {
             PlayerBucketEmptyEvent ev;
             player.getServer().getPluginManager().callEvent(ev = new PlayerBucketEmptyEvent(player, block, face, this, result));
             if (!ev.isCancelled()) {
-                player.getLevel().setBlock(block, targetBlock, true, true);
+                player.getLevel().setBlock(block, targetBlock, false, true);
                 if (player.isSurvival()) {
                     this.setCount(this.getCount() - 1);
                     player.getInventory().setItemInHand(this);
