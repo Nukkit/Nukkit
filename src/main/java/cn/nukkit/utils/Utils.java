@@ -16,7 +16,7 @@ import java.io.StringWriter;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * author: MagicDroidX
@@ -126,4 +126,16 @@ public class Utils {
         return UUID.nameUUIDFromBytes(stream.toByteArray());
     }
 
+    public static <T extends Collection<?>> T removeDuplicates(T input) {
+        List<Object> unique = new ArrayList<>();
+        for (Iterator<?> iter = input.iterator(); iter.hasNext(); ) {
+            Object next = iter.next();
+            if (unique.contains(next)) {
+                iter.remove();
+            } else {
+                unique.add(next);
+            }
+        }
+        return input;
+    }
 }

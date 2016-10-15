@@ -289,6 +289,10 @@ public class Level implements ChunkManager, Metadatable {
         return blockHash(block.x, block.y, block.z);
     }
 
+    public static int blockHash(BlockVector3 block) {
+        return localBlockHash(block.x, block.y, block.z);
+    }
+
     public static short localBlockHash(double x, double y, double z) {
         byte hi = (byte) (((int) x & 15) + (((int) z & 15) << 4));
         byte lo = (byte) y;

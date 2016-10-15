@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.redstone.IndirectRedstoneSource;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
@@ -21,7 +22,7 @@ import java.util.List;
  * author: MagicDroidX
  * Nukkit Project
  */
-public abstract class Block extends Position implements Metadatable, Cloneable {
+public abstract class Block extends Position implements Metadatable, Cloneable, IndirectRedstoneSource{
     public static final int AIR = 0;
     public static final int STONE = 1;
     public static final int GRASS = 2;
