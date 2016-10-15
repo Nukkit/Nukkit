@@ -108,8 +108,8 @@ public abstract class EntityCreature extends EntityLiving {
         if(!this.onGround){
             return false;
         }
-        if(this.motionY <= this.getGravity() * 4){
-            this.motionY = this.getGravity() * 4;
+        if(this.motionY <= this.getGravity() * 6){
+            this.motionY = this.getGravity() * 6;
         }else{
             this.motionY += this.getGravity() * 0.25;
         }
