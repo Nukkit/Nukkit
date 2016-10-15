@@ -41,7 +41,7 @@ public class DefaultVisitor implements BlockVisitor {
             }
         }
         Block toFloor = level.getBlock(temporalVector.setComponents(to.getFloorX(), to.getFloorY() - 1, to.getFloorZ()));
-        if (toFloor.isSolid() && (to.getFloorY() <= from.getFloorY() || !(toFloor instanceof BlockFence) || !(toFloor instanceof BlockFenceGate))) {
+        if ((toFloor.isSolid() || toFloor.getId() == Block.WATER || toFloor.getId() == Block.STILL_WATER) && (to.getFloorY() <= from.getFloorY() || !(toFloor instanceof BlockFence) || !(toFloor instanceof BlockFenceGate))) {
             for (int y = 1; y < height; y++) {
                 if (level.getBlock(temporalVector.setComponents(to.getFloorX(), to.getFloorY() + y, to.getFloorZ())).isSolid()) {
                     return false;

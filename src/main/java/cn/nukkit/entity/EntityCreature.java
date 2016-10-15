@@ -1,6 +1,7 @@
 package cn.nukkit.entity;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.ai.MobAI;
 import cn.nukkit.entity.projectile.EntityProjectile;
@@ -136,7 +137,7 @@ public abstract class EntityCreature extends EntityLiving {
             return false;
         }
         this.lastUpdate = currentTick;
-        boolean hasUpdate = this.entityBaseTick(tickDiff) || this.calculateAndPerformMove(tickDiff) != null;
+        boolean hasUpdate = this.entityBaseTick(tickDiff) | this.calculateAndPerformMove(tickDiff) != null;
         if (target != null && target instanceof EntityCreature) {
             attackTarget((EntityCreature) target);
         }
@@ -159,9 +160,24 @@ public abstract class EntityCreature extends EntityLiving {
     }
 
     public void defaultMovement(int tickDiff) {
-        this.move(this.motionX * tickDiff, this.motionY, this.motionZ * tickDiff);
+        calculateAndPerformFlow(tickDiff);
         this.motionY -= this.getGravity() * tickDiff;
         this.updateMovement();
+    }
+
+    private boolean calculateAndPerformFlow(int tickDiff) {
+        Block block = level.getBlock(this);
+        int blockId = block.getId();
+        this.move(this.motionX * tickDiff, this.motionY, this.motionZ * tickDiff);
+        if (block instanceof BlockLiquid) {
+            Vector3 flow = ((BlockLiquid) block).getFlowVector();
+            this.motionX += flow.x * 0.05 * tickDiff;
+            this.motionY += (this.getGravity() * 1.1 + flow.y * 0.05) * tickDiff;
+            this.motionZ += flow.x * 0.05 * tickDiff;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public Vector3 calculateAndPerformMove(int tickDiff){
@@ -170,6 +186,7 @@ public abstract class EntityCreature extends EntityLiving {
             return null;
         }
         if (intelligence == null) {
+            this.defaultMovement(tickDiff);
             return null;
         }
 
@@ -240,6 +257,7 @@ public abstract class EntityCreature extends EntityLiving {
             double dz = this.motionZ * tickDiff;
             this.move(dx, dy, dz);
         }
+        calculateAndPerformFlow(tickDiff);
         this.updateMovement();
         return this.target;
     }
