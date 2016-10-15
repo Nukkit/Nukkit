@@ -1,5 +1,9 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.entity.ai.CreatureFleeAI;
+import cn.nukkit.entity.ai.CreatureWanderAI;
+import cn.nukkit.entity.ai.FollowItemAI;
+import cn.nukkit.entity.ai.MobAIUnion;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -14,6 +18,7 @@ public class EntityCow extends EntityAnimal {
 
     public EntityCow(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+        setAI(new MobAIUnion(new CreatureFleeAI(this, 32), new FollowItemAI(this, Item.WHEAT, 49, 32), new CreatureWanderAI(this)));
     }
 
     @Override

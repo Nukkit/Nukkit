@@ -20,6 +20,10 @@ public class Vector3 implements Cloneable {
         this(0, 0, 0);
     }
 
+    public Vector3(Vector3 other) {
+        this(other.x, other.y, other.z);
+    }
+
     public Vector3(double x) {
         this(x, 0, 0);
     }
@@ -47,15 +51,15 @@ public class Vector3 implements Cloneable {
     }
 
     public int getFloorX() {
-        return (int) this.x;
+        return NukkitMath.floorDouble(this.x);
     }
 
     public int getFloorY() {
-        return (int) this.y;
+        return (int)(this.y);
     }
 
     public int getFloorZ() {
-        return (int) this.z;
+        return NukkitMath.floorDouble(this.z);
     }
 
     public double getRight() {

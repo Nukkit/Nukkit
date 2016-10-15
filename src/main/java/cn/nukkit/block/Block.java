@@ -13,7 +13,6 @@ import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.utils.BlockColor;
-
 import java.lang.reflect.Constructor;
 import java.util.List;
 
@@ -566,6 +565,21 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             block.level = pos.level;
         }
         return block;
+    }
+
+    @Override
+    public final int getFloorX() {
+        return (int) (this.x);
+    }
+
+    @Override
+    public final int getFloorY() {
+        return (int) (this.y);
+    }
+
+    @Override
+    public final int getFloorZ() {
+        return (int) (this.z);
     }
 
     public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz) {
