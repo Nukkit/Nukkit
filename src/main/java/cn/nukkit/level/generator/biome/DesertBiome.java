@@ -16,4 +16,9 @@ public class DesertBiome extends SandyBiome {
     public String getName() {
         return "Desert";
     }
+    
+    @Override
+    public int getColor() {
+        return 0x5E9D34;
+    }
 }
