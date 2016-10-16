@@ -5,6 +5,7 @@ import cn.nukkit.block.BlockSand;
 import cn.nukkit.block.BlockSandstone;
 import cn.nukkit.level.generator.populator.PopulatorCactus;
 import cn.nukkit.level.generator.populator.PopulatorDeadBush;
+import cn.nukkit.level.Level;
 
 /**
  * author: MagicDroidX
@@ -45,4 +46,5 @@ public abstract class SandyBiome extends NormalBiome implements CaveBiome{
     public int getStoneBlock() {
         return Block.SANDSTONE;
     }
+    level.setBiomeColor(x, z, 94, 157, 52);
 }
