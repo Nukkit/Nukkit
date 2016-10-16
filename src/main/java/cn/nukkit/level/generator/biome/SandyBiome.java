@@ -46,5 +46,9 @@ public abstract class SandyBiome extends NormalBiome implements CaveBiome{
     public int getStoneBlock() {
         return Block.SANDSTONE;
     }
-    level.setBiomeColor(94, 157, 52);
+    
+    @Override
+    public int getColor() {
+        return 0x5E9D34;
+    }
 }
