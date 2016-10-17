@@ -16,6 +16,7 @@ public class GamemodeCommand extends VanillaCommand {
     public GamemodeCommand(String name) {
         super(name, "%nukkit.command.gamemode.description", "%commands.gamemode.usage");
         this.setPermission("nukkit.command.gamemode");
+        this.setAliases(new String[]{"gm"});
     }
 
     @Override
@@ -53,9 +54,7 @@ public class GamemodeCommand extends VanillaCommand {
             return true;
         }
 
-        ((Player) target).setGamemode(gameMode);
-
-        if (gameMode != ((Player) target).getGamemode()) {
+        if (gameMode == ((Player) target).getGamemode()) {
             sender.sendMessage("Game mode update for " + target.getName() + " failed");
         } else {
             if (target.equals(sender)) {
@@ -65,7 +64,7 @@ public class GamemodeCommand extends VanillaCommand {
                 Command.broadcastCommandMessage(sender, new TranslationContainer("commands.gamemode.success.other", new String[]{target.getName(), Server.getGamemodeString(gameMode)}));
             }
         }
-
+        ((Player) target).setGamemode(gameMode);
         return true;
     }
 }
