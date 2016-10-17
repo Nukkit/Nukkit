@@ -550,11 +550,13 @@ public abstract class BaseFullChunk implements FullChunk {
     public int getFullBlock(int x, int y, int z) {
         int i = (x << 11) | (z << 7) | y;
         int block = this.blocks[i] & 0xff;
-        int data = this.data[i >> 1] & 0xff;
-        if ((y & 1) == 0) {
-            return (block << 4) | (data & 0x0f);
-        } else {
-            return (block << 4) | (data >> 4);
+        synchronized (this) {
+            int data = this.data[i >> 1] & 0xff;
+            if ((y & 1) == 0) {
+                return (block << 4) | (data & 0x0f);
+            } else {
+                return (block << 4) | (data >> 4);
+            }
         }
     }
 

@@ -140,8 +140,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
             try {
                 if (packet.buffer.length > 0) {
                     if (packet.buffer[0] == PING_DataPacket.ID) {
-                        PING_DataPacket pingPacket = new PING_DataPacket();
-                        pingPacket.buffer = packet.buffer;
+                        PING_DataPacket pingPacket = new PING_DataPacket(packet.buffer);
                         pingPacket.decode();
 
                         this.networkLatency.put(identifier, (int) pingPacket.pingID);
@@ -233,13 +232,14 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     @Override
     public Integer putPacket(Player player, DataPacket packet, boolean needACK, boolean immediate) {
         if (this.identifiers.containsKey(player.rawHashCode())) {
-            byte[] buffer = packet.getBuffer();
             String identifier = this.identifiers.get(player.rawHashCode());
             EncapsulatedPacket pk = null;
+            final byte[] buffer;
             if (!packet.isEncoded) {
                 packet.encode();
                 buffer = packet.getBuffer();
             } else if (!needACK) {
+                buffer = packet.getBuffer();
                 if (packet.encapsulatedPacket == null) {
                     packet.encapsulatedPacket = new CacheEncapsulatedPacket();
                     packet.encapsulatedPacket.identifierACK = null;
@@ -253,6 +253,8 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
                     }
                 }
                 pk = packet.encapsulatedPacket;
+            } else {
+                buffer = packet.getBuffer();
             }
 
 

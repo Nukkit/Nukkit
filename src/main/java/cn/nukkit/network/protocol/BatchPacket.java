@@ -9,6 +9,10 @@ public class BatchPacket extends DataPacket {
 
     public byte[] payload;
 
+    public BatchPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -21,6 +25,7 @@ public class BatchPacket extends DataPacket {
 
     @Override
     public void encode() {
+        setBuffer(new byte[5 + this.payload.length]);
         this.reset();
         this.putInt(this.payload.length);
         this.put(this.payload);

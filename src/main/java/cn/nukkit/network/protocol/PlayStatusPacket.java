@@ -7,6 +7,10 @@ public class PlayStatusPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.PLAY_STATUS_PACKET;
 
+    public PlayStatusPacket() {
+        super(5);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;

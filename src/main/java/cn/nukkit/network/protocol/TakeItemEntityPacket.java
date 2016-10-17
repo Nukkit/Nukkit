@@ -10,6 +10,10 @@ public class TakeItemEntityPacket extends DataPacket {
     public long entityId;
     public long target;
 
+    public TakeItemEntityPacket() {
+        super(17);
+    }
+
     @Override
     public void decode() {
     }

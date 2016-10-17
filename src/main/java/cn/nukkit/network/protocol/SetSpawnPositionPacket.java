@@ -7,6 +7,10 @@ public class SetSpawnPositionPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.SET_SPAWN_POSITION_PACKET;
 
+    public SetSpawnPositionPacket() {
+        super(13);
+    }
+
     public int y;
     public int z;
     public int x;

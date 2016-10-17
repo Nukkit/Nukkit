@@ -1117,16 +1117,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (entity instanceof EntityArrow && ((EntityArrow) entity).hadCollision) {
                 ItemArrow item = new ItemArrow();
-                if (this.isSurvival() && !this.inventory.canAddItem(item)) {
-                    continue;
-                }
+                synchronized (inventory) {
+                    if (this.isSurvival() && !this.inventory.canAddItem(item)) {
+                        continue;
+                    }
 
-                InventoryPickupArrowEvent ev;
-                this.server.getPluginManager().callEvent(ev = new InventoryPickupArrowEvent(this.inventory, (EntityArrow) entity));
-                if (ev.isCancelled()) {
-                    continue;
+                    InventoryPickupArrowEvent ev;
+                    this.server.getPluginManager().callEvent(ev = new InventoryPickupArrowEvent(this.inventory, (EntityArrow) entity));
+                    if (ev.isCancelled()) {
+                        continue;
+                    }
+                    this.inventory.addItem(item.clone());
                 }
-
                 TakeItemEntityPacket pk = new TakeItemEntityPacket();
                 pk.entityId = this.getId();
                 pk.target = entity.getId();
@@ -1136,22 +1138,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 pk.entityId = 0;
                 pk.target = entity.getId();
                 this.dataPacket(pk);
-
-                this.inventory.addItem(item.clone());
                 entity.kill();
             } else if (entity instanceof EntityItem) {
                 if (((EntityItem) entity).getPickupDelay() <= 0) {
                     Item item = ((EntityItem) entity).getItem();
 
                     if (item != null) {
-                        if (this.isSurvival() && !this.inventory.canAddItem(item)) {
-                            continue;
-                        }
-
-                        InventoryPickupItemEvent ev;
-                        this.server.getPluginManager().callEvent(ev = new InventoryPickupItemEvent(this.inventory, (EntityItem) entity));
-                        if (ev.isCancelled()) {
-                            continue;
+                        synchronized (inventory) {
+                            if (this.isSurvival() && !this.inventory.canAddItem(item)) {
+                                continue;
+                            }
+                            InventoryPickupItemEvent ev;
+                            this.server.getPluginManager().callEvent(ev = new InventoryPickupItemEvent(this.inventory, (EntityItem) entity));
+                            if (ev.isCancelled()) {
+                                continue;
+                            }
+                            this.inventory.addItem(item.clone());
                         }
 
                         //todo: achievement
@@ -1173,8 +1175,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         pk.entityId = 0;
                         pk.target = entity.getId();
                         this.dataPacket(pk);
-
-                        this.inventory.addItem(item.clone());
                         entity.kill();
                     }
                 }
@@ -2576,9 +2576,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 if (this.getGamemode() == SURVIVAL) {
                                     if (itemInHand.getCount() > 1) {
                                         ItemGlassBottle bottle = new ItemGlassBottle();
-                                        if (this.inventory.canAddItem(bottle)) {
-                                            this.inventory.addItem(bottle);
-                                        }
+                                        this.inventory.addItem(bottle);
                                         --itemInHand.count;
                                     } else {
                                         itemInHand = new ItemGlassBottle();
@@ -2939,59 +2937,61 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         int[] used = new int[this.inventory.getSize()];
 
-                        for (Item ingredient : ingredients) {
-                            slot = -1;
-                            for (int index : this.inventory.getContents().keySet()) {
-                                Item i = this.inventory.getContents().get(index);
-                                if (ingredient.getId() != 0 && ingredient.deepEquals(i, ingredient.hasMeta()) && (i.getCount() - used[index]) >= 1) {
-                                    slot = index;
-                                    used[index]++;
+                        synchronized (inventory) {
+                            for (Item ingredient : ingredients) {
+                                slot = -1;
+                                for (int index : this.inventory.getContents().keySet()) {
+                                    Item i = this.inventory.getContents().get(index);
+                                    if (ingredient.getId() != 0 && ingredient.deepEquals(i, ingredient.hasMeta()) && (i.getCount() - used[index]) >= 1) {
+                                        slot = index;
+                                        used[index]++;
+                                        break;
+                                    }
+                                }
+
+                                if (ingredient.getId() != 0 && slot == -1) {
+                                    canCraft = false;
                                     break;
                                 }
                             }
 
-                            if (ingredient.getId() != 0 && slot == -1) {
-                                canCraft = false;
+                            if (!canCraft) {
+                                this.server.getLogger().debug("(3) Unmatched recipe " + recipe.getId() + " from player " + this.getName() + ": client does not have enough items, using: " + Arrays.asList(ingredients).toString());
+                                this.inventory.sendContents(this);
                                 break;
                             }
-                        }
+                            CraftItemEvent craftItemEvent;
+                            this.server.getPluginManager().callEvent(craftItemEvent = new CraftItemEvent(this, ingredients, recipe));
 
-                        if (!canCraft) {
-                            this.server.getLogger().debug("(3) Unmatched recipe " + recipe.getId() + " from player " + this.getName() + ": client does not have enough items, using: " + Arrays.asList(ingredients).toString());
-                            this.inventory.sendContents(this);
-                            break;
-                        }
-                        CraftItemEvent craftItemEvent;
-                        this.server.getPluginManager().callEvent(craftItemEvent = new CraftItemEvent(this, ingredients, recipe));
-
-                        if (craftItemEvent.isCancelled()) {
-                            this.inventory.sendContents(this);
-                            break;
-                        }
-
-                        for (int i = 0; i < used.length; i++) {
-                            int count = used[i];
-                            if (count == 0) {
-                                continue;
+                            if (craftItemEvent.isCancelled()) {
+                                this.inventory.sendContents(this);
+                                break;
                             }
 
-                            item = this.inventory.getItem(i);
+                            for (int i = 0; i < used.length; i++) {
+                                int count = used[i];
+                                if (count == 0) {
+                                    continue;
+                                }
 
-                            Item newItem;
-                            if (item.getCount() > count) {
-                                newItem = item.clone();
-                                newItem.setCount(item.getCount() - count);
-                            } else {
-                                newItem = new ItemBlock(new BlockAir(), 0, 0);
+                                item = this.inventory.getItem(i);
+
+                                Item newItem;
+                                if (item.getCount() > count) {
+                                    newItem = item.clone();
+                                    newItem.setCount(item.getCount() - count);
+                                } else {
+                                    newItem = new ItemBlock(new BlockAir(), 0, 0);
+                                }
+
+                                this.inventory.setItem(i, newItem);
                             }
 
-                            this.inventory.setItem(i, newItem);
-                        }
-
-                        Item[] extraItem = this.inventory.addItem(recipe.getResult());
-                        if (extraItem.length > 0) {
-                            for (Item i : extraItem) {
-                                this.level.dropItem(this, i);
+                            Item[] extraItem = this.inventory.addItem(recipe.getResult());
+                            if (extraItem.length > 0) {
+                                for (Item i : extraItem) {
+                                    this.level.dropItem(this, i);
+                                }
                             }
                         }
                     }

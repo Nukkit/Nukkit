@@ -14,15 +14,13 @@ import java.util.UUID;
  * Nukkit Project
  */
 public class BinaryStream extends OutputStream{
-    public static final int DEFAULT_BLOCK_SIZE = 1024;
-
     public int offset;
-    private byte[] buffer;
-    private final ArrayDeque<byte[]> buffers = new ArrayDeque<>();
-    private final byte[] shortBuffer = new byte[2];
-    private final byte[] intBuffer = new byte[4];
-    private final byte[] longBuffer = new byte[8];
-    private int count;
+    public byte[] buffer;
+    protected final ArrayDeque<byte[]> buffers = new ArrayDeque<>();
+    protected final byte[] shortBuffer = new byte[2];
+    protected final byte[] intBuffer = new byte[4];
+    protected final byte[] longBuffer = new byte[8];
+    protected int count;
 
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
@@ -34,7 +32,6 @@ public class BinaryStream extends OutputStream{
         this(new byte[buffer]);
     }
 
-
     public BinaryStream(byte[] buffer) {
         this(buffer, 0);
     }
@@ -44,8 +41,14 @@ public class BinaryStream extends OutputStream{
         this.offset = offset;
     }
 
+    public int getBlockSize() {
+        return 1024;
+    }
+
     public void reset() {
-        setBuffer(new byte[35]);
+        if (offset != 0 || !this.buffers.isEmpty()) {
+            setBuffer(buffer == null ? new byte[35] : buffer);
+        }
     }
 
     public final void setBuffer(byte[] buffer) {
@@ -65,7 +68,7 @@ public class BinaryStream extends OutputStream{
     private final void addBuffer() {
         buffers.addLast(buffer);
         count += buffer.length;
-        buffer = new byte[DEFAULT_BLOCK_SIZE];
+        buffer = new byte[getBlockSize()];
         offset = 0;
     }
 
@@ -99,6 +102,9 @@ public class BinaryStream extends OutputStream{
 
     public byte[] getBuffer() {
         if (buffers.isEmpty()) {
+            if (buffer.length == offset) {
+                return buffer;
+            }
             buffer = Arrays.copyOfRange(buffer, 0, offset);
             return buffer;
         }
@@ -117,6 +123,29 @@ public class BinaryStream extends OutputStream{
         // write the internal buffer directly
         System.arraycopy(buffer, 0, data, pos, offset);
 
+        this.offset = count + offset;
+        this.buffer = data;
+        this.buffers.clear();
+        return this.buffer;
+    }
+
+    public byte[] getRawBuffer() {
+        if (buffers.isEmpty()) {
+            return buffer;
+        }
+        byte[] data = new byte[getCount()];
+        // Check if we have a list of buffers
+        int pos = 0;
+
+        if (buffers != null) {
+            for (byte[] bytes : buffers) {
+                System.arraycopy(bytes, 0, data, pos, bytes.length);
+                pos += bytes.length;
+            }
+        }
+        // write the internal buffer directly
+        System.arraycopy(buffer, 0, data, pos, buffer.length);
+        this.offset = count + offset;
         this.buffer = data;
         this.buffers.clear();
         return this.buffer;
@@ -154,13 +183,15 @@ public class BinaryStream extends OutputStream{
     public final void put(byte[] b) {
         if (b.length > buffer.length) {
             if (offset > 0) {
-                byte[] buf2 = new byte[offset];
-                System.arraycopy(buffer, 0, buf2, 0, offset);
-                buffer = buf2;
+                if (offset != buffer.length) {
+                    byte[] buf2 = new byte[offset];
+                    System.arraycopy(buffer, 0, buf2, 0, offset);
+                    buffer = buf2;
+                }
                 addBuffer();
             }
-            count += b.length;
-            buffers.addLast(b);
+            buffer = b;
+            offset = b.length;
         } else {
             put(b, 0, b.length);
         }

@@ -8,6 +8,10 @@ public class DisconnectPacket extends DataPacket {
 
     public String message;
 
+    public DisconnectPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -20,6 +24,7 @@ public class DisconnectPacket extends DataPacket {
 
     @Override
     public void encode() {
+        setBuffer(new byte[3 + this.message.length()]);
         this.reset();
         this.putString(this.message);
     }

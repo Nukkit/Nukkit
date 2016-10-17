@@ -9,6 +9,14 @@ import cn.nukkit.raknet.protocol.Packet;
 public class PING_DataPacket extends Packet {
     public static final byte ID = (byte) 0x00;
 
+    public PING_DataPacket() {
+        super(9);
+    }
+
+    public PING_DataPacket(byte[] buffer) {
+        super(buffer);
+    }
+
     @Override
     public byte getID() {
         return ID;

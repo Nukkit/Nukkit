@@ -1437,9 +1437,7 @@ public class Level implements ChunkManager, Metadatable {
             int cz = z >> 4;
             BaseFullChunk chunk = getChunk(cx, cz);
             if (chunk != null) {
-                synchronized (chunk) {
-                    fullState = chunk.getFullBlock(x & 0xF, y, z & 0xF);
-                }
+                fullState = chunk.getFullBlock(x & 0xF, y, z & 0xF);
             } else {
                 fullState = 0;
             }
@@ -1670,7 +1668,7 @@ public class Level implements ChunkManager, Metadatable {
         WeakReference<Map<Short, Object>> current = changedBlocks.get(index);
         if (current == null) {
             WeakReference toPut = new WeakReference(new ConcurrentHashMap<>(8, 0.9f, 1));
-            current = this.changedBlocks.putIfAbsent(index, current);
+            current = this.changedBlocks.putIfAbsent(index, toPut);
             if (current == null) {
                 current = toPut;
             }

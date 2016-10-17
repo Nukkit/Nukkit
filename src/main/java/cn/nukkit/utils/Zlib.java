@@ -18,7 +18,7 @@ public abstract class Zlib {
         deflater.reset();
         deflater.setInput(data);
         deflater.finish();
-        BinaryStream bos = new BinaryStream(data.length);
+        BinaryStream bos = new BinaryStream(Math.min(data.length, 1024));
         byte[] buf = new byte[1024];
         try {
             while (!deflater.finished()) {
@@ -33,7 +33,7 @@ public abstract class Zlib {
 
     public static byte[] inflate(InputStream stream) throws IOException {
         InflaterInputStream inputStream = new InflaterInputStream(stream);
-        BinaryStream outputStream = new BinaryStream();
+        BinaryStream outputStream = new BinaryStream(39);
         byte[] buffer = new byte[1024];
         int length;
 

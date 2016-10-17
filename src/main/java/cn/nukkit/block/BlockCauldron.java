@@ -148,10 +148,9 @@ public class BlockCauldron extends BlockSolidMeta {
                     item.setCount(item.getCount() - 1);
 
                     Item bottle = new ItemGlassBottle();
-                    if (player.getInventory().canAddItem(bottle)) {
-                        player.getInventory().addItem(bottle);
-                    } else {
-                        player.getLevel().dropItem(player.add(0, 1.3, 0), bottle, player.getDirectionVector().multiply(0.4));
+                    Item[] left = player.getInventory().addItem(bottle);
+                    for (Item current : left) {
+                        player.getLevel().dropItem(player.add(0, 1.3, 0), current, player.getDirectionVector().multiply(0.4));
                     }
                 }
 
@@ -172,10 +171,9 @@ public class BlockCauldron extends BlockSolidMeta {
                     item.setCount(item.getCount() - 1);
 
                     Item potion = new ItemPotion();
-                    if (player.getInventory().canAddItem(potion)) {
-                        player.getInventory().addItem(potion);
-                    } else {
-                        player.getLevel().dropItem(player.add(0, 1.3, 0), potion, player.getDirectionVector().multiply(0.4));
+                    Item[] left = player.getInventory().addItem(potion);
+                    for (Item current : left) {
+                        player.getLevel().dropItem(player.add(0, 1.3, 0), current, player.getDirectionVector().multiply(0.4));
                     }
                 }
 

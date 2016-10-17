@@ -17,11 +17,26 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
     public Integer orderIndex = null;
     public Integer orderChannel = null;
 
+    public DataPacket() {}
+
+    public DataPacket(int buffer) {
+        super(buffer);
+    }
+
+    public DataPacket(byte[] buffer) {
+        super(buffer);
+    }
+
     public abstract byte pid();
 
     public abstract void decode();
 
     public abstract void encode();
+
+    @Override
+    public int getBlockSize() {
+        return 35;
+    }
 
     @Override
     public void reset() {
@@ -47,6 +62,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
     @Override
     public DataPacket clone() {
         try {
+            getRawBuffer();
             return (DataPacket) super.clone();
         } catch (CloneNotSupportedException e) {
             return null;

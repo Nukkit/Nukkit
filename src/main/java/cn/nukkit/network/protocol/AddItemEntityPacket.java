@@ -23,6 +23,10 @@ public class AddItemEntityPacket extends DataPacket {
     public float speedY;
     public float speedZ;
 
+    public AddItemEntityPacket() {
+        super(null);
+    }
+
     @Override
     public void decode() {
 
@@ -30,6 +34,11 @@ public class AddItemEntityPacket extends DataPacket {
 
     @Override
     public void encode() {
+        if (this.item == null) {
+            this.setBuffer(new byte[35]);
+        } else {
+            this.setBuffer(new byte[40]);
+        }
         this.reset();
         this.putLong(this.eid);
         this.putSlot(this.item);

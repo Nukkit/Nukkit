@@ -18,6 +18,10 @@ public class UpdateBlockPacket extends DataPacket {
 
     public Entry[] records = new Entry[0];
 
+    public UpdateBlockPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -30,6 +34,7 @@ public class UpdateBlockPacket extends DataPacket {
 
     @Override
     public void encode() {
+        setBuffer(new byte[1 + 11 * this.records.length ]);
         this.reset();
         for (Entry entry : this.records) {
             this.putInt(entry.x);

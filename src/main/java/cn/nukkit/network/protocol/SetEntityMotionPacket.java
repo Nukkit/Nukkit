@@ -10,6 +10,10 @@ public class SetEntityMotionPacket extends DataPacket {
     // eid, motX, motY, motZ
     public Entry[] entities = new Entry[0];
 
+    public SetEntityMotionPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -28,7 +32,8 @@ public class SetEntityMotionPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
+        setBuffer(new byte[1 + 20 * this.entities.length]);
+        this.putByte(this.pid());
         for (Entry entry : this.entities) {
             this.putLong(entry.entityId);
             this.putFloat((float) entry.motionX);

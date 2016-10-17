@@ -25,6 +25,12 @@ public class EncapsulatedPacket implements Cloneable {
 
     private int offset;
 
+    public EncapsulatedPacket() {}
+
+    public EncapsulatedPacket(byte[] buffer) {
+        this.buffer = buffer;
+    }
+
     public int getOffset() {
         return offset;
     }
@@ -89,7 +95,12 @@ public class EncapsulatedPacket implements Cloneable {
     }
 
     public byte[] toBinary(boolean internal) {
-        BinaryStream stream = new BinaryStream();
+        BinaryStream stream = new BinaryStream(64) {
+            @Override
+            public int getBlockSize() {
+                return 35;
+            }
+        };
         try {
             stream.write((reliability << 5) | (hasSplit ? 0b00010000 : 0));
             if (internal) {

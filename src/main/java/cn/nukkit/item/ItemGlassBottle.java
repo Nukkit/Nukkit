@@ -4,7 +4,6 @@ package cn.nukkit.item;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.level.Level;
-import cn.nukkit.math.Vector3;
 
 public class ItemGlassBottle extends Item {
 
@@ -34,10 +33,9 @@ public class ItemGlassBottle extends Item {
                 player.getInventory().setItemInHand(potion);
             } else if (this.count > 1) {
                 this.count--;
-                if (player.getInventory().canAddItem(potion)) {
-                    player.getInventory().addItem(potion);
-                } else {
-                    player.getLevel().dropItem(player.add(0, 1.3, 0), potion, player.getDirectionVector().multiply(0.4));
+                Item[] left = player.getInventory().addItem(potion);
+                for (Item current : left) {
+                    player.getLevel().dropItem(player.add(0, 1.3, 0), current, player.getDirectionVector().multiply(0.4));
                 }
             }
         }

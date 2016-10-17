@@ -10,6 +10,10 @@ public class ChangeDimensionPacket extends DataPacket {
 
     public byte dimension;
 
+    public ChangeDimensionPacket() {
+        super(15);
+    }
+
     public float x;
     public float y;
     public float z;

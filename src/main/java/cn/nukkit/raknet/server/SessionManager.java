@@ -82,6 +82,7 @@ public class SessionManager {
                     }
                     --max;
                 } catch (Exception e) {
+                    e.printStackTrace();
                     if (!"".equals(currentSource)) {
                         this.blockAddress(currentSource);
                     }
@@ -177,12 +178,12 @@ public class SessionManager {
 
                 Packet packet = this.getPacketFromPool(pid);
                 if (packet != null) {
-                    packet.buffer = buffer;
+                    packet.setBuffer(buffer);
                     this.getSession(source, port).handlePacket(packet);
                     return true;
                 } else if (pid == UNCONNECTED_PING.ID) {
                     packet = new UNCONNECTED_PING();
-                    packet.buffer = buffer;
+                    packet.setBuffer(buffer);
                     packet.decode();
 
                     UNCONNECTED_PONG pk = new UNCONNECTED_PONG();
@@ -206,12 +207,12 @@ public class SessionManager {
 
     public void sendPacket(Packet packet, String dest, int port) throws IOException {
         packet.encode();
-        this.sendBytes += this.socket.writePacket(packet.buffer, dest, port);
+        this.sendBytes += this.socket.writePacket(packet.getBuffer(), dest, port);
     }
 
     public void sendPacket(Packet packet, InetSocketAddress dest) throws IOException {
         packet.encode();
-        this.sendBytes += this.socket.writePacket(packet.buffer, dest);
+        this.sendBytes += this.socket.writePacket(packet.getBuffer(), dest);
     }
 
     public void streamEncapsulated(Session session, EncapsulatedPacket packet) {

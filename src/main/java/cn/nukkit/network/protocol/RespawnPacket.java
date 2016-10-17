@@ -11,6 +11,10 @@ public class RespawnPacket extends DataPacket {
     public float y;
     public float z;
 
+    public RespawnPacket() {
+        super(13);
+    }
+
     @Override
     public void decode() {
         this.x = getFloat();

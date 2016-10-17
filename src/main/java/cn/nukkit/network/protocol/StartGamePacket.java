@@ -7,6 +7,10 @@ public class StartGamePacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.START_GAME_PACKET;
 
+    public StartGamePacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -40,6 +44,7 @@ public class StartGamePacket extends DataPacket {
 
     @Override
     public void encode() {
+        setBuffer(new byte[51 + unknownstr.length()]);
         this.reset();
         this.putInt(seed);
         this.putByte(dimension);

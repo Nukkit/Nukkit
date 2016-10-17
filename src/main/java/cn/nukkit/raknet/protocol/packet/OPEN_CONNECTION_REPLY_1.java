@@ -10,6 +10,10 @@ import cn.nukkit.raknet.protocol.Packet;
 public class OPEN_CONNECTION_REPLY_1 extends Packet {
     public static final byte ID = (byte) 0x06;
 
+    public OPEN_CONNECTION_REPLY_1() {
+        super(28);
+    }
+
     @Override
     public byte getID() {
         return ID;

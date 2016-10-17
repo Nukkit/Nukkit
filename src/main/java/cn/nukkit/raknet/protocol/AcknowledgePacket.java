@@ -13,6 +13,15 @@ public abstract class AcknowledgePacket extends Packet {
 
     public TreeMap<Integer, Integer> packets;
 
+    public AcknowledgePacket() {
+        super(7);
+    }
+
+    @Override
+    public int getBlockSize() {
+        return 3;
+    }
+
     @Override
     public void encode() {
         super.encode();
@@ -24,7 +33,12 @@ public abstract class AcknowledgePacket extends Packet {
             packets[index++] = i;
         }
         short records = 0;
-        BinaryStream payload = new BinaryStream();
+        BinaryStream payload = new BinaryStream(4) {
+            @Override
+            public int getBlockSize() {
+                return 3;
+            }
+        };
 
         if (count > 0) {
             int pointer = 1;
@@ -64,10 +78,7 @@ public abstract class AcknowledgePacket extends Packet {
         }
 
         this.putShort(records);
-        this.buffer = Binary.appendBytes(
-                this.buffer,
-                payload.getBuffer()
-        );
+        this.put(payload.getBuffer());
     }
 
     @Override
