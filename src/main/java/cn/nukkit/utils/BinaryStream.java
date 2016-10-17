@@ -2,7 +2,6 @@ package cn.nukkit.utils;
 
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.item.Item;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
@@ -124,6 +123,7 @@ public class BinaryStream extends OutputStream{
         System.arraycopy(buffer, 0, data, pos, offset);
 
         this.offset = count + offset;
+        this.count = 0;
         this.buffer = data;
         this.buffers.clear();
         return this.buffer;
@@ -146,6 +146,7 @@ public class BinaryStream extends OutputStream{
         // write the internal buffer directly
         System.arraycopy(buffer, 0, data, pos, buffer.length);
         this.offset = count + offset;
+        this.count = 0;
         this.buffer = data;
         this.buffers.clear();
         return this.buffer;
@@ -203,12 +204,12 @@ public class BinaryStream extends OutputStream{
     }
 
     @Override
-    public final void write(byte[] b) throws IOException {
+    public final void write(byte[] b) {
         put(b);
     }
 
     @Override
-    public final void write(byte[] b, int off, int len) throws IOException {
+    public final void write(byte[] b, int off, int len) {
         put(b, off, len);
     }
 

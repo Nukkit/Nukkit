@@ -418,11 +418,13 @@ public class Binary {
         for (byte[] b : bytes) {
             length += b.length;
         }
-        ByteBuffer buffer = ByteBuffer.allocate(length);
+        int offset = 0;
+        byte[] combined = new byte[length];
         for (byte[] b : bytes) {
-            buffer.put(b);
+            System.arraycopy(b, 0, combined, offset, b.length);
+            offset += b.length;
         }
-        return buffer.array();
+        return combined;
     }
 
     public static byte[] appendBytes(byte byte1, byte[]... bytes2) {

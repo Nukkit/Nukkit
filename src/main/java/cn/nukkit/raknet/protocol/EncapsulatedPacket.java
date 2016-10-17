@@ -2,7 +2,6 @@ package cn.nukkit.raknet.protocol;
 
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
-import java.io.IOException;
 
 /**
  * author: MagicDroidX
@@ -101,36 +100,31 @@ public class EncapsulatedPacket implements Cloneable {
                 return 35;
             }
         };
-        try {
-            stream.write((reliability << 5) | (hasSplit ? 0b00010000 : 0));
-            if (internal) {
-                stream.write(Binary.writeInt(buffer.length));
-                stream.write(Binary.writeInt(identifierACK == null ? 0 : identifierACK));
-            } else {
-                stream.write(Binary.writeShort(buffer.length << 3));
-            }
-
-            if (reliability > 0) {
-                if (reliability >= 2 && reliability != 5) {
-                    stream.write(Binary.writeLTriad(messageIndex == null ? 0 : messageIndex));
-                }
-                if (reliability <= 4 && reliability != 2) {
-                    stream.write(Binary.writeLTriad(orderIndex));
-                    stream.write((byte) (orderChannel & 0xff));
-                }
-            }
-
-            if (hasSplit) {
-                stream.write(Binary.writeInt(splitCount));
-                stream.write(Binary.writeShort(splitID));
-                stream.write(Binary.writeInt(splitIndex));
-            }
-
-            stream.write(buffer);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        stream.write((reliability << 5) | (hasSplit ? 0b00010000 : 0));
+        if (internal) {
+            stream.write(Binary.writeInt(buffer.length));
+            stream.write(Binary.writeInt(identifierACK == null ? 0 : identifierACK));
+        } else {
+            stream.write(Binary.writeShort(buffer.length << 3));
         }
 
+        if (reliability > 0) {
+            if (reliability >= 2 && reliability != 5) {
+                stream.write(Binary.writeLTriad(messageIndex == null ? 0 : messageIndex));
+            }
+            if (reliability <= 4 && reliability != 2) {
+                stream.write(Binary.writeLTriad(orderIndex));
+                stream.write((byte) (orderChannel & 0xff));
+            }
+        }
+
+        if (hasSplit) {
+            stream.write(Binary.writeInt(splitCount));
+            stream.write(Binary.writeShort(splitID));
+            stream.write(Binary.writeInt(splitIndex));
+        }
+
+        stream.write(buffer);
         return stream.toByteArray();
     }
 

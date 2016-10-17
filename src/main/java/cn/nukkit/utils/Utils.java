@@ -157,15 +157,7 @@ public class Utils {
     }
 
     public static UUID dataToUUID(byte[]... params) {
-        BinaryStream stream = new BinaryStream();
-        for (byte[] param : params) {
-            try {
-                stream.write(param);
-            } catch (IOException e) {
-                break;
-            }
-        }
-        return UUID.nameUUIDFromBytes(stream.toByteArray());
+        return UUID.nameUUIDFromBytes(Binary.appendBytes(params));
     }
 
 }

@@ -75,6 +75,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 
 /**
  * @author MagicDroidX
@@ -157,6 +159,7 @@ public class Server {
     private volatile boolean alwaysTickPlayers = false;
     private volatile int baseTickRate = 1;
     private volatile Boolean getAllowFlight = null;
+    public volatile boolean storeGeneratedChunks = false;
 
     private int autoSaveTicker = 0;
     private int autoSaveTicks = 6000;
@@ -383,6 +386,7 @@ public class Server {
         this.executor.submit(new Runnable() {
             @Override
             public void run() {
+                storeGeneratedChunks = (boolean) getConfig("chunk-generation.save-newly-generated", true);
                 maxPlayers = getPropertyInt("max-players", 20);
                 setAutoSave(getPropertyBoolean("auto-save", true));
 
@@ -663,33 +667,91 @@ public class Server {
         }
 
         Timings.playerNetworkSendTimer.startTiming();
-        byte[][] payload = new byte[packets.length * 2][];
-        for (int i = 0; i < packets.length; i++) {
-            DataPacket p = packets[i];
-            if (!p.isEncoded) {
-                p.encode();
-            }
-            byte[] buf = p.getBuffer();
-            payload[i * 2] = Binary.writeInt(buf.length);
-            payload[i * 2 + 1] = buf;
-        }
-        byte[] data;
-        data = Binary.appendBytes(payload);
-
-        List<String> targets = new ArrayList<>();
-        for (Player p : players) {
-            if (p.isConnected()) {
-                targets.add(this.identifier.get(p.rawHashCode()));
-            }
-        }
-
         if (!forceSync && this.networkCompressionAsync) {
+            int size = 0;
+            for (DataPacket packet : packets) {
+                if (!packet.isEncoded) {
+                    packet.encode();
+                    packet.isEncoded = true;
+                }
+                size += 4 + packet.getCount();
+            }
+            byte[] data = new byte[size];
+            byte[] rawBuf;
+            int i = 0;
+            for (DataPacket packet : packets) {
+                rawBuf = packet.getRawBuffer();
+                int len = packet.getCount();
+                data[i] = (byte) ((len >>> 24) & 0xFF);
+                data[i + 1] = (byte) ((len >>> 16) & 0xFF);
+                data[i + 2] = (byte) ((len >>> 8) & 0xFF);
+                data[i + 3] = (byte) ((len) & 0xFF);
+                System.arraycopy(rawBuf, 0, data, i + 4, len);
+                i += 4 + len;
+            }
+            List<String> targets = new ArrayList<>();
+            for (Player p : players) {
+                if (p.isConnected()) {
+                    targets.add(this.identifier.get(p.rawHashCode()));
+                }
+            }
             this.getScheduler().scheduleAsyncTask(new CompressBatchedTask(data, targets, this.networkCompressionLevel));
         } else {
+            int count = Runtime.getRuntime().availableProcessors();
+            ForkJoinPool pool = new ForkJoinPool();
+            int parallelism = Math.min(packets.length, pool.getParallelism());
+            int chunkSize = (packets.length + parallelism - 1) / parallelism;
+            int chunks = (packets.length + chunkSize - 1) / chunkSize;
+            final BatchPacket[] batched = new BatchPacket[chunks];
+            for (int index = 0, offset = 0; index < chunks; index++, offset += chunkSize) {
+                final DataPacket[] range = Arrays.copyOfRange(packets, offset, Math.min(packets.length, offset + chunkSize));
+                pool.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        int size = 0;
+                        for (DataPacket packet : range) {
+                            if (!packet.isEncoded) {
+                                packet.encode();
+                                packet.isEncoded = true;
+                            }
+                            size += 4 + packet.getCount();
+                        }
+                        BinaryStream bs = new BinaryStream(size / 64) {
+                            @Override
+                            public int getBlockSize() {
+                                return 8192;
+                            }
+                        };
+                        try (DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new DeflaterOutputStream(bs, new Deflater(networkCompressionLevel), 8192, true)))) {
+                            byte[] rawBuf;
+                            for (DataPacket packet : range) {
+                                rawBuf = packet.getRawBuffer();
+                                int len = packet.getCount();
+                                dos.writeInt(len);
+                                dos.write(rawBuf, 0, len);
+                            }
+                            dos.close();
+                            byte[] data = bs.getBuffer();
+                            final BatchPacket pk = new BatchPacket();
+                            pk.payload = data;
+                            pk.encode();
+                            pk.isEncoded = true;
+                            for (final Player p : players) {
+                                if (p.isConnected()) {
+                                    p.dataPacket(pk);
+                                }
+                            }
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+            }
+            pool.shutdown();
             try {
-                this.broadcastPacketsCallback(Zlib.deflate(data, this.networkCompressionLevel), targets);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+                pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
         Timings.playerNetworkSendTimer.stopTiming();

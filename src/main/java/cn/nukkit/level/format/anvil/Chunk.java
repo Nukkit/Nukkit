@@ -163,7 +163,9 @@ public class Chunk extends BaseChunk {
     @Override
     public void setPopulated(boolean value) {
         this.nbt.putBoolean("TerrainPopulated", value);
-        this.setChanged();
+        if (Server.getInstance().storeGeneratedChunks) {
+            this.setChanged();
+        }
     }
 
     @Override
@@ -184,7 +186,9 @@ public class Chunk extends BaseChunk {
     @Override
     public void setGenerated(boolean value) {
         this.nbt.putBoolean("TerrainGenerated", value);
-        this.setChanged();
+        if (Server.getInstance().storeGeneratedChunks) {
+            this.setChanged();
+        }
     }
 
     public CompoundTag getNBT() {

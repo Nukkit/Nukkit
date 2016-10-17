@@ -163,7 +163,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected volatile int chunkLoadCount = 0;
     protected final Map<Long, Integer> loadQueue = new ConcurrentHashMap<>(8, 0.9f, 1);
-    protected volatile int nextChunkOrderRun = 5;
+    protected volatile int nextChunkOrderRun = 1;
 
     protected final Map<UUID, Player> hiddenPlayers = new ConcurrentHashMap<>(8, 0.9f, 1);
 
@@ -622,18 +622,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!this.connected) {
             return;
         }
-
         Timings.playerChunkSendTimer.startTiming();
 
         int count = 0;
 
         List<Map.Entry<Long, Integer>> entryList = new ArrayList<>(this.loadQueue.entrySet());
-        entryList.sort(new Comparator<Map.Entry<Long, Integer>>() {
-            @Override
-            public int compare(Map.Entry<Long, Integer> o1, Map.Entry<Long, Integer> o2) {
-                return o1.getValue() - o2.getValue();
-            }
-        });
+        if (entryList.size() + chunkLoadCount > spawnThreshold) {
+            entryList.sort(new Comparator<Map.Entry<Long, Integer>>() {
+                @Override
+                public int compare(Map.Entry<Long, Integer> o1, Map.Entry<Long, Integer> o2) {
+                    return o1.getValue() - o2.getValue();
+                }
+            });
+        }
 
         for (Map.Entry<Long, Integer> entry : entryList) {
             long index = entry.getKey();
@@ -684,10 +685,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.inventory.sendContents(this);
         this.inventory.sendArmorContents(this);
 
-        SetTimePacket setTimePacket = new SetTimePacket();
-        setTimePacket.time = this.level.getTime();
-        setTimePacket.started = !this.level.stopTime.get();
-        this.dataPacket(setTimePacket);
+        if (level.stopTime.get()) {
+            SetTimePacket setTimePacket = new SetTimePacket();
+            setTimePacket.time = this.level.getTime();
+            setTimePacket.started = !this.level.stopTime.get();
+            this.dataPacket(setTimePacket);
+        }
+
 
         Position pos = this.level.getSafeSpawn(this);
 
@@ -697,11 +701,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         pos = respawnEvent.getRespawnPosition();
 
-        RespawnPacket respawnPacket = new RespawnPacket();
-        respawnPacket.x = (float) pos.x;
-        respawnPacket.y = (float) pos.y;
-        respawnPacket.z = (float) pos.z;
-        this.dataPacket(respawnPacket);
+        if (this.getHealth() <= 0) {
+            RespawnPacket  respawnPacket = new RespawnPacket();
+            pos = this.getSpawn();
+            respawnPacket.x = (float) pos.x;
+            respawnPacket.y = (float) pos.y;
+            respawnPacket.z = (float) pos.z;
+            this.dataPacket(respawnPacket);
+        } else {
+            RespawnPacket respawnPacket = new RespawnPacket();
+            respawnPacket.x = (float) pos.x;
+            respawnPacket.y = (float) pos.y;
+            respawnPacket.z = (float) pos.z;
+            this.dataPacket(respawnPacket);
+        }
 
         PlayStatusPacket playStatusPacket = new PlayStatusPacket();
         playStatusPacket.status = PlayStatusPacket.PLAYER_SPAWN;
@@ -731,8 +744,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        this.sendExperience(this.getExperience());
-        this.sendExperienceLevel(this.getExperienceLevel());
+        int experience = this.getExperience();
+        if (experience != 0) {
+            this.sendExperience(experience);
+        }
+
+        int level = this.getExperienceLevel();
+        if (level != 0) {
+            this.sendExperienceLevel(this.getExperienceLevel());
+        }
 
         this.teleport(pos, null); // Prevent PlayerTeleportEvent during player spawn
 
@@ -742,20 +762,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         //todo Updater
 
-        if (this.getHealth() <= 0) {
-            respawnPacket = new RespawnPacket();
-            pos = this.getSpawn();
-            respawnPacket.x = (float) pos.x;
-            respawnPacket.y = (float) pos.y;
-            respawnPacket.z = (float) pos.z;
-            this.dataPacket(respawnPacket);
+        //Weather
+        if (this.level.isRaining() || this.level.isThundering()) {
+           this.getLevel().sendWeather(this);
         }
 
-        //Weather
-        this.getLevel().sendWeather(this);
-
         //FoodLevel
-        this.getFoodData().sendFoodLevel();
+        PlayerFood food = this.getFoodData();
+        if (food.getLevel() != food.getMaxLevel()) {
+            food.sendFoodLevel();
+        }
     }
 
     protected synchronized boolean orderChunks() {
@@ -774,15 +790,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         int centerZ = (int) this.z >> 4;
         int count = 0;
 
-        for (int x = -this.chunkRadius; x <= this.chunkRadius; x++) {
-            for (int z = -this.chunkRadius; z <= this.chunkRadius; z++) {
-                int chunkX = x + centerX;
+        int radius = spawned ? this.chunkRadius : (int) Math.ceil(Math.sqrt(spawnThreshold));
+
+        int radiusSqr = radius * radius;
+        for (int x = -radius; x <= radius; x++) {
+            int chunkX = x + centerX;
+            for (int z = -radius; z <= radius; z++) {
                 int chunkZ = z + centerZ;
-                int distance = (int) Math.sqrt((double) x * x + (double) z * z);
-                if (distance <= this.chunkRadius) {
+                int distanceSqr = x * x + z * z;
+                if (distanceSqr <= radiusSqr) {
                     long index;
                     if (!(this.usedChunks.containsKey(index = Level.chunkHash(chunkX, chunkZ))) || !this.usedChunks.get(index)) {
-                        loadQueue.put(index, distance);
+                        this.loadQueue.put(index, distanceSqr);
                         count++;
                     }
                     lastChunk.remove(index);
@@ -1470,14 +1489,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        if (this.nextChunkOrderRun-- <= 0 || this.chunk == null) {
-            this.orderChunks();
-        }
-
-        if (!this.loadQueue.isEmpty() || !this.spawned) {
-            this.sendNextChunk();
-        }
-
         if (!this.batchedPackets.isEmpty()) {
             for (int channel : this.batchedPackets.keySet()) {
                 this.server.batchPackets(new Player[]{this}, batchedPackets.get(channel).stream().toArray(DataPacket[]::new), false);
@@ -1485,6 +1496,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.batchedPackets.clear();
         }
 
+        if (this.nextChunkOrderRun-- <= 0 || this.chunk == null) {
+            this.orderChunks();
+        }
+
+        if (!this.loadQueue.isEmpty() || !this.spawned) {
+            this.sendNextChunk();
+        }
     }
 
     public boolean canInteract(Vector3 pos, double maxDistance) {
@@ -3960,7 +3978,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void onChunkChanged(FullChunk chunk) {
-        this.loadQueue.put(Level.chunkHash(chunk.getX(), chunk.getZ()), Math.abs(((int) this.x >> 4) - chunk.getX()) + Math.abs(((int) this.z >> 4) - chunk.getZ()));
+        int dx = ((int) this.x >> 4) - chunk.getX();
+        int dz = ((int) this.z >> 4) - chunk.getZ();
+        this.loadQueue.put(Level.chunkHash(chunk.getX(), chunk.getZ()), dx * dx + dz * dz);
     }
 
     @Override

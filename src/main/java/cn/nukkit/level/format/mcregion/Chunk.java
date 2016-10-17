@@ -1,6 +1,7 @@
 package cn.nukkit.level.format.mcregion;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.LevelProvider;
@@ -147,7 +148,9 @@ public class Chunk extends BaseFullChunk {
     @Override
     public void setLightPopulated(boolean value) {
         this.nbt.putBoolean("LightPopulated", value);
-        this.setChanged();
+        if (Server.getInstance().storeGeneratedChunks) {
+            this.setChanged();
+        }
     }
 
     @Override
@@ -163,7 +166,9 @@ public class Chunk extends BaseFullChunk {
     @Override
     public void setPopulated(boolean value) {
         this.nbt.putBoolean("TerrainPopulated", value);
-        this.setChanged();
+        if (Server.getInstance().storeGeneratedChunks) {
+            this.setChanged();
+        }
     }
 
     @Override
@@ -184,7 +189,9 @@ public class Chunk extends BaseFullChunk {
     @Override
     public void setGenerated(boolean value) {
         this.nbt.putBoolean("TerrainGenerated", value);
-        this.setChanged();
+        if (Server.getInstance().storeGeneratedChunks) {
+            this.setChanged();
+        }
     }
 
     public static Chunk fromBinary(byte[] data) {

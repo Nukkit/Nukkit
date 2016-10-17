@@ -1,6 +1,7 @@
 package cn.nukkit.level.format.generic;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
@@ -113,19 +114,25 @@ public abstract class BaseFullChunk implements FullChunk {
                 this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer.startTiming();
                 for (CompoundTag nbt : NBTentities) {
                     if (!nbt.contains("id")) {
-                        this.setChanged();
+                        if (Server.getInstance().storeGeneratedChunks) {
+                            this.setChanged();
+                        }
                         continue;
                     }
                     ListTag pos = nbt.getList("Pos");
                     if ((((NumberTag) pos.get(0)).getData().intValue() >> 4) != this.x || ((((NumberTag) pos.get(2)).getData().intValue() >> 4) != this.z)) {
-                        this.changes.add(1);
+                        if (Server.getInstance().storeGeneratedChunks) {
+                            this.setChanged();
+                        }
                         continue;
                     }
                     Entity entity = Entity.createEntity(nbt.getString("id"), this, nbt);
                     if (entity != null) {
                         entity.spawnToAll();
                     } else {
-                        this.changes.add(1);
+                        if (Server.getInstance().storeGeneratedChunks) {
+                            this.setChanged();
+                        }
                         continue;
                     }
                 }
@@ -137,16 +144,22 @@ public abstract class BaseFullChunk implements FullChunk {
                 for (CompoundTag nbt : NBTtiles) {
                     if (nbt != null) {
                         if (!nbt.contains("id")) {
-                            this.changes.add(1);
+                            if (Server.getInstance().storeGeneratedChunks) {
+                                this.setChanged();
+                            }
                             continue;
                         }
                         if ((nbt.getInt("x") >> 4) != this.x || ((nbt.getInt("z") >> 4) != this.z)) {
-                            this.changes.add(1);
+                            if (Server.getInstance().storeGeneratedChunks) {
+                                this.setChanged();
+                            }
                             continue;
                         }
                         BlockEntity blockEntity = BlockEntity.createBlockEntity(nbt.getString("id"), this, nbt);
                         if (blockEntity == null) {
-                            this.changes.add(1);
+                            if (Server.getInstance().storeGeneratedChunks) {
+                                this.setChanged();
+                            }
                             continue;
                         }
                     }
@@ -398,7 +411,8 @@ public abstract class BaseFullChunk implements FullChunk {
         if (level == null) {
             return true;
         }
-        if (save && this.resetChanged() > 0) {
+        long changed = this.resetChanged();
+        if (save && changed > 0) {
             level.saveChunk(this.getX(), this.getZ());
         }
         if (safe) {
