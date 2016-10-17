@@ -16,6 +16,7 @@ public class GamemodeCommand extends VanillaCommand {
     public GamemodeCommand(String name) {
         super(name, "%nukkit.command.gamemode.description", "%commands.gamemode.usage");
         this.setPermission("nukkit.command.gamemode");
+        this.setAliases(new String[]{"gm"});
     }
 
     @Override
