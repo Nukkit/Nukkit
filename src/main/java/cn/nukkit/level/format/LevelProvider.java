@@ -27,6 +27,10 @@ public interface LevelProvider {
 
     BaseFullChunk getChunk(int X, int Z, boolean create);
 
+    BaseFullChunk getLoadedChunk(int X, int Z);
+
+    BaseFullChunk getLoadedChunk(long hash);
+
     void saveChunks();
 
     void saveChunk(int X, int Z);
@@ -46,6 +50,8 @@ public interface LevelProvider {
     boolean isChunkPopulated(int X, int Z);
 
     boolean isChunkLoaded(int X, int Z);
+
+    boolean isChunkLoaded(long hash);
 
     void setChunk(int chunkX, int chunkZ, FullChunk chunk);
 

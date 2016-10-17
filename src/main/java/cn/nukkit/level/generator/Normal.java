@@ -10,11 +10,7 @@ import cn.nukkit.level.generator.object.ore.OreType;
 import cn.nukkit.level.generator.populator.*;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 /**
  * author: MagicDroidX
@@ -60,7 +56,7 @@ public class Normal extends Generator {
     private final int basegroundHeight = 3;
 
     public Normal() {
-        this(new ConcurrentHashMap<>(8, 0.9f, 1));
+        //Nothing here. Just used for future update.
     }
 
     public Normal(Map<String, Object> options) {
@@ -79,7 +75,7 @@ public class Normal extends Generator {
 
     @Override
     public Map<String, Object> getSettings() {
-        return new ConcurrentHashMap<>(8, 0.9f, 1);
+        return new HashMap<>();
     }
 
     public Biome pickBiome(int x, int z) {

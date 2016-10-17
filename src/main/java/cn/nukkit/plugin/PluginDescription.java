@@ -3,7 +3,6 @@ package cn.nukkit.plugin;
 import cn.nukkit.permission.Permission;
 import cn.nukkit.utils.PluginException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -117,7 +116,7 @@ public class PluginDescription {
     private List<String> softDepend = new ArrayList<>();
     private List<String> loadBefore = new ArrayList<>();
     private String version;
-    private Map<String, Object> commands = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private Map<String, Object> commands = new HashMap<>();
     private String description;
     private final List<String> authors = new ArrayList<>();
     private String website;

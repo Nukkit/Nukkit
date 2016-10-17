@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -97,7 +97,7 @@ public class Chunk extends BaseChunk {
             }
         }
 
-        Map<Integer, Integer> extraData = new ConcurrentHashMap<>(8, 0.9f, 1);
+        Map<Integer, Integer> extraData = new HashMap<>();
 
         if (!this.nbt.contains("ExtraData") || !(this.nbt.get("ExtraData") instanceof ByteArrayTag)) {
             this.nbt.putByteArray("ExtraData", Binary.writeInt(0));
@@ -109,8 +109,7 @@ public class Chunk extends BaseChunk {
             }
         }
 
-        this.x = this.nbt.getInt("xPos");
-        this.z = this.nbt.getInt("zPos");
+        this.setPosition(this.nbt.getInt("xPos"), this.nbt.getInt("zPos"));
         for (int Y = 0; Y < sections.length; ++Y) {
             cn.nukkit.level.format.ChunkSection section = sections[Y];
             if (section != null) {
@@ -164,7 +163,7 @@ public class Chunk extends BaseChunk {
     @Override
     public void setPopulated(boolean value) {
         this.nbt.putBoolean("TerrainPopulated", value);
-        this.hasChanged = true;
+        this.setChanged();
     }
 
     @Override
@@ -185,7 +184,7 @@ public class Chunk extends BaseChunk {
     @Override
     public void setGenerated(boolean value) {
         this.nbt.putBoolean("TerrainGenerated", value);
-        this.hasChanged = true;
+        this.setChanged();
     }
 
     public CompoundTag getNBT() {
@@ -233,8 +232,8 @@ public class Chunk extends BaseChunk {
     @Override
     public byte[] toFastBinary() {
         CompoundTag nbt = this.getNBT().copy();
-        nbt.putInt("xPos", this.x);
-        nbt.putInt("zPos", this.z);
+        nbt.putInt("xPos", this.getX());
+        nbt.putInt("zPos", this.getZ());
 
         nbt.putIntArray("BiomeColors", this.getBiomeColorArray());
         nbt.putIntArray("HeightMap", this.getHeightMapArray());
@@ -297,8 +296,8 @@ public class Chunk extends BaseChunk {
     public byte[] toBinary() {
         CompoundTag nbt = this.getNBT().copy();
 
-        nbt.putInt("xPos", this.x);
-        nbt.putInt("zPos", this.z);
+        nbt.putInt("xPos", this.getX());
+        nbt.putInt("zPos", this.getZ());
 
         ListTag<CompoundTag> sectionList = new ListTag<>("Sections");
         for (cn.nukkit.level.format.ChunkSection section : this.getSections()) {
@@ -371,8 +370,7 @@ public class Chunk extends BaseChunk {
                 chunk = new Chunk(Anvil.class, null);
             }
 
-            chunk.x = chunkX;
-            chunk.z = chunkZ;
+            chunk.setPosition(chunkX, chunkZ);
 
             chunk.sections = new cn.nukkit.level.format.ChunkSection[8];
             for (int y = 0; y < 8; ++y) {

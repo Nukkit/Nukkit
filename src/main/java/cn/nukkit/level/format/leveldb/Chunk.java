@@ -84,8 +84,7 @@ public class Chunk extends BaseFullChunk {
             this.providerClass = level.getClass();
         }
 
-        this.x = chunkX;
-        this.z = chunkZ;
+        this.setPosition(chunkX, chunkZ);
 
         this.blocks = blocks;
         this.data = data;

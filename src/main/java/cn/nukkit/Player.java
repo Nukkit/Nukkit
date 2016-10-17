@@ -2449,7 +2449,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             itemDamage += enchantment.getDamageBonus(targetEntity);
                         }
 
-                        Map<Integer, Float> damage = new ConcurrentHashMap<>(8, 0.9f, 1);
+                        Map<Integer, Float> damage = new HashMap<>();
                         damage.put(EntityDamageEvent.MODIFIER_BASE, itemDamage);
 
                         if (!this.canInteract(targetEntity, isCreative() ? 8 : 5)) {

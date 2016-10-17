@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -33,7 +32,6 @@ public class Config {
 
     //private LinkedHashMap<String, Object> config = new LinkedHashMap<>();
     private ConfigSection config = new ConfigSection();
-    private final Map<String, Object> nestedCache = new ConcurrentHashMap<>(8, 0.9f, 1);
     private File file;
     private boolean correct = false;
     private int type = Config.DETECT;
@@ -106,7 +104,6 @@ public class Config {
 
     public void reload() {
         this.config.clear();
-        this.nestedCache.clear();
         this.correct = false;
         //this.load(this.file.toString());
         if (this.file == null) throw new IllegalStateException("Failed to reload Config. File object is undefined.");

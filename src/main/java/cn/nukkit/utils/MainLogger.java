@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 
@@ -18,9 +19,7 @@ import org.fusesource.jansi.AnsiConsole;
 public class MainLogger extends ThreadedLogger {
 
     protected final String logPath;
-    protected final String[] logBuffer = new String[128];
-    protected volatile int writeIndex = 0;
-    protected volatile int readIndex = 0;
+    protected final ConcurrentLinkedQueue<String> logBuffer = new ConcurrentLinkedQueue<String>();
     protected boolean shutdown;
     protected boolean logDebug = false;
     private final Map<TextFormat, String> replacements = new EnumMap<>(TextFormat.class);
@@ -133,15 +132,13 @@ public class MainLogger extends ThreadedLogger {
 
     protected void send(String message) {
         this.send(message, -1);
-    }
-
-    protected void send(String message, int level) {
-        int index = writeIndex;
-        writeIndex = (index + 1) % logBuffer.length;
-        logBuffer[index] = message;
         synchronized (this) {
             this.notify();
         }
+    }
+
+    protected void send(String message, int level) {
+        logBuffer.add(message);
     }
 
     private String colorize(String string) {
@@ -204,40 +201,34 @@ public class MainLogger extends ThreadedLogger {
         replacements.put(TextFormat.RESET, Ansi.ansi().a(Ansi.Attribute.RESET).toString());
         this.shutdown = false;
         do {
-            if (readIndex == writeIndex) {
+            if (logBuffer.isEmpty()) {
                 try {
                     synchronized (this) {
-                        wait(25000);
+                        wait(25000); // Wait for next message
                     }
+                    Thread.sleep(5); // Buffer for 5ms to reduce back and forth between disk
                 } catch (InterruptedException ignore) {}
             }
-            if (readIndex != writeIndex) {
-                try {
-                    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(logFile, true), StandardCharsets.UTF_8);
-                    Date now = new Date();
-                    String dateFormat = new SimpleDateFormat("Y-M-d").format(now);
-                    int count = 0;
-                    while (readIndex != writeIndex && count++ < logBuffer.length) {
-                        int index = readIndex;
-                        readIndex = (index + 1) % logBuffer.length;
-                        String message = logBuffer[index];
-                        if (message != null) {
-                            writer.write(dateFormat);
-                            writer.write(TextFormat.clean(message));
-                            writer.write("\r\n");
-                            CommandReader.getInstance().stashLine();
-                            System.out.println(colorize(TextFormat.AQUA + dateFormat + TextFormat.RESET + " " + message + TextFormat.RESET));
-                            CommandReader.getInstance().unstashLine();
-                            try {
-                                Thread.sleep(5);
-                            } catch (InterruptedException ignore) {}
-                        }
+            try {
+                OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(logFile, true), StandardCharsets.UTF_8);
+                Date now = new Date();
+                String dateFormat = new SimpleDateFormat("Y-M-d").format(now);
+                int count = 0;
+                while (!logBuffer.isEmpty()) {
+                    String message = logBuffer.poll();
+                    if (message != null) {
+                        writer.write(dateFormat);
+                        writer.write(TextFormat.clean(message));
+                        writer.write("\r\n");
+                        CommandReader.getInstance().stashLine();
+                        System.out.println(colorize(TextFormat.AQUA + dateFormat + TextFormat.RESET + " " + message + TextFormat.RESET));
+                        CommandReader.getInstance().unstashLine();
                     }
-                    writer.flush();
-                    writer.close();
-                } catch (Exception e) {
-                    this.logException(e);
                 }
+                writer.flush();
+                writer.close();
+            } catch (Exception e) {
+                this.logException(e);
             }
         } while (!this.shutdown);
     }

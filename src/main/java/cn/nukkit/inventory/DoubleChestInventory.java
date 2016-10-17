@@ -5,8 +5,8 @@ import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.network.protocol.BlockEventPacket;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -24,7 +24,7 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
         this.right = right.getRealInventory();
 
         int i = 0;
-        Map<Integer, Item> items = new ConcurrentHashMap<>(8, 0.9f, 1);
+        Map<Integer, Item> items = new HashMap<>();
         for (Item item : this.left.getContents().values()) {
             items.put(i++, item);
         }
@@ -62,7 +62,7 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
 
     @Override
     public Map<Integer, Item> getContents() {
-        Map<Integer, Item> contents = new ConcurrentHashMap<>(8, 0.9f, 1);
+        Map<Integer, Item> contents = new HashMap<>();
 
         for (int i = 0; i < this.getSize(); ++i) {
             contents.put(i, this.getItem(i));
@@ -74,7 +74,7 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
     @Override
     public void setContents(Map<Integer, Item> items) {
         if (items.size() > this.size) {
-            Map<Integer, Item> newItems = new ConcurrentHashMap<>(8, 0.9f, 1);
+            Map<Integer, Item> newItems = new HashMap<>();
             for (int i = 0; i < this.size; i++) {
                 newItems.put(i, items.get(i));
             }

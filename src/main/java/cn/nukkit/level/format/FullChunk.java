@@ -20,6 +20,10 @@ public interface FullChunk extends Cloneable {
 
     void setZ(int z);
 
+    void setPosition(int x, int z);
+
+    long getIndex();
+
     LevelProvider getProvider();
 
     void setProvider(LevelProvider provider);
@@ -152,4 +156,5 @@ public interface FullChunk extends Cloneable {
 
     void setChanged(boolean changed);
 
+    long resetChanged();
 }

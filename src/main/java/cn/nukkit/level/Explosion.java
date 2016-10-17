@@ -17,11 +17,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.ExplodePacket;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -115,7 +111,7 @@ public class Explosion {
 
     public boolean explodeB() {
 
-        Map<BlockVector3, Boolean> updateBlocks = new ConcurrentHashMap<>(8, 0.9f, 1);
+        Map<BlockVector3, Boolean> updateBlocks = new HashMap<>();
         List<Vector3> send = new ArrayList<>();
 
         Vector3 source = (new Vector3(this.source.x, this.source.y, this.source.z)).floor();

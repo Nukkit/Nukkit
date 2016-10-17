@@ -180,8 +180,7 @@ public class Flat extends Generator {
             }
         }
         BaseFullChunk chunk = this.chunk.clone();
-        chunk.setX(chunkX);
-        chunk.setZ(chunkZ);
+        chunk.setPosition(chunkX, chunkZ);
         this.level.setChunk(chunkX, chunkZ, chunk);
     }
 

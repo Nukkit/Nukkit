@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * author: MagicDroidX
@@ -49,10 +50,11 @@ public abstract class BaseFullChunk implements FullChunk {
     protected LevelProvider provider;
     protected Class<? extends LevelProvider> providerClass;
 
-    protected int x;
-    protected int z;
+    private int x;
+    private int z;
+    private long hash;
 
-    protected boolean hasChanged = false;
+    protected LongAdder changes = new LongAdder();
 
     protected boolean isInit = false;
 
@@ -116,14 +118,14 @@ public abstract class BaseFullChunk implements FullChunk {
                     }
                     ListTag pos = nbt.getList("Pos");
                     if ((((NumberTag) pos.get(0)).getData().intValue() >> 4) != this.x || ((((NumberTag) pos.get(2)).getData().intValue() >> 4) != this.z)) {
-                        this.hasChanged = true;
+                        this.changes.add(1);
                         continue;
                     }
                     Entity entity = Entity.createEntity(nbt.getString("id"), this, nbt);
                     if (entity != null) {
                         entity.spawnToAll();
                     } else {
-                        this.hasChanged = true;
+                        this.changes.add(1);
                         continue;
                     }
                 }
@@ -135,16 +137,16 @@ public abstract class BaseFullChunk implements FullChunk {
                 for (CompoundTag nbt : NBTtiles) {
                     if (nbt != null) {
                         if (!nbt.contains("id")) {
-                            this.hasChanged = true;
+                            this.changes.add(1);
                             continue;
                         }
                         if ((nbt.getInt("x") >> 4) != this.x || ((nbt.getInt("z") >> 4) != this.z)) {
-                            this.hasChanged = true;
+                            this.changes.add(1);
                             continue;
                         }
                         BlockEntity blockEntity = BlockEntity.createBlockEntity(nbt.getString("id"), this, nbt);
                         if (blockEntity == null) {
-                            this.hasChanged = true;
+                            this.changes.add(1);
                             continue;
                         }
                     }
@@ -170,10 +172,24 @@ public abstract class BaseFullChunk implements FullChunk {
 
     public void setX(int x) {
         this.x = x;
+        this.hash = Level.chunkHash(x, z);
     }
 
     public void setZ(int z) {
         this.z = z;
+        this.hash = Level.chunkHash(x, z);
+    }
+
+    @Override
+    public long getIndex() {
+        return hash;
+    }
+
+    @Override
+    public void setPosition(int x, int z) {
+        this.x = x;
+        this.z = z;
+        this.hash = Level.chunkHash(x, z);
     }
 
     @Override
@@ -193,7 +209,7 @@ public abstract class BaseFullChunk implements FullChunk {
 
     @Override
     public void setBiomeId(int x, int z, int biomeId) {
-        this.hasChanged = true;
+        this.changes.add(1);
         this.getBiomeColorArray()[(z << 4) + x] = (this.getBiomeColorArray()[(z << 4) + x] & 0xFFFFFF) | (biomeId << 24);
     }
 
@@ -205,7 +221,7 @@ public abstract class BaseFullChunk implements FullChunk {
 
     @Override
     public void setBiomeColor(int x, int z, int R, int G, int B) {
-        this.hasChanged = true;
+        this.changes.add(1);
         this.getBiomeColorArray()[(z << 4) + x] = (this.getBiomeColorArray()[(z << 4) + x] & 0xFF000000) | ((R & 0xFF) << 16) | ((G & 0xFF) << 8) | (B & 0XFF);
     }
 
@@ -295,7 +311,7 @@ public abstract class BaseFullChunk implements FullChunk {
     public void addEntity(Entity entity) {
         this.entities.put(entity.getId(), entity);
         if (!(entity instanceof Player) && this.isInit) {
-            this.hasChanged = true;
+            this.changes.add(1);
         }
     }
 
@@ -303,7 +319,7 @@ public abstract class BaseFullChunk implements FullChunk {
     public void removeEntity(Entity entity) {
         this.entities.remove(entity.getId());
         if (!(entity instanceof Player) && this.isInit) {
-            this.hasChanged = true;
+            this.changes.add(1);
         }
     }
 
@@ -316,7 +332,7 @@ public abstract class BaseFullChunk implements FullChunk {
         }
         this.tileList.put(index, blockEntity);
         if (this.isInit) {
-            this.hasChanged = true;
+            this.changes.add(1);
         }
     }
 
@@ -326,7 +342,7 @@ public abstract class BaseFullChunk implements FullChunk {
         int index = ((blockEntity.getFloorZ() & 0x0f) << 12) | ((blockEntity.getFloorX() & 0x0f) << 8) | (blockEntity.getFloorY() & 0xff);
         this.tileList.remove(index);
         if (this.isInit) {
-            this.hasChanged = true;
+            this.changes.add(1);
         }
     }
 
@@ -382,7 +398,7 @@ public abstract class BaseFullChunk implements FullChunk {
         if (level == null) {
             return true;
         }
-        if (save && this.hasChanged) {
+        if (save && this.resetChanged() > 0) {
             level.saveChunk(this.getX(), this.getZ());
         }
         if (safe) {
@@ -448,7 +464,11 @@ public abstract class BaseFullChunk implements FullChunk {
 
     @Override
     public boolean hasChanged() {
-        return this.hasChanged;
+        return this.changes.longValue() > 0;
+    }
+
+    public long getChanges() {
+        return this.changes.sum();
     }
 
     @Override
@@ -458,7 +478,18 @@ public abstract class BaseFullChunk implements FullChunk {
 
     @Override
     public void setChanged(boolean changed) {
-        this.hasChanged = changed;
+        if (changed) {
+            this.changes.add(1);
+        } else {
+            this.changes.add(this.changes.sum());
+        }
+    }
+
+    @Override
+    public long resetChanged() {
+        long sum = this.changes.sum();
+        this.changes.add(-sum);
+        return sum;
     }
 
     @Override
@@ -490,7 +521,7 @@ public abstract class BaseFullChunk implements FullChunk {
     @Override
     public void setBlockId(int x, int y, int z, int id) {
         this.blocks[(x << 11) | (z << 7) | y] = (byte) (id);
-        this.hasChanged = true;
+        this.changes.add(1);
     }
 
     @Override
@@ -512,7 +543,7 @@ public abstract class BaseFullChunk implements FullChunk {
         } else {
             this.data[i] = (byte) (((data & 0x0f) << 4) | (old & 0x0f));
         }
-        this.hasChanged = true;
+        this.changes.add(1);
     }
 
     @Override
@@ -543,7 +574,7 @@ public abstract class BaseFullChunk implements FullChunk {
         int i = (x << 11) | (z << 7) | y;
         int idPrevious = this.blocks[i] & 0xFF;
         if (idPrevious != block.getId()) {
-            hasChanged = true;
+            this.changes.add(1);
             this.blocks[i] = (byte) block.getId();
             if (Block.mightHaveMeta(block.getId())) {
                 i >>= 1;
@@ -564,12 +595,16 @@ public abstract class BaseFullChunk implements FullChunk {
             int old = this.data[i] & 0xff;
             if ((y & 1) == 0) {
                 int previousData = (old & 0xf0);
-                hasChanged |= previousData != block.getDamage();
+                if (previousData != block.getDamage()) {
+                    this.changes.add(1);
+                }
                 this.data[i] = (byte) ((old & 0xf0) | (block.getDamage() & 0x0f));
                 return Block.fullList[(idPrevious << 4) + previousData];
             } else {
                 int previousData = (old & 0x0f);
-                hasChanged |= previousData != block.getDamage();
+                if (previousData != block.getDamage()) {
+                    this.changes.add(1);
+                }
                 this.data[i] = (byte) (((block.getDamage() & 0x0f) << 4) | previousData);
                 return Block.fullList[(idPrevious << 4) + previousData];
             }
@@ -584,7 +619,7 @@ public abstract class BaseFullChunk implements FullChunk {
         int idPrevious = this.blocks[i] & 0xFF;
         if (idPrevious != blockId) {
             this.blocks[i] = (byte) blockId;
-            changed = true;
+            this.changes.add(1);
             if (Block.mightHaveMeta(blockId)) {
                 i >>= 1;
                 int old = this.data[i] & 0xff;
@@ -600,16 +635,15 @@ public abstract class BaseFullChunk implements FullChunk {
             if ((y & 1) == 0) {
                 this.data[i] = (byte) ((old & 0xf0) | (meta & 0x0f));
                 if ((old & 0x0f) != meta) {
-                    changed = true;
+                    this.changes.add(1);
                 }
             } else {
                 this.data[i] = (byte) (((meta & 0x0f) << 4) | (old & 0x0f));
                 if (meta != ((old & 0xf0) >> 4)) {
-                    changed = true;
+                    this.changes.add(1);
                 }
             }
         }
-        this.hasChanged |= changed;
         return changed;
     }
 
@@ -632,7 +666,7 @@ public abstract class BaseFullChunk implements FullChunk {
         } else {
             this.skyLight[i] = (byte) (((level & 0x0f) << 4) | (old & 0x0f));
         }
-        this.hasChanged = true;
+        this.changes.add(1);
     }
 
     @Override
@@ -654,7 +688,7 @@ public abstract class BaseFullChunk implements FullChunk {
         } else {
             this.blockLight[i] = (byte) (((level & 0x0f) << 4) | (old & 0x0f));
         }
-        this.hasChanged = true;
+        this.changes.add(1);
     }
 
     @Override

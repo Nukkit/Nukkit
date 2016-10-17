@@ -5,8 +5,8 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.EventException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -49,7 +49,7 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
     private final Map<Integer, Float> originals;
 
     public EntityDamageEvent(Entity entity, int cause, float damage) {
-        this(entity, cause, new ConcurrentHashMap<Integer, Float>(8, 0.9f, 1) {
+        this(entity, cause, new HashMap<Integer, Float>() {
             {
                 put(MODIFIER_BASE, damage);
             }

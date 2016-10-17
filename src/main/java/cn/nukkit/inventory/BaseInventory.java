@@ -36,7 +36,7 @@ public abstract class BaseInventory implements Inventory {
     protected InventoryHolder holder;
 
     public BaseInventory(InventoryHolder holder, InventoryType type) {
-        this(holder, type, new ConcurrentHashMap<>(8, 0.9f, 1));
+        this(holder, type, new HashMap<>());
     }
 
     public BaseInventory(InventoryHolder holder, InventoryType type, Map<Integer, Item> items) {
@@ -185,7 +185,7 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public Map<Integer, Item> all(Item item) {
-        Map<Integer, Item> slots = new ConcurrentHashMap<>(8, 0.9f, 1);
+        Map<Integer, Item> slots = new HashMap<>();
         boolean checkDamage = item.hasMeta();
         boolean checkTag = item.getCompoundTag() != null;
         for (Map.Entry<Integer, Item> entry : this.getContents().entrySet()) {

@@ -37,7 +37,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     public Block getAndSetBlock(int x, int y, int z, Block block) {
         int Y = y >> 4;
         try {
-            this.hasChanged = true;
+            this.changes.add(1);
             return this.sections[Y].getAndSetBlock(x, y & 0x0f, z, block);
         } catch (ChunkException e) {
             try {
@@ -57,7 +57,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     public boolean setBlock(int x, int y, int z, int blockId, int meta) {
         int Y = y >> 4;
         try {
-            this.hasChanged = true;
+            this.changes.add(1);
             return this.sections[Y].setBlock(x, y & 0x0f, z, blockId, meta);
         } catch (ChunkException e) {
             try {
@@ -78,7 +78,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     public void setBlockId(int x, int y, int z, int id) {
         int Y = y >> 4;
         try {
-            this.hasChanged = true;
+            this.changes.add(1);
             this.sections[Y].setBlockId(x, y & 0x0f, z, id);
         } catch (ChunkException e) {
             try {
@@ -99,7 +99,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     public void setBlockData(int x, int y, int z, int data) {
         int Y = y >> 4;
         try {
-            this.hasChanged = true;
+            this.changes.add(1);
             this.sections[Y].setBlockData(x, y & 0x0f, z, data);
         } catch (ChunkException e) {
             try {
@@ -120,7 +120,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     public void setBlockSkyLight(int x, int y, int z, int level) {
         int Y = y >> 4;
         try {
-            this.hasChanged = true;
+            this.changes.add(1);
             this.sections[Y].setBlockSkyLight(x, y & 0x0f, z, level);
         } catch (ChunkException e) {
             try {
@@ -141,7 +141,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     public void setBlockLight(int x, int y, int z, int level) {
         int Y = y >> 4;
         try {
-            this.hasChanged = true;
+            this.changes.add(1);
             this.sections[Y].setBlockLight(x, y & 0x0f, z, level);
         } catch (ChunkException e) {
             try {
@@ -210,13 +210,13 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
         } else {
             this.sections[(int) fY] = section;
         }
-        this.hasChanged = true;
+        this.changes.add(1);
         return true;
     }
 
     private void setInternalSection(float fY, ChunkSection section) {
         this.sections[(int) fY] = section;
-        this.hasChanged = true;
+        this.changes.add(1);
     }
 
     @Override

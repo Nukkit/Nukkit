@@ -172,7 +172,7 @@ public class Server {
     private final String dataPath;
     private final String pluginPath;
 
-    private final Set<UUID> uniquePlayers = new HashSet<>();
+    private final Set<UUID> uniquePlayers = new HashSet<>(); // Unused
 
     private volatile QueryHandler queryHandler;
 
@@ -702,8 +702,9 @@ public class Server {
         pk.isEncoded = true;
 
         for (String i : identifiers) {
-            if (this.players.containsKey(i)) {
-                this.players.get(i).dataPacket(pk);
+            Player player = this.players.get(i);
+            if (player != null) {
+                player.dataPacket(pk);
             }
         }
     }
@@ -938,9 +939,7 @@ public class Server {
     }
 
     public void removeOnlinePlayer(Player player) {
-        if (this.playerList.containsKey(player.getUniqueId())) {
-            this.playerList.remove(player.getUniqueId());
-
+        if (this.playerList.remove(player.getUniqueId()) != null) {
             PlayerListPacket pk = new PlayerListPacket();
             pk.type = PlayerListPacket.TYPE_REMOVE;
             pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(player.getUniqueId())};
@@ -1020,7 +1019,8 @@ public class Server {
     }
 
     private void checkTickUpdates(int currentTick, long tickTime) {
-        for (Player p : new ArrayList<>(this.players.values())) {
+        for (Map.Entry<String, Player> entry : players.entrySet()) {
+            Player p = entry.getValue();
             if (!p.loggedIn && (tickTime - p.creationTime) >= 10000) {
                 p.close("", "Login timeout");
             } else if (this.alwaysTickPlayers) {
@@ -1081,14 +1081,14 @@ public class Server {
     public void doAutoSave() {
         if (this.getAutoSave()) {
             Timings.levelSaveTimer.startTiming();
-            for (Player player : new ArrayList<>(this.players.values())) {
+            for (Map.Entry<String, Player> entry : this.players.entrySet()) {
+                Player player = entry.getValue();
                 if (player.isOnline()) {
                     player.save(true);
                 } else if (!player.isConnected()) {
                     this.removePlayer(player);
                 }
             }
-
             for (Level level : this.getLevels().values()) {
                 level.save();
             }
@@ -1121,8 +1121,8 @@ public class Server {
 
         this.checkTickUpdates(this.tickCounter, tickTime);
 
-        for (Player player : new ArrayList<>(this.players.values())) {
-            player.checkNetwork();
+        for (Map.Entry<String, Player> entry : players.entrySet()) {
+            entry.getValue().checkNetwork();
         }
 
         if ((this.tickCounter & 0b11111) == 0) {
@@ -1478,7 +1478,7 @@ public class Server {
     }
 
     public Map<UUID, Player> getOnlinePlayers() {
-        return new ConcurrentHashMap<>(playerList);
+        return new HashMap<>(playerList);
     }
 
     public void addRecipe(Recipe recipe) {
@@ -1607,19 +1607,17 @@ public class Server {
     }
 
     public void removePlayer(Player player) {
-        if (this.identifier.containsKey(player.rawHashCode())) {
-            String identifier = this.identifier.get(player.rawHashCode());
-            this.players.remove(identifier);
-            this.identifier.remove(player.rawHashCode());
-            return;
+        String identifier = this.identifier.remove(player.rawHashCode());
+        if (identifier != null) {
+            if (this.players.remove(identifier) != null) {
+                return;
+            }
         }
-
-        for (String identifier : new ArrayList<>(this.players.keySet())) {
-            Player p = this.players.get(identifier);
-            if (player == p) {
-                this.players.remove(identifier);
-                this.identifier.remove(player.rawHashCode());
-                break;
+        Iterator<Map.Entry<String, Player>> iter = players.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String, Player> entry = iter.next();
+            if (entry.getValue() == player) {
+                iter.remove();
             }
         }
     }
@@ -1702,7 +1700,10 @@ public class Server {
             return false;
         }
 
-        this.levels.put(level.getId(), level);
+        Level existing = this.levels.putIfAbsent(level.getId(), level);
+        if (existing != null) {
+            return true;
+        }
 
         level.initLevel();
 
@@ -1722,7 +1723,7 @@ public class Server {
     }
 
     public boolean generateLevel(String name, long seed, Class<? extends Generator> generator) {
-        return this.generateLevel(name, seed, generator, new ConcurrentHashMap<>(8, 0.9f, 1));
+        return this.generateLevel(name, seed, generator, new HashMap<>());
     }
 
     public boolean generateLevel(String name, long seed, Class<? extends Generator> generator, Map<String, Object> options) {
@@ -1752,7 +1753,10 @@ public class Server {
             provider.getMethod("generate", String.class, String.class, long.class, Class.class, Map.class).invoke(null, path, name, seed, generator, options);
 
             level = new Level(this, name, path, provider);
-            this.levels.put(level.getId(), level);
+            Level existing = this.levels.putIfAbsent(level.getId(), level);
+            if (existing != null) {
+                return false;
+            }
 
             level.initLevel();
 

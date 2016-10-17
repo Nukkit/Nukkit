@@ -97,8 +97,7 @@ public class Chunk extends BaseFullChunk {
             }
         }
 
-        this.x = this.nbt.getInt("xPos");
-        this.z = this.nbt.getInt("zPos");
+        this.setPosition(this.nbt.getInt("xPos"), this.nbt.getInt("zPos"));
         this.blocks = this.nbt.getByteArray("Blocks");
         this.data = this.nbt.getByteArray("Data");
         this.skyLight = this.nbt.getByteArray("SkyLight");
@@ -148,7 +147,7 @@ public class Chunk extends BaseFullChunk {
     @Override
     public void setLightPopulated(boolean value) {
         this.nbt.putBoolean("LightPopulated", value);
-        this.hasChanged = true;
+        this.setChanged();
     }
 
     @Override
@@ -164,7 +163,7 @@ public class Chunk extends BaseFullChunk {
     @Override
     public void setPopulated(boolean value) {
         this.nbt.putBoolean("TerrainPopulated", value);
-        this.hasChanged = true;
+        this.setChanged();
     }
 
     @Override
@@ -185,7 +184,7 @@ public class Chunk extends BaseFullChunk {
     @Override
     public void setGenerated(boolean value) {
         this.nbt.putBoolean("TerrainGenerated", value);
-        this.hasChanged = true;
+        this.setChanged();
     }
 
     public static Chunk fromBinary(byte[] data) {
@@ -214,9 +213,10 @@ public class Chunk extends BaseFullChunk {
             int offset = 0;
             Chunk chunk = new Chunk(provider != null ? provider : McRegion.class.newInstance(), null);
             chunk.provider = provider;
-            chunk.x = Binary.readInt(Arrays.copyOfRange(data, offset, offset + 3));
+            int x = Binary.readInt(Arrays.copyOfRange(data, offset, offset + 3));
             offset += 4;
-            chunk.z = Binary.readInt(Arrays.copyOfRange(data, offset, offset + 3));
+            int z = Binary.readInt(Arrays.copyOfRange(data, offset, offset + 3));
+            chunk.setPosition(x, z);
             offset += 4;
             chunk.blocks = Arrays.copyOfRange(data, offset, offset + 32767);
             offset += 32768;
@@ -250,8 +250,8 @@ public class Chunk extends BaseFullChunk {
     @Override
     public byte[] toFastBinary() {
         BinaryStream stream = new BinaryStream(new byte[65536]);
-        stream.put(Binary.writeInt(this.x));
-        stream.put(Binary.writeInt(this.z));
+        stream.put(Binary.writeInt(this.getX()));
+        stream.put(Binary.writeInt(this.getZ()));
         stream.put(this.getBlockIdArray());
         stream.put(this.getBlockDataArray());
         stream.put(this.getBlockSkyLightArray());
@@ -270,8 +270,8 @@ public class Chunk extends BaseFullChunk {
     public byte[] toBinary() {
         CompoundTag nbt = this.getNBT().copy();
 
-        nbt.putInt("xPos", this.x);
-        nbt.putInt("zPos", this.z);
+        nbt.putInt("xPos", this.getX());
+        nbt.putInt("zPos", this.getZ());
 
         if (this.isGenerated()) {
             nbt.putByteArray("Blocks", this.getBlockIdArray());
@@ -340,8 +340,7 @@ public class Chunk extends BaseFullChunk {
                 chunk = new Chunk(McRegion.class, null);
             }
 
-            chunk.x = chunkX;
-            chunk.z = chunkZ;
+            chunk.setPosition(chunkX, chunkZ);
             chunk.data = new byte[16384];
             chunk.blocks = new byte[32768];
             byte[] skyLight = new byte[16384];
