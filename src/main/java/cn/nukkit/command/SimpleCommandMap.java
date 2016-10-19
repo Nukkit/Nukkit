@@ -62,16 +62,15 @@ public class SimpleCommandMap implements CommandMap {
         this.register("nukkit", new SetWorldSpawnCommand("setworldspawn"));
         this.register("nukkit", new TeleportCommand("tp"));
         this.register("nukkit", new TimeCommand("time"));
-        this.register("nukkit", new TimingsCommand("timings"));
         this.register("nukkit", new ReloadCommand("reload"));
         this.register("nukkit", new WeatherCommand("weather"));
         this.register("nukkit", new XpCommand("xp"));
 
-        if ((boolean) this.server.getConfig("debug.commands", false)) {
-            this.register("nukkit", new StatusCommand("status"));
-            this.register("nukkit", new GarbageCollectorCommand("gc"));
-            //this.register("nukkit", new DumpMemoryCommand("dumpmemory"));
-        }
+        // Debug commands should be allowed by default:
+        this.register("nukkit", new StatusCommand("status"));
+        this.register("nukkit", new GarbageCollectorCommand("gc"));
+        this.register("nukkit", new DebugCommand("debug"));
+        this.register("nukkit", new TimingsCommand("timings"));
     }
 
     @Override
