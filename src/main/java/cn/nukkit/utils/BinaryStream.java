@@ -80,14 +80,16 @@ public class BinaryStream extends OutputStream{
     }
 
     public final byte[][] getBuffers() {
+        byte[][] res;
         if (offset > 0) {
             byte[] buf2 = new byte[offset];
             System.arraycopy(buffer, 0, buf2, 0, offset);
-            buffers.addLast(buf2);
-            count += offset;
-            offset = 0;
+            buffer = buf2;
+            res = new byte[buffers.size() + 1][];
+            res[res.length - 1] = buffer;
+        } else {
+            res = new byte[buffers.size()][];
         }
-        byte[][] res = new byte[buffers.size()][];
         int i = 0;
         for (byte[] bytes : buffers) {
             res[i++] = bytes;

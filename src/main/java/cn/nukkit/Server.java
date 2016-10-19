@@ -75,8 +75,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
 
 /**
  * @author MagicDroidX
@@ -153,6 +151,7 @@ public class Server {
 
     private volatile boolean networkCompressionAsync = true;
     public volatile int networkCompressionLevel = 7;
+    public volatile int networkCompressionStrategy = 2;
 
     private volatile boolean autoTickRate = true;
     private volatile int autoTickRateLimit = 20;
@@ -665,30 +664,9 @@ public class Server {
         if (players == null || packets == null || players.length == 0 || packets.length == 0) {
             return;
         }
-
         Timings.playerNetworkSendTimer.startTiming();
         if (!forceSync && this.networkCompressionAsync) {
-            int size = 0;
-            for (DataPacket packet : packets) {
-                if (!packet.isEncoded) {
-                    packet.encode();
-                    packet.isEncoded = true;
-                }
-                size += 4 + packet.getCount();
-            }
-            byte[] data = new byte[size];
-            byte[] rawBuf;
-            int i = 0;
-            for (DataPacket packet : packets) {
-                rawBuf = packet.getRawBuffer();
-                int len = packet.getCount();
-                data[i] = (byte) ((len >>> 24) & 0xFF);
-                data[i + 1] = (byte) ((len >>> 16) & 0xFF);
-                data[i + 2] = (byte) ((len >>> 8) & 0xFF);
-                data[i + 3] = (byte) ((len) & 0xFF);
-                System.arraycopy(rawBuf, 0, data, i + 4, len);
-                i += 4 + len;
-            }
+            byte[] data = DataPacket.join(packets);
             List<String> targets = new ArrayList<>();
             for (Player p : players) {
                 if (p.isConnected()) {
@@ -697,49 +675,21 @@ public class Server {
             }
             this.getScheduler().scheduleAsyncTask(new CompressBatchedTask(data, targets, this.networkCompressionLevel));
         } else {
-            int count = Runtime.getRuntime().availableProcessors();
             ForkJoinPool pool = new ForkJoinPool();
+
             int parallelism = Math.min(packets.length, pool.getParallelism());
             int chunkSize = (packets.length + parallelism - 1) / parallelism;
             int chunks = (packets.length + chunkSize - 1) / chunkSize;
-            final BatchPacket[] batched = new BatchPacket[chunks];
+
             for (int index = 0, offset = 0; index < chunks; index++, offset += chunkSize) {
                 final DataPacket[] range = Arrays.copyOfRange(packets, offset, Math.min(packets.length, offset + chunkSize));
                 pool.submit(new Runnable() {
                     @Override
                     public void run() {
-                        int size = 0;
-                        for (DataPacket packet : range) {
-                            if (!packet.isEncoded) {
-                                packet.encode();
-                                packet.isEncoded = true;
-                            }
-                            size += 4 + packet.getCount();
-                        }
-                        BinaryStream bs = new BinaryStream(size / 64) {
-                            @Override
-                            public int getBlockSize() {
-                                return 8192;
-                            }
-                        };
-                        try (DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new DeflaterOutputStream(bs, new Deflater(networkCompressionLevel), 8192, true)))) {
-                            byte[] rawBuf;
-                            for (DataPacket packet : range) {
-                                rawBuf = packet.getRawBuffer();
-                                int len = packet.getCount();
-                                dos.writeInt(len);
-                                dos.write(rawBuf, 0, len);
-                            }
-                            dos.close();
-                            byte[] data = bs.getBuffer();
-                            final BatchPacket pk = new BatchPacket();
-                            pk.payload = data;
-                            pk.encode();
-                            pk.isEncoded = true;
+                        try {
+                            BatchPacket bpk = BatchPacket.compressPackets(range, networkCompressionLevel, networkCompressionStrategy);
                             for (final Player p : players) {
-                                if (p.isConnected()) {
-                                    p.dataPacket(pk);
-                                }
+                                p.dataPacket(bpk);
                             }
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -747,12 +697,9 @@ public class Server {
                     }
                 });
             }
-            pool.shutdown();
-            try {
-                pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
+            pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            pool.shutdownNow();
         }
         Timings.playerNetworkSendTimer.stopTiming();
     }
@@ -908,7 +855,6 @@ public class Server {
             this.getLogger().debug("Stopping all tasks");
             getScheduler().cancelAllTasks();
             getScheduler().mainThreadHeartbeat(Integer.MAX_VALUE);
-
             this.getLogger().debug("Closing console");
             CommandReader.getInstance().interrupt();
 

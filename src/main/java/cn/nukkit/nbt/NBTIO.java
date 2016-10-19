@@ -5,8 +5,8 @@ import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.stream.NBTOutputStream;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
-
 import cn.nukkit.utils.BinaryStream;
+import cn.nukkit.utils.PGZIPOutputStream;
 import java.io.*;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 public class NBTIO {
 
@@ -162,7 +161,7 @@ public class NBTIO {
     }
 
     public static void writeGZIPCompressed(CompoundTag tag, OutputStream outputStream, ByteOrder endianness) throws IOException {
-        write(tag, new GZIPOutputStream(outputStream), endianness);
+        write(tag, new PGZIPOutputStream(outputStream), endianness);
     }
 
     public static void writeZLIBCompressed(CompoundTag tag, OutputStream outputStream) throws IOException {

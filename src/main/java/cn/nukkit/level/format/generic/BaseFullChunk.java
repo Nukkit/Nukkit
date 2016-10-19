@@ -553,7 +553,7 @@ public abstract class BaseFullChunk implements FullChunk {
         int i = (x << 10) | (z << 6) | (y >> 1);
         int old = this.data[i] & 0xff;
         if ((y & 1) == 0) {
-            this.data[i] = (byte) ((old & 0xf0) | (old & 0x0f));
+            this.data[i] = (byte) ((old & 0xf0) | (data & 0x0f));
         } else {
             this.data[i] = (byte) (((data & 0x0f) << 4) | (old & 0x0f));
         }
@@ -597,8 +597,8 @@ public abstract class BaseFullChunk implements FullChunk {
                 int old = this.data[i] & 0xff;
                 if ((y & 1) == 0) {
                     int previousData = (old & 0xf0);
-                    this.data[i] = (byte) ((old & 0xf0) | (block.getDamage() & 0x0f));
-                    return Block.fullList[(idPrevious << 4) + previousData];
+                    this.data[i] = (byte) (previousData | (block.getDamage() & 0x0f));
+                    return Block.fullList[(idPrevious << 4) + (previousData >> 4)];
                 } else {
                     int previousData = (old & 0x0f);
                     this.data[i] = (byte) (((block.getDamage() & 0x0f) << 4) | previousData);
@@ -606,22 +606,23 @@ public abstract class BaseFullChunk implements FullChunk {
                 }
             }
             return Block.fullList[idPrevious << 4];
-        } else if (Block.mightHaveMeta(idPrevious & 0xFF)) {
+        } else if (Block.mightHaveMeta(idPrevious)) {
             i >>= 1;
             int old = this.data[i] & 0xff;
             if ((y & 1) == 0) {
-                int previousData = (old & 0xf0);
+                old = old & 0xf0;
+                int previousData = old >> 4;
                 if (previousData != block.getDamage()) {
+                    this.data[i] = (byte) ((old) | (block.getDamage() & 0x0f));
                     this.changes.add(1);
                 }
-                this.data[i] = (byte) ((old & 0xf0) | (block.getDamage() & 0x0f));
                 return Block.fullList[(idPrevious << 4) + previousData];
             } else {
                 int previousData = (old & 0x0f);
                 if (previousData != block.getDamage()) {
                     this.changes.add(1);
+                    this.data[i] = (byte) (((block.getDamage() & 0x0f) << 4) | previousData);
                 }
-                this.data[i] = (byte) (((block.getDamage() & 0x0f) << 4) | previousData);
                 return Block.fullList[(idPrevious << 4) + previousData];
             }
         }
@@ -638,24 +639,25 @@ public abstract class BaseFullChunk implements FullChunk {
             this.changes.add(1);
             if (Block.mightHaveMeta(blockId)) {
                 i >>= 1;
-                int old = this.data[i] & 0xff;
                 if ((y & 1) == 0) {
-                    this.data[i] = (byte) ((old & 0xf0) | (meta & 0x0f));
+                    this.data[i] = (byte) ((this.data[i] & 0xf0) | (meta & 0x0f));
                 } else {
-                    this.data[i] = (byte) (((meta & 0x0f) << 4) | (old & 0x0f));
+                    this.data[i] = (byte) (((meta & 0x0f) << 4) | (this.data[i] & 0x0f));
                 }
             }
-        } else if (Block.mightHaveMeta(idPrevious & 0xFF)) {
+        } else if (Block.mightHaveMeta(idPrevious)) {
             i >>= 1;
             int old = this.data[i] & 0xff;
             if ((y & 1) == 0) {
-                this.data[i] = (byte) ((old & 0xf0) | (meta & 0x0f));
-                if ((old & 0x0f) != meta) {
+                int newData = ((old & 0xf0) | (meta & 0x0f));
+                if (newData != old) {
+                    this.data[i] = (byte) newData;
                     this.changes.add(1);
                 }
             } else {
-                this.data[i] = (byte) (((meta & 0x0f) << 4) | (old & 0x0f));
-                if (meta != ((old & 0xf0) >> 4)) {
+                int newData = (((meta & 0x0f) << 4) | (old & 0x0f));
+                if (newData != old) {
+                    this.data[i] = (byte) newData;
                     this.changes.add(1);
                 }
             }

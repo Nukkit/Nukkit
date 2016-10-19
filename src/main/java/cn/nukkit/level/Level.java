@@ -2552,6 +2552,7 @@ public class Level implements ChunkManager, Metadatable {
             if (generate) {
                 throw new IllegalStateException("Could not create new Chunk");
             }
+            this.timings.syncChunkLoadTimer.stopTiming();
             return chunk;
         }
 
@@ -2645,15 +2646,16 @@ public class Level implements ChunkManager, Metadatable {
             try {
                 if (chunk != null) {
                     if (trySave && this.getAutoSave()) {
-                        int entities = 0;
+                        boolean hasEntities = false;
                         for (Entity e : chunk.getEntities().values()) {
                             if (e instanceof Player) {
                                 continue;
                             }
-                            ++entities;
+                            hasEntities = true;
+                            break;
                         }
 
-                        if (chunk.hasChanged() || !chunk.getBlockEntities().isEmpty() || entities > 0) {
+                        if (chunk.hasChanged() || !chunk.getBlockEntities().isEmpty() || hasEntities) {
                             this.provider.setChunk(x, z, chunk);
                             this.provider.saveChunk(x, z);
                         }
@@ -2661,8 +2663,8 @@ public class Level implements ChunkManager, Metadatable {
                     for (ChunkLoader loader : this.getChunkLoaders(x, z)) {
                         loader.onChunkUnloaded(chunk);
                     }
+                    this.provider.unloadChunk(x, z, safe);
                 }
-                this.provider.unloadChunk(x, z, safe);
             } catch (Exception e) {
                 MainLogger logger = this.server.getLogger();
                 logger.error(this.server.getLanguage().translateString("nukkit.level.chunkUnloadError", e.toString()));

@@ -68,4 +68,29 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
             return null;
         }
     }
+
+    public static byte[] join(DataPacket[] packets) {
+        int size = 0;
+        for (DataPacket packet : packets) {
+            if (!packet.isEncoded) {
+                packet.encode();
+                packet.isEncoded = true;
+            }
+            size += 4 + packet.getCount();
+        }
+        byte[] data = new byte[size];
+        byte[] rawBuf;
+        int i = 0;
+        for (DataPacket packet : packets) {
+            rawBuf = packet.getRawBuffer();
+            int len = packet.getCount();
+            data[i] = (byte) ((len >>> 24) & 0xFF);
+            data[i + 1] = (byte) ((len >>> 16) & 0xFF);
+            data[i + 2] = (byte) ((len >>> 8) & 0xFF);
+            data[i + 3] = (byte) ((len) & 0xFF);
+            System.arraycopy(rawBuf, 0, data, i + 4, len);
+            i += 4 + len;
+        }
+        return data;
+    }
 }

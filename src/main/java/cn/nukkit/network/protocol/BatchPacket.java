@@ -1,5 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.utils.Zlib;
+import java.util.zip.Deflater;
+
 /**
  * author: MagicDroidX
  * Nukkit Project
@@ -29,5 +32,16 @@ public class BatchPacket extends DataPacket {
         this.reset();
         this.putInt(this.payload.length);
         this.put(this.payload);
+    }
+
+    public static BatchPacket compressPackets(DataPacket[] packets, int level, int strategy) throws Exception {
+        byte[] data = DataPacket.join(packets);
+        Deflater deflater = new Deflater();
+        byte[] compressed = Zlib.deflate(deflater, data, level, strategy);
+        final BatchPacket pk = new BatchPacket();
+        pk.payload = compressed;
+        pk.encode();
+        pk.isEncoded = true;
+        return pk;
     }
 }
