@@ -61,7 +61,7 @@ public class PlayerKickEvent extends PlayerEvent implements Cancellable {
     }
 
     public String getReason() {
-        return reason.toString();
+        return reasonString;
     }
 
     public Reason getReasonEnum() {
