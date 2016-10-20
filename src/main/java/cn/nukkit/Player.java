@@ -2622,9 +2622,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    boolean creative = this.isCreative();
 
-                    item = (creative || this.inventory.contains(dropItem.item)) ? dropItem.item : this.inventory.getItemInHand();
+                    item = (this.isCreative() || this.inventory.contains(dropItem.item)) ? dropItem.item : this.inventory.getItemInHand();
                     PlayerDropItemEvent dropItemEvent = new PlayerDropItemEvent(this, item);
                     this.server.getPluginManager().callEvent(dropItemEvent);
                     if (dropItemEvent.isCancelled()) {
@@ -2632,7 +2631,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    if (!creative) {
+                    if (!this.isCreative()) {
                         this.inventory.removeItem(item);
                     }
                     Vector3 motion = this.getDirectionVector().multiply(0.4);
