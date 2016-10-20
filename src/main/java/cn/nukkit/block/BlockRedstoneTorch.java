@@ -2,7 +2,6 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
-import cn.nukkit.redstone.Redstone;
 
 /**
  * author: Angelic47
@@ -16,8 +15,6 @@ public class BlockRedstoneTorch extends BlockTorch {
 
     public BlockRedstoneTorch(int meta) {
         super(meta);
-        this.setPowerSource(true);
-        this.setPowerLevel(Redstone.POWER_STRONGEST);
     }
 
     @Override
@@ -50,13 +47,11 @@ public class BlockRedstoneTorch extends BlockTorch {
             };
             this.meta = faces[face];
             this.getLevel().setBlock(block, this, true, true);
-            Redstone.active(this);
 
             return true;
         } else if (!below.isTransparent() || below instanceof BlockFence || below.getId() == COBBLE_WALL) {
             this.meta = 0;
             this.getLevel().setBlock(block, this, true, true);
-            Redstone.active(this);
 
             return true;
         }
@@ -66,9 +61,7 @@ public class BlockRedstoneTorch extends BlockTorch {
 
     @Override
     public boolean onBreak(Item item) {
-        int level = this.getPowerLevel();
         this.getLevel().setBlock(this, new BlockAir(), true, true);
-        Redstone.deactive(this, level);
         return true;
     }
 

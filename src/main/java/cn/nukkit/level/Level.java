@@ -31,6 +31,8 @@ import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.generator.task.*;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.particle.Particle;
+import cn.nukkit.level.physics.PhysicsQueue;
+import cn.nukkit.level.physics.UpdateQueue;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.math.*;
 import cn.nukkit.metadata.BlockMetadataStore;
@@ -216,6 +218,8 @@ public class Level implements ChunkManager, Metadatable {
     private long levelCurrentTick = 0;
 
     private final int dimension = DIMENSION_OVERWORLD;
+
+    private final PhysicsQueue physicsQueue = new PhysicsQueue(this);
 
     public Level(Server server, String name, String path, Class<? extends LevelProvider> provider) {
         this.blockStates = Block.fullList;
@@ -1491,7 +1495,7 @@ public class Level implements ChunkManager, Metadatable {
                     }
                     ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
                 }
-                this.updateAround(position);
+                this.physicsQueue.queueForUpdateAsync(block.getFloorX(), block.getFloorY(), block.getFloorZ(), block.getPhysicsRange());
             }
 
             return true;
@@ -2911,4 +2915,26 @@ public class Level implements ChunkManager, Metadatable {
         return this.getHighestBlockAt(pos.getFloorX(), pos.getFloorZ()) < pos.getY();
     }
 
+    public boolean runPhysics(){
+        boolean updated = false;
+        updated |= physicsQueue.commitAsyncQueue();
+
+        UpdateQueue queue = physicsQueue.getUpdateQueue();
+
+        while (queue.hasNext()) {
+            int x = queue.getX();
+            int y = queue.getY();
+            int z = queue.getZ();
+            callOnUpdatePhysicsForRange(x, y, z);
+        }
+        return updated;
+    }
+
+    private boolean callOnUpdatePhysicsForRange(int x, int y, int z) {
+        Block block = this.getBlock(temporalVector.setComponents(x, y, z));
+        if (block.hasPhysics()) {
+            block.onUpdate(BLOCK_UPDATE_NORMAL);
+        }
+        return true;
+    }
 }

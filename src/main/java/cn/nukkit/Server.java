@@ -34,6 +34,7 @@ import cn.nukkit.level.generator.Flat;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.generator.Normal;
 import cn.nukkit.level.generator.biome.Biome;
+import cn.nukkit.level.physics.PhysicsTask;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.metadata.EntityMetadataStore;
 import cn.nukkit.metadata.LevelMetadataStore;
@@ -181,6 +182,10 @@ public class Server {
     private final Map<Integer, Level> levels = new HashMap<>();
 
     private Level defaultLevel = null;
+
+    private PhysicsTask physicsTask;
+
+    public boolean physicsDone = true;
 
     public Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
         instance = this;
@@ -437,6 +442,8 @@ public class Server {
 
             this.setDefaultLevel(this.getLevelByName(defaultName));
         }
+
+        this.physicsTask = new PhysicsTask();
 
         this.properties.save(true);
 
@@ -992,6 +999,11 @@ public class Server {
             this.rcon.check();
         }
         Timings.connectionTimer.stopTiming();
+
+        if(this.physicsDone) {
+            this.physicsDone = false;
+            this.scheduler.scheduleAsyncTask(physicsTask);
+        }
 
         Timings.schedulerTimer.startTiming();
         this.scheduler.mainThreadHeartbeat(this.tickCounter);

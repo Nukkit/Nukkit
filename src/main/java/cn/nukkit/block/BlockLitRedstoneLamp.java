@@ -1,7 +1,6 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.level.Level;
 
 /**
  * Created by Pub4Game on 30.03.2016.
@@ -33,9 +32,6 @@ public class BlockLitRedstoneLamp extends BlockRedstoneLamp {
 
     @Override
     public int onUpdate(int type) {
-        if ((type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_SCHEDULED) && this.getNeighborPowerLevel() <= 0) {
-            this.getLevel().setBlock(this, new BlockRedstoneLamp());
-        }
         return 0;
     }
 
