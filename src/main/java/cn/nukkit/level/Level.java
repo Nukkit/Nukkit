@@ -157,6 +157,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private Position temporalPosition;
     private Vector3 temporalVector;
+    private Vector3 temporalPhysicsVector;
 
     private final Block[] blockStates;
 
@@ -282,6 +283,7 @@ public class Level implements ChunkManager, Metadatable {
         this.timings = new LevelTimings(this);
         this.temporalPosition = new Position(0, 0, 0, this);
         this.temporalVector = new Vector3(0, 0, 0);
+        this.temporalPhysicsVector = new Vector3(0, 0, 0);
         this.tickRate = 1;
     }
 
@@ -2930,11 +2932,11 @@ public class Level implements ChunkManager, Metadatable {
         return updated;
     }
 
-    private boolean callOnUpdatePhysicsForRange(int x, int y, int z) {
-        Block block = this.getBlock(temporalVector.setComponents(x, y, z));
+    private void callOnUpdatePhysicsForRange(int x, int y, int z) {
+        Block block = this.getBlock(temporalPhysicsVector.setComponents(x, y, z));
+        System.out.println(String.valueOf(x) + " " + String.valueOf(y) + " " + String.valueOf(z) + " " + block.getName());
         if (block.hasPhysics()) {
             block.onUpdate(BLOCK_UPDATE_NORMAL);
         }
-        return true;
     }
 }

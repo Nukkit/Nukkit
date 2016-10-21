@@ -6,28 +6,28 @@ import cn.nukkit.level.range.EffectRange;
  * Nukkit Project
  */
 public class PhysicsUpdate {
-    private byte x;
-    private byte y;
-    private byte z;
+    private int x;
+    private int y;
+    private int z;
     private EffectRange range;
 
     public PhysicsUpdate(int x, int y, int z, EffectRange range) {
-        this.x = (byte) x;
-        this.y = (byte) y;
-        this.z = (byte) z;
+        this.x = x;
+        this.y = y;
+        this.z = z;
         this.range = range;
     }
 
     public int getX() {
-        return x & 0xFF;
+        return x;
     }
 
     public int getY() {
-        return y & 0xFF;
+        return y;
     }
 
     public int getZ() {
-        return z & 0xFF;
+        return z;
     }
 
     public EffectRange getRange() {

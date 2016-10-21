@@ -3,6 +3,7 @@ package cn.nukkit.utils;
 import cn.nukkit.math.BlockVector3;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * An Iterator that iterates outwards from a given central 3d integer coordinate.<br> <br> The Manhattan distance from the given center to the coordinates in the sequence increases monotonically and
@@ -11,7 +12,6 @@ import java.util.Iterator;
  * Nukkit Project
  */
 public class OutwardIterator extends BlockVector3 implements Iterator<BlockVector3> {
-    private static final long serialVersionUID = 1L;
     private final BlockVector3 center;
     private final BlockVector3 step;
     private int distance;
@@ -77,7 +77,7 @@ public class OutwardIterator extends BlockVector3 implements Iterator<BlockVecto
     @Override
     public BlockVector3 next() {
         if (!this.hasNext) {
-            throw new IllegalStateException("The Outward Iterator ran out of elements");
+            throw new NoSuchElementException("The Outward Iterator ran out of elements");
         }
         // First block is always the central block
         if (first) {
@@ -88,13 +88,13 @@ public class OutwardIterator extends BlockVector3 implements Iterator<BlockVecto
                 this.hasNext = false;
             }
         } else {
-            double dx = getX() - center.getX();
-            double dy = getY() - center.getY();
-            double dz = getZ() - center.getZ();
+            int dx = getX() - center.getX();
+            int dy = getY() - center.getY();
+            int dz = getZ() - center.getZ();
 
             // Last block was top of layer, move to start of next layer
             if (dx == 0 && dz == 0 && dy >= 0) {
-                setY(((int) center.getY() << 1) - getY() - 1);
+                setY((center.getY() << 1) - getY() - 1);
                 step.setX(0);
                 step.setZ(0);
                 distance++;

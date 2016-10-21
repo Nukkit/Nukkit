@@ -13,6 +13,10 @@ import cn.nukkit.math.Vector3;
 public class RedstoneUtil {
     public static final int[] NESWDU = {Vector3.SIDE_NORTH, Vector3.SIDE_EAST, Vector3.SIDE_SOUTH, Vector3.SIDE_WEST, Vector3.SIDE_DOWN, Vector3.SIDE_UP};
 
+    public static final int[] DUEWNS = {Vector3.SIDE_DOWN, Vector3.SIDE_UP, Vector3.SIDE_EAST, Vector3.SIDE_WEST, Vector3.SIDE_NORTH, Vector3.SIDE_SOUTH};
+
+    public static final int[] NESWD = {Vector3.SIDE_NORTH, Vector3.SIDE_EAST, Vector3.SIDE_SOUTH, Vector3.SIDE_WEST, Vector3.SIDE_DOWN};
+
 
     /**
      * Checks if the block given is a redstone conductor
