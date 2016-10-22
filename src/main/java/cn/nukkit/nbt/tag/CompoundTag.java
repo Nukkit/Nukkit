@@ -20,7 +20,7 @@ public class CompoundTag extends Tag {
     }
 
     @Override
-    void write(NBTOutputStream dos) throws IOException {
+    public void write(NBTOutputStream dos) throws IOException {
         for (Tag tag : tags.values()) {
             Tag.writeNamedTag(tag, dos);
         }
@@ -28,7 +28,7 @@ public class CompoundTag extends Tag {
     }
 
     @Override
-    void load(NBTInputStream dis) throws IOException {
+    public void load(NBTInputStream dis) throws IOException {
         tags.clear();
         Tag tag;
         while ((tag = Tag.readNamedTag(dis)).getId() != Tag.TAG_End) {
