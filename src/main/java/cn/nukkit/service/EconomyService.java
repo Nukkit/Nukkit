@@ -2,16 +2,9 @@ package cn.nukkit.service;
 
 import cn.nukkit.IPlayer;
 import cn.nukkit.level.Level;
-import cn.nukkit.plugin.Plugin;
 import java.util.Collection;
 
 public interface EconomyService extends Service{
-    public Plugin getPlugin();
-
-    public boolean isEnabled();
-
-    public String getName();
-
     public String getCurrency();
 
     public boolean hasAccount(IPlayer player, Level level);
@@ -20,9 +13,24 @@ public interface EconomyService extends Service{
 
     public boolean has(IPlayer player, Level level, double amount);
 
-    public boolean withdraw(IPlayer player, Level level, double amount);
 
-    public boolean deposit(IPlayer player, Level level, double amount);
+    /**
+     * Returns amount not withdrawn
+     * @param player
+     * @param level
+     * @param amount
+     * @return
+     */
+    public double withdraw(IPlayer player, Level level, double amount);
+
+    /**
+     * Returns amount not deposited
+     * @param player
+     * @param level
+     * @param amount
+     * @return
+     */
+    public double deposit(IPlayer player, Level level, double amount);
 
     public Collection<IPlayer> getAccounts() ;
 }
