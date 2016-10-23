@@ -14,6 +14,8 @@ public class AdventureSettings implements Cloneable {
 
     private boolean canFly = false;
 
+    private boolean flying = false;
+
     private boolean noclip = false;
 
     private Player player;
@@ -43,6 +45,10 @@ public class AdventureSettings implements Cloneable {
         this.canFly = canFly;
     }
 
+    public void setFlying(boolean flying) {
+        this.flying = flying;
+    }
+
     public void setNoclip(boolean noclip) {
         this.noclip = noclip;
     }
@@ -57,6 +63,10 @@ public class AdventureSettings implements Cloneable {
 
     public boolean canFly() {
         return canFly;
+    }
+
+    public boolean isFlying() {
+        return flying;
     }
 
     public boolean isNoclipEnabled() {
