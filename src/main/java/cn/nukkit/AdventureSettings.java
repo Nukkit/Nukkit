@@ -74,48 +74,14 @@ public class AdventureSettings implements Cloneable {
     }
 
     public void update() {
-        /*
-         bit mask | flag name
-		0x00000001 world_immutable
-		0x00000002 no_pvp
-		0x00000004 no_pvm
-		0x00000008 no_pve
-		0x00000010 static_time
-		0x00000020 nametags_visible
-		0x00000040 auto_jump
-		0x00000080 can_switch_between_walking_and_flying
-		0x00000100 noclip
-		*/
-        int flags = 0;
-
-        flags |= 0x02; // No PvP (Remove hit markers client-side).
-        flags |= 0x04; // No PvM (Remove hit markers client-side).
-        flags |= 0x08; // No PvE (Remove hit markers client-side).
-
-        if (!this.canDestroyBlock()) {
-            flags |= 0x01;
-        }
-
-		/*if(!nametags){
-            flags |= 0x20; //Show Nametags
-		}*/
-
-        if (this.isAutoJumpEnabled()) {
-            flags |= 0x40;
-        }
-
-        if (this.canFly()) {
-            flags |= 0x80;
-        }
-
-        if (this.isNoclipEnabled()) {
-            flags |= 0x100;
-        }
-
         AdventureSettingsPacket pk = new AdventureSettingsPacket();
-        pk.flags = flags;
-        pk.userPermission = 0x2;
-        pk.globalPermission = 0x2;
+        pk.flags = 0;
+        pk.worldInmutable = player.isAdventure();
+        pk.autoJump = autoJump;
+        pk.allowFlight = canFly;
+        pk.noClip = noclip;
+        pk.isFlying = flying;
+        pk.userPermission = 2;
         player.dataPacket(pk);
 
         player.resetInAirTicks();

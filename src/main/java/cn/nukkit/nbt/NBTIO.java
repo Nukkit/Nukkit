@@ -90,6 +90,10 @@ public class NBTIO {
         return read(new ByteArrayInputStream(data), endianness);
     }
 
+    public static CompoundTag read(byte[] data, ByteOrder endianness, boolean network) throws IOException {
+        return read(new ByteArrayInputStream(data), endianness, network);
+    }
+
     public static CompoundTag readCompressed(InputStream inputStream) throws IOException {
         return readCompressed(inputStream, ByteOrder.BIG_ENDIAN);
     }
