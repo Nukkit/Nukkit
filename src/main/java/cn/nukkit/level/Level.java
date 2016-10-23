@@ -81,8 +81,6 @@ public class Level implements ChunkManager, Metadatable {
     public static final int MAX_BLOCK_CACHE = 512;
 
     private final Map<Long, BlockEntity> blockEntities = new HashMap<>();
-
-    private Map<Long, Map<Long, SetEntityMotionPacket.Entry>> motionToSend = new HashMap<>();
     private Map<Long, Map<Long, MoveEntityPacket>> moveToSend = new HashMap<>();
     private Map<Long, Map<Long, MovePlayerPacket>> playerMoveToSend = new HashMap<>();
 
@@ -789,16 +787,6 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
         this.moveToSend.clear();
-
-        for (long index : this.motionToSend.keySet()) {
-            int chunkX = getHashX(index);
-            int chunkZ = getHashZ(index);
-            SetEntityMotionPacket pk = new SetEntityMotionPacket();
-            pk.entities = this.motionToSend.get(index).values().stream().toArray(SetEntityMotionPacket.Entry[]::new);
-            this.addChunkPacket(chunkX, chunkZ, pk);
-        }
-
-        this.motionToSend.clear();
 
         for (long index : this.playerMoveToSend.keySet()) {
             int chunkX = getHashX(index);
@@ -2766,14 +2754,6 @@ public class Level implements ChunkManager, Metadatable {
     @Override
     public void removeMetadata(String metadataKey, Plugin owningPlugin) throws Exception {
         this.server.getLevelMetadata().removeMetadata(this, metadataKey, owningPlugin);
-    }
-
-    public void addEntityMotion(int chunkX, int chunkZ, long entityId, double x, double y, double z) {
-        Long index = Level.chunkHash(chunkX, chunkZ);
-        if (!this.motionToSend.containsKey(index)) {
-            this.motionToSend.put(index, new HashMap<>());
-        }
-        this.motionToSend.get(index).put(entityId, new SetEntityMotionPacket.Entry(entityId, x, y, z));
     }
 
     public void addEntityMovement(int chunkX, int chunkZ, long entityId, double x, double y, double z, double yaw,
