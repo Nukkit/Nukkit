@@ -28,6 +28,7 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.MobEffectPacket;
 import cn.nukkit.network.protocol.RemoveEntityPacket;
 import cn.nukkit.network.protocol.SetEntityDataPacket;
+import cn.nukkit.network.protocol.SetEntityMotionPacket;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.timings.Timing;
@@ -978,7 +979,14 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void addMotion(double motionX, double motionY, double motionZ) {
-        this.level.addEntityMotion(this.chunk.getX(), this.chunk.getZ(), this.id, motionX, motionY, motionZ);
+        int chunkX = this.getFloorX() >> 16;
+        int chunkZ = this.getFloorZ() >> 16;
+        SetEntityMotionPacket pk = new SetEntityMotionPacket();
+        pk.eid = this.getId();
+        pk.motionX = (float) motionX;
+        pk.motionY = (float) motionY;
+        pk.motionZ = (float) motionZ;
+        this.level.addChunkPacket(chunkX, chunkZ, pk);
     }
 
     public Vector3 getDirectionVector() {
