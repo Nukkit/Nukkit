@@ -11,6 +11,7 @@ import cn.nukkit.level.generator.populator.PopulatorTree;
 public class IcePlainsBiome extends SnowyBiome {
 
     public IcePlainsBiome() {
+        super();
         PopulatorTallGrass tallGrass = new PopulatorTallGrass();
         tallGrass.setBaseAmount(5);
 
