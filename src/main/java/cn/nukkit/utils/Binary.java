@@ -2,7 +2,6 @@ package cn.nukkit.utils;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.*;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -344,19 +343,19 @@ public class Binary {
 
     //TODO: proper varlong support
 
-    public static int readVarInt(DataInputStream stream) throws InvalidArgumentException, IOException {
+    public static int readVarInt(DataInputStream stream) throws IOException {
         long raw = readUnsignedVarInt(stream);
         long temp = (((raw << 31) >> 31) ^ raw) >> 1;
         return (int) (temp ^ (raw & (1 << 31)));
     }
 
-    public static long readUnsignedVarInt(DataInputStream stream) throws InvalidArgumentException, IOException {
+    public static long readUnsignedVarInt(DataInputStream stream) throws IOException {
         long value = 0;
         int i = 0;
         byte b;
         do {
             if (i > 63) {
-                throw new InvalidArgumentException(new String[]{"Varint did not terminate after 10 bytes!"});
+                throw new IllegalArgumentException("Varint did not terminate after 10 bytes!");
             }
             value |= (((b = stream.readByte()) & 0x7f) << i);
             i += 7;
@@ -364,16 +363,16 @@ public class Binary {
         return value;
     }
 
-    public static byte[] writeVarInt(int v) throws InvalidArgumentException, IOException {
+    public static byte[] writeVarInt(int v) throws IOException {
         return  writeUnsignedVarInt((v << 1) ^ (v >> 31));
     }
 
-    public static byte[] writeUnsignedVarInt(long v) throws InvalidArgumentException, IOException {
+    public static byte[] writeUnsignedVarInt(long v) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         int loops = 0;
         do {
             if (loops > 9) {
-                throw new InvalidArgumentException(new String[]{"Varint cannot be longer than 10 bytes!"}); //for safety reasons
+                throw new IllegalArgumentException("Varint cannot be longer than 10 bytes!"); //for safety reasons
             }
             long w = v & 0x7f;
             if ((v >> 7) != 0) {
