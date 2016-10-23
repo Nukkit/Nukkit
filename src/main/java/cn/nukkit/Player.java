@@ -707,9 +707,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         respawnPacket.z = (float) pos.z;
         this.dataPacket(respawnPacket);
 
-        PlayStatusPacket playStatusPacket = new PlayStatusPacket();
-        playStatusPacket.status = PlayStatusPacket.PLAYER_SPAWN;
-        this.dataPacket(playStatusPacket);
+        this.dataPacket(new ResourcePacksInfoPacket());
 
         PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(this,
                 new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.joined", new String[]{
@@ -1379,7 +1377,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (this.chunk != null) {
                 this.level.addEntityMotion(this.chunk.getX(), this.chunk.getZ(), this.getId(), this.motionX, this.motionY, this.motionZ);
                 SetEntityMotionPacket pk = new SetEntityMotionPacket();
-                pk.entities = new SetEntityMotionPacket.Entry[]{new SetEntityMotionPacket.Entry(0, (float) motion.x, (float) motion.y, (float) motion.z)};
+                pk.eid = 0;
+                pk.motionX = (float) motion.x;
+                pk.motionY = (float) motion.y;
+                pk.motionZ = (float) motion.z;
                 this.dataPacket(pk);
             }
 
@@ -1688,21 +1689,26 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         Position spawnPosition = this.getSpawn();
 
         StartGamePacket startGamePacket = new StartGamePacket();
-        startGamePacket.seed = -1;
-        startGamePacket.dimension = (byte) (getLevel().getDimension() & 0xFF);
+        startGamePacket.entityUniqueId = 0;
+        startGamePacket.entityRuntimeId = 0;
         startGamePacket.x = (float) this.x;
         startGamePacket.y = (float) this.y;
         startGamePacket.z = (float) this.z;
+        startGamePacket.seed = -1;
+        startGamePacket.dimension = (byte) (this.level.getDimension() & 0xff);
+        startGamePacket.gamemode = this.gamemode & 0x01;
+        startGamePacket.difficulty = this.server.getDifficulty();
         startGamePacket.spawnX = (int) spawnPosition.x;
         startGamePacket.spawnY = (int) spawnPosition.y;
         startGamePacket.spawnZ = (int) spawnPosition.z;
+        startGamePacket.hasAchievementsDisabled = true;
+        startGamePacket.dayCycleStopTime = -1;
+        startGamePacket.eduMode = false;
+        startGamePacket.rainLevel = 0;
+        startGamePacket.lightningLevel = 0;
+        startGamePacket.commandsEnabled = true;
+        startGamePacket.unknown = "UNKNOWN";
         startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat
-        startGamePacket.gamemode = this.gamemode & 0x01;
-        startGamePacket.eid = 0; //Always use EntityID as zero for the actual player
-        startGamePacket.b1 = true;
-        startGamePacket.b2 = true;
-        startGamePacket.b3 = false;
-        startGamePacket.unknownstr = "";
         this.dataPacket(startGamePacket);
 
         SetTimePacket setTimePacket = new SetTimePacket();
@@ -1888,7 +1894,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     break;
                 case ProtocolInfo.ADVENTURE_SETTINGS_PACKET:
-                    //TODO
+                    //TODO: player abilities, check for other changes
+                    AdventureSettingsPacket adventureSettingsPacket = (AdventureSettingsPacket) packet;
+                    if (adventureSettingsPacket.isFlying && !this.getAdventureSettings().canFly()) {
+                        this.kick("Flying is not enabled on this server");
+                        break;
+                    }
+                    PlayerToggleFlightEvent playerToggleFlightEvent = new PlayerToggleFlightEvent(this, adventureSettingsPacket.isFlying);
+                    this.server.getPluginManager().callEvent(playerToggleFlightEvent);
+                    if (playerToggleFlightEvent.isCancelled()) {
+                        this.getAdventureSettings().update();
+                    } else {
+                        this.getAdventureSettings().setFlying(playerToggleFlightEvent.isFlying());
+                    }
                     break;
                 case ProtocolInfo.MOB_EQUIPMENT_PACKET:
                     if (!this.spawned || !this.isAlive()) {
@@ -3112,7 +3130,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (t instanceof BlockEntitySign) {
                         CompoundTag nbt;
                         try {
-                            nbt = NBTIO.read(blockEntityDataPacket.namedTag, ByteOrder.LITTLE_ENDIAN);
+                            nbt = NBTIO.read(blockEntityDataPacket.namedTag, ByteOrder.LITTLE_ENDIAN, true);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
@@ -3150,7 +3168,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.dataPacket(chunkRadiusUpdatePacket);
                     break;
                 case ProtocolInfo.SET_PLAYER_GAME_TYPE_PACKET:
-                    //TODO
+                    SetPlayerGameTypePacket setPlayerGameTypePacket = (SetPlayerGameTypePacket) packet;
+                    if (setPlayerGameTypePacket.gamemode != this.gamemode) {
+                        if (!this.hasPermission("nukkit.command.gamemode")) {
+                            SetPlayerGameTypePacket setPlayerGameTypePacket1 = new SetPlayerGameTypePacket();
+                            setPlayerGameTypePacket1.gamemode = this.gamemode & 0x01;
+                            this.dataPacket(setPlayerGameTypePacket1);
+                            this.getAdventureSettings().update();
+                            break;
+                        }
+                        this.setGamemode(setPlayerGameTypePacket.gamemode);
+                    }
                     break;
                 case ProtocolInfo.ITEM_FRAME_DROP_ITEM_PACKET:
                     ItemFrameDropItemPacket itemFrameDropItemPacket = (ItemFrameDropItemPacket) packet;
@@ -4032,7 +4060,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         BatchPacket batch = new BatchPacket();
         byte[][] batchPayload = new byte[2][];
         byte[] buf = pk.getBuffer();
-        batchPayload[0] = Binary.writeInt(buf.length);
+        batchPayload[0] = Binary.writeUnsignedVarInt(buf.length);
         batchPayload[1] = buf;
         byte[] data = Binary.appendBytes(batchPayload);
         try {
