@@ -65,6 +65,7 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
+import cn.nukkit.service.ServiceManager;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.*;
 import java.io.*;
@@ -103,7 +104,9 @@ public class Server {
 
     private volatile PluginManager pluginManager;
 
-    private volatile int profilingTickrate = 20;
+    private ServiceManager serviceManager = null;
+
+    private int profilingTickrate = 20;
 
     private final Object schedulerLock = new Object();
     private volatile ServerScheduler scheduler;
@@ -408,6 +411,7 @@ public class Server {
         Runnable initPlugins = new Runnable() {
             @Override
             public void run() {
+                serviceManager = new ServiceManager();
                 pluginManager = new PluginManager(Server.this, getCommandMap());
                 pluginManager.registerInterface(JavaPluginLoader.class);
                 pluginManager.loadPlugins(pluginPath);
@@ -1411,6 +1415,10 @@ public class Server {
 
     public LevelMetadataStore getLevelMetadata() {
         return levelMetadata;
+    }
+
+    public ServiceManager getServiceManager() {
+        return this.serviceManager;
     }
 
     public PluginManager getPluginManager() {
