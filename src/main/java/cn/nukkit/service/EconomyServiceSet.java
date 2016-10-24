@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
-public class EconomyServiceSet implements EconomyService {
+public class EconomyServiceSet implements EconomyService_v1 {
 
     private final Collection<EconomyService> services;
 

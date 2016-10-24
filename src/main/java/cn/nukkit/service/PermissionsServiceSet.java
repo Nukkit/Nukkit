@@ -8,7 +8,7 @@ import cn.nukkit.permission.PermissionAttachmentInfo;
 import cn.nukkit.plugin.Plugin;
 import java.util.*;
 
-public class PermissionsServiceSet implements PermissionService {
+public class PermissionsServiceSet implements PermissionService_v1 {
 
     private final Collection<PermissionService> services;
 
