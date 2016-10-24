@@ -65,9 +65,9 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
+import cn.nukkit.service.ServiceManager;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.*;
-
 import java.io.*;
 import java.nio.ByteOrder;
 import java.util.*;
@@ -96,6 +96,8 @@ public class Server {
     private boolean hasStopped = false;
 
     private PluginManager pluginManager = null;
+
+    private ServiceManager serviceManager = null;
 
     private int profilingTickrate = 20;
 
@@ -367,6 +369,8 @@ public class Server {
         Attribute.init();
 
         this.craftingManager = new CraftingManager();
+
+        this.serviceManager = new ServiceManager();
 
         this.pluginManager = new PluginManager(this, this.commandMap);
         this.pluginManager.subscribeToPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE, this.consoleSender);
@@ -813,15 +817,8 @@ public class Server {
     }
 
     public void addOnlinePlayer(Player player) {
-        this.addOnlinePlayer(player, true);
-    }
-
-    public void addOnlinePlayer(Player player, boolean update) {
         this.playerList.put(player.getUniqueId(), player);
-
-        if (update) {
-            this.updatePlayerListData(player.getUniqueId(), player.getId(), player.getDisplayName(), player.getSkin());
-        }
+        this.updatePlayerListData(player.getUniqueId(), player.getId(), player.getDisplayName(), player.getSkin());
     }
 
     public void removeOnlinePlayer(Player player) {
@@ -867,22 +864,17 @@ public class Server {
     }
 
     public void sendFullPlayerListData(Player player) {
-        this.sendFullPlayerListData(player, false);
-    }
-
-    public void sendFullPlayerListData(Player player, boolean self) {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
-        List<PlayerListPacket.Entry> entries = new ArrayList<>();
-        for (Player p : this.playerList.values()) {
-            if (!self && p == player) {
-                continue;
-            }
-
-            entries.add(new PlayerListPacket.Entry(p.getUniqueId(), p.getId(), p.getDisplayName(), p.getSkin()));
-        }
-
-        pk.entries = entries.stream().toArray(PlayerListPacket.Entry[]::new);
+        pk.entries = this.playerList
+                .values()
+                .stream()
+                .map(p -> new PlayerListPacket.Entry(
+                        p.getUniqueId(),
+                        p.getId(),
+                        p.getDisplayName(),
+                        p.getSkin()))
+                .toArray(PlayerListPacket.Entry[]::new);
 
         player.dataPacket(pk);
     }
@@ -1293,6 +1285,10 @@ public class Server {
 
     public LevelMetadataStore getLevelMetadata() {
         return levelMetadata;
+    }
+
+    public ServiceManager getServiceManager() {
+        return this.serviceManager;
     }
 
     public PluginManager getPluginManager() {
