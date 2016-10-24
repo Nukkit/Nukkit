@@ -7,7 +7,9 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityItemFrame;
 import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
+import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandData;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
@@ -69,6 +71,7 @@ import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -383,6 +386,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.server.removeOp(this.getName());
         }
 
+        this.sendCommandData();
         this.recalculatePermissions();
         //TODO: Send command data
     }
@@ -444,6 +448,26 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (this.hasPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE)) {
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE, this);
+        }
+    }
+
+    public void sendCommandData(){
+        AvailableCommandsPacket pk = new AvailableCommandsPacket();
+        Map<String, CommandData> data = new HashMap<>();
+        int count = 0;
+        for (Command command: this.server.getCommandMap().getCommands().values()){
+            if(!command.testPermissionSilent(this)){
+                continue;
+            }
+            ++count;
+            CommandData data0 = command.generateCustomCommandData(this);
+            data.put(command.getName(), data0);
+        }
+        if(count > 0){
+            //TODO: structure checking
+            pk.commands = new Gson().toJson(data);
+            Server.getInstance().getLogger().warning(pk.commands);
+            this.dataPacket(pk);
         }
     }
 
@@ -680,8 +704,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.sendRecipeList(this);
         this.getAdventureSettings().update();
 
-        this.server.updatePlayerListData(this.getUniqueId(), this.getId(), this.getDisplayName(), this.getSkin());
         this.server.sendFullPlayerListData(this);
+        this.server.updatePlayerListData(this.getUniqueId(), this.getId(), this.getDisplayName(), this.getSkin());
 
         this.sendPotionEffects(this);
         this.sendData(this);
@@ -707,7 +731,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         respawnPacket.z = (float) pos.z;
         this.dataPacket(respawnPacket);
 
-        this.dataPacket(new ResourcePacksInfoPacket());
+        PlayStatusPacket playStatusPacket = new PlayStatusPacket();
+        playStatusPacket.status = PlayStatusPacket.PLAYER_SPAWN;
+        this.dataPacket(playStatusPacket);
 
         PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(this,
                 new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.joined", new String[]{
@@ -1324,6 +1350,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } else {
             if (this.speed == null) speed = new Vector3(0, 0, 0);
             else this.speed.setComponents(0, 0, 0);
+            this.setSprinting(false);
         }
 
         if (!revert && (this.isFoodEnabled() || this.getServer().getDifficulty() == 0)) {
@@ -1375,13 +1402,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean setMotion(Vector3 motion) {
         if (super.setMotion(motion)) {
             if (this.chunk != null) {
-                this.level.addEntityMotion(this.chunk.getX(), this.chunk.getZ(), this.getId(), this.motionX, this.motionY, this.motionZ);
+                this.getLevel().addEntityMotion(this.chunk.getX(), this.chunk.getZ(), this.getId(), this.motionX, this.motionY, this.motionZ);  //Send to others
                 SetEntityMotionPacket pk = new SetEntityMotionPacket();
                 pk.eid = 0;
                 pk.motionX = (float) motion.x;
                 pk.motionY = (float) motion.y;
                 pk.motionZ = (float) motion.z;
-                this.dataPacket(pk);
+                this.dataPacket(pk);  //Send to self
             }
 
             if (this.motionY > 0) {
@@ -1682,6 +1709,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         statusPacket.status = PlayStatusPacket.LOGIN_SUCCESS;
         this.dataPacket(statusPacket);
 
+        this.dataPacket(new ResourcePacksInfoPacket());
+
         if (this.spawnPosition == null && this.namedTag.contains("SpawnLevel") && (level = this.server.getLevelByName(this.namedTag.getString("SpawnLevel"))) != null) {
             this.spawnPosition = new Position(this.namedTag.getInt("SpawnX"), this.namedTag.getInt("SpawnY"), this.namedTag.getInt("SpawnZ"), level);
         }
@@ -1708,6 +1737,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.lightningLevel = 0;
         startGamePacket.commandsEnabled = true;
         startGamePacket.unknown = "UNKNOWN";
+        startGamePacket.worldName = this.getServer().getNetwork().getName();
         startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat
         this.dataPacket(startGamePacket);
 
@@ -1747,6 +1777,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             containerSetContentPacket.slots = Item.getCreativeItems().stream().toArray(Item[]::new);
             this.dataPacket(containerSetContentPacket);
         }
+
+        //this.sendCommandData();
 
         this.forceMovement = this.teleportPosition = this.getPosition();
 
