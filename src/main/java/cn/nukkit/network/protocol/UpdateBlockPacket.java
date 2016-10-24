@@ -32,11 +32,9 @@ public class UpdateBlockPacket extends DataPacket {
     public void encode() {
         this.reset();
         for (Entry entry : this.records) {
-            this.putInt(entry.x);
-            this.putInt(entry.z);
-            this.putByte((byte) entry.y);
-            this.putByte((byte) entry.blockId);
-            this.putByte((byte) ((entry.flags << 4) | entry.blockData));
+            this.putBlockCoords(entry.x, entry.y, entry.z);
+            this.putUnsignedVarInt(entry.blockId);
+            this.putUnsignedVarInt((entry.flags << 4) | entry.blockData);
         }
     }
 
