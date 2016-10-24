@@ -7,8 +7,8 @@ public class ResourcePacksInfoPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.RESOURCE_PACKS_INFO_PACKET;
 
     public boolean mustAccept = false;
-    public ResourcePackInfoEntry[] behaviourPackEntries;
-    public ResourcePackInfoEntry[] resourcePackEntries;
+    public ResourcePackInfoEntry[] behaviourPackEntries = new ResourcePackInfoEntry[0];
+    public ResourcePackInfoEntry[] resourcePackEntries = new ResourcePackInfoEntry[0];
 
     @Override
     public void decode() {

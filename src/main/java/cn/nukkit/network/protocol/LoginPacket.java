@@ -41,7 +41,7 @@ public class LoginPacket extends DataPacket {
         this.gameEdition = (byte) this.getByte();
         byte[] str;
         try {
-            str = Zlib.inflate(this.get((int) this.getUnsignedVarInt()), 64 * 1024 * 1024);
+            str = Zlib.inflate(this.get((int) this.getUnsignedVarInt()));
         } catch (Exception e) {
             return;
         }

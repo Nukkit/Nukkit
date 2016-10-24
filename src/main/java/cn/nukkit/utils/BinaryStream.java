@@ -311,22 +311,46 @@ public class BinaryStream {
         this.put(Binary.writeVarInt(v));
     }
 
+    public int getSignedVarInt() {
+        return VarInt.readSInt32(this);
+    }
+
+    public void putSignedVarInt(int v) {
+        VarInt.writeSInt32(this, v);
+    }
+
+    public long getVarLong() {
+        return VarInt.readRawVarInt64(this, 64);
+    }
+
+    public void putVarLong(long v) {
+        VarInt.writeRawVarInt64(this, v);
+    }
+
+    public long getSignedVarLong() {
+        return VarInt.readSInt64(this);
+    }
+
+    public void putSignedVarLong(long v) {
+        VarInt.writeSInt64(this, v);
+    }
+
     public long getEntityId() {
-        return this.getVarInt();
+        return this.getVarLong();
     }
 
     public void putEntityId(long v) {
-        this.putVarInt((int) v); //varlong?
+        this.putVarLong(v); //varlong?
     }
 
     public BlockVector3 getBlockCoords() {
-        return new BlockVector3(this.getVarInt(), this.getByte(), this.getVarInt());
+        return new BlockVector3(this.getSignedVarInt(), (int)this.getUnsignedVarInt(), this.getSignedVarInt());
     }
 
     public void putBlockCoords(int x, int y, int z) {
-        this.putVarInt(x);
-        this.putByte((byte) y);
-        this.putVarInt(z);
+        this.putSignedVarInt(x);
+        this.putUnsignedVarInt(y);
+        this.putSignedVarInt(z);
     }
 
     public Vector3f getVector3f() {
