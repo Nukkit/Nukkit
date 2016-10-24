@@ -2,7 +2,6 @@ package cn.nukkit.utils;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.*;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 
 import java.io.*;
 import java.nio.ByteBuffer;

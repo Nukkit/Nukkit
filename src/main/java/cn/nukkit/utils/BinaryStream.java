@@ -3,7 +3,6 @@ package cn.nukkit.utils;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockVector3;
-import cn.nukkit.math.Vector3;
 import cn.nukkit.math.Vector3f;
 
 import java.nio.charset.StandardCharsets;
