@@ -86,7 +86,7 @@ public class Explosion {
                         d0 = d0 / d3;
                         d1 = d1 / d3;
                         d2 = d2 / d3;
-                        float f = this.explosionSize * (0.7F + center.getLevel().rand.nextFloat() * 0.6F);
+                        float f = this.explosionSize * (0.7F + this.level.rand.nextFloat() * 0.6F);
                         double d4 = this.explosionX;
                         double d6 = this.explosionY;
                         double d8 = this.explosionZ;
@@ -151,7 +151,7 @@ public class Explosion {
             }
         }
 
-        double explosionSize = this.size * 2d;
+        float f3 = this.explosionSize * 2.0F;
         double minX = NukkitMath.floorDouble(this.explosionX - (double)f3 - 1.0D);
         double maxX = NukkitMath.floorDouble(this.explosionX + (double)f3 + 1.0D);
         double minY = NukkitMath.floorDouble(this.explosionY - (double)f3 - 1.0D);
