@@ -53,20 +53,20 @@ public abstract class ObjectTree {
                 break;
             case BlockSapling.BIRCH:
                 if (random.nextBoundedInt(39) == 0) {
-                    tree = new ObjectBirchTree(true, true);
+                    tree = new ObjectTallBirchTree();
                 } else {
-                    tree = new ObjectBirchTree(true, false);
+                    tree = new ObjectBirchTree();
                 }
                 break;
             case BlockSapling.JUNGLE:
-                tree = new ObjectJungleTree(true, 10, 20, 3, 3); // Magic values as in BlockSapling
+                tree = new ObjectJungleTree();
                 break;
             case BlockSapling.OAK:
             default:
                 /*if(random.nextRange(0, 9) == 0) {
 					tree = new BigTree();
 				} else {*/ 
-				tree = new ObjectOakTree();
+		tree = new ObjectOakTree();
 				//}
                 break;
         }
