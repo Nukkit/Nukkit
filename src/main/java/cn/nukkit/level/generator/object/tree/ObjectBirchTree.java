@@ -13,8 +13,8 @@ import java.util.Random;
  */
 public class ObjectBirchTree extends ObjectTree {
     
-    Random rand = new Random();
-    protected int treeHeight += rand.nextInt(7);
+    Random random = new Random();
+    protected int treeHeight = random.nextInt(8 - 6 + 1) + 8;
 
     @Override
     public int getTrunkBlock() {
