@@ -63,7 +63,7 @@ public abstract class ObjectTree {
                 }
                 break;
             case BlockSapling.JUNGLE:
-                tree = new ObjectJungleTree();
+                tree = new ObjectJungleTree(true, 10, 20, 3, 3); // Magic values as in BlockSapling
                 break;
             case BlockSapling.OAK:
             default:
