@@ -87,7 +87,7 @@ public class Explosion {
                         d0 = d0 / d3;
                         d1 = d1 / d3;
                         d2 = d2 / d3;
-                        float f = this.explosionSize * (0.7F + this.worldObject.rand.nextFloat() * 0.6F);
+                        float f = this.explosionSize * (0.7F + center.getLevel().rand.nextFloat() * 0.6F);
                         double d4 = this.explosionX;
                         double d6 = this.explosionY;
                         double d8 = this.explosionZ;
