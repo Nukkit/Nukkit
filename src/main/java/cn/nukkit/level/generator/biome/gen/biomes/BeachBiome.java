@@ -29,4 +29,9 @@ public class BeachBiome extends SandyBiome {
     public String getName() {
         return "Beach";
     }
+    
+    @Override
+    public int getColor() {
+        return 0xfade85;
+    }
 }
