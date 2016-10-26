@@ -153,7 +153,7 @@ public class Explosion {
             }
         }
 
-        float f3 = this.explosionSize * 2.0F;
+        double f3 = this.explosionSize * 2.0F;
         double minX = NukkitMath.floorDouble(this.explosionX - (double)f3 - 1.0D);
         double maxX = NukkitMath.floorDouble(this.explosionX + (double)f3 + 1.0D);
         double minY = NukkitMath.floorDouble(this.explosionY - (double)f3 - 1.0D);
