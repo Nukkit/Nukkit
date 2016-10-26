@@ -29,8 +29,8 @@ public class TaigaBiome extends SnowyBiome {
 
         this.setElevation(63, 81);
 
-        this.temperature = 0.05;
-        this.rainfall = 0.8;
+        this.temperature = 0.05f;
+        this.rainfall = 0.8f;
     }
 
     @Override
