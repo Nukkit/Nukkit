@@ -13,8 +13,8 @@ import java.util.Random;
  */
 public class ObjectBirchTree extends ObjectTree {
     
-    /*Random random = new Random();
-    protected int treeHeight = random.nextInt(8 - 6 + 1) + 8;*/
+    Random random = new Random();
+    protected int treeHeight = random.nextInt(8 - 6 + 1) + 8;
 
     @Override
     public int getTrunkBlock() {
@@ -38,7 +38,7 @@ public class ObjectBirchTree extends ObjectTree {
 
     @Override
     public void placeObject(ChunkManager level, int x, int y, int z, NukkitRandom random) {
-        //this.treeHeight = random.nextBoundedInt(3) + 5;
+        this.treeHeight = random.nextBoundedInt(3) + 5;
         super.placeObject(level, x, y, z, random);
     }
 }
