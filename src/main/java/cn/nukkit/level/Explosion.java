@@ -46,12 +46,12 @@ public class Explosion {
 
     private final Object what;
 
-    public Explosion(Position center, double size, Entity what) {
+    public Explosion(Position center, double size, Entity what, float sizeW) {
         this.level = center.getLevel();
         this.source = center;
         this.size = Math.max(size, 0);
         this.what = what;
-        this.explosionSize = size;
+        this.explosionSize = sizeW;
     }
 
     /**
