@@ -153,12 +153,12 @@ public class Explosion {
         }
 
         double explosionSize = this.size * 2d;
-        double minX = NukkitMath.floor_double(this.explosionX - (double)f3 - 1.0D);
-        double maxX = NukkitMath.floor_double(this.explosionX + (double)f3 + 1.0D);
-        double minY = NukkitMath.floor_double(this.explosionY - (double)f3 - 1.0D);
-        double maxY = NukkitMath.floor_double(this.explosionY + (double)f3 - 1.0D);
-        double minZ = NukkitMath.floor_double(this.explosionY - (double)f3 - 1.0D);
-        double maxZ = NukkitMath.floor_double(this.explosionY + (double)f3 - 1.0D);
+        double minX = (double)NukkitMath.floor(this.explosionX - (double)f3 - 1.0D);
+        double maxX = (double)NukkitMath.floor(this.explosionX + (double)f3 + 1.0D);
+        double minY = (double)NukkitMath.floor(this.explosionY - (double)f3 - 1.0D);
+        double maxY = (double)NukkitMath.floor(this.explosionY + (double)f3 - 1.0D);
+        double minZ = (double)NukkitMath.floor(this.explosionY - (double)f3 - 1.0D);
+        double maxZ = (double)NukkitMath.floor(this.explosionY + (double)f3 - 1.0D);
 
         AxisAlignedBB explosionBB = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
 
