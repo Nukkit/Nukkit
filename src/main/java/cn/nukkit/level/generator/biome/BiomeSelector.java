@@ -36,19 +36,13 @@ public class BiomeSelector {
             } else {
                 return Biome.DESERT;
             }
-        } else if (rainfall < 0.80) {
+        } else {
             if (temperature < 0.25) {
                 return Biome.TAIGA;
             } else if (temperature < 0.75) {
                 return Biome.FOREST;
             } else {
                 return Biome.BIRCH_FOREST;
-            }
-        } else {
-            if (temperature < 0.25) {
-                return Biome.MOUNTAINS;
-            } else {
-                return Biome.SMALL_MOUNTAINS;
             }
         }
     }
