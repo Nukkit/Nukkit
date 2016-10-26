@@ -57,7 +57,7 @@ public abstract class Biome {
 
     protected static void register(int id, Biome biome) {
         biome.setId(id);
-        biome.grassColor = generateBiomeColor(biome.getTemperature(), biome.getRainfall());
+        biome.grassColor = generateBiomeColor();
         biomes.put(id, biome);
     }
 
@@ -151,9 +151,7 @@ public abstract class Biome {
         return rainfall;
     }
 
-    private static int generateBiomeColor(double temperature, double rainfall) {
-        double x = (1 - temperature) * 255;
-        double z = (1 - rainfall * temperature) * 255;
+    private static int generateBiomeColor() {
         double[] c = interpolateColor(256, x, z, new double[]{0x47, 0xd0, 0x33}, new double[]{0x6c, 0xb4, 0x93}, new double[]{0xbf, 0xb6, 0x55}, new double[]{0x80, 0xb4, 0x97});
         return ((int) c[0] << 16) | ((int) c[1] << 8) | (int) (c[2]);
     }
