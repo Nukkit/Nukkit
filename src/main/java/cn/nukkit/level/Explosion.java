@@ -39,17 +39,19 @@ public class Explosion {
     private final double explosionX;
     private final double explosionY;
     private final double explosionZ;
+    private final float explosionSize;
 
     private List<Block> affectedBlocks = new ArrayList<>();
     private final double stepLen = 0.3d;
 
     private final Object what;
 
-    public Explosion(Position center, double size, Entity what) {
+    public Explosion(Position center, double size, Entity what, float size) {
         this.level = center.getLevel();
         this.source = center;
         this.size = Math.max(size, 0);
         this.what = what;
+        this.explosionSize = size;
     }
 
     /**
