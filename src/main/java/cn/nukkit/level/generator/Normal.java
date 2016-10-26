@@ -46,15 +46,15 @@ public class Normal extends Generator {
 
     private int heightOffset;
 
-    private final int seaHeight = 62;
+    private final int seaHeight = 64; // from http://minecraft.gamepedia.com/Biome : "The temperature also drops 0.00166667 per meter above sea level (Y=64)."
     private final int seaFloorHeight = 48;
     private final int beathStartHeight = 60;
     private final int beathStopHeight = 64;
     private final int bedrockDepth = 5;
     private final int seaFloorGenerateRange = 5;
-    private final int landHeightRange = 18; // 36 / 2
-    private final int mountainHeight = 13; // 26 / 2
-    private final int basegroundHeight = 3;
+    private final int landHeightRange = 0.2F;
+    private final int mountainHeight = 13;
+    private final int basegroundHeight = 0.1F;
 
     public Normal() {
         this(new HashMap<>());
