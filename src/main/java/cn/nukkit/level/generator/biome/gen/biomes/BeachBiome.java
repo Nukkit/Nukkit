@@ -5,14 +5,14 @@ import cn.nukkit.block.BlockSand;
 import cn.nukkit.block.BlockSandstone;
 
 /**
- * Author: PeratX
+ * Author: PeratX, NycuRO
  * Nukkit Project
  */
 public class BeachBiome extends SandyBiome {
     public BeachBiome() {
         //Todo: SugarCane
 
-        this.setElevation(62, 65);
+        this.setElevation(0.0f, 0.025f);
         this.temperature = 0.8f;
         this.rainfall = 0.4f;
 
