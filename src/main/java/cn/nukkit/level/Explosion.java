@@ -33,13 +33,12 @@ public class Explosion {
 
     private final int rays = 16; //Rays
     private final Level level;
+    private final Position source;
+    private final double size;
     
     private final double explosionX;
     private final double explosionY;
     private final double explosionZ;
-    
-    private final Position source;
-    private final double size;
 
     private List<Block> affectedBlocks = new ArrayList<>();
     private final double stepLen = 0.3d;
@@ -153,12 +152,12 @@ public class Explosion {
         }
 
         double explosionSize = this.size * 2d;
-        double minX = (double)NukkitMath.floor(this.explosionX - (double)f3 - 1.0D);
-        double maxX = (double)NukkitMath.floor(this.explosionX + (double)f3 + 1.0D);
-        double minY = (double)NukkitMath.floor(this.explosionY - (double)f3 - 1.0D);
-        double maxY = (double)NukkitMath.floor(this.explosionY + (double)f3 - 1.0D);
-        double minZ = (double)NukkitMath.floor(this.explosionY - (double)f3 - 1.0D);
-        double maxZ = (double)NukkitMath.floor(this.explosionY + (double)f3 - 1.0D);
+        double minX = NukkitMath.floorDouble(this.explosionX - (double)f3 - 1.0D);
+        double maxX = NukkitMath.floorDouble(this.explosionX + (double)f3 + 1.0D);
+        double minY = NukkitMath.floorDouble(this.explosionY - (double)f3 - 1.0D);
+        double maxY = NukkitMath.floorDouble(this.explosionY + (double)f3 - 1.0D);
+        double minZ = NukkitMath.floorDouble(this.explosionY - (double)f3 - 1.0D);
+        double maxZ = NukkitMath.floorDouble(this.explosionY + (double)f3 - 1.0D);
 
         AxisAlignedBB explosionBB = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
 
