@@ -182,7 +182,7 @@ public class Normal extends Generator {
                 landHeightNoise = landHeightNoise - 0.6F;
                 landHeightNoise = landHeightNoise > 0 ? landHeightNoise : 0;
 
-                //generate mountains
+                /*generate mountains
                 double mountainHeightGenerate = mountainNoise[genx][genz] - 0.2F;
                 mountainHeightGenerate = mountainHeightGenerate > 0 ? mountainHeightGenerate : 0;
                 int mountainGenerate = (int) (mountainHeight * mountainHeightGenerate);
@@ -196,7 +196,7 @@ public class Normal extends Generator {
                 }
 
                 int genyHeight = seaFloorHeight + landHeightGenerate;
-                genyHeight += mountainGenerate;
+                genyHeight += mountainGenerate;*/
 
                 //prepare for generate ocean, desert, and land
                 if (genyHeight < beathStartHeight) {
