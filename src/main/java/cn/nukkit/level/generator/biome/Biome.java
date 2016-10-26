@@ -28,9 +28,6 @@ public abstract class Biome {
     public static final int ICE_PLAINS = 12;
 
 
-    public static final int BEACH = 16;
-
-
     public static final int SMALL_MOUNTAINS = 20;
 
 
@@ -39,12 +36,12 @@ public abstract class Biome {
 
     public static final int MAX_BIOMES = 256;
 
-    private static final Map<Integer, Biome> biomes = new HashMap<>();
+    private static Map<Integer, Biome> biomes = new HashMap<>();
 
     private int id;
     private boolean registered = false;
 
-    private final ArrayList<Populator> populators = new ArrayList<>();
+    private ArrayList<Populator> populators = new ArrayList<>();
 
     private int minElevation;
     private int maxElevation;
@@ -53,10 +50,11 @@ public abstract class Biome {
 
     protected double rainfall = 0.5;
     protected double temperature = 0.5;
+    protected int grassColor = 0;
 
     protected static void register(int id, Biome biome) {
         biome.setId(id);
-        biome.grassColor = generateBiomeColor();
+        biome.grassColor = generateBiomeColor(biome.getTemperature(), biome.getRainfall());
         biomes.put(id, biome);
     }
 
@@ -72,25 +70,10 @@ public abstract class Biome {
         register(ICE_PLAINS, new IcePlainsBiome());
         register(SMALL_MOUNTAINS, new SmallMountainsBiome());
         register(BIRCH_FOREST, new ForestBiome(ForestBiome.TYPE_BIRCH));
-
-        register(BEACH, new BeachBiome());
     }
 
     public static Biome getBiome(int id) {
         return biomes.containsKey(id) ? biomes.get(id) : biomes.get(OCEAN);
-    }
-
-    /**
-     * Get Biome by name.
-     *
-     * @param name Name of biome. Name could contain symbol "_" instead of space
-     * @return Biome. Null - when biome was not found
-     */
-    public static Biome getBiome(String name) {
-        for (Biome biome : biomes.values()) {
-            if (biome.getName().equalsIgnoreCase(name.replace("_", " "))) return biome;
-        }
-        return null;
     }
 
     public void clearPopulators() {
@@ -150,9 +133,9 @@ public abstract class Biome {
         return rainfall;
     }
 
-    private static int generateBiomeColor() {
-        x = Biome biome.getColor() * 255;
-        z = Biome biome.getColor() * 255;
+    private static int generateBiomeColor(double temperature, double rainfall) {
+        double x = (1 - temperature) * 255;
+        double z = (1 - rainfall * temperature) * 255;
         double[] c = interpolateColor(256, x, z, new double[]{0x47, 0xd0, 0x33}, new double[]{0x6c, 0xb4, 0x93}, new double[]{0xbf, 0xb6, 0x55}, new double[]{0x80, 0xb4, 0x97});
         return ((int) c[0] << 16) | ((int) c[1] << 8) | (int) (c[2]);
     }
