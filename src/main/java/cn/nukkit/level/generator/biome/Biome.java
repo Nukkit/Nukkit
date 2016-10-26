@@ -92,6 +92,7 @@ public abstract class Biome {
     public void removePopulator(class) {
         if (this.populators[class] != null) {
             return this.populators[class] = null;
+        }
     }
 
     public void populateChunk(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random) {
