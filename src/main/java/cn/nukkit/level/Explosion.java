@@ -34,6 +34,10 @@ public class Explosion {
     private final Level level;
     private final Position source;
     private final double size;
+    
+    private final double explosionX;
+    private final double explosionY;
+    private final double explosionZ;
 
     private List<Block> affectedBlocks = new ArrayList<>();
     private final double stepLen = 0.3d;
@@ -74,12 +78,21 @@ public class Explosion {
             for (int j = 0; j < this.rays; ++j) {
                 for (int k = 0; k < this.rays; ++k) {
                     if (i == 0 || i == mRays || j == 0 || j == mRays || k == 0 || k == mRays) {
-                        vector.setComponents((double) i / (double) mRays * 2d - 1, (double) j / (double) mRays * 2d - 1, (double) k / (double) mRays * 2d - 1);
-                        double len = vector.length();
-                        vector.setComponents((vector.x / len) * this.stepLen, (vector.y / len) * this.stepLen, (vector.z / len) * this.stepLen);
-                        double pointerX = this.source.x;
-                        double pointerY = this.source.y;
-                        double pointerZ = this.source.z;
+                        double d0 = (double)((float)j / 15.0F * 2.0F - 1.0F);
+                        double d1 = (double)((float)k / 15.0F * 2.0F - 1.0F);
+                        double d2 = (double)((float)l / 15.0F * 2.0F - 1.0F);
+                        double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
+                        d0 = d0 / d3;
+                        d1 = d1 / d3;
+                        d2 = d2 / d3;
+                        float f = this.explosionSize * (0.7F + this.worldObj.rand.nextFloat() * 0.6F);
+                        double d4 = this.explosionX;
+                        double d6 = this.explosionY;
+                        double d8 = this.explosionZ;
+                        d4 += d0 * 0.30000001192092896D;
+                        d6 += d1 * 0.30000001192092896D;
+                        d8 += d2 * 0.30000001192092896D;
+                        
 
                         for (double blastForce = this.size * (ThreadLocalRandom.current().nextInt(700, 1301)) / 1000d; blastForce > 0; blastForce -= this.stepLen * 0.75d) {
                             int x = (int) pointerX;
@@ -133,12 +146,12 @@ public class Explosion {
         }
 
         double explosionSize = this.size * 2d;
-        double minX = NukkitMath.floorDouble(this.source.x - explosionSize - 1);
-        double maxX = NukkitMath.ceilDouble(this.source.x + explosionSize + 1);
-        double minY = NukkitMath.floorDouble(this.source.y - explosionSize - 1);
-        double maxY = NukkitMath.ceilDouble(this.source.y + explosionSize + 1);
-        double minZ = NukkitMath.floorDouble(this.source.z - explosionSize - 1);
-        double maxZ = NukkitMath.ceilDouble(this.source.z + explosionSize + 1);
+        double minX = NukkitMath.floor_double(this.explosionX - (double)f3 - 1.0D);
+        double maxX = NukkitMath.floor_double(this.explosionX + (double)f3 + 1.0D);
+        double minY = NukkitMath.floor_double(this.explosionY - (double)f3 - 1.0D);
+        double maxY = NukkitMath.floor_double(this.explosionY - (double)f3 - 1.0D);
+        double minZ = NukkitMath.floor_double(this.explosionY - (double)f3 - 1.0D);
+        double maxZ = NukkitMath.floor_double(this.explosionY - (double)f3 - 1.0D);
 
         AxisAlignedBB explosionBB = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
 
