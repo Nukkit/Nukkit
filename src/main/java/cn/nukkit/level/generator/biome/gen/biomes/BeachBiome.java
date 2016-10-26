@@ -11,6 +11,7 @@ import cn.nukkit.level.generator.populator.PopulatorTallGrass;
  */
 public class BeachBiome extends SandyBiome {
     public BeachBiome() {
+        super();
 
         this.setElevation(47, 68);
         this.temperature = 0.8f;
