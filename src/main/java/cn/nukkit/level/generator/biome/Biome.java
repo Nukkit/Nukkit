@@ -19,29 +19,22 @@ public abstract class Biome {
     public static final int OCEAN = 0;
     public static final int PLAINS = 1;
     public static final int DESERT = 2;
-    public static final int MOUNTAINS = 3;
     public static final int FOREST = 4;
     public static final int TAIGA = 5;
     public static final int SWAMP = 6;
     public static final int RIVER = 7;
-
     public static final int ICE_PLAINS = 12;
-
-
-    public static final int SMALL_MOUNTAINS = 20;
-
-
+    public static final int BEACH = 16;
     public static final int BIRCH_FOREST = 27;
-
 
     public static final int MAX_BIOMES = 256;
 
-    private static Map<Integer, Biome> biomes = new HashMap<>();
+    private static final Map<Integer, Biome> biomes = new HashMap<>();
 
     private int id;
     private boolean registered = false;
 
-    private ArrayList<Populator> populators = new ArrayList<>();
+    private final ArrayList<Populator> populators = new ArrayList<>();
 
     private int minElevation;
     private int maxElevation;
@@ -62,18 +55,30 @@ public abstract class Biome {
         register(OCEAN, new OceanBiome());
         register(PLAINS, new PlainBiome());
         register(DESERT, new DesertBiome());
-        register(MOUNTAINS, new MountainsBiome());
         register(FOREST, new ForestBiome());
         register(TAIGA, new TaigaBiome());
         register(SWAMP, new SwampBiome());
         register(RIVER, new RiverBiome());
         register(ICE_PLAINS, new IcePlainsBiome());
-        register(SMALL_MOUNTAINS, new SmallMountainsBiome());
         register(BIRCH_FOREST, new ForestBiome(ForestBiome.TYPE_BIRCH));
+        register(BEACH, new BeachBiome());
     }
 
     public static Biome getBiome(int id) {
         return biomes.containsKey(id) ? biomes.get(id) : biomes.get(OCEAN);
+    }
+
+    /**
+     * Get Biome by name.
+     *
+     * @param name Name of biome. Name could contain symbol "_" instead of space
+     * @return Biome. Null - when biome was not found
+     */
+    public static Biome getBiome(String name) {
+        for (Biome biome : biomes.values()) {
+            if (biome.getName().equalsIgnoreCase(name.replace("_", " "))) return biome;
+        }
+        return null;
     }
 
     public void clearPopulators() {
