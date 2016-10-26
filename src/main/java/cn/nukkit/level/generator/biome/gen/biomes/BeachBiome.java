@@ -13,8 +13,8 @@ public class BeachBiome extends SandyBiome {
         //Todo: SugarCane
 
         this.setElevation(62, 65);
-        this.temperature = 2;
-        this.rainfall = 0;
+        this.temperature = 0.8f;
+        this.rainfall = 0.4f;
 
         this.setGroundCover(new Block[]{
                 new BlockSand(),
