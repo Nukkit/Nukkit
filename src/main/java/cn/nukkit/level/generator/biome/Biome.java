@@ -57,7 +57,7 @@ public abstract class Biome {
         register(DESERT, new DesertBiome());
         register(FOREST, new ForestBiome());
         register(TAIGA, new TaigaBiome());
-        register(SWAMP, new SwampBiome());
+        register(SWAMP, new SwamplandBiome());
         register(RIVER, new RiverBiome());
         register(ICE_PLAINS, new IcePlainsBiome());
         register(BIRCH_FOREST, new ForestBiome(ForestBiome.TYPE_BIRCH));
