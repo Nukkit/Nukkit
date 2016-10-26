@@ -32,8 +32,6 @@ public class Explosion {
 
     private final int rays = 16; //Rays
     private final Level level;
-    private final Position source;
-    private final double size;
     
     private final double explosionX;
     private final double explosionY;
@@ -149,9 +147,9 @@ public class Explosion {
         double minX = NukkitMath.floor_double(this.explosionX - (double)f3 - 1.0D);
         double maxX = NukkitMath.floor_double(this.explosionX + (double)f3 + 1.0D);
         double minY = NukkitMath.floor_double(this.explosionY - (double)f3 - 1.0D);
-        double maxY = NukkitMath.floor_double(this.explosionY - (double)f3 - 1.0D);
+        double maxY = NukkitMath.floor_double(this.explosionY + (double)f3 - 1.0D);
         double minZ = NukkitMath.floor_double(this.explosionY - (double)f3 - 1.0D);
-        double maxZ = NukkitMath.floor_double(this.explosionY - (double)f3 - 1.0D);
+        double maxZ = NukkitMath.floor_double(this.explosionY + (double)f3 - 1.0D);
 
         AxisAlignedBB explosionBB = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
 
