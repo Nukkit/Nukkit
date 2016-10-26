@@ -89,7 +89,7 @@ public abstract class Biome {
         this.populators.add(populator);
     }
     
-    public void removePopulator(Integer.valueof(class)) {
+    public void removePopulator(class) {
         if (this.populators[class] != null) {
             this.populators[class] = null;
         }
@@ -105,6 +105,10 @@ public abstract class Biome {
         return populators;
     }
 
+    public void getClass(int class) {
+        this.class = class;
+    }
+    
     public void setId(int id) {
         this.id = id;
     }
