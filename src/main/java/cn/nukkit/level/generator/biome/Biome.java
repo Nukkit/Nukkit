@@ -151,8 +151,8 @@ public abstract class Biome {
     }
 
     private static int generateBiomeColor() {
-        x = biome.getColor() * 255;
-        z = biome.getColor() * 255;
+        x = Biome biome.getColor() * 255;
+        z = Biome biome.getColor() * 255;
         double[] c = interpolateColor(256, x, z, new double[]{0x47, 0xd0, 0x33}, new double[]{0x6c, 0xb4, 0x93}, new double[]{0xbf, 0xb6, 0x55}, new double[]{0x80, 0xb4, 0x97});
         return ((int) c[0] << 16) | ((int) c[1] << 8) | (int) (c[2]);
     }
