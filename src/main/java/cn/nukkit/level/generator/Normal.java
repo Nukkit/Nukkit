@@ -52,9 +52,9 @@ public class Normal extends Generator {
     private final int beathStopHeight = 64;
     private final int bedrockDepth = 5;
     private final int seaFloorGenerateRange = 5;
-    private final float landHeightRange = 0.2F;
+    private final int landHeightRange = 0.2;
     private final int mountainHeight = 13;
-    private final float basegroundHeight = 0.1F;
+    private final int basegroundHeight = 0.1;
     private int waterColor = 16777215;
     //private boolean enableSnow; Coming soon
 
