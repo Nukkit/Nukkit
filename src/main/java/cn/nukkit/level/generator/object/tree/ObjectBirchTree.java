@@ -12,8 +12,9 @@ import java.util.Random;
  * Nukkit Project
  */
 public class ObjectBirchTree extends ObjectTree {
-    Random random = new Random();
-    protected int treeHeight += random.nextInt(7);
+    
+    Random rand = new Random();
+    protected int treeHeight += rand.nextInt(7);
 
     @Override
     public int getTrunkBlock() {
