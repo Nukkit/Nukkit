@@ -46,7 +46,7 @@ public class Explosion {
 
     private final Object what;
 
-    public Explosion(Position center, double size, Entity what, float size) {
+    public Explosion(Position center, float size, Entity what) {
         this.level = center.getLevel();
         this.source = center;
         this.size = Math.max(size, 0);
