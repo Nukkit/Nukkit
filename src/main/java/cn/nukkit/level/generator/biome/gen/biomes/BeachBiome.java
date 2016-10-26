@@ -21,8 +21,8 @@ public class BeachBiome extends SandyBiome {
         tallGrass.setBaseAmount(3);
 
         this.addPopulator(tallGrass);
-        this.removePopulator(int cactus);
-        this.removePopulator(int deadbush);
+        this.removePopulator(.cactus);
+        this.removePopulator(.deadbush);
 
         this.setGroundCover(new Block[]{
                 new BlockSand(),
