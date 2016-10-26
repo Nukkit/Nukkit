@@ -41,8 +41,8 @@ public abstract class Biome {
 
     private Block[] groundCover;
 
-    protected double rainfall = 0.5;
-    protected double temperature = 0.5;
+    private float rainfall = 0.5F;
+    private float temperature = 0.5F;
     protected int grassColor = 0;
 
     protected static void register(int id, Biome biome) {
