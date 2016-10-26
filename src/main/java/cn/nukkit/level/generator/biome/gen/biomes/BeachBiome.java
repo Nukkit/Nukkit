@@ -16,9 +16,6 @@ public class BeachBiome extends SandyBiome {
         this.temperature = 0.8f;
         this.rainfall = 0.4f;
         
-        this.removePopulator(cactus);
-        this.removePopulator(deadbush);
-        
         PopulatorTallGrass tallGrass = new PopulatorTallGrass();
         tallGrass.setBaseAmount(3);
 
