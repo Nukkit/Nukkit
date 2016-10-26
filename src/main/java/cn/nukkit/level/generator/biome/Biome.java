@@ -157,6 +157,13 @@ public abstract class Biome {
         double invs = 1 - s;
         return new double[]{a[0] * invs + b[0] * s, a[1] * invs + b[1] * s, a[2] * invs + b[2] * s};
     }
+    
+    public static enum TempCategory {
+        OCEAN,
+        COLD,
+        MEDIUM,
+        WARM;
+    }
 
     abstract public int getColor();
 }
