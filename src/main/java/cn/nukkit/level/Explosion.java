@@ -37,6 +37,9 @@ public class Explosion {
     private final double explosionX;
     private final double explosionY;
     private final double explosionZ;
+    
+    private final Position source;
+    private final double size;
 
     private List<Block> affectedBlocks = new ArrayList<>();
     private final double stepLen = 0.3d;
