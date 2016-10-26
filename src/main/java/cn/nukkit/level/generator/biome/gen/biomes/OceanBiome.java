@@ -21,8 +21,8 @@ public class OceanBiome extends WateryBiome {
         this.addPopulator(tallSugarcane);
         this.setElevation(46, 58);
 
-        this.temperature = 0.5;
-        this.rainfall = 0.5;
+        this.temperature = 0.5f;
+        this.rainfall = 0.5f;
 
     }
 
