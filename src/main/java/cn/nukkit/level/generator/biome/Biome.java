@@ -8,6 +8,7 @@ import cn.nukkit.math.NukkitRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * author: MagicDroidX
@@ -87,6 +88,18 @@ public abstract class Biome {
 
     public void addPopulator(Populator populator) {
         this.populators.add(populator);
+    }
+    
+    public boolean removePopulator(Class<?> type) {
+    boolean ret = false;
+        for (Iterator<Populator> itr = populators.iterator(); itr.hasNext();) {
+        Populator p = itr.next();
+            if (p.getClass() == type) {
+                itr.remove();
+                ret = true;
+            }
+        }
+        return ret;
     }
 
     public void populateChunk(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random) {
