@@ -5,12 +5,16 @@ import cn.nukkit.block.BlockWood;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.NukkitRandom;
 
+import java.util.Random;
+
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
 public class ObjectBirchTree extends ObjectTree {
-    protected int treeHeight = 7;
+    
+    Random random = new Random();
+    protected int treeHeight = random.nextInt(8 - 6 + 1) + 8;
 
     @Override
     public int getTrunkBlock() {

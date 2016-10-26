@@ -11,9 +11,9 @@ import cn.nukkit.level.generator.populator.PopulatorTree;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class SwampBiome extends GrassyBiome {
+public class SwamplandBiome extends GrassyBiome {
 
-    public SwampBiome() {
+    public SwamplandBiome() {
         super();
 
         PopulatorLilyPad lilypad = new PopulatorLilyPad();
@@ -32,8 +32,8 @@ public class SwampBiome extends GrassyBiome {
 
         this.setElevation(62, 63);
 
-        this.temperature = 0.8;
-        this.rainfall = 0.9;
+        this.temperature = 0.8f;
+        this.rainfall = 0.9f;
     }
 
     @Override
@@ -43,6 +43,6 @@ public class SwampBiome extends GrassyBiome {
 
     @Override
     public int getColor() {
-        return 0x6a7039;
+        return 0x92BD59;
     }
 }

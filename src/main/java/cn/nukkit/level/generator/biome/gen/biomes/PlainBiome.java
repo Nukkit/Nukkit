@@ -40,8 +40,8 @@ public class PlainBiome extends GrassyBiome {
 
         this.setElevation(63, 74);
 
-        this.temperature = 0.8;
-        this.rainfall = 0.4;
+        this.temperature = 0.8f;
+        this.rainfall = 0.4f;
     }
 
     @Override

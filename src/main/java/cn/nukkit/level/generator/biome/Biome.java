@@ -8,6 +8,7 @@ import cn.nukkit.math.NukkitRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * author: MagicDroidX
@@ -19,23 +20,13 @@ public abstract class Biome {
     public static final int OCEAN = 0;
     public static final int PLAINS = 1;
     public static final int DESERT = 2;
-    public static final int MOUNTAINS = 3;
     public static final int FOREST = 4;
     public static final int TAIGA = 5;
     public static final int SWAMP = 6;
     public static final int RIVER = 7;
-
     public static final int ICE_PLAINS = 12;
-
-
     public static final int BEACH = 16;
-
-
-    public static final int SMALL_MOUNTAINS = 20;
-
-
     public static final int BIRCH_FOREST = 27;
-
 
     public static final int MAX_BIOMES = 256;
 
@@ -51,8 +42,8 @@ public abstract class Biome {
 
     private Block[] groundCover;
 
-    protected double rainfall = 0.5;
-    protected double temperature = 0.5;
+    protected float rainfall = 0.5F;
+    protected float temperature = 0.5F;
     protected int grassColor = 0;
 
     protected static void register(int id, Biome biome) {
@@ -65,15 +56,12 @@ public abstract class Biome {
         register(OCEAN, new OceanBiome());
         register(PLAINS, new PlainBiome());
         register(DESERT, new DesertBiome());
-        register(MOUNTAINS, new MountainsBiome());
         register(FOREST, new ForestBiome());
         register(TAIGA, new TaigaBiome());
-        register(SWAMP, new SwampBiome());
+        register(SWAMP, new SwamplandBiome());
         register(RIVER, new RiverBiome());
         register(ICE_PLAINS, new IcePlainsBiome());
-        register(SMALL_MOUNTAINS, new SmallMountainsBiome());
         register(BIRCH_FOREST, new ForestBiome(ForestBiome.TYPE_BIRCH));
-
         register(BEACH, new BeachBiome());
     }
 
@@ -101,6 +89,18 @@ public abstract class Biome {
     public void addPopulator(Populator populator) {
         this.populators.add(populator);
     }
+    
+    public boolean removePopulator(Class<?> type) {
+    boolean ret = false;
+        for (Iterator<Populator> itr = populators.iterator(); itr.hasNext();) {
+        Populator p = itr.next();
+            if (p.getClass() == type) {
+                itr.remove();
+                ret = true;
+            }
+        }
+        return ret;
+    }
 
     public void populateChunk(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random) {
         for (Populator populator : populators) {
@@ -111,7 +111,7 @@ public abstract class Biome {
     public ArrayList<Populator> getPopulators() {
         return populators;
     }
-
+    
     public void setId(int id) {
         this.id = id;
     }
@@ -169,6 +169,13 @@ public abstract class Biome {
     private static double[] lerpColor(double[] a, double[] b, double s) {
         double invs = 1 - s;
         return new double[]{a[0] * invs + b[0] * s, a[1] * invs + b[1] * s, a[2] * invs + b[2] * s};
+    }
+    
+    public static enum TempCategory {
+        OCEAN,
+        COLD,
+        MEDIUM,
+        WARM;
     }
 
     abstract public int getColor();

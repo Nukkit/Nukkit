@@ -1,38 +1,43 @@
 package cn.nukkit.level.generator.biome;
 
-import cn.nukkit.block.Block;
+import cn.nukkit.level.generator.populator.PopulatorGrass;
 import cn.nukkit.level.generator.populator.PopulatorSugarcane;
+import cn.nukkit.level.generator.populator.PopulatorTallGrass;
 import cn.nukkit.level.generator.populator.PopulatorTallSugarcane;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
-public class OceanBiome extends WateryBiome {
+public class RiverBiome extends WateryBiome {
 
-    public OceanBiome() {
+    public RiverBiome() {
         super();
 
         PopulatorSugarcane sugarcane = new PopulatorSugarcane();
         sugarcane.setBaseAmount(6);
         PopulatorTallSugarcane tallSugarcane = new PopulatorTallSugarcane();
         tallSugarcane.setBaseAmount(60);
+
+        PopulatorGrass grass = new PopulatorGrass();
+        grass.setBaseAmount(30);
+        this.addPopulator(grass);
+
+        PopulatorTallGrass tallGrass = new PopulatorTallGrass();
+        tallGrass.setBaseAmount(5);
+
+        this.addPopulator(tallGrass);
         this.addPopulator(sugarcane);
         this.addPopulator(tallSugarcane);
-        this.setElevation(46, 58);
 
-        this.temperature = 0.5;
-        this.rainfall = 0.5;
+        this.setElevation(58, 62);
 
-    }
-
-    @Override
-    public Block[] getGroundCover() {
-        return super.getGroundCover();
+        this.temperature = 0.5f;
+        this.rainfall = 0.5f;
     }
 
     @Override
     public String getName() {
-        return "Ocean";
+        return "River";
     }
 }

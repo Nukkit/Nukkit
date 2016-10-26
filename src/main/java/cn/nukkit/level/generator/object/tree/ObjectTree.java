@@ -49,11 +49,7 @@ public abstract class ObjectTree {
         ObjectTree tree;
         switch (type) {
             case BlockSapling.SPRUCE:
-                if (random.nextBoundedInt(39) == 0) {
-                    tree = new ObjectSpruceTree();
-                } else {
-                    tree = new ObjectSpruceTree();
-                }
+                tree = new ObjectSpruceTree();
                 break;
             case BlockSapling.BIRCH:
                 if (random.nextBoundedInt(39) == 0) {
@@ -67,8 +63,11 @@ public abstract class ObjectTree {
                 break;
             case BlockSapling.OAK:
             default:
-                tree = new ObjectOakTree();
-                //todo: more complex treeeeeeeeeeeeeeeee
+                /*if(random.nextRange(0, 9) == 0) {
+					tree = new BigTree();
+				} else {*/ 
+		tree = new ObjectOakTree();
+				//}
                 break;
         }
 
