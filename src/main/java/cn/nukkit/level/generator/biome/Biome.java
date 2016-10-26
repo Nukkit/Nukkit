@@ -89,9 +89,9 @@ public abstract class Biome {
         this.populators.add(populator);
     }
     
-    public void removePopulator(String []class) {
-        if (this.populators[class] != null) {
-            this.populators[class] = null;
+    public void removePopulator(class) {
+        if (isset(this.populators[class])) {
+            unset(this.populators[class]);
         }
     }
 
