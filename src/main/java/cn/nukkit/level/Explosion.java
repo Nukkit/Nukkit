@@ -17,6 +17,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.ExplodePacket;
+import cn.nukkit.level.Level;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,21 +77,26 @@ public class Explosion {
             for (int j = 0; j < this.rays; ++j) {
                 for (int k = 0; k < this.rays; ++k) {
                     if (i == 0 || i == mRays || j == 0 || j == mRays || k == 0 || k == mRays) {
-                        double d0 = (double)((float)j / 15.0F * 2.0F - 1.0F);
-                        double d1 = (double)((float)k / 15.0F * 2.0F - 1.0F);
-                        double d2 = (double)((float)l / 15.0F * 2.0F - 1.0F);
+                        double d0 = (double)((float)i / 15.0F * 2.0F - 1.0F);
+                        double d1 = (double)((float)j / 15.0F * 2.0F - 1.0F);
+                        double d2 = (double)((float)k / 15.0F * 2.0F - 1.0F);
                         double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
                         d0 = d0 / d3;
                         d1 = d1 / d3;
                         d2 = d2 / d3;
-                        float f = this.explosionSize * (0.7F + this.worldObj.rand.nextFloat() * 0.6F);
+                        float f = this.explosionSize * (0.7F + this.worldObject.rand.nextFloat() * 0.6F);
                         double d4 = this.explosionX;
                         double d6 = this.explosionY;
                         double d8 = this.explosionZ;
                         d4 += d0 * 0.30000001192092896D;
                         d6 += d1 * 0.30000001192092896D;
                         d8 += d2 * 0.30000001192092896D;
-                        
+                        vector.setComponents((double) i / (double) mRays * 2d - 1, (double) j / (double) mRays * 2d - 1, (double) k / (double) mRays * 2d - 1);
+                        double len = vector.length();
+                        vector.setComponents((vector.x / len) * this.stepLen, (vector.y / len) * this.stepLen, (vector.z / len) * this.stepLen);
+                        double pointerX = this.source.x;
+                        double pointerY = this.source.y;
+                        double pointerZ = this.source.z;
 
                         for (double blastForce = this.size * (ThreadLocalRandom.current().nextInt(700, 1301)) / 1000d; blastForce > 0; blastForce -= this.stepLen * 0.75d) {
                             int x = (int) pointerX;
