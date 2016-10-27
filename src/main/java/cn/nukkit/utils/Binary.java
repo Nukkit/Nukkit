@@ -75,7 +75,8 @@ public class Binary {
         Map<Integer, EntityData> map = metadata.getMap();
         for (int id : map.keySet()) {
             EntityData d = map.get(id);
-            stream.putByte((byte) (((d.getType() << 5) | (id & 0x1F)) & 0xff));
+            stream.put(writeVarInt(id));
+            stream.put(writeUnsignedVarInt(d.getType()));
             switch (d.getType()) {
                 case Entity.DATA_TYPE_BYTE:
                     stream.putByte(((ByteEntityData) d).getData().byteValue());
@@ -84,35 +85,35 @@ public class Binary {
                     stream.putLShort(((ShortEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_INT:
-                    stream.putLInt(((IntEntityData) d).getData());
+                    stream.putVarInt(((IntEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_FLOAT:
                     stream.putLFloat(((FloatEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_STRING:
                     String s = ((StringEntityData) d).getData();
-                    stream.putLShort(s.getBytes(StandardCharsets.UTF_8).length);
+                    stream.putUnsignedVarInt(s.getBytes(StandardCharsets.UTF_8).length);
                     stream.put(s.getBytes(StandardCharsets.UTF_8));
                     break;
                 case Entity.DATA_TYPE_SLOT:
                     SlotEntityData slot = (SlotEntityData) d;
-                    stream.putLShort(slot.blockId);
+                    stream.putVarInt(slot.blockId);
                     stream.putByte((byte) slot.meta);
-                    stream.putLShort(slot.count);
+                    stream.putVarInt(slot.count);
                     break;
                 case Entity.DATA_TYPE_POS:
                     PositionEntityData pos = (PositionEntityData) d;
-                    stream.putLInt(pos.x);
-                    stream.putLInt(pos.y);
-                    stream.putLInt(pos.z);
+                    stream.putSignedVarInt(pos.x);
+                    stream.putUnsignedVarInt(pos.y);
+                    stream.putSignedVarInt(pos.z);
                     break;
                 case Entity.DATA_TYPE_LONG:
-                    stream.putLLong(((LongEntityData) d).getData());
+                    stream.putVarLong(((LongEntityData) d).getData());
                     break;
             }
         }
 
-        stream.putByte((byte) 0x7f);
+        //stream.putByte((byte) 0x7f);
         return stream.getBuffer();
     }
 
@@ -408,6 +409,10 @@ public class Binary {
         return writeUnsignedVarInt((v << 1) ^ (v >> 31));
     }
 
+    public static byte[] writeVarInt64(long v){
+        return writeUnsignedVarInt64((v << 1) ^ (v >> 63));
+    }
+
     public static byte[] writeUnsignedVarInt(long v) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         int loops = 0;
@@ -424,6 +429,16 @@ public class Binary {
             ++loops;
         } while (v != 0);
         return stream.toByteArray();
+    }
+
+    public static byte[] writeUnsignedVarInt64(long v){
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        while((v & 0xFFFFFFFFFFFFFF80L) != 0){
+            buf.write(((byte) v & 0x7f) | 0x80);
+            v >>= 7;
+        }
+        buf.write((byte)v);
+        return buf.toByteArray();
     }
 
     public static byte[] reserveBytes(byte[] bytes) {

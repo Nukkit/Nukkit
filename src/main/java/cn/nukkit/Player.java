@@ -1348,7 +1348,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } else {
             if (this.speed == null) speed = new Vector3(0, 0, 0);
             else this.speed.setComponents(0, 0, 0);
-            this.setSprinting(false);
         }
 
         if (!revert && (this.isFoodEnabled() || this.getServer().getDifficulty() == 0)) {
