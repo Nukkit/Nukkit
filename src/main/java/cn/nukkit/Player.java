@@ -69,7 +69,6 @@ import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
-
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.*;
@@ -226,7 +225,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setBanned(boolean value) {
         if (value) {
             this.server.getNameBans().addBan(this.getName(), null, null, null);
-            this.kick("You have been banned");
+            this.kick(PlayerKickEvent.Reason.NAME_BANNED, "Banned by admin");
         } else {
             this.server.getNameBans().remove(this.getName());
         }
@@ -1459,7 +1458,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             if (this.inAirTicks < 100) {
                                 //this.sendSettings();
                                 this.setMotion(new Vector3(0, expectedVelocity, 0));
-                            } else if (this.kick("Flying is not enabled on this server")) {
+                            } else if (this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server")) {
                                 return false;
                             }
                         }
@@ -1545,12 +1544,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected synchronized void processLogin() {
         if (!this.server.isWhitelisted((this.getName()).toLowerCase())) {
-            this.close(this.getLeaveMessage(), "Server is white-listed");
+            this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, "Server is white-listed");
 
             return;
-        } else if (this.server.getNameBans().isBanned(this.getName().toLowerCase()) || this.server.getIPBans().isBanned(this.getAddress())) {
-            this.close(this.getLeaveMessage(), "You are banned");
-
+        } else if (this.server.getNameBans().isBanned(this.getName().toLowerCase())) {
+            this.kick(PlayerKickEvent.Reason.NAME_BANNED, "You are banned");
+            return;
+        } else if (this.server.getIPBans().isBanned(this.getAddress())) {
+            this.kick(PlayerKickEvent.Reason.IP_BANNED, "You are banned");
             return;
         }
 
@@ -1562,16 +1563,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         for (Player p : new ArrayList<>(this.server.getOnlinePlayers().values())) {
-            if (p != this && p.getName() != null && this.getName() != null && Objects.equals(p.getName().toLowerCase(), this.getName().toLowerCase())) {
-                if (!p.kick("logged in from another location")) {
-                    this.close(this.getLeaveMessage(), "Logged in from another location");
-
+            if (p != this && p.getName() != null && p.getName().equalsIgnoreCase(this.getName())) {
+                if (!p.kick(PlayerKickEvent.Reason.NEW_CONNECTION, "logged in from another location")) {
+                    this.close(this.getLeaveMessage(), "Already connected");
                     return;
                 }
             } else if (p.loggedIn && this.getUniqueId().equals(p.getUniqueId())) {
-                if (!p.kick("logged in from another location")) {
-                    this.close(this.getLeaveMessage(), "Logged in from another location");
-
+                if (!p.kick(PlayerKickEvent.Reason.NEW_CONNECTION, "logged in from another location")) {
+                    this.close(this.getLeaveMessage(), "Already connected");
                     return;
                 }
             }
@@ -1797,7 +1796,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.iusername = this.username.toLowerCase();
                     this.setDataProperty(new StringEntityData(DATA_NAMETAG, this.username), false);
 
-                    if (this.server.getOnlinePlayers().size() >= this.server.getMaxPlayers() && this.kick("disconnectionScreen.serverFull", false)) {
+                    if (this.server.getOnlinePlayers().size() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull", false)) {
                         break;
                     }
 
@@ -1835,9 +1834,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (!loginPacket.skin.isValid()) {
                         this.close("", "disconnectionScreen.invalidSkin");
                         break;
+                    } else {
+                        this.setSkin(loginPacket.getSkin());
                     }
-
-                    this.setSkin(loginPacket.getSkin());
 
                     PlayerPreLoginEvent playerPreLoginEvent;
                     this.server.getPluginManager().callEvent(playerPreLoginEvent = new PlayerPreLoginEvent(this, "Plugin reason"));
@@ -2455,7 +2454,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             cancelled = true;
                         }
                         if (targetEntity instanceof EntityItem || targetEntity instanceof EntityArrow) {
-                            this.kick("Attempting to attack an invalid entity");
+                            this.kick(PlayerKickEvent.Reason.INVALID_PVE, "Attempting to attack an invalid entity");
                             this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.getName()));
                             break;
                         }
@@ -3175,11 +3174,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.kick("");
     }
 
+    public boolean kick(String reason, boolean isAdmin) {
+        return this.kick(PlayerKickEvent.Reason.UNKNOWN, reason, isAdmin);
+    }
+
     public boolean kick(String reason) {
+        return kick(PlayerKickEvent.Reason.UNKNOWN, reason);
+    }
+
+    public boolean kick(PlayerKickEvent.Reason reason) {
         return this.kick(reason, true);
     }
 
-    public boolean kick(String reason, boolean isAdmin) {
+    public boolean kick(PlayerKickEvent.Reason reason, String reasonString) {
+        return this.kick(reason, reasonString, true);
+    }
+
+    public boolean kick(PlayerKickEvent.Reason reason, boolean isAdmin) {
+        return this.kick(reason, reason.toString(), isAdmin);
+    }
+
+    public boolean kick(PlayerKickEvent.Reason reason, String reasonString, boolean isAdmin) {
         PlayerKickEvent ev;
         this.server.getPluginManager().callEvent(ev = new PlayerKickEvent(this, reason, this.getLeaveMessage()));
         if (!ev.isCancelled()) {
@@ -3188,13 +3203,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (!this.isBanned()) {
                     message = "Kicked by admin." + (!"".equals(reason) ? " Reason: " + reason : "");
                 } else {
-                    message = reason;
+                    message = reasonString;
                 }
             } else {
                 if ("".equals(reason)) {
                     message = "disconnectionScreen.noReason";
                 } else {
-                    message = reason;
+                    message = reasonString;
                 }
             }
 

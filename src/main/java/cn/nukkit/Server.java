@@ -16,6 +16,7 @@ import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.level.LevelInitEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
+import cn.nukkit.event.player.PlayerKickEvent;
 import cn.nukkit.event.server.QueryRegenerateEvent;
 import cn.nukkit.inventory.*;
 import cn.nukkit.item.Item;
@@ -65,9 +66,9 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
-import cn.nukkit.service.ServiceManager;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.*;
+
 import java.io.*;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
@@ -103,8 +104,6 @@ public class Server {
     private volatile boolean hasStopped = false;
 
     private volatile PluginManager pluginManager;
-
-    private ServiceManager serviceManager = null;
 
     private int profilingTickrate = 20;
 
@@ -411,7 +410,6 @@ public class Server {
         Runnable initPlugins = new Runnable() {
             @Override
             public void run() {
-                serviceManager = new ServiceManager();
                 pluginManager = new PluginManager(Server.this, getCommandMap());
                 pluginManager.registerInterface(JavaPluginLoader.class);
                 pluginManager.loadPlugins(pluginPath);
@@ -1021,9 +1019,10 @@ public class Server {
     private void checkTickUpdates(int currentTick, long tickTime) {
         for (Map.Entry<String, Player> entry : players.entrySet()) {
             Player p = entry.getValue();
-            if (!p.loggedIn && (tickTime - p.creationTime) >= 10000) {
-                p.close("", "Login timeout");
-            } else if (this.alwaysTickPlayers) {
+            if (!p.loggedIn && (tickTime - p.creationTime) >= 10000 && p.kick(PlayerKickEvent.Reason.LOGIN_TIMOUT)) {
+                continue;
+            }
+            if (this.alwaysTickPlayers) {
                 p.onUpdate(currentTick);
             }
         }
@@ -1415,10 +1414,6 @@ public class Server {
 
     public LevelMetadataStore getLevelMetadata() {
         return levelMetadata;
-    }
-
-    public ServiceManager getServiceManager() {
-        return this.serviceManager;
     }
 
     public PluginManager getPluginManager() {
