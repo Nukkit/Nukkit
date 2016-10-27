@@ -77,7 +77,7 @@ public class VarInt {
     // Int
 
     public static void writeInt32(BinaryStream stream, int value) {
-        writeRawVarInt32(stream, (long) value);
+        writeRawVarInt32(stream, value);
     }
 
     public static int readInt32(BinaryStream stream) {
@@ -92,11 +92,11 @@ public class VarInt {
         return decodeZigZag32(readRawVarInt32(stream, 5));
     }
 
-    public static void writelong32(BinaryStream stream, long value) {
+    public static void writeUInt32(BinaryStream stream, long value) {
         writeRawVarInt32(stream, value);
     }
 
-    public static long readlong32(BinaryStream stream) {
+    public static long readUInt32(BinaryStream stream) {
         return readRawVarInt32(stream, 5);
     }
 
@@ -118,11 +118,11 @@ public class VarInt {
         return decodeZigZag64(readRawVarInt64(stream, 10));
     }
 
-    public static void writelong64(BinaryStream stream, long value) {
+    public static void writeUInt64(BinaryStream stream, long value) {
         writeRawVarInt64(stream, value);
     }
 
-    public static long readlong64(BinaryStream stream) {
+    public static long readUInt64(BinaryStream stream) {
         return readRawVarInt64(stream, 10);
     }
 }

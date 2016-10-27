@@ -297,18 +297,22 @@ public class BinaryStream {
 
     public long getUnsignedVarInt() {
         return Binary.readUnsignedVarInt(this);
+        //return VarInt.readUInt32(this);
     }
 
     public void putUnsignedVarInt(long v) {
         this.put(Binary.writeUnsignedVarInt(v));
+        //VarInt.writeUInt32(this, v);
     }
 
     public int getVarInt() {
         return Binary.readVarInt(this);
+        //return VarInt.readInt32(this);
     }
 
     public void putVarInt(int v) {
         this.put(Binary.writeVarInt(v));
+        //VarInt.writeInt32(this, v);
     }
 
     public int getSignedVarInt() {
@@ -320,11 +324,13 @@ public class BinaryStream {
     }
 
     public long getVarLong() {
-        return VarInt.readRawVarInt64(this, 64);
+        return Binary.readVarInt64(this);
+        //return VarInt.readInt64(this);
     }
 
     public void putVarLong(long v) {
-        VarInt.writeRawVarInt64(this, v);
+        //VarInt.writeInt64(this, v);
+        this.put(Binary.writeVarInt64(v));
     }
 
     public long getSignedVarLong() {
@@ -335,11 +341,19 @@ public class BinaryStream {
         VarInt.writeSInt64(this, v);
     }
 
+    public long getUnsignedVarLong() {
+        return VarInt.readUInt64(this);
+    }
+
+    public void putUnsignedVarLong(long v) {
+        VarInt.writeUInt64(this, v);
+    }
     public long getEntityId() {
         return this.getVarLong();
     }
 
     public void putEntityId(long v) {
+        //VarInt.writeRawVarInt64(this, v);
         this.putVarLong(v); //varlong?
     }
 
