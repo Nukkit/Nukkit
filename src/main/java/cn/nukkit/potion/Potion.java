@@ -183,19 +183,15 @@ public class Potion implements Cloneable {
 
         switch (this.getId()) {
             case INSTANT_HEALTH:
-                entity.heal(new EntityRegainHealthEvent(entity, (float) (health * (double) (4 << 1) + 0.5D), EntityRegainHealthEvent.CAUSE_EATING));
-                break;
             case INSTANT_HEALTH_II:
-                entity.heal(new EntityRegainHealthEvent(entity, (float) (health * (double) (4 << 2) + 0.5D), EntityRegainHealthEvent.CAUSE_EATING));
+                entity.heal(new EntityRegainHealthEvent(entity, (float) (health * (double) (4 << (applyEffect.getAmplifier() + 1))), EntityRegainHealthEvent.CAUSE_EATING));
                 break;
             case HARMING:
-                entity.attack(new EntityDamageEvent(entity, EntityDamageEvent.CAUSE_MAGIC, (float) (health * (double) (6 << 1) + 0.5D)));
-                break;
             case HARMING_II:
-                entity.attack(new EntityDamageEvent(entity, EntityDamageEvent.CAUSE_MAGIC, (float) (health * (double) (6 << 2) + 0.5D)));
+                entity.attack(new EntityDamageEvent(entity, EntityDamageEvent.CAUSE_MAGIC, (float) (health * (double) (6 << (applyEffect.getAmplifier() + 1)))));
                 break;
             default:
-                int duration = (int) (health * (double) applyEffect.getDuration() + 0.5D);
+                int duration = (int) ((isSplash() ? health : 1) * (double) applyEffect.getDuration() + 0.5);
                 applyEffect.setDuration(duration);
                 entity.addEffect(applyEffect);
         }
