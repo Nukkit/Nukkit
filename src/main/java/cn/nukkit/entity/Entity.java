@@ -67,9 +67,9 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_OWNER_EID = 5; //long
 
     public static final int DATA_AIR = 7; //short
-    /* 8 (int)
-	 * 9 (int)
-	 * 27 (byte) something to do with beds
+    public static final int DATA_POTION_COLOR = 8; //int (ARGB!)
+    public static final int DATA_POTION_AMBIENT = 9; //byte
+    /* 27 (byte) something to do with beds
 	 * 28 (int)
 	 * 29 (block coords) bed position */
     public static final int DATA_LEAD_HOLDER_EID = 38; //long
@@ -94,8 +94,6 @@ public abstract class Entity extends Location implements Metadatable {
 
 	/*
  	const DATA_SILENT = 4;
- 	const DATA_POTION_COLOR = 7;
- 	const DATA_POTION_AMBIENT = 8;
  	*/
 
     public static final int DATA_FLAG_ONFIRE = 0;
@@ -104,12 +102,33 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_SPRINTING = 3;
     public static final int DATA_FLAG_ACTION = 4;
     public static final int DATA_FLAG_INVISIBLE = 5;
-
+    public static final int DATA_FLAG_TEMPTED = 6; //???
+    public static final int DATA_FLAG_INLOVE = 7;
+    public static final int DATA_FLAG_SADDLED = 8;
+    public static final int DATA_FLAG_POWERED = 9;
+    public static final int DATA_FLAG_IGNITED = 10; //for creepers?
+    public static final int DATA_FLAG_BABY = 11;
+    public static final int DATA_FLAG_CONVERTING = 12; //???
+    public static final int DATA_FLAG_CRITICAL = 13;
     public static final int DATA_FLAG_CAN_SHOW_NAMETAG = 14;
     public static final int DATA_FLAG_ALWAYS_SHOW_NAMETAG = 15;
-    public static final int DATA_FLAG_IMMOBILE = 16;
-
-    public static final int DATA_FLAG_NOT_UNDERWATER = 30; //Hide bubbles if not underwater
+    public static final int DATA_FLAG_IMMOBILE = 16, DATA_FLAG_NO_AI = 16;
+    public static final int DATA_FLAG_SILENT = 17;
+    public static final int DATA_FLAG_WALLCLIMBING = 18;
+    public static final int DATA_FLAG_RESTING = 19; //for bats?
+    public static final int DATA_FLAG_SITTING = 20;
+    public static final int DATA_FLAG_ANGRY = 21;
+    public static final int DATA_FLAG_INTERESTED = 22; //for mobs following players with food?
+    public static final int DATA_FLAG_CHARGED = 23;
+    public static final int DATA_FLAG_TAMED = 24;
+    public static final int DATA_FLAG_LEASHED = 25;
+    public static final int DATA_FLAG_SHEARED = 26; //for sheep
+    public static final int DATA_FLAG_FALL_FLYING = 27; //???
+    public static final int DATA_FLAG_ELDER = 28; //elder guardian
+    public static final int DATA_FLAG_MOVING = 29;
+    public static final int DATA_FLAG_BREATHING = 30; //hides bubbles if true
+    public static final int DATA_FLAG_CHESTED = 31; //for mules?
+    public static final int DATA_FLAG_STACKABLE = 32; //???
 
     public static final int DATA_LEAD_HOLDER = 23;
     public static final int DATA_LEAD = 24;
@@ -496,11 +515,11 @@ public abstract class Entity extends Location implements Metadatable {
             int g = (color[1] / count) & 0xff;
             int b = (color[2] / count) & 0xff;
 
-            //this.setDataProperty(new IntEntityData(Entity.DATA_POTION_COLOR, (r << 16) + (g << 8) + b));
-            //this.setDataProperty(new ByteEntityData(Entity.DATA_POTION_AMBIENT, ambient ? 1 : 0));
+            this.setDataProperty(new IntEntityData(Entity.DATA_POTION_COLOR, (r << 16) + (g << 8) + b));
+            this.setDataProperty(new ByteEntityData(Entity.DATA_POTION_AMBIENT, ambient ? 1 : 0));
         } else {
-            //this.setDataProperty(new IntEntityData(Entity.DATA_POTION_COLOR, 0));
-            //this.setDataProperty(new ByteEntityData(Entity.DATA_POTION_AMBIENT, 0));
+            this.setDataProperty(new IntEntityData(Entity.DATA_POTION_COLOR, 0));
+            this.setDataProperty(new ByteEntityData(Entity.DATA_POTION_AMBIENT, 0));
         }
     }
 
@@ -1665,14 +1684,21 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void setDataFlag(int propertyId, int id, boolean value) {
         if (this.getDataFlag(propertyId, id) != value) {
-            long flags = this.getDataPropertyLong(propertyId);
-            flags ^= 1 << id;
-            this.setDataProperty(new LongEntityData(propertyId, flags));
+            if (propertyId == EntityHuman.DATA_PLAYER_FLAGS) {
+                int flags = this.getDataPropertyByte(propertyId);
+                flags ^= 1 << id;
+                this.setDataProperty(new ByteEntityData(propertyId, flags));
+            } else {
+                long flags = this.getDataPropertyLong(propertyId);
+                flags ^= 1 << id;
+                this.setDataProperty(new LongEntityData(propertyId, flags));
+            }
+
         }
     }
 
     public boolean getDataFlag(int propertyId, int id) {
-        return ((this.getDataPropertyLong(propertyId) & 0xff) & (1 << id)) > 0;
+        return (((propertyId == EntityHuman.DATA_PLAYER_FLAGS ? this.getDataPropertyByte(propertyId) : this.getDataPropertyLong(propertyId)) & 0xff) & (1 << id)) > 0;
     }
 
     @Override

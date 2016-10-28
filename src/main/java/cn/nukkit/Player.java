@@ -202,6 +202,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private int hash;
 
+    private String buttonText = "Button";
+
+    protected boolean enableClientCommand = true;
+
+    @Override
+    protected void initEntity() {
+        super.initEntity();
+        this.setDataProperty(new StringEntityData(EntityHuman.DATA_PLAYER_BUTTON_TEXT, this.buttonText));
+    }
+
     public TranslationContainer getLeaveMessage() {
         return new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.left", this.getDisplayName());
     }
@@ -386,8 +396,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.server.removeOp(this.getName());
         }
 
-        this.sendCommandData();
         this.recalculatePermissions();
+        this.getAdventureSettings().update();
+        if (this.isEnableClientCommand()) this.sendCommandData();
         //TODO: Send command data
     }
 
@@ -449,6 +460,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.hasPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE)) {
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE, this);
         }
+    }
+
+    public boolean isEnableClientCommand() {
+        return this.enableClientCommand;
+    }
+
+    public void setEnableClientCommand(boolean enable) {
+        this.enableClientCommand = enable;
+        SetCommandsEnabledPacket pk = new SetCommandsEnabledPacket();
+        pk.enabled = enable;
+        this.dataPacket(pk);
+        if (enable) this.sendCommandData();
     }
 
     public void sendCommandData(){
@@ -548,6 +571,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public int getInAirTicks() {
         return this.inAirTicks;
+    }
+
+    public String getButtonText() {
+        return this.buttonText;
+    }
+
+    public void setButtonText(String text) {
+        this.buttonText = text;
+        this.setDataProperty(new StringEntityData(EntityHuman.DATA_PLAYER_BUTTON_TEXT, text));
     }
 
     @Override
@@ -863,6 +895,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return -1;
         }
 
+        //if (packet instanceof SetEntityDataPacket) return -1;
+        //if (packet instanceof MovePlayerPacket) return -1;
+
         try (Timing timing = Timings.getSendDataPacketTiming(packet)) {
             DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
             this.server.getPluginManager().callEvent(ev);
@@ -941,7 +976,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.sleeping = pos.clone();
         this.teleport(new Location(pos.x + 0.5, pos.y - 0.5, pos.z + 0.5, this.yaw, this.pitch, this.level), null);
 
-        this.setDataProperty(new PositionEntityData(DATA_PLAYER_BED_POSITION, (int) pos.x, (int) pos.y, (int) pos.z));
+        this.setDataProperty(new IntPositionEntityData(DATA_PLAYER_BED_POSITION, (int) pos.x, (int) pos.y, (int) pos.z));
         this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, true);
 
         this.setSpawn(pos);
@@ -971,7 +1006,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.server.getPluginManager().callEvent(new PlayerBedLeaveEvent(this, this.level.getBlock(this.sleeping)));
 
             this.sleeping = null;
-            this.setDataProperty(new PositionEntityData(DATA_PLAYER_BED_POSITION, 0, 0, 0));
+            this.setDataProperty(new IntPositionEntityData(DATA_PLAYER_BED_POSITION, 0, 0, 0));
             this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, false);
 
 
@@ -1777,7 +1812,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.dataPacket(containerSetContentPacket);
         }
 
-        //this.sendCommandData();
+        this.setEnableClientCommand(false);  //Temporarily disable, because it has not been implemented.
 
         this.forceMovement = this.teleportPosition = this.getPosition();
 
