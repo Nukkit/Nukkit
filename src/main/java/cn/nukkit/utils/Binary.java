@@ -1,11 +1,13 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.*;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
@@ -85,7 +87,7 @@ public class Binary {
                     stream.putLShort(((ShortEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_INT:
-                    stream.putVarInt(((IntEntityData) d).getData());
+                    stream.putSignedVarInt(((IntEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_FLOAT:
                     stream.putLFloat(((FloatEntityData) d).getData());
@@ -103,9 +105,9 @@ public class Binary {
                     break;
                 case Entity.DATA_TYPE_POS:
                     IntPositionEntityData pos = (IntPositionEntityData) d;
-                    stream.putVarInt(pos.x);
-                    stream.putVarInt(pos.y);
-                    stream.putVarInt(pos.z);
+                    stream.putSignedVarInt(pos.x);
+                    stream.putByte((byte) pos.y);
+                    stream.putSignedVarInt(pos.z);
                     break;
                 case Entity.DATA_TYPE_LONG:
                     stream.putVarLong(((LongEntityData) d).getData());

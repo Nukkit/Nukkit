@@ -59,7 +59,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_TYPE_LONG = 7;
     public static final int DATA_TYPE_VECTOR3F = 8;
 
-    public static final int DATA_FLAGS = 0;
+    public static final int DATA_FLAGS = 0;  //long
     //1 (int)
     public static final int DATA_VARIANT = 2; //int
     public static final int DATA_COLOUR = 3; //byte
@@ -143,8 +143,6 @@ public abstract class Entity extends Location implements Metadatable {
     protected final Map<Integer, Effect> effects = new ConcurrentHashMap<>();
 
     protected long id;
-
-    protected int dataFlags = 0;
 
     protected final EntityMetadata dataProperties = new EntityMetadata()
             .putLong(DATA_FLAGS, 0)
@@ -1698,7 +1696,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean getDataFlag(int propertyId, int id) {
-        return (((propertyId == EntityHuman.DATA_PLAYER_FLAGS ? this.getDataPropertyByte(propertyId) : this.getDataPropertyLong(propertyId)) & 0xff) & (1 << id)) > 0;
+        return (((propertyId == EntityHuman.DATA_PLAYER_FLAGS ? this.getDataPropertyByte(propertyId) & 0xff : this.getDataPropertyLong(propertyId))) & (1 << id)) > 0;
     }
 
     @Override
