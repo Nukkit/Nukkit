@@ -73,7 +73,7 @@ public class EntityMetadata {
     }
 
     public Vector3 getPosition(int id) {
-        return (Vector3) this.getOrDefault(id, new PositionEntityData(id, new Vector3())).getData();
+        return (Vector3) this.getOrDefault(id, new IntPositionEntityData(id, new Vector3())).getData();
     }
 
     public EntityMetadata putByte(int id, int value) {

@@ -2,6 +2,7 @@ package cn.nukkit.network.protocol;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockVector3;
+import cn.nukkit.math.Vector3f;
 
 /**
  * @author Nukkit Project Team
@@ -24,7 +25,7 @@ public class UseItemPacket extends DataPacket {
     public float posY;
     public float posZ;
 
-    public int slot;
+    public int unknown;
 
     public Item item;
 
@@ -39,11 +40,18 @@ public class UseItemPacket extends DataPacket {
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
-        this.face = this.getVarInt();
-        this.putVector3f(fx, fy, fz);
-        this.putVector3f(posX, posY, posZ);
-        this.slot = this.getVarInt();
+        this.face = this.getSignedVarInt();
+        Vector3f faceVector3 = this.getVector3f();
+        this.fx = faceVector3.x;
+        this.fy = faceVector3.y;
+        this.fz = faceVector3.z;
+        Vector3f playerPos = this.getVector3f();
+        this.posX = playerPos.x;
+        this.posY = playerPos.y;
+        this.posZ = playerPos.z;
+        this.unknown = this.getByte();
         this.item = this.getSlot();
+        this.posX = playerPos.x;
     }
 
     @Override

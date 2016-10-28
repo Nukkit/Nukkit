@@ -251,12 +251,12 @@ public class BinaryStream {
     }
 
     public Item getSlot() {
-        int id = this.getVarInt();
+        int id = this.getSignedVarInt();
 
         if (id <= 0) {
             return Item.get(0, 0, 0);
         }
-        int auxValue = this.getVarInt();
+        int auxValue = this.getSignedVarInt();
         int data = auxValue >> 8;
         int cnt = auxValue & 0xff;
 
@@ -273,13 +273,13 @@ public class BinaryStream {
 
     public void putSlot(Item item) {
         if (item == null || item.getId() == 0) {
-            this.putVarInt(0);
+            this.putSignedVarInt(0);
             return;
         }
 
-        this.putVarInt(item.getId());
+        this.putSignedVarInt(item.getId());
         int auxValue = (item.getDamage() << 8) | item.getCount();
-        this.putVarInt(auxValue);
+        this.putSignedVarInt(auxValue);
         byte[] nbt = item.getCompoundTag();
         this.putLShort(nbt.length);
         this.put(nbt);
@@ -349,12 +349,12 @@ public class BinaryStream {
         VarInt.writeUInt64(this, v);
     }
     public long getEntityId() {
-        return this.getVarLong();
+        return this.getUnsignedVarLong();
     }
 
     public void putEntityId(long v) {
         //VarInt.writeRawVarInt64(this, v);
-        this.putVarLong(v); //varlong?
+        this.putUnsignedVarLong(v); //varlong?
     }
 
     public BlockVector3 getBlockCoords() {

@@ -8,6 +8,12 @@ import cn.nukkit.network.protocol.AdventureSettingsPacket;
  */
 public class AdventureSettings implements Cloneable {
 
+    public static final int PERMISSION_NORMAL = 0;
+    public static final int PERMISSION_OPERATOR = 1;
+    public static final int PERMISSION_HOST = 2;
+    public static final int PERMISSION_AUTOMATION = 3;
+    public static final int PERMISSION_ADMIN = 4;
+
     private boolean canDestroyBlock = true;
 
     private boolean autoJump = true;
@@ -17,6 +23,12 @@ public class AdventureSettings implements Cloneable {
     private boolean flying = false;
 
     private boolean noclip = false;
+
+    private boolean noPvp = false;
+
+    private boolean noPvm = false;
+
+    private boolean noMvp = false;
 
     private Player player;
 
@@ -53,6 +65,18 @@ public class AdventureSettings implements Cloneable {
         this.noclip = noclip;
     }
 
+    public void setNoPvp(boolean noPvp) {
+        this.noPvp = noPvp;
+    }
+
+    public void setNoPvm(boolean noPvm) {
+        this.noPvm = noPvm;
+    }
+
+    public void setNoMvp(boolean noMvp) {
+        this.noMvp = noMvp;
+    }
+
     public boolean canDestroyBlock() {
         return canDestroyBlock;
     }
@@ -73,15 +97,30 @@ public class AdventureSettings implements Cloneable {
         return noclip;
     }
 
+    public boolean isNoPvp() {
+        return noPvp;
+    }
+
+    public boolean isNoPvm() {
+        return noPvm;
+    }
+
+    public boolean isNoMvp() {
+        return noMvp;
+    }
+
     public void update() {
         AdventureSettingsPacket pk = new AdventureSettingsPacket();
         pk.flags = 0;
-        pk.worldInmutable = player.isAdventure();
+        pk.worldImmutable = !canDestroyBlock;
         pk.autoJump = autoJump;
         pk.allowFlight = canFly;
         pk.noClip = noclip;
         pk.isFlying = flying;
-        pk.userPermission = 2;
+        pk.noPvp = noPvp;
+        pk.noPvm = noPvm;
+        pk.noMvp = noMvp;
+        pk.userPermission = (this.player.isOp() ? PERMISSION_OPERATOR : PERMISSION_NORMAL);;
         player.dataPacket(pk);
 
         player.resetInAirTicks();
