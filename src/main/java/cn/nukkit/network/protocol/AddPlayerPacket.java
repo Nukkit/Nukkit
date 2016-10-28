@@ -42,7 +42,7 @@ public class AddPlayerPacket extends DataPacket {
         this.reset();
         this.putUUID(this.uuid);
         this.putString(this.username);
-        this.putEntityId(this.eid);
+        this.putSignedVarLong(this.eid);
         this.putEntityId(this.eid);
         this.putVector3f(x, y, z);
         this.putVector3f(speedX, speedY, speedZ);

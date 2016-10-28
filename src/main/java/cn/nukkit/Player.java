@@ -79,9 +79,6 @@ import java.nio.ByteOrder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-//import cn.nukkit.entity.Item;
-
-
 /**
  * author: MagicDroidX & Box
  * Nukkit Project
@@ -1035,6 +1032,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             newSettings.setCanDestroyBlock((gamemode & 0x02) == 0);
             newSettings.setCanFly((gamemode & 0x01) > 0);
             newSettings.setNoclip(gamemode == 0x03);
+            newSettings.setFlying(this.isSpectator());
         }
 
         PlayerGameModeChangeEvent ev;
@@ -2745,7 +2743,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     String commandText = commandStepPacket.command;
                     if(commandStepPacket.args != null && commandStepPacket.args.size() > 0){
                         for (Object arg: commandStepPacket.args.values()){ //command ordering will be an issue
-                            if (arg instanceof Integer || arg instanceof String) commandText += " " + arg;
+                            if (arg.getClass() == int.class || arg instanceof String) commandText += " " + arg;
                         }
                     }
                     this.server.dispatchCommand(this, commandText);
