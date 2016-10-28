@@ -1248,9 +1248,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             if (diffX != 0 || diffY != 0 || diffZ != 0) {
-                double diffHorizontalSqr = (diffX * diffX + diffZ * diffZ) / ((double) (tickDiff * tickDiff));
                 if (this.checkMovement && !server.getAllowFlight() && this.isSurvival()) {
                     if (!this.isSleeping()) {
+                        double diffHorizontalSqr = (diffX * diffX + diffZ * diffZ) / ((double) (tickDiff * tickDiff));
                         if (diffHorizontalSqr > 0.125) {
                             PlayerInvalidMoveEvent ev;
                             this.getServer().getPluginManager().callEvent(ev = new PlayerInvalidMoveEvent(this, true));
