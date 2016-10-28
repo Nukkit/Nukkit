@@ -9,7 +9,8 @@ import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
-import cn.nukkit.command.data.CommandData;
+import cn.nukkit.command.data.CommandArgs;
+import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
@@ -69,6 +70,7 @@ import cn.nukkit.potion.Potion;
 import cn.nukkit.timings.Timing;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.Binary;
+import cn.nukkit.utils.SimpleConfig;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
 import com.google.gson.Gson;
@@ -474,16 +476,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (enable) this.sendCommandData();
     }
 
-    public void sendCommandData(){
+    public void sendCommandData() {
         AvailableCommandsPacket pk = new AvailableCommandsPacket();
-        Map<String, CommandData> data = new HashMap<>();
+        Map<String, CommandDataVersions> data = new HashMap<>();
         int count = 0;
         for (Command command: this.server.getCommandMap().getCommands().values()){
             if(!command.testPermissionSilent(this)){
                 continue;
             }
             ++count;
-            CommandData data0 = command.generateCustomCommandData(this);
+            CommandDataVersions data0 = command.generateCustomCommandData(this);
             data.put(command.getName(), data0);
         }
         if(count > 0){
@@ -1812,7 +1814,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.dataPacket(containerSetContentPacket);
         }
 
-        this.setEnableClientCommand(false);  //Temporarily disable, because it has not been implemented.
+        this.setEnableClientCommand(true);
 
         this.forceMovement = this.teleportPosition = this.getPosition();
 
@@ -2484,9 +2486,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.startAction = -1;
                     this.setDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION, false);
                     break;
-                case ProtocolInfo.COMMAND_STEP_PACKET:
-                    //TODO
-                    break;
                 case ProtocolInfo.REMOVE_BLOCK_PACKET:
                     if (!this.spawned || this.blocked || !this.isAlive()) {
                         break;
@@ -2741,7 +2740,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false);
                     break;
-
+                case ProtocolInfo.COMMAND_STEP_PACKET:
+                    if(!this.spawned || !this.isAlive()){
+                        break;
+                    }
+                    this.craftingType = 0;
+                    CommandStepPacket commandStepPacket = (CommandStepPacket) packet;
+                    String commandText = commandStepPacket.command;
+                    if(commandStepPacket.args != null && commandStepPacket.args.size() > 0){
+                        for (Object arg: commandStepPacket.args.values()){ //command ordering will be an issue
+                            if (arg instanceof Integer || arg instanceof String) commandText += " " + arg;
+                        }
+                    }
+                    this.server.dispatchCommand(this, commandText);
+                    break;
                 case ProtocolInfo.TEXT_PACKET:
                     if (!this.spawned || !this.isAlive()) {
                         break;

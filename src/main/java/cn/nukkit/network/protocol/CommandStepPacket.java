@@ -1,5 +1,9 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.Server;
+import cn.nukkit.command.data.CommandArgs;
+import com.google.gson.Gson;
+
 /**
  * author: MagicDroidX
  * Nukkit Project
@@ -20,15 +24,15 @@ public class CommandStepPacket extends DataPacket {
      * https://gist.github.com/dktapps/8285b93af4ca38e0104bfeb9a6c87afd
      */
 
-    /*
+
     public String command;
     public String overload;
-    public uvarint1;
-    public uvarint2;
+    public long uvarint1;
+    public long uvarint2;
     public boolean bool;
-    public uvarint64;
-    public SimpleConfig args; //JSON formatted command arguments
-    public String string4;*/
+    public long uvarint64;
+    public CommandArgs args = new CommandArgs(); //JSON formatted command arguments
+    public String string4;
 
     @Override
     public byte pid() {
@@ -37,19 +41,20 @@ public class CommandStepPacket extends DataPacket {
 
     @Override
     public void decode(){
-        /*  TODO
         this.command = this.getString();
         this.overload = this.getString();
         this.uvarint1 = this.getUnsignedVarInt();
         this.uvarint2 = this.getUnsignedVarInt();
         this.bool = this.getBoolean();
-        this.uvarint64 = this.getUnsignedVarInt(); //TODO: varint64
-        this.args = new Gson().fromJson(this.getString(), SimpleConfig.class);
+        this.uvarint64 = this.getUnsignedVarLong();
+        String argsString = this.getString();
+        Server.getInstance().getLogger().debug(argsString);
+        this.args = new Gson().fromJson(argsString, CommandArgs.class);
         this.string4 = this.getString();
         while(!this.feof()){
             this.getByte(); //prevent assertion errors. TODO: find out why there are always 3 extra bytes at the end of this packet.
         }
-        */
+
     }
 
     @Override
