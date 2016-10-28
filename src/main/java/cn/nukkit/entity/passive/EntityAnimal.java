@@ -19,16 +19,8 @@ public abstract class EntityAnimal extends EntityCreature implements EntityAgeab
     }
 
     @Override
-    protected void initEntity() {
-        super.initEntity();
-        if (this.getDataProperty(DATA_AGEABLE_FLAGS) == null) {
-            this.setDataProperty(new ByteEntityData(DATA_AGEABLE_FLAGS, 0));
-        }
-    }
-
-    @Override
     public boolean isBaby() {
-        return this.getDataFlag(DATA_AGEABLE_FLAGS, Entity.DATA_FLAG_BABY);
+        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
     }
 
     public void spawnTo(Player player) {
