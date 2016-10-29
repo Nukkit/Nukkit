@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.command.data.CommandParameterOptional;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.utils.TextFormat;
 
@@ -18,8 +19,8 @@ public class GamemodeCommand extends VanillaCommand {
         super(name, "%nukkit.command.gamemode.description", "%commands.gamemode.usage");
         this.setPermission("nukkit.command.gamemode");
         this.commandParameters = new CommandParameter[]{
-                new CommandParameter("mode", CommandParameter.ARG_TYPE_INT, false),
-                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, true)
+                new CommandParameter("mode", CommandParameter.ARG_TYPE_INT, CommandParameterOptional.FALSE),
+                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, CommandParameterOptional.TRUE)
         };
     }
 

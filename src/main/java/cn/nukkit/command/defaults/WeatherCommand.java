@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.command.data.CommandParameterOptional;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Level;
 
@@ -20,7 +21,7 @@ public class WeatherCommand extends VanillaCommand {
         this.setPermission("nukkit.command.weather");
         this.commandParameters = new CommandParameter[]{
                 new CommandParameter("clear|rain|thunder"),
-                new CommandParameter("duration in seconds", false)
+                new CommandParameter("duration in seconds", CommandParameterOptional.FALSE)
         };
     }
 
