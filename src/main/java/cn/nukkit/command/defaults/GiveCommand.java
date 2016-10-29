@@ -17,6 +17,9 @@ public class GiveCommand extends VanillaCommand {
         super(name, "%nukkit.command.give.description", "%nukkit.command.give.usage");
         this.setPermission("nukkit.command.give");
         this.commandParameters = new CommandParameter[]{
+                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, CommandParameterOptional.FALSE),
+                new CommandParameter("item[:damage]", CommandParameter.ARG_TYPE_STRING, CommandParameterOptional.FALSE),
+                new CommandParameter("amount", CommandParameter.ARG_TYPE_INT, CommandParameterOptional.TRUE),
                 new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
                 new CommandParameter("item[:damage]"),
                 new CommandParameter("amount", CommandParameter.ARG_TYPE_INT, true),
