@@ -2755,7 +2755,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             for (JsonElement arg : commandStepPacket.args.values()) {
                                 if (index < pars.length) {
                                     CommandParameter par = pars[index];
-                                    switch (par.getType()) {
+                                    switch (par.type) {
                                         case CommandParameter.ARG_TYPE_TARGET:
                                             CommandArg rules = new Gson().fromJson(arg, CommandArg.class);
                                             commandText += " " + rules.getRules()[0].getValue();
