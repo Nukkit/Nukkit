@@ -862,11 +862,14 @@ public class Level implements ChunkManager, Metadatable {
                     Iterator<Map.Entry<Long, ConcurrentLinkedQueue<DataPacket>>> iter = chunkPackets.entrySet().iterator();
                     while (iter.hasNext()) {
                         Map.Entry<Long, ConcurrentLinkedQueue<DataPacket>> entry = iter.next();
-                        iter.remove();
                         long index = entry.getKey();
-                        Player[] chunkPlayers = entry.getValue().stream().toArray(Player[]::new);
+                        int chunkX = Level.getHashX(index);
+                        int chunkZ = Level.getHashZ(index);
+                        iter.remove();
+                        ConcurrentLinkedQueue<DataPacket> packets = entry.getValue();
+                        Player[] chunkPlayers = this.getChunkPlayers(chunkX, chunkZ).values().stream().toArray(Player[]::new);
                         if (chunkPlayers.length > 0) {
-                            for (DataPacket pk : this.chunkPackets.get(index)) {
+                            for (DataPacket pk : packets) {
                                 Server.broadcastPacket(chunkPlayers, pk);
                             }
                         }
