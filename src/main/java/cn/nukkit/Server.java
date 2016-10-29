@@ -360,11 +360,11 @@ public class Server {
         this.registerBlockEntities();
 
         Block.init();
+        Enchantment.init();
         Item.init();
         Biome.init();
         Effect.init();
         Potion.init();
-        Enchantment.init();
         Attribute.init();
 
         this.craftingManager = new CraftingManager();
