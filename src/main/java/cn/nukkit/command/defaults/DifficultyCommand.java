@@ -4,7 +4,6 @@ import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
-import cn.nukkit.command.data.CommandParameterOptional;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.network.protocol.SetDifficultyPacket;
 
@@ -20,7 +19,7 @@ public class DifficultyCommand extends VanillaCommand {
         super(name, "%nukkit.command.difficulty.description", "%commands.difficulty.usage");
         this.setPermission("nukkit.command.difficulty");
         this.commandParameters = new CommandParameter[]{
-                new CommandParameter("difficulty", CommandParameter.ARG_TYPE_INT, CommandParameterOptional.FALSE)
+                new CommandParameter("difficulty", CommandParameter.ARG_TYPE_INT, false)
         };
     }
 

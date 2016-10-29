@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
-import cn.nukkit.command.data.CommandParameterOptional;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Level;
 import cn.nukkit.utils.TextFormat;
@@ -23,7 +22,7 @@ public class TimeCommand extends VanillaCommand {
                 "nukkit.command.time.stop");
         this.commandParameters = new CommandParameter[]{
                 new CommandParameter("add|set|start|stop"),
-                new CommandParameter("value", CommandParameterOptional.TRUE)
+                new CommandParameter("value", true)
         };
     }
 
