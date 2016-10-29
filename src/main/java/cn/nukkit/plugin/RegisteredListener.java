@@ -66,6 +66,14 @@ public class RegisteredListener {
 
     public void callEvent(Event event) throws EventException {
         caller.callEvent(event);
+        if (event instanceof Cancellable) {
+            if (event.isCancelled() && isIgnoringCancelled()) {
+                return;
+            }
+        }
+        this.timing.startTiming();
+        executor.execute(listener, event);
+        this.timing.stopTiming();
     }
 
     public boolean isIgnoringCancelled() {
