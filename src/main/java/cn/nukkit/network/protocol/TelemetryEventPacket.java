@@ -14,6 +14,10 @@ public class TelemetryEventPacket extends DataPacket {
     public int fromDimension; //?
     public int toDimension; //?
 
+    public TelemetryEventPacket() {
+        super(21);
+    }
+
     @Override
     public void decode() {
 

@@ -11,6 +11,11 @@ public class PlayerJoinEvent extends PlayerEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     protected TextContainer joinMessage;
 
     public PlayerJoinEvent(Player player, TextContainer joinMessage) {

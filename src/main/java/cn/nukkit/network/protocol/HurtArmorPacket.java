@@ -9,6 +9,10 @@ public class HurtArmorPacket extends DataPacket {
 
     public byte health;
 
+    public HurtArmorPacket() {
+        super(2);
+    }
+
     @Override
     public void decode() {
 

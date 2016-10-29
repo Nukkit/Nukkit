@@ -11,12 +11,14 @@ import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.PluginException;
 import cn.nukkit.utils.Utils;
-
 import java.io.File;
-import java.io.FilenameFilter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 /**
@@ -30,19 +32,19 @@ public class PluginManager {
 
     protected final Map<String, Plugin> plugins = new LinkedHashMap<>();
 
-    protected final Map<String, Permission> permissions = new HashMap<>();
+    protected final Map<String, Permission> permissions = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<String, Permission> defaultPerms = new HashMap<>();
+    protected final Map<String, Permission> defaultPerms = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<String, Permission> defaultPermsOp = new HashMap<>();
+    protected final Map<String, Permission> defaultPermsOp = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<String, WeakHashMap<Permissible, Permissible>> permSubs = new HashMap<>();
+    protected final Map<String, WeakHashMap<Permissible, Permissible>> permSubs = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected final Map<Permissible, Permissible> defSubs = new WeakHashMap<>();
 
     protected final Map<Permissible, Permissible> defSubsOp = new WeakHashMap<>();
 
-    protected final Map<String, PluginLoader> fileAssociations = new HashMap<>();
+    protected final Map<String, PluginLoader> fileAssociations = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public PluginManager(Server server, SimpleCommandMap commandMap) {
         this.server = server;
@@ -134,13 +136,15 @@ public class PluginManager {
     }
 
     public Map<String, Plugin> loadPlugins(File dictionary, List<String> newLoaders, boolean includeDir) {
+        final ForkJoinPool pool = new ForkJoinPool();
         if (dictionary.isDirectory()) {
-            Map<String, File> plugins = new LinkedHashMap<>();
-            Map<String, Plugin> loadedPlugins = new LinkedHashMap<>();
-            Map<String, List<String>> dependencies = new LinkedHashMap<>();
-            Map<String, List<String>> softDependencies = new LinkedHashMap<>();
-            Map<String, PluginLoader> loaders = new LinkedHashMap<>();
+            final Map<String, File> plugins = new ConcurrentHashMap<>();
+            final Map<String, Plugin> loadedPlugins = new ConcurrentHashMap<>();
+            final Map<String, List<String>> dependencies = new ConcurrentHashMap<>();
+            final Map<String, List<String>> softDependencies = new ConcurrentHashMap<>();
+            final Map<String, PluginLoader> loaders;
             if (newLoaders != null) {
+                loaders = new LinkedHashMap<>();
                 for (String key : newLoaders) {
                     if (this.fileAssociations.containsKey(key)) {
                         loaders.put(key, this.fileAssociations.get(key));
@@ -151,140 +155,146 @@ public class PluginManager {
             }
 
             for (final PluginLoader loader : loaders.values()) {
-                for (File file : dictionary.listFiles(new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        for (Pattern pattern : loader.getPluginFilters()) {
-                            if (pattern.matcher(name).matches()) {
-                                return true;
-                            }
+                for (File file : dictionary.listFiles((dir, name) -> {
+                    for (Pattern pattern : loader.getPluginFilters()) {
+                        if (pattern.matcher(name).matches()) {
+                            return true;
                         }
-                        return false;
                     }
+                    return false;
                 })) {
                     if (file.isDirectory() && !includeDir) {
                         continue;
                     }
-                    try {
-                        PluginDescription description = loader.getPluginDescription(file);
-                        if (description != null) {
-                            String name = description.getName();
+                    pool.submit((Runnable) () -> {
+                        try {
+                            PluginDescription description = loader.getPluginDescription(file);
+                            if (description != null) {
+                                String name = description.getName();
+                                if (plugins.containsKey(name) || getPlugin(name) != null) {
+                                    server.getLogger().error(server.getLanguage().translateString("nukkit.plugin.duplicateError", name));
+                                    return;
+                                }
 
-                            if (plugins.containsKey(name) || this.getPlugin(name) != null) {
-                                this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.duplicateError", name));
-                                continue;
+                                boolean compatible = false;
+
+                                for (String version : description.getCompatibleAPIs()) {
+
+                                    //Check the format: majorVersion.minorVersion.patch
+                                    if (!Pattern.matches("[0-9]\\.[0-9]\\.[0-9]", version)) {
+                                        server.getLogger().error(server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "Wrong API format"}));
+                                        continue;
+                                    }
+
+                                    String[] versionArray = version.split("\\.");
+                                    String[] apiVersion = server.getApiVersion().split("\\.");
+
+                                    //Completely different API version
+                                    if (!Objects.equals(Integer.valueOf(versionArray[0]), Integer.valueOf(apiVersion[0]))) {
+                                        continue;
+                                    }
+
+                                    //If the plugin requires new API features, being backwards compatible
+                                    if (Integer.valueOf(versionArray[1]) > Integer.valueOf(apiVersion[1])) {
+                                        continue;
+                                    }
+
+                                    compatible = true;
+                                    break;
+                                }
+
+                                if (!compatible) {
+                                    server.getLogger().error(server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "%nukkit.plugin.incompatibleAPI"}));
+                                }
+
+                                plugins.put(name, file);
+
+                                softDependencies.put(name, description.getSoftDepend());
+
+                                dependencies.put(name, description.getDepend());
+
+                                for (String before : description.getLoadBefore()) {
+                                    if (softDependencies.containsKey(before)) {
+                                        softDependencies.get(before).add(name);
+                                    } else {
+                                        List<String> list = new ArrayList<>();
+                                        list.add(name);
+                                        softDependencies.put(before, list);
+                                    }
+                                }
                             }
-
-                            boolean compatible = false;
-
-                            for (String version : description.getCompatibleAPIs()) {
-
-                                //Check the format: majorVersion.minorVersion.patch
-                                if (!Pattern.matches("[0-9]\\.[0-9]\\.[0-9]", version)) {
-                                    this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "Wrong API format"}));
-                                    continue;
-                                }
-
-                                String[] versionArray = version.split("\\.");
-                                String[] apiVersion = this.server.getApiVersion().split("\\.");
-
-                                //Completely different API version
-                                if (!Objects.equals(Integer.valueOf(versionArray[0]), Integer.valueOf(apiVersion[0]))) {
-                                    continue;
-                                }
-
-                                //If the plugin requires new API features, being backwards compatible
-                                if (Integer.valueOf(versionArray[1]) > Integer.valueOf(apiVersion[1])) {
-                                    continue;
-                                }
-
-                                compatible = true;
-                                break;
-                            }
-
-                            if (!compatible) {
-                                this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "%nukkit.plugin.incompatibleAPI"}));
-                            }
-
-                            plugins.put(name, file);
-
-                            softDependencies.put(name, description.getSoftDepend());
-
-                            dependencies.put(name, description.getDepend());
-
-                            for (String before : description.getLoadBefore()) {
-                                if (softDependencies.containsKey(before)) {
-                                    softDependencies.get(before).add(name);
-                                } else {
-                                    List<String> list = new ArrayList<>();
-                                    list.add(name);
-                                    softDependencies.put(before, list);
-                                }
+                        } catch (Throwable e) {
+                            server.getLogger().error(server.getLanguage().translateString("nukkit.plugin" +
+                                    ".fileError", new String[]{file.getName(), dictionary.toString(), Utils
+                                    .getExceptionMessage(e)}));
+                            MainLogger logger = server.getLogger();
+                            if (logger != null) {
+                                logger.logException(e instanceof Exception ? (Exception) e : new RuntimeException(e));
                             }
                         }
-                    } catch (Exception e) {
-                        this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin" +
-                                ".fileError", new String[]{file.getName(), dictionary.toString(), Utils
-                                .getExceptionMessage(e)}));
-                        MainLogger logger = this.server.getLogger();
-                        if (logger != null) {
-                            logger.logException(e);
-                        }
-                    }
+                    });
                 }
             }
+            // Wait for all the plugin descriptions to be read
+            pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
+            // While there are plugins left to load, we will load anything that has all of its dependencies loaded
             while (!plugins.isEmpty()) {
-                boolean missingDependency = true;
-                for (String name : new ArrayList<>(plugins.keySet())) {
-                    File file = plugins.get(name);
-                    if (dependencies.containsKey(name)) {
-                        for (String dependency : new ArrayList<>(dependencies.get(name))) {
-                            if (loadedPlugins.containsKey(dependency) || this.getPlugin(dependency) != null) {
-                                dependencies.get(name).remove(dependency);
-                            } else if (!plugins.containsKey(dependency)) {
-                                this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit" +
-                                        ".plugin.loadError", new String[]{name, "%nukkit.plugin.unknownDependency"}));
-                                break;
+                final AtomicBoolean missingDependency = new AtomicBoolean(true);
+                for (final String name : new ArrayList<>(plugins.keySet())) {
+                    pool.submit((Runnable) () -> {
+                        File file = plugins.get(name);
+                        if (dependencies.containsKey(name)) {
+                            for (String dependency : new ArrayList<>(dependencies.get(name))) {
+                                if (loadedPlugins.containsKey(dependency) || getPlugin(dependency) != null) {
+                                    dependencies.get(name).remove(dependency);
+                                } else if (!plugins.containsKey(dependency)) {
+                                    server.getLogger().critical(server.getLanguage().translateString("nukkit" +
+                                            ".plugin.loadError", new String[]{name, "%nukkit.plugin.unknownDependency"}));
+                                    break;
+                                }
+                            }
+
+                            if (dependencies.get(name).isEmpty()) {
+                                dependencies.remove(name);
                             }
                         }
 
-                        if (dependencies.get(name).isEmpty()) {
-                            dependencies.remove(name);
-                        }
-                    }
+                        if (softDependencies.containsKey(name)) {
+                            for (String dependency : new ArrayList<>(softDependencies.get(name))) {
+                                if (loadedPlugins.containsKey(dependency) || getPlugin(dependency) != null) {
+                                    softDependencies.get(name).remove(dependency);
+                                }
+                            }
 
-                    if (softDependencies.containsKey(name)) {
-                        for (String dependency : new ArrayList<>(softDependencies.get(name))) {
-                            if (loadedPlugins.containsKey(dependency) || this.getPlugin(dependency) != null) {
-                                softDependencies.get(name).remove(dependency);
+                            if (softDependencies.get(name).isEmpty()) {
+                                softDependencies.remove(name);
                             }
                         }
 
-                        if (softDependencies.get(name).isEmpty()) {
-                            softDependencies.remove(name);
+                        if (!dependencies.containsKey(name) && !softDependencies.containsKey(name)) {
+                            Plugin plugin = loadPlugin(file, loaders);
+                            if (plugin != null) {
+                                loadedPlugins.put(name, plugin);
+                            } else {
+                                server.getLogger().critical(server.getLanguage().translateString("nukkit.plugin.genericLoadError", name));
+                            }
+                            plugins.remove(name);
+                            missingDependency.set(false);
                         }
-                    }
-
-                    if (!dependencies.containsKey(name) && !softDependencies.containsKey(name)) {
-                        plugins.remove(name);
-                        missingDependency = false;
-                        Plugin plugin = this.loadPlugin(file, loaders);
-                        if (plugin != null) {
-                            loadedPlugins.put(name, plugin);
-                        } else {
-                            this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.genericLoadError", name));
-                        }
-                    }
+                    });
                 }
+                // Wait for this round of plugin loads to finish
+                pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-                if (missingDependency) {
+                // Attempt to load plugins with missing dependencies
+                if (missingDependency.get()) {
                     for (String name : new ArrayList<>(plugins.keySet())) {
                         File file = plugins.get(name);
                         if (!dependencies.containsKey(name)) {
                             softDependencies.remove(name);
                             plugins.remove(name);
-                            missingDependency = false;
+                            missingDependency.set(false);
                             Plugin plugin = this.loadPlugin(file, loaders);
                             if (plugin != null) {
                                 loadedPlugins.put(name, plugin);
@@ -294,7 +304,7 @@ public class PluginManager {
                         }
                     }
 
-                    if (missingDependency) {
+                    if (missingDependency.get()) {
                         for (String name : plugins.keySet()) {
                             this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "%nukkit.plugin.circularDependency"}));
                         }
@@ -303,9 +313,12 @@ public class PluginManager {
                 }
             }
 
+            // Finished
+            pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            pool.shutdownNow();
             return loadedPlugins;
         } else {
-            return new HashMap<>();
+            return new ConcurrentHashMap<>(8, 0.9f, 1);
         }
     }
 
@@ -548,11 +561,12 @@ public class PluginManager {
 
     public void callEvent(Event event) {
         try {
-            for (RegisteredListener registration : getEventListeners(event.getClass()).getRegisteredListeners()) {
+            HandlerList handler = event.getHandlerList();
+            RegisteredListener[] listeners = handler.getRegisteredListeners();
+            for (RegisteredListener registration : listeners) {
                 if (!registration.getPlugin().isEnabled()) {
                     continue;
                 }
-
                 try {
                     registration.callEvent(event);
                 } catch (Exception e) {
@@ -570,7 +584,7 @@ public class PluginManager {
             throw new PluginException("Plugin attempted to register " + listener.getClass().getName() + " while not enabled");
         }
 
-        Map<Class<? extends Event>, Set<RegisteredListener>> ret = new HashMap<>();
+        Map<Class<? extends Event>, Set<RegisteredListener>> ret = new ConcurrentHashMap<>(8, 0.9f, 1);
         Set<Method> methods;
         try {
             Method[] publicMethods = listener.getClass().getMethods();

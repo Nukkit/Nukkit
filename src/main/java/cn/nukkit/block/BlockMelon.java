@@ -14,11 +14,6 @@ import java.util.Random;
 public class BlockMelon extends BlockSolid {
 
     public BlockMelon() {
-        this(0);
-    }
-
-    public BlockMelon(int meta) {
-        super(0);
     }
 
     @Override

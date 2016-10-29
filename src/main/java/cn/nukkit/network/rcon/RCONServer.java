@@ -1,7 +1,6 @@
 package cn.nukkit.network.rcon;
 
 import cn.nukkit.Server;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.BufferUnderflowException;
@@ -14,6 +13,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Thread that performs all RCON network work. A server.
@@ -35,7 +35,7 @@ public class RCONServer extends Thread {
     private final Set<SocketChannel> rconSessions = new HashSet<>();
 
     private final List<RCONCommand> receiveQueue = new ArrayList<>();
-    private final Map<SocketChannel, List<RCONPacket>> sendQueues = new HashMap<>();
+    private final Map<SocketChannel, List<RCONPacket>> sendQueues = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public RCONServer(String address, int port, String password) throws IOException {
         this.setName("RCON");
@@ -67,7 +67,7 @@ public class RCONServer extends Thread {
         this.send(channel, new RCONPacket(id, SERVERDATA_RESPONSE_VALUE, response.getBytes()));
     }
 
-    public void close() {
+    public synchronized void close() {
         this.running = false;
         this.selector.wakeup();
     }

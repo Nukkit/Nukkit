@@ -17,7 +17,7 @@ import java.util.Map;
  * author: Angelic47
  * Nukkit Project
  */
-public class BlockFurnaceBurning extends BlockSolid {
+public class BlockFurnaceBurning extends BlockSolidMeta {
 
     public BlockFurnaceBurning() {
         this(0);

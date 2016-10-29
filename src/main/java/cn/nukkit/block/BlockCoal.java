@@ -13,7 +13,6 @@ public class BlockCoal extends BlockSolid {
     }
 
     public BlockCoal(int meta) {
-        super(0);
     }
 
     @Override

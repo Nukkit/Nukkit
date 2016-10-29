@@ -8,15 +8,14 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.timings.Timing;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.ChunkException;
-
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author MagicDroidX
  */
-public abstract class BlockEntity extends Position {
+public abstract class BlockEntity extends Position implements Runnable {
     //WARNING: DO NOT CHANGE ANY NAME HERE, OR THE CLIENT WILL CRASH
     public static final String CHEST = "Chest";
     public static final String FURNACE = "Furnace";
@@ -34,8 +33,8 @@ public abstract class BlockEntity extends Position {
 
     public static long count = 1;
 
-    private static final Map<String, Class<? extends BlockEntity>> knownBlockEntities = new HashMap<>();
-    private static final Map<String, String> shortNames = new HashMap<>();
+    private static final Map<String, Class<? extends BlockEntity>> knownBlockEntities = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private static final Map<String, String> shortNames = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public FullChunk chunk;
     public String name;
@@ -139,17 +138,28 @@ public abstract class BlockEntity extends Position {
         return this.level.getBlock(this);
     }
 
+    public Block getTemporalBlock() {
+        return this.level.getTemporalBlock(this);
+    }
+
     public abstract boolean isBlockEntityValid();
 
-    public boolean onUpdate() {
+    public synchronized boolean onUpdate() {
         return false;
+    }
+
+    @Override
+    public void run() {
+        if (!onUpdate()) {
+            level.removeBlockEntityUpdate(this);
+        }
     }
 
     public final void scheduleUpdate() {
         this.level.updateBlockEntities.put(this.id, this);
     }
 
-    public void close() {
+    public synchronized void close() {
         if (!this.closed) {
             this.closed = true;
             this.level.updateBlockEntities.remove(this.id);

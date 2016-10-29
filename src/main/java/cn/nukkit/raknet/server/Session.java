@@ -7,7 +7,6 @@ import cn.nukkit.raknet.protocol.Packet;
 import cn.nukkit.raknet.protocol.packet.*;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
-
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,7 +27,7 @@ public class Session {
     public static final int WINDOW_SIZE = 2048;
 
     private int messageIndex = 0;
-    private final Map<Integer, Integer> channelIndex = new ConcurrentHashMap<>();
+    private final Map<Integer, Integer> channelIndex = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private SessionManager sessionManager;
     private final String address;
@@ -47,16 +46,16 @@ public class Session {
 
     private boolean isTemporal = true;
 
-    private final List<DataPacket> packetToSend = new ArrayList<>();
+    private final Queue<DataPacket> packetToSend = new ArrayDeque<>();
 
     private boolean isActive;
 
-    private Map<Integer, Integer> ACKQueue = new HashMap<>();
-    private Map<Integer, Integer> NACKQueue = new HashMap<>();
+    private Map<Integer, Integer> ACKQueue = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private Map<Integer, Integer> NACKQueue = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private final Map<Integer, DataPacket> recoveryQueue = new TreeMap<>();
 
-    private final Map<Integer, Map<Integer, EncapsulatedPacket>> splitPackets = new HashMap<>();
+    private final Map<Integer, Map<Integer, EncapsulatedPacket>> splitPackets = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private final Map<Integer, Map<Integer, Integer>> needACK = new TreeMap<>();
 
@@ -114,32 +113,25 @@ public class Session {
             ACK pk = new ACK();
             pk.packets = new TreeMap<>(this.ACKQueue);
             this.sendPacket(pk);
-            this.ACKQueue = new HashMap<>();
+            this.ACKQueue = new ConcurrentHashMap<>(8, 0.9f, 1);
         }
 
         if (!this.NACKQueue.isEmpty()) {
             NACK pk = new NACK();
             pk.packets = new TreeMap<>(this.NACKQueue);
             this.sendPacket(pk);
-            this.NACKQueue = new HashMap<>();
+            this.NACKQueue = new ConcurrentHashMap<>(8, 0.9f, 1);
         }
-
-        if (!this.packetToSend.isEmpty()) {
-            int limit = 16;
-            for (int i = 0; i < this.packetToSend.size(); i++) {
-                DataPacket pk = this.packetToSend.get(i);
+        for (int i = 0; i < 16 && !this.packetToSend.isEmpty(); i++) {
+            DataPacket pk = this.packetToSend.poll();
+            if (pk != null) {
                 pk.sendTime = time;
                 pk.encode();
                 this.recoveryQueue.put(pk.seqNumber, pk);
                 this.packetToSend.remove(pk);
                 this.sendPacket(pk);
-
-                if (limit-- <= 0) {
-                    break;
-                }
             }
         }
-
         if (this.packetToSend.size() > WINDOW_SIZE) {
             this.packetToSend.clear();
         }
@@ -205,7 +197,7 @@ public class Session {
         int priority = flags & 0b0000111;
         if (pk.needACK && pk.messageIndex != null) {
             if (!this.needACK.containsKey(pk.identifierACK)) {
-                this.needACK.put(pk.identifierACK, new HashMap<>());
+                this.needACK.put(pk.identifierACK, new ConcurrentHashMap<>(8, 0.9f, 1));
             }
             this.needACK.get(pk.identifierACK).put(pk.messageIndex, pk.messageIndex);
         }
@@ -245,7 +237,7 @@ public class Session {
 
     public void addEncapsulatedToQueue(EncapsulatedPacket packet, int flags) throws Exception {
         if ((packet.needACK = (flags & RakNet.FLAG_NEED_ACK) > 0)) {
-            this.needACK.put(packet.identifierACK, new HashMap<>());
+            this.needACK.put(packet.identifierACK, new ConcurrentHashMap<>(8, 0.9f, 1));
         }
 
         if (packet.reliability == 2 ||
@@ -299,7 +291,7 @@ public class Session {
             if (this.splitPackets.size() >= MAX_SPLIT_COUNT) {
                 return;
             }
-            this.splitPackets.put(packet.splitID, new HashMap<Integer, EncapsulatedPacket>() {{
+            this.splitPackets.put(packet.splitID, new ConcurrentHashMap<Integer, EncapsulatedPacket>(8, 0.9f, 1) {{
                 put(packet.splitIndex, packet);
             }});
         } else {
@@ -382,8 +374,7 @@ public class Session {
         if ((id & 0xff) < 0x80) { //internal data packet
             if (state == STATE_CONNECTING_2) {
                 if (id == CLIENT_CONNECT_DataPacket.ID) {
-                    CLIENT_CONNECT_DataPacket dataPacket = new CLIENT_CONNECT_DataPacket();
-                    dataPacket.buffer = packet.buffer;
+                    CLIENT_CONNECT_DataPacket dataPacket = new CLIENT_CONNECT_DataPacket(packet.buffer);
                     dataPacket.decode();
                     SERVER_HANDSHAKE_DataPacket pk = new SERVER_HANDSHAKE_DataPacket();
                     pk.address = this.address;
@@ -394,11 +385,11 @@ public class Session {
 
                     EncapsulatedPacket sendPacket = new EncapsulatedPacket();
                     sendPacket.reliability = 0;
-                    sendPacket.buffer = pk.buffer;
+                    sendPacket.buffer = pk.getBuffer();
                     this.addToQueue(sendPacket, RakNet.PRIORITY_IMMEDIATE);
                 } else if (id == CLIENT_HANDSHAKE_DataPacket.ID) {
                     CLIENT_HANDSHAKE_DataPacket dataPacket = new CLIENT_HANDSHAKE_DataPacket();
-                    dataPacket.buffer = packet.buffer;
+                    dataPacket.setBuffer(packet.buffer);
                     dataPacket.decode();
 
                     if (dataPacket.port == this.sessionManager.getPort() || !this.sessionManager.portChecking) {
@@ -410,17 +401,15 @@ public class Session {
             } else if (id == CLIENT_DISCONNECT_DataPacket.ID) {
                 disconnect("client disconnect");
             } else if (id == PING_DataPacket.ID) {
-                PING_DataPacket dataPacket = new PING_DataPacket();
-                dataPacket.buffer = packet.buffer;
+                PING_DataPacket dataPacket = new PING_DataPacket(packet.buffer);
                 dataPacket.decode();
 
                 PONG_DataPacket pk = new PONG_DataPacket();
                 pk.pingID = dataPacket.pingID;
                 pk.encode();
 
-                EncapsulatedPacket sendPacket = new EncapsulatedPacket();
+                EncapsulatedPacket sendPacket = new EncapsulatedPacket(pk.getBuffer());
                 sendPacket.reliability = 0;
-                sendPacket.buffer = pk.buffer;
                 this.addToQueue(sendPacket);
 
                 //Latency measurement
@@ -428,21 +417,19 @@ public class Session {
                 pingPacket.pingID = System.currentTimeMillis();
                 pingPacket.encode();
 
-                sendPacket = new EncapsulatedPacket();
+                sendPacket = new EncapsulatedPacket(pingPacket.getBuffer());
                 sendPacket.reliability = 0;
-                sendPacket.buffer = pingPacket.buffer;
                 this.addToQueue(sendPacket);
             } else if (id == PONG_DataPacket.ID) {
                 if (state == STATE_CONNECTED) {
-                    PONG_DataPacket dataPacket = new PONG_DataPacket();
-                    dataPacket.buffer = packet.buffer;
+                    PONG_DataPacket dataPacket = new PONG_DataPacket(packet.buffer);
                     dataPacket.decode();
 
                     if (state == STATE_CONNECTED) {
                         PING_DataPacket pingPacket = new PING_DataPacket();
                         pingPacket.pingID = (System.currentTimeMillis() - dataPacket.pingID) / 10;
                         pingPacket.encode();
-                        packet.buffer = pingPacket.buffer;
+                        packet.buffer = pingPacket.getBuffer();
                         this.sessionManager.streamEncapsulated(this, packet);
                     }
                 }
@@ -458,7 +445,8 @@ public class Session {
         this.isActive = true;
         this.lastUpdate = System.currentTimeMillis();
         if (this.state == STATE_CONNECTED || this.state == STATE_CONNECTING_2) {
-            if (((packet.buffer[0] & 0xff) >= 0x80 || (packet.buffer[0] & 0xff) <= 0x8f) && packet instanceof DataPacket) {
+            byte[] rawBuffer = packet.getRawBuffer();
+            if (((rawBuffer[0] & 0xff) >= 0x80 || (rawBuffer[0] & 0xff) <= 0x8f) && packet instanceof DataPacket) {
                 DataPacket dp = (DataPacket) packet;
                 dp.decode();
 
@@ -518,32 +506,35 @@ public class Session {
                     }
                 }
             }
-        } else if ((packet.buffer[0] & 0xff) > 0x00 || (packet.buffer[0] & 0xff) < 0x80) { //Not Data packet :)
-            packet.decode();
-            if (packet instanceof OPEN_CONNECTION_REQUEST_1) {
-                //TODO: check protocol number and refuse connections
-                OPEN_CONNECTION_REPLY_1 pk = new OPEN_CONNECTION_REPLY_1();
-                pk.mtuSize = ((OPEN_CONNECTION_REQUEST_1) packet).mtuSize;
-                pk.serverID = sessionManager.getID();
-                this.sendPacket(pk);
-                this.state = STATE_CONNECTING_1;
-            } else if (this.state == STATE_CONNECTING_1 && packet instanceof OPEN_CONNECTION_REQUEST_2) {
-                this.id = ((OPEN_CONNECTION_REQUEST_2) packet).clientID;
-                if (((OPEN_CONNECTION_REQUEST_2) packet).serverPort == this.sessionManager.getPort() || !this.sessionManager.portChecking) {
-                    this.mtuSize = Math.min(Math.abs(((OPEN_CONNECTION_REQUEST_2) packet).mtuSize), 1464); //Max size, do not allow creating large buffers to fill server memory
-                    OPEN_CONNECTION_REPLY_2 pk = new OPEN_CONNECTION_REPLY_2();
-                    pk.mtuSize = (short) this.mtuSize;
-                    pk.serverID = this.sessionManager.getID();
-                    pk.clientAddress = this.address;
-                    pk.clientPort = this.port;
+        } else {
+            byte[] buffer = packet.getRawBuffer();
+            if ((buffer[0] & 0xff) > 0x00 || (buffer[0] & 0xff) < 0x80) { //Not Data packet :)
+                packet.decode();
+                if (packet instanceof OPEN_CONNECTION_REQUEST_1) {
+                    //TODO: check protocol number and refuse connections
+                    OPEN_CONNECTION_REPLY_1 pk = new OPEN_CONNECTION_REPLY_1();
+                    pk.mtuSize = ((OPEN_CONNECTION_REQUEST_1) packet).mtuSize;
+                    pk.serverID = sessionManager.getID();
                     this.sendPacket(pk);
-                    this.state = STATE_CONNECTING_2;
+                    this.state = STATE_CONNECTING_1;
+                } else if (this.state == STATE_CONNECTING_1 && packet instanceof OPEN_CONNECTION_REQUEST_2) {
+                    this.id = ((OPEN_CONNECTION_REQUEST_2) packet).clientID;
+                    if (((OPEN_CONNECTION_REQUEST_2) packet).serverPort == this.sessionManager.getPort() || !this.sessionManager.portChecking) {
+                        this.mtuSize = Math.min(Math.abs(((OPEN_CONNECTION_REQUEST_2) packet).mtuSize), 1464); //Max size, do not allow creating large buffers to fill server memory
+                        OPEN_CONNECTION_REPLY_2 pk = new OPEN_CONNECTION_REPLY_2();
+                        pk.mtuSize = (short) this.mtuSize;
+                        pk.serverID = this.sessionManager.getID();
+                        pk.clientAddress = this.address;
+                        pk.clientPort = this.port;
+                        this.sendPacket(pk);
+                        this.state = STATE_CONNECTING_2;
+                    }
                 }
             }
         }
     }
 
-    public void close() throws Exception {
+    public synchronized void close() throws Exception {
         byte[] data = new byte[]{0x00, 0x00, 0x08, 0x15}; //CLIENT_DISCONNECT packet 0x15
         this.addEncapsulatedToQueue(EncapsulatedPacket.fromBinary(data), RakNet.PRIORITY_IMMEDIATE);
         this.sessionManager = null;

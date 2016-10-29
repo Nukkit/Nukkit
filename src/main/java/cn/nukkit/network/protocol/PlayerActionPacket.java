@@ -31,6 +31,9 @@ public class PlayerActionPacket extends DataPacket {
     public int z;
     public int face;
 
+    public PlayerActionPacket() {
+        super(29);
+    }
 
     @Override
     public void decode() {

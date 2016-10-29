@@ -17,6 +17,11 @@ public class InventoryPickupItemEvent extends InventoryEvent implements Cancella
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final EntityItem item;
 
     public InventoryPickupItemEvent(Inventory inventory, EntityItem item) {

@@ -11,6 +11,11 @@ public class PlayerBedLeaveEvent extends PlayerEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final Block bed;
 
     public PlayerBedLeaveEvent(Player player, Block bed) {

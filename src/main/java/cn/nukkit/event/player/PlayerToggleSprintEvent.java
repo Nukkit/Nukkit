@@ -11,6 +11,11 @@ public class PlayerToggleSprintEvent extends PlayerEvent implements Cancellable 
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     protected final boolean isSprinting;
 
     public PlayerToggleSprintEvent(Player player, boolean isSprinting) {

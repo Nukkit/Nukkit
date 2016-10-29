@@ -5,8 +5,8 @@ import cn.nukkit.blockentity.BlockEntityBrewingStand;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemPotion;
 import cn.nukkit.utils.Utils;
-
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -14,17 +14,20 @@ import java.util.*;
  */
 public class CraftingManager {
 
-    public final Map<UUID, Recipe> recipes = new HashMap<>();
+    public final Map<UUID, Recipe> recipes = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<String, Map<String, Recipe>> recipeLookup = new HashMap<>();
+    protected final Map<String, Map<String, Recipe>> recipeLookup = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    public final Map<String, FurnaceRecipe> furnaceRecipes = new HashMap<>();
+    public final Map<String, FurnaceRecipe> furnaceRecipes = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    public final Map<String, BrewingRecipe> brewingRecipes = new HashMap<>();
+    public final Map<String, BrewingRecipe> brewingRecipes = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private static int RECIPE_COUNT = 0;
 
     public CraftingManager() {
+    }
+
+    public void init() {
         this.registerFurnace();
         this.registerBrewing();
         this.registerDyes();
@@ -649,7 +652,7 @@ public class CraftingManager {
 
     protected void registerBrewing() {
         for (int ingredient : new int[]{Item.NETHER_WART, Item.GOLD_NUGGET, Item.GHAST_TEAR, Item.GLOWSTONE_DUST, Item.REDSTONE_DUST, Item.GUNPOWDER, Item.MAGMA_CREAM, Item.BLAZE_POWDER, Item.GOLDEN_CARROT, Item.SPIDER_EYE, Item.FERMENTED_SPIDER_EYE, Item.GLISTERING_MELON, Item.SUGAR, Item.RAW_FISH}) {
-            BlockEntityBrewingStand.ingredients.add(ingredient); //temporally solution for ingredients
+            BlockEntityBrewingStand.ingredients.add(ingredient); //temporary solution for ingredients
         }
 
         registerBrewingRecipe(new BrewingRecipe(Item.get(Item.POTION, ItemPotion.AWKWARD, 1), Item.get(Item.NETHER_WART, 0, 1), Item.get(Item.POTION, ItemPotion.NO_EFFECTS, 1)));
@@ -1012,7 +1015,7 @@ public class CraftingManager {
 
         String index = result.getId() + ":" + (result.hasMeta() ? result.getDamage() : "");
         if (!this.recipeLookup.containsKey(index)) {
-            this.recipeLookup.put(index, new HashMap<>());
+            this.recipeLookup.put(index, new ConcurrentHashMap<>(8, 0.9f, 1));
         }
 
         this.recipeLookup.get(index).put(hash, recipe);
@@ -1029,7 +1032,7 @@ public class CraftingManager {
         }
 
         if (!this.recipeLookup.containsKey(result.getId() + ":" + result.getDamage())) {
-            this.recipeLookup.put(result.getId() + ":" + result.getDamage(), new HashMap<>());
+            this.recipeLookup.put(result.getId() + ":" + result.getDamage(), new ConcurrentHashMap<>(8, 0.9f, 1));
         }
         this.recipeLookup.get(result.getId() + ":" + result.getDamage()).put(hash, recipe);
     }

@@ -10,7 +10,7 @@ import cn.nukkit.utils.BlockColor;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class BlockSlab extends BlockTransparent {
+public class BlockSlab extends BlockTransparentMeta {
     public static final int STONE = 0;
     public static final int SANDSTONE = 1;
     public static final int WOODEN = 2;

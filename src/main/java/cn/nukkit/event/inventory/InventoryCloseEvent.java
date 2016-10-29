@@ -16,6 +16,11 @@ public class InventoryCloseEvent extends InventoryEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final Player who;
 
     public InventoryCloseEvent(Inventory inventory, Player who) {

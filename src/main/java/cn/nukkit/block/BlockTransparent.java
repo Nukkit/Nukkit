@@ -8,8 +8,7 @@ import cn.nukkit.utils.BlockColor;
  */
 public abstract class BlockTransparent extends Block {
 
-    protected BlockTransparent(int meta) {
-        super(meta);
+    protected BlockTransparent() {
     }
 
     @Override

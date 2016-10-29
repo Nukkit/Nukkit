@@ -15,6 +15,11 @@ public class ChunkLoadEvent extends ChunkEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final boolean newChunk;
 
     public ChunkLoadEvent(FullChunk chunk, boolean newChunk) {

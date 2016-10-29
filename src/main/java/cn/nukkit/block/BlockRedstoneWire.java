@@ -13,13 +13,20 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockRedstoneWire extends BlockFlowable {
 
+    private byte powerLevel;
+
+    @Override
+    public int getPowerLevel() {
+        return powerLevel;
+    }
+
     public BlockRedstoneWire() {
         this(0);
     }
 
     public BlockRedstoneWire(int meta) {
         super(meta);
-        this.powerLevel = meta;
+        this.powerLevel = (byte) meta;
     }
 
     @Override
@@ -36,7 +43,7 @@ public class BlockRedstoneWire extends BlockFlowable {
     public void setPowerLevel(int redstonePower) {
         if (redstonePower > 15) redstonePower = 15;
         else if (redstonePower < 0) redstonePower = 0;
-        this.powerLevel = redstonePower;
+        this.powerLevel = (byte) redstonePower;
         this.meta = redstonePower;
     }
 

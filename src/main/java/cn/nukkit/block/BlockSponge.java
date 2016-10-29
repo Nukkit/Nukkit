@@ -13,7 +13,6 @@ public class BlockSponge extends BlockSolid {
     }
 
     public BlockSponge(int meta) {
-        super(meta);
     }
 
     @Override

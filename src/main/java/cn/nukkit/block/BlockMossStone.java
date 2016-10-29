@@ -7,7 +7,7 @@ import cn.nukkit.item.ItemTool;
  * Created on 2015/12/2 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockMossStone extends BlockSolid {
+public class BlockMossStone extends BlockSolidMeta {
 
     public BlockMossStone() {
         this(0);

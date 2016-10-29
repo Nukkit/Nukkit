@@ -17,6 +17,11 @@ public class DoorToggleEvent extends BlockUpdateEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private Player player;
 
     public DoorToggleEvent(Block block, Player player) {

@@ -1,7 +1,6 @@
 package cn.nukkit.utils;
 
 import com.google.common.collect.Maps;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;

@@ -1,16 +1,15 @@
 package cn.nukkit.level.format;
 
 import cn.nukkit.Server;
-
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
 public abstract class LevelProviderManager {
-    protected static final Map<String, Class<? extends LevelProvider>> providers = new HashMap<>();
+    protected static final Map<String, Class<? extends LevelProvider>> providers = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public static void addProvider(Server server, Class<? extends LevelProvider> clazz) {
         try {

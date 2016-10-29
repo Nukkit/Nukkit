@@ -10,12 +10,19 @@ import cn.nukkit.redstone.Redstone;
  */
 public class BlockRedstoneLamp extends BlockSolid {
 
-    public BlockRedstoneLamp(int meta) {
-        super(meta);
+    private byte powerLevel;
+
+    @Override
+    public int getPowerLevel() {
+        return powerLevel;
+    }
+
+    @Override
+    public void setPowerLevel(int powerLevel) {
+        this.powerLevel = (byte) powerLevel;
     }
 
     public BlockRedstoneLamp() {
-        this(0);
     }
 
     @Override

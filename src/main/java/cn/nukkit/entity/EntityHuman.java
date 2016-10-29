@@ -169,7 +169,7 @@ public class EntityHuman extends EntityHumanType {
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         if (!this.closed) {
             if (!(this instanceof Player) || ((Player) this).loggedIn) {
                 for (Player viewer : this.inventory.getViewers()) {

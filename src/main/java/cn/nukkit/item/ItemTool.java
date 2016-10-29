@@ -56,7 +56,7 @@ public abstract class ItemTool extends Item {
     }
 
     @Override
-    public boolean useOn(Block block) {
+    public synchronized boolean useOn(Block block) {
         if (this.isUnbreakable() || !canReduceDamage()) {
             return true;
         }
@@ -81,7 +81,7 @@ public abstract class ItemTool extends Item {
     }
 
     @Override
-    public boolean useOn(Entity entity) {
+    public synchronized boolean useOn(Entity entity) {
         if (this.isUnbreakable() || !canReduceDamage()) {
             return true;
         }

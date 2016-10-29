@@ -5,11 +5,11 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.ConsoleCommandSender;
 import cn.nukkit.command.RemoteConsoleCommandSender;
 import cn.nukkit.lang.TranslationContainer;
+import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.TextFormat;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
@@ -19,6 +19,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.zip.GZIPOutputStream;
+
 
 import static cn.nukkit.timings.TimingsManager.HISTORY;
 
@@ -236,7 +237,7 @@ public class TimingsExport extends Thread {
         InputStream is = null;
         try {
             is = con.getInputStream();
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            BinaryStream bos = new BinaryStream();
 
             byte[] b = new byte[1024];
             int bytesRead;

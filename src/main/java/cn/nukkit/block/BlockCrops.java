@@ -61,7 +61,7 @@ public abstract class BlockCrops extends BlockFlowable {
                 return false;
             }
 
-            this.getLevel().setBlock(this, ev.getNewState(), true, true);
+            this.getLevel().setBlock(this, ev.getNewState(), false, true);
             item.count--;
 
             return true;
@@ -86,7 +86,7 @@ public abstract class BlockCrops extends BlockFlowable {
                     Server.getInstance().getPluginManager().callEvent(ev);
 
                     if (!ev.isCancelled()) {
-                        this.getLevel().setBlock(this, ev.getNewState(), true, true);
+                        this.getLevel().setBlock(this, ev.getNewState(), false, true);
                     } else {
                         return Level.BLOCK_UPDATE_RANDOM;
                     }

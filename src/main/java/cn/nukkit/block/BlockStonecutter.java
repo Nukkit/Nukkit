@@ -14,7 +14,6 @@ public class BlockStonecutter extends BlockSolid {
     }
 
     public BlockStonecutter(int meta) {
-        super(meta);
     }
 
     @Override

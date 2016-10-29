@@ -1,7 +1,6 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityCauldron;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
@@ -10,9 +9,7 @@ import cn.nukkit.item.*;
 import cn.nukkit.level.sound.ExplodeSound;
 import cn.nukkit.level.sound.SplashSound;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.Tag;
-
 import java.util.Iterator;
 import java.util.Map;
 
@@ -20,7 +17,7 @@ import java.util.Map;
  * author: CreeperFace
  * Nukkit Project
  */
-public class BlockCauldron extends BlockSolid {
+public class BlockCauldron extends BlockSolidMeta {
 
     public BlockCauldron() {
         super(0);
@@ -152,10 +149,9 @@ public class BlockCauldron extends BlockSolid {
                     player.getInventory().setItemInHand(item);
 
                     Item bottle = new ItemGlassBottle();
-                    if (player.getInventory().canAddItem(bottle)) {
-                        player.getInventory().addItem(bottle);
-                    } else {
-                        player.getLevel().dropItem(player.add(0, 1.3, 0), bottle, player.getDirectionVector().multiply(0.4));
+                    Item[] left = player.getInventory().addItem(bottle);
+                    for (Item current : left) {
+                        player.getLevel().dropItem(player.add(0, 1.3, 0), current, player.getDirectionVector().multiply(0.4));
                     }
                 }
 
@@ -177,10 +173,9 @@ public class BlockCauldron extends BlockSolid {
                     player.getInventory().setItemInHand(item);
 
                     Item potion = new ItemPotion();
-                    if (player.getInventory().canAddItem(potion)) {
-                        player.getInventory().addItem(potion);
-                    } else {
-                        player.getLevel().dropItem(player.add(0, 1.3, 0), potion, player.getDirectionVector().multiply(0.4));
+                    Item[] left = player.getInventory().addItem(potion);
+                    for (Item current : left) {
+                        player.getLevel().dropItem(player.add(0, 1.3, 0), current, player.getDirectionVector().multiply(0.4));
                     }
                 }
 

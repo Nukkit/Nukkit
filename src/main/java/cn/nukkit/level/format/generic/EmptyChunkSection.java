@@ -1,8 +1,8 @@
 package cn.nukkit.level.format.generic;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.utils.ChunkException;
-
 import java.util.Arrays;
 
 /**
@@ -52,17 +52,17 @@ public class EmptyChunkSection implements ChunkSection {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z) throws ChunkException {
+    public Block getAndSetBlock(int x, int y, int z, Block block) {
         throw new ChunkException("Tried to modify an empty Chunk");
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, Integer blockId) throws ChunkException {
+    public boolean setBlock(int x, int y, int z, int blockId) throws ChunkException {
         throw new ChunkException("Tried to modify an empty Chunk");
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, Integer blockId, Integer meta) throws ChunkException {
+    public boolean setBlock(int x, int y, int z, int blockId, int meta) throws ChunkException {
         throw new ChunkException("Tried to modify an empty Chunk");
     }
 

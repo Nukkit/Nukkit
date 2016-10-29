@@ -18,6 +18,11 @@ public class BlockPlaceEvent extends BlockEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     protected final Player player;
 
     protected final Item item;

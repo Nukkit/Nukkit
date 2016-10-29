@@ -18,6 +18,11 @@ public class WeatherChangeEvent extends WeatherEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public WeatherChangeEvent(Level level, boolean to) {
         super(level);
         this.to = to;

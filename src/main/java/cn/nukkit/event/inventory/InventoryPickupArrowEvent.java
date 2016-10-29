@@ -17,6 +17,11 @@ public class InventoryPickupArrowEvent extends InventoryEvent implements Cancell
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final EntityArrow arrow;
 
     public InventoryPickupArrowEvent(Inventory inventory, EntityArrow arrow) {

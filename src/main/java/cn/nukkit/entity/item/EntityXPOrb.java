@@ -88,7 +88,7 @@ public class EntityXPOrb extends Entity {
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
+    public synchronized boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;
         }
@@ -120,7 +120,7 @@ public class EntityXPOrb extends Entity {
             double friction = 1d - this.getDrag();
 
             if (this.onGround && (Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionZ) > 0.00001)) {
-                friction = this.getLevel().getBlock(this.temporalVector.setComponents((int) Math.floor(this.x), (int) Math.floor(this.y - 1), (int) Math.floor(this.z) - 1)).getFrictionFactor() * friction;
+                friction = this.getLevel().getTemporalBlock((int) Math.floor(this.x), (int) Math.floor(this.y - 1), (int) Math.floor(this.z) - 1).getFrictionFactor() * friction;
             }
 
             this.motionX *= friction;

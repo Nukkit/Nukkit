@@ -17,6 +17,11 @@ public class InventoryTransactionEvent extends Event implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final TransactionGroup transaction;
 
     public InventoryTransactionEvent(TransactionGroup transaction) {

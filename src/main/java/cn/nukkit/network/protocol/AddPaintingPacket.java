@@ -14,6 +14,10 @@ public class AddPaintingPacket extends DataPacket {
     public int direction;
     public String title;
 
+    public AddPaintingPacket() {
+        super(null);
+    }
+
     @Override
     public void decode() {
 
@@ -21,6 +25,7 @@ public class AddPaintingPacket extends DataPacket {
 
     @Override
     public void encode() {
+        setBuffer(new byte[27 + title.length()]);
         this.reset();
         this.putLong(eid);
         this.putInt(x);

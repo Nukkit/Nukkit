@@ -9,7 +9,7 @@ import cn.nukkit.utils.BlockColor;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class BlockQuartz extends BlockSolid {
+public class BlockQuartz extends BlockSolidMeta {
 
     public static final int QUARTZ_NORMAL = 0;
     public static final int QUARTZ_CHISELED = 1;

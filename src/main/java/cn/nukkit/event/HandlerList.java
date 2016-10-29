@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class HandlerList {
 
-    private volatile RegisteredListener[] handlers = null;
+    private volatile RegisteredListener[] handlers = new RegisteredListener[0];
 
     private final EnumMap<EventPriority, ArrayList<RegisteredListener>> handlerslots;
 
@@ -31,7 +31,7 @@ public class HandlerList {
                     for (List<RegisteredListener> list : h.handlerslots.values()) {
                         list.clear();
                     }
-                    h.handlers = null;
+                    h.bake();
                 }
             }
         }
@@ -66,8 +66,8 @@ public class HandlerList {
     public synchronized void register(RegisteredListener listener) {
         if (handlerslots.get(listener.getPriority()).contains(listener))
             throw new IllegalStateException("This listener is already registered to priority " + listener.getPriority().toString());
-        handlers = null;
         handlerslots.get(listener.getPriority()).add(listener);
+        bake();
     }
 
     public void registerAll(Collection<RegisteredListener> listeners) {
@@ -78,7 +78,7 @@ public class HandlerList {
 
     public synchronized void unregister(RegisteredListener listener) {
         if (handlerslots.get(listener.getPriority()).remove(listener)) {
-            handlers = null;
+            bake();
         }
     }
 
@@ -92,7 +92,7 @@ public class HandlerList {
                 }
             }
         }
-        if (changed) handlers = null;
+        if (changed) bake();
     }
 
     public synchronized void unregister(Listener listener) {
@@ -105,11 +105,10 @@ public class HandlerList {
                 }
             }
         }
-        if (changed) handlers = null;
+        if (changed) bake();
     }
 
     public synchronized void bake() {
-        if (handlers != null) return; // don't re-bake when still valid
         List<RegisteredListener> entries = new ArrayList<>();
         for (Map.Entry<EventPriority, ArrayList<RegisteredListener>> entry : handlerslots.entrySet()) {
             entries.addAll(entry.getValue());
@@ -118,11 +117,7 @@ public class HandlerList {
     }
 
     public RegisteredListener[] getRegisteredListeners() {
-        RegisteredListener[] handlers;
-        while ((handlers = this.handlers) == null) {
-            bake();
-        } // This prevents fringe cases of returning null
-        return handlers;
+        return this.handlers;
     }
 
 

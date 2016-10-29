@@ -7,10 +7,9 @@ package cn.nukkit.entity;
  */
 
 import cn.nukkit.utils.ServerException;
-
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Attribute implements Cloneable {
 
@@ -27,7 +26,7 @@ public class Attribute implements Cloneable {
     public static final int EXPERIENCE_LEVEL = 9;
     public static final int EXPERIENCE = 10;
 
-    protected static Map<Integer, Attribute> attributes = new HashMap<>();
+    protected static Map<Integer, Attribute> attributes = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected float minValue;
     protected float maxValue;

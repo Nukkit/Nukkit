@@ -15,12 +15,15 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -81,8 +84,7 @@ public class Chunk extends BaseFullChunk {
             this.providerClass = level.getClass();
         }
 
-        this.x = chunkX;
-        this.z = chunkZ;
+        this.setPosition(chunkX, chunkZ);
 
         this.blocks = blocks;
         this.data = data;
@@ -105,168 +107,7 @@ public class Chunk extends BaseFullChunk {
 
         this.NBTentities = entityData == null ? new ArrayList<>() : entityData;
         this.NBTtiles = tileData == null ? new ArrayList<>() : tileData;
-        this.extraData = extraData == null ? new HashMap<>() : extraData;
-    }
-
-    @Override
-    public int getBlockId(int x, int y, int z) {
-        return this.blocks[(x << 11) | (z << 7) | y] & 0xff;
-    }
-
-    @Override
-    public void setBlockId(int x, int y, int z, int id) {
-        this.blocks[(x << 11) | (z << 7) | y] = (byte) (id);
-        this.hasChanged = true;
-    }
-
-    @Override
-    public int getBlockData(int x, int y, int z) {
-        int b = this.data[(x << 10) | (z << 6) | (y >> 1)] & 0xff;
-        if ((y & 1) == 0) {
-            return b & 0x0f;
-        } else {
-            return b >> 4;
-        }
-    }
-
-    @Override
-    public void setBlockData(int x, int y, int z, int data) {
-        int i = (x << 10) | (z << 6) | (y >> 1);
-        int old = this.data[i] & 0xff;
-        if ((y & 1) == 0) {
-            this.data[i] = (byte) ((old & 0xf0) | (old & 0x0f));
-        } else {
-            this.data[i] = (byte) (((data & 0x0f) << 4) | (old & 0x0f));
-        }
-        this.hasChanged = true;
-    }
-
-    @Override
-    public int getFullBlock(int x, int y, int z) {
-        int i = (x << 11) | (z << 7) | y;
-        int block = this.blocks[i] & 0xff;
-        int data = this.data[i >> 1] & 0xff;
-        if ((y & 1) == 0) {
-            return (block << 4) | (data & 0x0f);
-        } else {
-            return (block << 4) | (data >> 4);
-        }
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z) {
-        return setBlock(x, y, z, null, null);
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, Integer blockId) {
-        return setBlock(x, y, z, blockId, null);
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, Integer blockId, Integer meta) {
-        int i = (x << 11) | (z << 7) | y;
-        boolean changed = false;
-        if (blockId != null) {
-            byte id = (byte) (blockId & 0xff);
-            if (this.blocks[i] != id) {
-                this.blocks[i] = id;
-                changed = true;
-            }
-        }
-
-        if (meta != null) {
-            i >>= 1;
-            int old = this.data[i] & 0xff;
-            if ((y & 1) == 0) {
-                this.data[i] = (byte) ((old & 0xf0) | (meta & 0x0f));
-                if ((old & 0x0f) != meta) {
-                    changed = true;
-                }
-            } else {
-                this.data[i] = (byte) (((meta & 0x0f) << 4) | (old & 0x0f));
-                if (!meta.equals((old & 0xf0) >> 4)) {
-                    changed = true;
-                }
-            }
-        }
-
-        if (changed) {
-            this.hasChanged = true;
-        }
-        return changed;
-    }
-
-    @Override
-    public int getBlockSkyLight(int x, int y, int z) {
-        int sl = this.skyLight[(x << 10) | (z << 6) | (y >> 1)] & 0xff;
-        if ((y & 1) == 0) {
-            return sl & 0x0f;
-        } else {
-            return sl >> 4;
-        }
-    }
-
-    @Override
-    public void setBlockSkyLight(int x, int y, int z, int level) {
-        int i = (x << 10) | (z << 6) | (y >> 1);
-        int old = this.skyLight[i] & 0xff;
-        if ((y & 1) == 0) {
-            this.skyLight[i] = (byte) ((old & 0xf0) | (level & 0x0f));
-        } else {
-            this.skyLight[i] = (byte) (((level & 0x0f) << 4) | (old & 0x0f));
-        }
-        this.hasChanged = true;
-    }
-
-    @Override
-    public int getBlockLight(int x, int y, int z) {
-        int b = this.blockLight[(x << 10) | (z << 6) | (y >> 1)] & 0xff;
-        if ((y & 1) == 0) {
-            return b & 0x0f;
-        } else {
-            return b >> 4;
-        }
-    }
-
-    @Override
-    public void setBlockLight(int x, int y, int z, int level) {
-        int i = (x << 10) | (z << 6) | (y >> 1);
-        int old = this.blockLight[i] & 0xff;
-        if ((y & 1) == 0) {
-            this.blockLight[i] = (byte) ((old & 0xf0) | (level & 0x0f));
-        } else {
-            this.blockLight[i] = (byte) (((level & 0x0f) << 4) | (old & 0x0f));
-        }
-        this.hasChanged = true;
-    }
-
-    @Override
-    public byte[] getBlockIdColumn(int x, int z) {
-        byte[] b = new byte[128];
-        System.arraycopy(this.blocks, (x << 11) + (z << 7), b, 0, 128);
-        return b;
-    }
-
-    @Override
-    public byte[] getBlockDataColumn(int x, int z) {
-        byte[] b = new byte[64];
-        System.arraycopy(this.data, (x << 10) + (z << 6), b, 0, 64);
-        return b;
-    }
-
-    @Override
-    public byte[] getBlockSkyLightColumn(int x, int z) {
-        byte[] b = new byte[64];
-        System.arraycopy(this.skyLight, (x << 10) + (z << 6), b, 0, 64);
-        return b;
-    }
-
-    @Override
-    public byte[] getBlockLightColumn(int x, int z) {
-        byte[] b = new byte[64];
-        System.arraycopy(this.blockLight, (x << 10) + (z << 6), b, 0, 64);
-        return b;
+        this.extraData = extraData == null ? new ConcurrentHashMap<>(8, 0.9f, 1) : extraData;
     }
 
     @Override
@@ -330,7 +171,7 @@ public class Chunk extends BaseFullChunk {
             List<CompoundTag> entities = new ArrayList<>();
             List<CompoundTag> tiles = new ArrayList<>();
 
-            Map<Integer, Integer> extraDataMap = new HashMap<>();
+            Map<Integer, Integer> extraDataMap = new ConcurrentHashMap<>(8, 0.9f, 1);
 
             if (provider instanceof LevelDB) {
                 byte[] entityData = ((LevelDB) provider).getDatabase().get(EntitiesKey.create(chunkX, chunkZ).toArray());

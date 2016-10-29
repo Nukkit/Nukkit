@@ -28,7 +28,7 @@ public class BlockEntitySkull extends BlockEntitySpawnable {
 
     @Override
     public boolean isBlockEntityValid() {
-        return getBlock().getId() == Block.SKULL_BLOCK;
+        return getTemporalBlock().getId() == Block.SKULL_BLOCK;
     }
 
     @Override

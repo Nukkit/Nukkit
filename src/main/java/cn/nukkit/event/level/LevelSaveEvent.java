@@ -15,6 +15,11 @@ public class LevelSaveEvent extends LevelEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public LevelSaveEvent(Level level) {
         super(level);
     }

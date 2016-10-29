@@ -1,15 +1,15 @@
 package cn.nukkit.item.randomitem;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Snake1999 on 2016/1/15.
  * Package cn.nukkit.item.randomitem in project nukkit.
  */
 public final class RandomItem {
-    private static final Map<Selector, Float> selectors = new HashMap<>();
+    private static final Map<Selector, Float> selectors = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public static final Selector ROOT = new Selector(null);
 
@@ -25,7 +25,7 @@ public final class RandomItem {
 
     static Object selectFrom(Selector selector) {
         Objects.requireNonNull(selector);
-        Map<Selector, Float> child = new HashMap<>();
+        Map<Selector, Float> child = new ConcurrentHashMap<>(8, 0.9f, 1);
         selectors.forEach((s, f) -> {
             if (s.getParent() == selector) child.put(s, f);
         });

@@ -10,6 +10,10 @@ public class FullChunkDataPacket extends DataPacket {
     public static final byte ORDER_COLUMNS = 0;
     public static final byte ORDER_LAYERED = 1;
 
+    public FullChunkDataPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -27,6 +31,7 @@ public class FullChunkDataPacket extends DataPacket {
 
     @Override
     public void encode() {
+        setBuffer(new byte[14 + data.length]);
         this.reset();
         this.putInt(this.chunkX);
         this.putInt(this.chunkZ);

@@ -9,6 +9,14 @@ import cn.nukkit.raknet.protocol.Packet;
 public class CLIENT_CONNECT_DataPacket extends Packet {
     public static final byte ID = (byte) 0x09;
 
+    public CLIENT_CONNECT_DataPacket(){
+        super(18);
+    }
+
+    public CLIENT_CONNECT_DataPacket(byte[] buffer) {
+        super(buffer);
+    }
+
     @Override
     public byte getID() {
         return ID;

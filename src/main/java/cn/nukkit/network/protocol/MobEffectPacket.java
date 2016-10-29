@@ -24,6 +24,10 @@ public class MobEffectPacket extends DataPacket {
     public boolean particles = true;
     public int duration;
 
+    public MobEffectPacket() {
+        super(17);
+    }
+
     @Override
     public void decode() {
 

@@ -1,71 +1,67 @@
 package cn.nukkit.level.format.leveldb;
 
-import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.format.LevelProvider;
+import cn.nukkit.level.format.generic.BaseFullChunk;
+import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.format.leveldb.key.FlagsKey;
 import cn.nukkit.level.format.leveldb.key.TerrainKey;
 import cn.nukkit.level.format.leveldb.key.VersionKey;
 import cn.nukkit.level.generator.Generator;
-import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
 import org.iq80.leveldb.impl.Iq80DBFactory;
-
-import java.io.*;
-import java.nio.ByteOrder;
-import java.util.*;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
-public class LevelDB implements LevelProvider {
-
-    protected Map<Long, Chunk> chunks = new HashMap<>();
+public class LevelDB extends BaseLevelProvider {
 
     protected DB db;
 
-    protected Level level;
-
-    protected final String path;
-
     protected CompoundTag levelData;
 
-    public LevelDB(Level level, String path) {
-        this.level = level;
-        this.path = path;
-        File file_path = new File(this.path);
-        if (!file_path.exists()) {
-            file_path.mkdirs();
-        }
+    public LevelDB(Level level, String path) throws IOException {
+        super(level, path);
+    }
 
+    @Override
+    public CompoundTag initLevelData() throws IOException {
+        CompoundTag levelData;
         try (FileInputStream stream = new FileInputStream(this.getPath() + "level.dat")) {
             stream.skip(8);
-            CompoundTag levelData = NBTIO.read(stream, ByteOrder.LITTLE_ENDIAN);
-            if (levelData != null) {
-                this.levelData = levelData;
-            } else {
+            levelData = NBTIO.read(stream, ByteOrder.LITTLE_ENDIAN);
+            if (levelData == null) {
                 throw new IOException("LevelData can not be null");
             }
         } catch (IOException e) {
             throw new LevelException("Invalid level.dat");
         }
 
-        if (!this.levelData.contains("generatorName")) {
-            this.levelData.putString("generatorName", Generator.getGenerator("DEFAULT").getSimpleName().toLowerCase());
+        if (!levelData.contains("generatorName")) {
+            levelData.putString("generatorName", Generator.getGenerator("DEFAULT").getSimpleName().toLowerCase());
         }
 
-        if (!this.levelData.contains("generatorOptions")) {
-            this.levelData.putString("generatorOptions", "");
+        if (!levelData.contains("generatorOptions")) {
+            levelData.putString("generatorOptions", "");
         }
 
         try {
@@ -73,6 +69,7 @@ public class LevelDB implements LevelProvider {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return levelData;
     }
 
     public static String getProviderName() {
@@ -92,7 +89,7 @@ public class LevelDB implements LevelProvider {
     }
 
     public static void generate(String path, String name, long seed, Class<? extends Generator> generator) throws IOException {
-        generate(path, name, seed, generator, new HashMap<>());
+        generate(path, name, seed, generator, new ConcurrentHashMap<>(8, 0.9f, 1));
     }
 
     public static void generate(String path, String name, long seed, Class<? extends Generator> generator, Map<String, String> options) throws IOException {
@@ -126,7 +123,7 @@ public class LevelDB implements LevelProvider {
                 .putLong("worldStartCount", ((long) Integer.MAX_VALUE) & 0xffffffffL);
 
         byte[] data = NBTIO.write(levelData, ByteOrder.LITTLE_ENDIAN);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        BinaryStream outputStream = new BinaryStream();
         outputStream.write(Binary.writeLInt(3));
         outputStream.write(Binary.writeLInt(data.length));
         outputStream.write(data);
@@ -141,7 +138,7 @@ public class LevelDB implements LevelProvider {
     public void saveLevelData() {
         try {
             byte[] data = NBTIO.write(levelData, ByteOrder.LITTLE_ENDIAN);
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            BinaryStream outputStream = new BinaryStream();
             outputStream.write(Binary.writeLInt(3));
             outputStream.write(Binary.writeLInt(data.length));
             outputStream.write(data);
@@ -214,68 +211,18 @@ public class LevelDB implements LevelProvider {
     }
 
     @Override
-    public void unloadChunks() {
-        for (Chunk chunk : new ArrayList<>(this.chunks.values())) {
-            this.unloadChunk(chunk.getX(), chunk.getZ(), false);
-        }
-        this.chunks = new HashMap<>();
-    }
-
-    @Override
-    public String getGenerator() {
-        return this.levelData.getString("generatorName");
-    }
-
-    @Override
-    public Map<String, Object> getGeneratorOptions() {
-        return new HashMap<String, Object>() {
-            {
-                put("preset", levelData.getString("generatorOptions"));
-            }
-        };
-    }
-
-    @Override
-    public Map<Long, Chunk> getLoadedChunks() {
-        return this.chunks;
-    }
-
-    @Override
-    public boolean isChunkLoaded(int X, int Z) {
-        return this.chunks.containsKey(Level.chunkHash(X, Z));
-    }
-
-    @Override
-    public void saveChunks() {
-        for (Chunk chunk : this.chunks.values()) {
-            this.saveChunk(chunk.getX(), chunk.getZ());
-        }
-    }
-
-    @Override
-    public boolean loadChunk(int chunkX, int chunkZ) {
-        return this.loadChunk(chunkX, chunkZ, false);
-    }
-
-    @Override
-    public boolean loadChunk(int chunkX, int chunkZ, boolean create) {
-        long index = Level.chunkHash(chunkX, chunkZ);
-        if (this.chunks.containsKey(index)) {
-            return true;
-        }
-
+    public BaseFullChunk loadChunk(long index, int chunkX, int chunkZ, boolean create) {
         this.level.timings.syncChunkLoadDataTimer.startTiming();
         Chunk chunk = this.readChunk(chunkX, chunkZ);
-        if (chunk == null && create) {
-            chunk = Chunk.getEmptyChunk(chunkX, chunkZ, this);
+        if (chunk == null) {
+            if (create) {
+                chunk = Chunk.getEmptyChunk(chunkX, chunkZ, this);
+            }
+        } else {
+            this.chunks.put(index, chunk);
         }
         this.level.timings.syncChunkLoadDataTimer.stopTiming();
-        if (chunk != null) {
-            this.chunks.put(index, chunk);
-            return true;
-        }
-
-        return false;
+        return chunk;
     }
 
     private Chunk readChunk(int chunkX, int chunkZ) {
@@ -306,65 +253,14 @@ public class LevelDB implements LevelProvider {
     }
 
     @Override
-    public boolean unloadChunk(int X, int Z) {
-        return this.unloadChunk(X, Z, true);
-    }
-
-    @Override
-    public boolean unloadChunk(int X, int Z, boolean safe) {
-        long index = Level.chunkHash(X, Z);
-        Chunk chunk = this.chunks.containsKey(index) ? this.chunks.get(index) : null;
-        if (chunk != null && chunk.unload(false, safe)) {
-            this.chunks.remove(index);
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
     public void saveChunk(int X, int Z) {
         if (this.isChunkLoaded(X, Z)) {
-            this.writeChunk(this.getChunk(X, Z));
-        }
-    }
-
-    @Override
-    public Chunk getChunk(int chunkX, int chunkZ) {
-        return this.getChunk(chunkX, chunkZ, false);
-    }
-
-    @Override
-    public Chunk getChunk(int chunkX, int chunkZ, boolean create) {
-        long index = Level.chunkHash(chunkX, chunkZ);
-        if (this.chunks.containsKey(index)) {
-            return this.chunks.get(index);
-        } else {
-            this.loadChunk(chunkX, chunkZ, create);
-            return this.chunks.containsKey(index) ? this.chunks.get(index) : null;
+            this.writeChunk((Chunk) this.getChunk(X, Z));
         }
     }
 
     public DB getDatabase() {
         return db;
-    }
-
-    @Override
-    public void setChunk(int chunkX, int chunkZ, FullChunk chunk) {
-        if (!(chunk instanceof Chunk)) {
-            throw new ChunkException("Invalid Chunk class");
-        }
-        chunk.setProvider(this);
-
-        chunk.setX(chunkX);
-        chunk.setZ(chunkZ);
-        long index = Level.chunkHash(chunkX, chunkZ);
-
-        if (this.chunks.containsKey(index) && !this.chunks.get(index).equals(chunk)) {
-            this.unloadChunk(chunkX, chunkZ, false);
-        }
-
-        this.chunks.put(index, (Chunk) chunk);
     }
 
     public static ChunkSection createChunkSection(int Y) {
@@ -387,7 +283,7 @@ public class LevelDB implements LevelProvider {
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         this.unloadChunks();
         try {
             this.db.close();
@@ -398,25 +294,6 @@ public class LevelDB implements LevelProvider {
     }
 
     @Override
-    public String getPath() {
-        return path;
-    }
-
-    public Server getServer() {
-        return this.level.getServer();
-    }
-
-    @Override
-    public Level getLevel() {
-        return level;
-    }
-
-    @Override
-    public String getName() {
-        return this.levelData.getString("LevelName");
-    }
-
-    @Override
     public boolean isRaining() {
         return this.levelData.getFloat("rainLevel") > 0;
     }
@@ -424,16 +301,6 @@ public class LevelDB implements LevelProvider {
     @Override
     public void setRaining(boolean raining) {
         this.levelData.putFloat("rainLevel", raining ? 1.0f : 0);
-    }
-
-    @Override
-    public int getRainTime() {
-        return this.levelData.getInt("rainTime");
-    }
-
-    @Override
-    public void setRainTime(int rainTime) {
-        this.levelData.putInt("rainTime", rainTime);
     }
 
     @Override
@@ -477,39 +344,7 @@ public class LevelDB implements LevelProvider {
     }
 
     @Override
-    public long getSeed() {
-        return this.levelData.getLong("RandomSeed");
-    }
-
-    @Override
-    public void setSeed(long value) {
-        this.levelData.putLong("RandomSeed", value);
-    }
-
-    @Override
-    public Vector3 getSpawn() {
-        return new Vector3(this.levelData.getInt("SpawnX"), this.levelData.getInt("SpawnY"), this.levelData.getInt("SpawnZ"));
-    }
-
-    @Override
-    public void setSpawn(Vector3 pos) {
-        this.levelData.putInt("SpawnX", (int) pos.x);
-        this.levelData.putInt("SpawnY", (int) pos.y);
-        this.levelData.putInt("SpawnZ", (int) pos.z);
-    }
-
-    @Override
     public void doGarbageCollection() {
 
-    }
-
-    public CompoundTag getLevelData() {
-        return levelData;
-    }
-
-    public void updateLevelName(String name) {
-        if (!this.getName().equals(name)) {
-            this.levelData.putString("LevelName", name);
-        }
     }
 }

@@ -14,6 +14,12 @@ public abstract class DataPacket extends Packet {
 
     public Integer seqNumber;
 
+    public DataPacket() {}
+
+    public DataPacket(int buffer) {
+        super(buffer);
+    }
+
     @Override
     public void encode() {
         super.encode();
@@ -37,8 +43,9 @@ public abstract class DataPacket extends Packet {
         super.decode();
         this.seqNumber = this.getLTriad();
 
+        byte[] buffer = getRawBuffer();
         while (!this.feof()) {
-            byte[] data = Binary.subBytes(this.buffer, this.offset);
+            byte[] data = Binary.subBytes(buffer, this.offset);
             EncapsulatedPacket packet = EncapsulatedPacket.fromBinary(data, false);
             this.offset += packet.getOffset();
             if (packet.buffer.length == 0) {

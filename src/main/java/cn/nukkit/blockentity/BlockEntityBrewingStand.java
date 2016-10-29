@@ -74,7 +74,7 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         if (!closed) {
             for (Player player : new HashSet<>(getInventory().getViewers())) {
                 player.removeWindow(getInventory());
@@ -95,7 +95,7 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
 
     @Override
     public boolean isBlockEntityValid() {
-        return getBlock().getId() == Block.BREWING_STAND_BLOCK;
+        return getTemporalBlock().getId() == Block.BREWING_STAND_BLOCK;
     }
 
     @Override
@@ -152,7 +152,7 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
     }
 
     @Override
-    public boolean onUpdate() {
+    public synchronized boolean onUpdate() {
         if (closed) {
             return false;
         }

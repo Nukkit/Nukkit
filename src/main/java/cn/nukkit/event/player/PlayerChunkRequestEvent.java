@@ -11,6 +11,11 @@ public class PlayerChunkRequestEvent extends PlayerEvent implements Cancellable 
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final int chunkX;
     private final int chunkZ;
 

@@ -30,6 +30,11 @@ public class PlayerKickEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     protected TextContainer quitMessage;
 
     protected final Reason reason;

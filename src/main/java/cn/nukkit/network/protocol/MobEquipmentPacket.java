@@ -19,6 +19,10 @@ public class MobEquipmentPacket extends DataPacket {
     public int slot;
     public int selectedSlot;
 
+    public MobEquipmentPacket() {
+        super(null);
+    }
+
     @Override
     public void decode() {
         this.eid = this.getLong();
@@ -29,6 +33,11 @@ public class MobEquipmentPacket extends DataPacket {
 
     @Override
     public void encode() {
+        if (this.item == null) {
+            setBuffer(new byte[13]);
+        } else {
+            setBuffer(new byte[18]);
+        }
         this.reset();
         this.putLong(this.eid);
         this.putSlot(this.item);

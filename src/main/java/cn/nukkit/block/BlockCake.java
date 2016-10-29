@@ -10,7 +10,7 @@ import cn.nukkit.utils.BlockColor;
 /**
  * @author Nukkit Project Team
  */
-public class BlockCake extends BlockTransparent {
+public class BlockCake extends BlockTransparentMeta {
 
     public BlockCake(int meta) {
         super(meta);

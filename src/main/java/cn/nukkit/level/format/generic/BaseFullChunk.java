@@ -1,6 +1,7 @@
 package cn.nukkit.level.format.generic;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
@@ -11,23 +12,23 @@ import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.NumberTag;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
 public abstract class BaseFullChunk implements FullChunk {
-    protected final Map<Long, Entity> entities = new HashMap<>();
+    protected final Map<Long, Entity> entities = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<Long, BlockEntity> tiles = new HashMap<>();
+    protected final Map<Long, BlockEntity> tiles = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Map<Integer, BlockEntity> tileList = new HashMap<>();
+    protected final Map<Integer, BlockEntity> tileList = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected int[] biomeColors;
 
@@ -45,15 +46,16 @@ public abstract class BaseFullChunk implements FullChunk {
 
     protected List<CompoundTag> NBTentities;
 
-    protected Map<Integer, Integer> extraData = new HashMap<>();
+    protected Map<Integer, Integer> extraData = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected LevelProvider provider;
     protected Class<? extends LevelProvider> providerClass;
 
-    protected int x;
-    protected int z;
+    private int x;
+    private int z;
+    private long hash;
 
-    protected boolean hasChanged = false;
+    protected LongAdder changes = new LongAdder();
 
     protected boolean isInit = false;
 
@@ -108,56 +110,65 @@ public abstract class BaseFullChunk implements FullChunk {
 
     public void initChunk() {
         if (this.getProvider() != null && !this.isInit) {
-            boolean changed = false;
-            if (this.NBTentities != null) {
+            if (this.NBTentities != null && !this.NBTentities.isEmpty()) {
                 this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer.startTiming();
                 for (CompoundTag nbt : NBTentities) {
                     if (!nbt.contains("id")) {
-                        this.setChanged();
+                        if (Server.getInstance().storeGeneratedChunks) {
+                            this.setChanged();
+                        }
                         continue;
                     }
                     ListTag pos = nbt.getList("Pos");
                     if ((((NumberTag) pos.get(0)).getData().intValue() >> 4) != this.x || ((((NumberTag) pos.get(2)).getData().intValue() >> 4) != this.z)) {
-                        changed = true;
+                        if (Server.getInstance().storeGeneratedChunks) {
+                            this.setChanged();
+                        }
                         continue;
                     }
                     Entity entity = Entity.createEntity(nbt.getString("id"), this, nbt);
                     if (entity != null) {
                         entity.spawnToAll();
                     } else {
-                        changed = true;
+                        if (Server.getInstance().storeGeneratedChunks) {
+                            this.setChanged();
+                        }
                         continue;
                     }
                 }
                 this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer.stopTiming();
+            }
 
+            if (this.NBTtiles != null && !this.NBTtiles.isEmpty()) {
                 this.getProvider().getLevel().timings.syncChunkLoadBlockEntitiesTimer.startTiming();
                 for (CompoundTag nbt : NBTtiles) {
                     if (nbt != null) {
                         if (!nbt.contains("id")) {
-                            changed = true;
+                            if (Server.getInstance().storeGeneratedChunks) {
+                                this.setChanged();
+                            }
                             continue;
                         }
                         if ((nbt.getInt("x") >> 4) != this.x || ((nbt.getInt("z") >> 4) != this.z)) {
-                            changed = true;
+                            if (Server.getInstance().storeGeneratedChunks) {
+                                this.setChanged();
+                            }
                             continue;
                         }
                         BlockEntity blockEntity = BlockEntity.createBlockEntity(nbt.getString("id"), this, nbt);
                         if (blockEntity == null) {
-                            changed = true;
+                            if (Server.getInstance().storeGeneratedChunks) {
+                                this.setChanged();
+                            }
                             continue;
                         }
                     }
                 }
 
                 this.getProvider().getLevel().timings.syncChunkLoadBlockEntitiesTimer.stopTiming();
-
-                this.NBTentities = null;
-                this.NBTtiles = null;
             }
-
-            this.setChanged(changed);
-
+            this.NBTentities = null;
+            this.NBTtiles = null;
             this.isInit = true;
         }
     }
@@ -174,10 +185,24 @@ public abstract class BaseFullChunk implements FullChunk {
 
     public void setX(int x) {
         this.x = x;
+        this.hash = Level.chunkHash(x, z);
     }
 
     public void setZ(int z) {
         this.z = z;
+        this.hash = Level.chunkHash(x, z);
+    }
+
+    @Override
+    public long getIndex() {
+        return hash;
+    }
+
+    @Override
+    public void setPosition(int x, int z) {
+        this.x = x;
+        this.z = z;
+        this.hash = Level.chunkHash(x, z);
     }
 
     @Override
@@ -197,7 +222,7 @@ public abstract class BaseFullChunk implements FullChunk {
 
     @Override
     public void setBiomeId(int x, int z, int biomeId) {
-        this.hasChanged = true;
+        this.changes.add(1);
         this.getBiomeColorArray()[(z << 4) + x] = (this.getBiomeColorArray()[(z << 4) + x] & 0xFFFFFF) | (biomeId << 24);
     }
 
@@ -209,7 +234,7 @@ public abstract class BaseFullChunk implements FullChunk {
 
     @Override
     public void setBiomeColor(int x, int z, int R, int G, int B) {
-        this.hasChanged = true;
+        this.changes.add(1);
         this.getBiomeColorArray()[(z << 4) + x] = (this.getBiomeColorArray()[(z << 4) + x] & 0xFF000000) | ((R & 0xFF) << 16) | ((G & 0xFF) << 8) | (B & 0XFF);
     }
 
@@ -299,7 +324,7 @@ public abstract class BaseFullChunk implements FullChunk {
     public void addEntity(Entity entity) {
         this.entities.put(entity.getId(), entity);
         if (!(entity instanceof Player) && this.isInit) {
-            this.hasChanged = true;
+            this.changes.add(1);
         }
     }
 
@@ -307,7 +332,7 @@ public abstract class BaseFullChunk implements FullChunk {
     public void removeEntity(Entity entity) {
         this.entities.remove(entity.getId());
         if (!(entity instanceof Player) && this.isInit) {
-            this.hasChanged = true;
+            this.changes.add(1);
         }
     }
 
@@ -320,7 +345,7 @@ public abstract class BaseFullChunk implements FullChunk {
         }
         this.tileList.put(index, blockEntity);
         if (this.isInit) {
-            this.hasChanged = true;
+            this.changes.add(1);
         }
     }
 
@@ -330,7 +355,7 @@ public abstract class BaseFullChunk implements FullChunk {
         int index = ((blockEntity.getFloorZ() & 0x0f) << 12) | ((blockEntity.getFloorX() & 0x0f) << 8) | (blockEntity.getFloorY() & 0xff);
         this.tileList.remove(index);
         if (this.isInit) {
-            this.hasChanged = true;
+            this.changes.add(1);
         }
     }
 
@@ -386,7 +411,8 @@ public abstract class BaseFullChunk implements FullChunk {
         if (level == null) {
             return true;
         }
-        if (save && this.hasChanged) {
+        long changed = this.resetChanged();
+        if (save && changed > 0) {
             level.saveChunk(this.getX(), this.getZ());
         }
         if (safe) {
@@ -452,7 +478,11 @@ public abstract class BaseFullChunk implements FullChunk {
 
     @Override
     public boolean hasChanged() {
-        return this.hasChanged;
+        return this.changes.longValue() > 0;
+    }
+
+    public long getChanges() {
+        return this.changes.sum();
     }
 
     @Override
@@ -462,7 +492,18 @@ public abstract class BaseFullChunk implements FullChunk {
 
     @Override
     public void setChanged(boolean changed) {
-        this.hasChanged = changed;
+        if (changed) {
+            this.changes.add(1);
+        } else {
+            this.changes.add(this.changes.sum());
+        }
+    }
+
+    @Override
+    public long resetChanged() {
+        long sum = this.changes.sum();
+        this.changes.add(-sum);
+        return sum;
     }
 
     @Override
@@ -483,6 +524,217 @@ public abstract class BaseFullChunk implements FullChunk {
     @Override
     public void setLightPopulated(boolean value) {
 
+    }
+
+
+    @Override
+    public int getBlockId(int x, int y, int z) {
+        return this.blocks[(x << 11) | (z << 7) | y] & 0xff;
+    }
+
+    @Override
+    public void setBlockId(int x, int y, int z, int id) {
+        this.blocks[(x << 11) | (z << 7) | y] = (byte) (id);
+        this.changes.add(1);
+    }
+
+    @Override
+    public int getBlockData(int x, int y, int z) {
+        int b = this.data[(x << 10) | (z << 6) | (y >> 1)] & 0xff;
+        if ((y & 1) == 0) {
+            return b & 0x0f;
+        } else {
+            return b >> 4;
+        }
+    }
+
+    @Override
+    public void setBlockData(int x, int y, int z, int data) {
+        int i = (x << 10) | (z << 6) | (y >> 1);
+        int old = this.data[i] & 0xff;
+        if ((y & 1) == 0) {
+            this.data[i] = (byte) ((old & 0xf0) | (data & 0x0f));
+        } else {
+            this.data[i] = (byte) (((data & 0x0f) << 4) | (old & 0x0f));
+        }
+        this.changes.add(1);
+    }
+
+    @Override
+    public int getFullBlock(int x, int y, int z) {
+        int i = (x << 11) | (z << 7) | y;
+        int block = this.blocks[i] & 0xff;
+        synchronized (this) {
+            int data = this.data[i >> 1] & 0xff;
+            if ((y & 1) == 0) {
+                return (block << 4) | (data & 0x0f);
+            } else {
+                return (block << 4) | (data >> 4);
+            }
+        }
+    }
+
+    @Override
+    public boolean setBlock(int x, int y, int z, int blockId) {
+        int i = (x << 11) | (z << 7) | y;
+        byte id = (byte) (blockId);
+        if (this.blocks[i] != id) {
+            this.blocks[i] = id;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Block getAndSetBlock(int x, int y, int z, Block block) {
+        int i = (x << 11) | (z << 7) | y;
+        int idPrevious = this.blocks[i] & 0xFF;
+        if (idPrevious != block.getId()) {
+            this.changes.add(1);
+            this.blocks[i] = (byte) block.getId();
+            if (Block.mightHaveMeta(block.getId())) {
+                i >>= 1;
+                int old = this.data[i] & 0xff;
+                if ((y & 1) == 0) {
+                    int previousData = (old & 0xf0);
+                    this.data[i] = (byte) (previousData | (block.getDamage() & 0x0f));
+                    return Block.fullList[(idPrevious << 4) + (previousData >> 4)];
+                } else {
+                    int previousData = (old & 0x0f);
+                    this.data[i] = (byte) (((block.getDamage() & 0x0f) << 4) | previousData);
+                    return Block.fullList[(idPrevious << 4) + previousData];
+                }
+            }
+            return Block.fullList[idPrevious << 4];
+        } else if (Block.mightHaveMeta(idPrevious)) {
+            i >>= 1;
+            int old = this.data[i] & 0xff;
+            if ((y & 1) == 0) {
+                old = old & 0xf0;
+                int previousData = old >> 4;
+                if (previousData != block.getDamage()) {
+                    this.data[i] = (byte) ((old) | (block.getDamage() & 0x0f));
+                    this.changes.add(1);
+                }
+                return Block.fullList[(idPrevious << 4) + previousData];
+            } else {
+                int previousData = (old & 0x0f);
+                if (previousData != block.getDamage()) {
+                    this.changes.add(1);
+                    this.data[i] = (byte) (((block.getDamage() & 0x0f) << 4) | previousData);
+                }
+                return Block.fullList[(idPrevious << 4) + previousData];
+            }
+        }
+        return block;
+    }
+
+    @Override
+    public boolean setBlock(int x, int y, int z, int blockId, int meta) {
+        int i = (x << 11) | (z << 7) | y;
+        boolean changed = false;
+        int idPrevious = this.blocks[i] & 0xFF;
+        if (idPrevious != blockId) {
+            this.blocks[i] = (byte) blockId;
+            this.changes.add(1);
+            if (Block.mightHaveMeta(blockId)) {
+                i >>= 1;
+                if ((y & 1) == 0) {
+                    this.data[i] = (byte) ((this.data[i] & 0xf0) | (meta & 0x0f));
+                } else {
+                    this.data[i] = (byte) (((meta & 0x0f) << 4) | (this.data[i] & 0x0f));
+                }
+            }
+        } else if (Block.mightHaveMeta(idPrevious)) {
+            i >>= 1;
+            int old = this.data[i] & 0xff;
+            if ((y & 1) == 0) {
+                int newData = ((old & 0xf0) | (meta & 0x0f));
+                if (newData != old) {
+                    this.data[i] = (byte) newData;
+                    this.changes.add(1);
+                }
+            } else {
+                int newData = (((meta & 0x0f) << 4) | (old & 0x0f));
+                if (newData != old) {
+                    this.data[i] = (byte) newData;
+                    this.changes.add(1);
+                }
+            }
+        }
+        return changed;
+    }
+
+    @Override
+    public int getBlockSkyLight(int x, int y, int z) {
+        int sl = this.skyLight[(x << 10) | (z << 6) | (y >> 1)] & 0xff;
+        if ((y & 1) == 0) {
+            return sl & 0x0f;
+        } else {
+            return sl >> 4;
+        }
+    }
+
+    @Override
+    public void setBlockSkyLight(int x, int y, int z, int level) {
+        int i = (x << 10) | (z << 6) | (y >> 1);
+        int old = this.skyLight[i] & 0xff;
+        if ((y & 1) == 0) {
+            this.skyLight[i] = (byte) ((old & 0xf0) | (level & 0x0f));
+        } else {
+            this.skyLight[i] = (byte) (((level & 0x0f) << 4) | (old & 0x0f));
+        }
+        this.changes.add(1);
+    }
+
+    @Override
+    public int getBlockLight(int x, int y, int z) {
+        int b = this.blockLight[(x << 10) | (z << 6) | (y >> 1)] & 0xff;
+        if ((y & 1) == 0) {
+            return b & 0x0f;
+        } else {
+            return b >> 4;
+        }
+    }
+
+    @Override
+    public void setBlockLight(int x, int y, int z, int level) {
+        int i = (x << 10) | (z << 6) | (y >> 1);
+        int old = this.blockLight[i] & 0xff;
+        if ((y & 1) == 0) {
+            this.blockLight[i] = (byte) ((old & 0xf0) | (level & 0x0f));
+        } else {
+            this.blockLight[i] = (byte) (((level & 0x0f) << 4) | (old & 0x0f));
+        }
+        this.changes.add(1);
+    }
+
+    @Override
+    public byte[] getBlockIdColumn(int x, int z) {
+        byte[] b = new byte[128];
+        System.arraycopy(this.blocks, (x << 11) + (z << 7), b, 0, 128);
+        return b;
+    }
+
+    @Override
+    public byte[] getBlockDataColumn(int x, int z) {
+        byte[] b = new byte[64];
+        System.arraycopy(this.data, (x << 10) + (z << 6), b, 0, 64);
+        return b;
+    }
+
+    @Override
+    public byte[] getBlockSkyLightColumn(int x, int z) {
+        byte[] b = new byte[64];
+        System.arraycopy(this.skyLight, (x << 10) + (z << 6), b, 0, 64);
+        return b;
+    }
+
+    @Override
+    public byte[] getBlockLightColumn(int x, int z) {
+        byte[] b = new byte[64];
+        System.arraycopy(this.blockLight, (x << 10) + (z << 6), b, 0, 64);
+        return b;
     }
 
 }

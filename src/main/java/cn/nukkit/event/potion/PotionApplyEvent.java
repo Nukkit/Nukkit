@@ -17,6 +17,11 @@ public class PotionApplyEvent extends PotionEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final Entity entity;
 
     public PotionApplyEvent(Potion potion, Entity entity) {

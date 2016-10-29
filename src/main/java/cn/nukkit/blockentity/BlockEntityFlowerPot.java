@@ -29,7 +29,7 @@ public class BlockEntityFlowerPot extends BlockEntitySpawnable {
 
     @Override
     public boolean isBlockEntityValid() {
-        int blockID = getBlock().getId();
+        int blockID = this.level.getBlockIdAt((int) x, (int) y, (int) z);
         return blockID == Block.FLOWER_POT_BLOCK;
     }
 

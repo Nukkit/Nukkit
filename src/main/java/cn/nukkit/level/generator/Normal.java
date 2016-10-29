@@ -10,7 +10,6 @@ import cn.nukkit.level.generator.object.ore.OreType;
 import cn.nukkit.level.generator.populator.*;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
-
 import java.util.*;
 
 /**
@@ -57,7 +56,7 @@ public class Normal extends Generator {
     private final int basegroundHeight = 3;
 
     public Normal() {
-        this(new HashMap<>());
+        //Nothing here. Just used for future update.
     }
 
     public Normal(Map<String, Object> options) {

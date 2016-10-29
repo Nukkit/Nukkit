@@ -14,6 +14,10 @@ public class RemoveEntityPacket extends DataPacket {
         return NETWORK_ID;
     }
 
+    public RemoveEntityPacket() {
+        super(9);
+    }
+
     @Override
     public void decode() {
 

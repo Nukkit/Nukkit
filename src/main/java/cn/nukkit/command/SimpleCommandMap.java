@@ -10,25 +10,24 @@ import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Utils;
-
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
 public class SimpleCommandMap implements CommandMap {
-    protected final Map<String, Command> knownCommands = new HashMap<>();
+    protected final Map<String, Command> knownCommands = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private final Server server;
 
     public SimpleCommandMap(Server server) {
         this.server = server;
-        this.setDefaultCommands();
     }
 
-    private void setDefaultCommands() {
+    public void setDefaultCommands() {
         this.register("nukkit", new VersionCommand("version"));
         this.register("nukkit", new PluginsCommand("plugins"));
         this.register("nukkit", new SeedCommand("seed"));
@@ -146,8 +145,8 @@ public class SimpleCommandMap implements CommandMap {
         this.knownCommands.put(fallbackPrefix + ":" + label, command);
 
         //if you're registering a command alias that is already registered, then return false
-        boolean alreadyRegistered = this.knownCommands.containsKey(label);
         Command existingCommand = this.knownCommands.get(label);
+        boolean alreadyRegistered = existingCommand != null;
         boolean existingCommandIsNotVanilla = alreadyRegistered && !(existingCommand instanceof VanillaCommand);
         //basically, if we're an alias and it's already registered, or we're a vanilla command, then we can't override it
         if ((command instanceof VanillaCommand || isAlias) && alreadyRegistered && existingCommandIsNotVanilla) {

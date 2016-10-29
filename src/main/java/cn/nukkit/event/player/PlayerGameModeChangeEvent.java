@@ -12,6 +12,11 @@ public class PlayerGameModeChangeEvent extends PlayerEvent implements Cancellabl
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     protected final int gamemode;
 
     protected AdventureSettings newAdventureSettings;

@@ -10,6 +10,10 @@ public class AdventureSettingsPacket extends DataPacket {
     public int userPermission;
     public int globalPermission;
 
+    public AdventureSettingsPacket() {
+        super(13);
+    }
+
     @Override
     public void decode() {
 

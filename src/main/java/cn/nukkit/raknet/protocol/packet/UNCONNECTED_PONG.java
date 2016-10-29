@@ -10,6 +10,10 @@ import cn.nukkit.raknet.protocol.Packet;
 public class UNCONNECTED_PONG extends Packet {
     public static final byte ID = (byte) 0x1c;
 
+    public UNCONNECTED_PONG() {
+        super(null);
+    }
+
     @Override
     public byte getID() {
         return ID;
@@ -21,6 +25,7 @@ public class UNCONNECTED_PONG extends Packet {
 
     @Override
     public void encode() {
+        setBuffer(new byte[35 + serverName.length()]);
         super.encode();
         this.putLong(this.pingID);
         this.putLong(this.serverID);

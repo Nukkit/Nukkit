@@ -17,6 +17,11 @@ public class PlayerEatFoodEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public PlayerEatFoodEvent(Player player, Food food) {
         this.player = player;
         this.food = food;

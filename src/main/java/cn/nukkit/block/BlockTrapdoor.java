@@ -12,7 +12,7 @@ import cn.nukkit.utils.BlockColor;
 /**
  * Created by Pub4Game on 26.12.2015.
  */
-public class BlockTrapdoor extends BlockTransparent {
+public class BlockTrapdoor extends BlockTransparentMeta {
 
     public BlockTrapdoor() {
         this(0);

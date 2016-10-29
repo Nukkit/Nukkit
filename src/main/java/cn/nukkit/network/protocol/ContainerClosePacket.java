@@ -14,6 +14,10 @@ public class ContainerClosePacket extends DataPacket {
 
     public int windowid;
 
+    public ContainerClosePacket() {
+        super(2);
+    }
+
     @Override
     public void decode() {
         this.windowid = this.getByte();

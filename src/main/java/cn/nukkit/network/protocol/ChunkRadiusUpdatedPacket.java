@@ -10,6 +10,10 @@ public class ChunkRadiusUpdatedPacket extends DataPacket {
 
     public int radius;
 
+    public ChunkRadiusUpdatedPacket() {
+        super(5);
+    }
+
     @Override
     public void decode() {
     }

@@ -10,8 +10,8 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.network.protocol.ContainerSetContentPacket;
 import cn.nukkit.network.protocol.ContainerSetSlotPacket;
-
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -23,15 +23,15 @@ public abstract class BaseInventory implements Inventory {
 
     protected int maxStackSize = Inventory.MAX_STACK;
 
-    protected int size;
+    protected volatile int size;
 
     protected final String name;
 
     protected final String title;
 
-    protected final Map<Integer, Item> slots = new HashMap<>();
+    protected final Map<Integer, Item> slots = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    protected final Set<Player> viewers = new HashSet<>();
+    protected final Map<Player, Object> viewers = new ConcurrentHashMap<>();
 
     protected InventoryHolder holder;
 
@@ -97,7 +97,8 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public Item getItem(int index) {
-        return this.slots.containsKey(index) ? this.slots.get(index).clone() : new ItemBlock(new BlockAir(), null, 0);
+        Item item = this.slots.get(index);
+        return item == null ? new ItemBlock(new BlockAir(), null, 0) : item.clone();
     }
 
     @Override
@@ -139,7 +140,7 @@ public abstract class BaseInventory implements Inventory {
     }
 
     @Override
-    public boolean setItem(int index, Item item) {
+    public synchronized boolean setItem(int index, Item item) {
         item = item.clone();
         if (index < 0 || index >= this.size) {
             return false;
@@ -188,20 +189,23 @@ public abstract class BaseInventory implements Inventory {
         Map<Integer, Item> slots = new HashMap<>();
         boolean checkDamage = item.hasMeta();
         boolean checkTag = item.getCompoundTag() != null;
-        for (Map.Entry<Integer, Item> entry : this.getContents().entrySet()) {
+        Iterator<Map.Entry<Integer, Item>> iter = this.getContents().entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Integer, Item> entry = iter.next();
             if (item.equals(entry.getValue(), checkDamage, checkTag)) {
                 slots.put(entry.getKey(), entry.getValue());
             }
         }
-
         return slots;
     }
 
     @Override
-    public void remove(Item item) {
+    public synchronized void remove(Item item) {
         boolean checkDamage = item.hasMeta();
         boolean checkTag = item.getCompoundTag() != null;
-        for (Map.Entry<Integer, Item> entry : this.getContents().entrySet()) {
+        Iterator<Map.Entry<Integer, Item>> iter = this.getContents().entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Integer, Item> entry = iter.next();
             if (item.equals(entry.getValue(), checkDamage, checkTag)) {
                 this.clear(entry.getKey());
             }
@@ -258,7 +262,7 @@ public abstract class BaseInventory implements Inventory {
     }
 
     @Override
-    public Item[] addItem(Item... slots) {
+    public synchronized Item[] addItem(Item... slots) {
         List<Item> itemSlots = new ArrayList<>();
         for (Item slot : slots) {
             if (slot.getId() != 0 && slot.getCount() > 0) {
@@ -314,7 +318,7 @@ public abstract class BaseInventory implements Inventory {
     }
 
     @Override
-    public Item[] removeItem(Item... slots) {
+    public synchronized Item[] removeItem(Item... slots) {
         List<Item> itemSlots = new ArrayList<>();
         for (Item slot : slots) {
             if (slot.getId() != 0 && slot.getCount() > 0) {
@@ -350,7 +354,7 @@ public abstract class BaseInventory implements Inventory {
     }
 
     @Override
-    public boolean clear(int index) {
+    public synchronized boolean clear(int index) {
         if (this.slots.containsKey(index)) {
             Item item = new ItemBlock(new BlockAir(), null, 0);
             Item old = this.slots.get(index);
@@ -378,7 +382,7 @@ public abstract class BaseInventory implements Inventory {
     }
 
     @Override
-    public void clearAll() {
+    public synchronized void clearAll() {
         for (Integer index : this.getContents().keySet()) {
             this.clear(index);
         }
@@ -386,7 +390,7 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public Set<Player> getViewers() {
-        return viewers;
+        return viewers.keySet();
     }
 
     @Override
@@ -412,13 +416,13 @@ public abstract class BaseInventory implements Inventory {
     }
 
     @Override
-    public void close(Player who) {
+    public synchronized void close(Player who) {
         this.onClose(who);
     }
 
     @Override
     public void onOpen(Player who) {
-        this.viewers.add(who);
+        this.viewers.put(who, who);
     }
 
     @Override

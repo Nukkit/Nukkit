@@ -1,6 +1,5 @@
 package cn.nukkit.event.block;
 
-import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.Cancellable;
@@ -12,6 +11,11 @@ public class BlockIgniteEvent extends BlockEvent implements Cancellable {
 
     public static HandlerList getHandlers() {
         return handlers;
+    }
+
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
     }
 
     private final Block source;

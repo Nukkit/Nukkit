@@ -59,7 +59,7 @@ public class RCON {
         }
     }
 
-    public void close() {
+    public synchronized void close() {
         try {
             synchronized (serverThread) {
                 serverThread.close();

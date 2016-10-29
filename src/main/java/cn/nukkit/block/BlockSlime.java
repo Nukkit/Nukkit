@@ -8,11 +8,6 @@ import cn.nukkit.item.Item;
 public class BlockSlime extends BlockSolid {
 
     public BlockSlime() {
-        this(0);
-    }
-
-    public BlockSlime(int meta) {
-        super(meta);
     }
 
     @Override

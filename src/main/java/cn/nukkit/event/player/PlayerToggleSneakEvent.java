@@ -11,6 +11,11 @@ public class PlayerToggleSneakEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     protected final boolean isSneaking;
 
     public PlayerToggleSneakEvent(Player player, boolean isSneaking) {

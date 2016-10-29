@@ -282,13 +282,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static boolean[] solid = null;
     public static double[] hardness = null;
     public static boolean[] transparent = null;
-    public AxisAlignedBB boundingBox = null;
-    protected int meta = 0;
-    protected int powerLevel = 0;
-    protected boolean powerSource = false;
 
-    protected Block(Integer meta) {
-        this.meta = (meta != null ? meta : 0);
+    protected Block() {
     }
 
     @SuppressWarnings("unchecked")
@@ -499,10 +494,18 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
                     Block block;
                     try {
                         block = (Block) c.newInstance();
-                        Constructor constructor = c.getDeclaredConstructor(int.class);
-                        constructor.setAccessible(true);
-                        for (int data = 0; data < 16; ++data) {
-                            fullList[(id << 4) | data] = (Block) constructor.newInstance(data);
+                        try {
+                            Constructor constructor = c.getDeclaredConstructor(int.class);
+                            constructor.setAccessible(true);
+                            for (int data = 0; data < 16; ++data) {
+                                fullList[(id << 4) | data] = (Block) constructor.newInstance(data);
+                            }
+                        } catch (NoSuchMethodException ignore) {
+                            Constructor constructor = c.getDeclaredConstructor();
+                            constructor.setAccessible(true);
+                            for (int data = 0; data < 16; ++data) {
+                                fullList[(id << 4) | data] = (Block) constructor.newInstance();
+                            }
                         }
                     } catch (Exception e) {
                         Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
@@ -547,20 +550,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
     @SuppressWarnings("unchecked")
     public static Block get(int id, Integer meta, Position pos) {
-        Block block;
-        try {
-            Class c = list[id];
-            if (c != null) {
-                Constructor constructor = c.getDeclaredConstructor(int.class);
-                constructor.setAccessible(true);
-                block = (Block) constructor.newInstance(meta);
-            } else {
-                block = new BlockUnknown(id, meta);
-            }
-        } catch (Exception e) {
-            block = new BlockUnknown(id, meta);
-        }
-
+        Block block = fullList[(id << 4) | (meta == null ? 0 : meta)].clone();
         if (pos != null) {
             block.x = pos.x;
             block.y = pos.y;
@@ -568,6 +558,77 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             block.level = pos.level;
         }
         return block;
+    }
+
+    public static final boolean mightHaveMeta(int id) {
+        switch (id) {
+            case AIR:
+            case GRASS:
+            case COBBLESTONE:
+            case BEDROCK:
+            case STILL_WATER:
+            case STILL_LAVA:
+            case GRAVEL:
+            case GOLD_ORE:
+            case IRON_ORE:
+            case COAL_ORE:
+            case SPONGE:
+            case GLASS:
+            case LAPIS_ORE:
+            case LAPIS_BLOCK:
+            case COBWEB:
+            case BUSH:
+            case DANDELION:
+            case BROWN_MUSHROOM:
+            case RED_MUSHROOM:
+            case GOLD_BLOCK:
+            case IRON_BLOCK:
+            case BRICKS:
+            case TNT:
+            case BOOKSHELF:
+            case OBSIDIAN:
+            case FIRE:
+            case MONSTER_SPAWNER:
+            case DIAMOND_ORE:
+            case DIAMOND_BLOCK:
+            case CRAFTING_TABLE:
+            case FARMLAND:
+            case REDSTONE_ORE:
+            case GLOWING_REDSTONE_ORE:
+            case ICE:
+            case SNOW_BLOCK:
+            case CLAY_BLOCK:
+            case FENCE:
+            case NETHERRACK:
+            case SOUL_SAND:
+            case GLOWSTONE:
+            case INVISIBLE_BEDROCK:
+            case IRON_BAR:
+            case GLASS_PANE:
+            case MELON_BLOCK:
+            case MYCELIUM:
+            case WATER_LILY:
+            case NETHER_BRICKS:
+            case NETHER_BRICK_FENCE:
+            case CAULDRON_BLOCK:
+            case END_STONE:
+            case REDSTONE_LAMP:
+            case LIT_REDSTONE_LAMP:
+            case EMERALD_ORE:
+            case EMERALD_BLOCK:
+            case REDSTONE_BLOCK:
+            case QUARTZ_ORE:
+            case SLIME_BLOCK:
+            case HARDENED_CLAY:
+            case COAL_BLOCK:
+            case PACKED_ICE:
+            case GRASS_PATH:
+            case PODZOL:
+            case GLOWING_OBSIDIAN:
+                return false;
+            default:
+                return true;
+        }
     }
 
     public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz) {
@@ -670,16 +731,20 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
     public abstract int getId();
 
+    public final int getFullId() {
+        return (getId() << 4) + getDamage();
+    }
+
     public void addVelocityToEntity(Entity entity, Vector3 vector) {
 
     }
 
-    public final int getDamage() {
-        return this.meta;
+    public int getDamage() {
+        return 0;
     }
 
-    public final void setDamage(Integer meta) {
-        this.meta = (meta == null ? 0 : meta & 0x0f);
+    public void setDamage(Integer meta) {
+        // Do nothing
     }
 
     final public void position(Position v) {
@@ -687,7 +752,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         this.y = (int) v.y;
         this.z = (int) v.z;
         this.level = v.level;
-        this.boundingBox = null;
     }
 
     public int[][] getDrops(Item item) {
@@ -770,10 +834,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     public AxisAlignedBB getBoundingBox() {
-        if (this.boundingBox == null) {
-            this.boundingBox = this.recalculateBoundingBox();
-        }
-        return this.boundingBox;
+        return this.recalculateBoundingBox();
     }
 
     protected AxisAlignedBB recalculateBoundingBox() {
@@ -903,11 +964,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     public int getPowerLevel() {
-        return powerLevel;
+        return 0;
     }
 
     public void setPowerLevel(int powerLevel) {
-        this.powerLevel = powerLevel;
+        // Do nothing
     }
 
     public int getPowerLevel(int side) {
@@ -933,15 +994,15 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     public boolean isPowered() {
-        return this.powerLevel > 0;
+        return getPowerLevel() > 0;
     }
 
     public boolean isPowerSource() {
-        return this.powerSource;
+        return false;
     }
 
     public void setPowerSource(boolean isSource) {
-        this.powerSource = isSource;
+        // Do nothing
     }
 
     public String getLocationHash() {

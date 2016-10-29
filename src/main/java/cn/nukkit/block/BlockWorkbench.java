@@ -11,11 +11,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockWorkbench extends BlockSolid {
     public BlockWorkbench() {
-        this(0);
-    }
-
-    public BlockWorkbench(int meta) {
-        super(meta);
     }
 
     @Override

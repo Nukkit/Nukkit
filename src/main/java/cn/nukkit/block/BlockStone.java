@@ -7,7 +7,7 @@ import cn.nukkit.item.ItemTool;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class BlockStone extends BlockSolid {
+public class BlockStone extends BlockSolidMeta {
     public static final int NORMAL = 0;
     public static final int GRANITE = 1;
     public static final int POLISHED_GRANITE = 2;

@@ -9,6 +9,14 @@ import cn.nukkit.raknet.protocol.Packet;
 public class PONG_DataPacket extends Packet {
     public static final byte ID = (byte) 0x03;
 
+    public PONG_DataPacket() {
+        super(9);
+    }
+
+    public PONG_DataPacket(byte[] buffer) {
+        super(buffer);
+    }
+
     @Override
     public byte getID() {
         return ID;

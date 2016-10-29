@@ -13,7 +13,6 @@ public class BlockMobSpawner extends BlockSolid {
     }
 
     public BlockMobSpawner(int meta) {
-        super(0);
     }
 
     @Override

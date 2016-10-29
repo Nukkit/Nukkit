@@ -98,8 +98,7 @@ public class EntityFallingBlock extends Entity {
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
-
+    public synchronized boolean onUpdate(int currentTick) {
         if (closed) {
             return false;
         }
@@ -117,7 +116,6 @@ public class EntityFallingBlock extends Entity {
 
         if (isAlive()) {
             Vector3 pos = new Vector3(x - 0.5, y, z - 0.5).round();
-
             if (ticksLived == 1) {
                 Block block = level.getBlock(pos);
                 if (block.getId() != blockId) {

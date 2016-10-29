@@ -12,6 +12,10 @@ public class UpdateAttributesPacket extends DataPacket {
     public Attribute[] entries;
     public long entityId;
 
+    public UpdateAttributesPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -22,13 +26,19 @@ public class UpdateAttributesPacket extends DataPacket {
     }
 
     public void encode() {
-        this.reset();
-
-        this.putLong(this.entityId);
-
         if (this.entries == null) {
+            setBuffer(new byte[11]);
+            this.reset();
+            this.putLong(this.entityId);
             this.putShort(0);
         } else {
+            int size = 11;
+            for (Attribute entry : this.entries) {
+                size += 14 + entry.getName().length();
+            }
+            setBuffer(new byte[size]);
+            this.reset();
+            this.putLong(this.entityId);
             this.putShort(this.entries.length);
             for (Attribute entry : this.entries) {
                 this.putFloat(entry.getMinValue());

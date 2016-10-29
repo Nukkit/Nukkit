@@ -7,7 +7,7 @@ import cn.nukkit.utils.BlockColor;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class BlockPlanks extends BlockSolid {
+public class BlockPlanks extends BlockSolidMeta {
     public static final int OAK = 0;
     public static final int SPRUCE = 1;
     public static final int BIRCH = 2;

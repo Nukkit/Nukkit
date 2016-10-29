@@ -10,6 +10,15 @@ import cn.nukkit.raknet.protocol.Packet;
 public class DATA_PACKET_4 extends DataPacket {
     public static final byte ID = (byte) 0x84;
 
+    public DATA_PACKET_4() {
+        super(64);
+    }
+
+    @Override
+    public int getBlockSize() {
+        return 512;
+    }
+
     @Override
     public byte getID() {
         return ID;

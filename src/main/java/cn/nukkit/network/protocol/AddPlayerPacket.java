@@ -13,6 +13,10 @@ import java.util.UUID;
 public class AddPlayerPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.ADD_PLAYER_PACKET;
 
+    public AddPlayerPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -39,6 +43,9 @@ public class AddPlayerPacket extends DataPacket {
 
     @Override
     public void encode() {
+        int slot = this.item == null ? 2 : 7;
+        byte[] meta = Binary.writeMetadata(this.metadata);
+        setBuffer(new byte[63 + username.length() + slot + meta.length]);
         this.reset();
         this.putUUID(this.uuid);
         this.putString(this.username);
@@ -54,6 +61,6 @@ public class AddPlayerPacket extends DataPacket {
         this.putFloat(this.pitch);
         this.putSlot(this.item);
 
-        this.put(Binary.writeMetadata(this.metadata));
+        this.put(meta);
     }
 }

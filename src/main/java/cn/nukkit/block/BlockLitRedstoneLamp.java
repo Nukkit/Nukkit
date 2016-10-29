@@ -8,12 +8,19 @@ import cn.nukkit.level.Level;
  */
 public class BlockLitRedstoneLamp extends BlockRedstoneLamp {
 
-    public BlockLitRedstoneLamp(int meta) {
-        super(meta);
+    private byte powerLevel;
+
+    @Override
+    public int getPowerLevel() {
+        return powerLevel;
+    }
+
+    @Override
+    public void setPowerLevel(int powerLevel) {
+        this.powerLevel = (byte) powerLevel;
     }
 
     public BlockLitRedstoneLamp() {
-        this(0);
     }
 
     @Override

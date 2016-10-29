@@ -12,6 +12,10 @@ import java.net.InetSocketAddress;
 public class OPEN_CONNECTION_REQUEST_2 extends Packet {
     public static final byte ID = (byte) 0x07;
 
+    public OPEN_CONNECTION_REQUEST_2() {
+        super(34);
+    }
+
     @Override
     public byte getID() {
         return ID;
@@ -48,6 +52,5 @@ public class OPEN_CONNECTION_REQUEST_2 extends Packet {
         public Packet create() {
             return new OPEN_CONNECTION_REQUEST_2();
         }
-
     }
 }

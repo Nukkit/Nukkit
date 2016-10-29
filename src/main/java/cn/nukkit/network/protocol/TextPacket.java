@@ -7,6 +7,10 @@ public class TextPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.TEXT_PACKET;
 
+    public TextPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -49,24 +53,38 @@ public class TextPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.reset();
-        this.putByte(this.type);
         switch (this.type) {
             case TYPE_POPUP:
             case TYPE_CHAT:
+                setBuffer(new byte[6 + source.length() + message.length()]);
+                this.reset();
+                this.putByte(this.type);
                 this.putString(this.source);
+                this.putString(this.message);
+                break;
             case TYPE_RAW:
             case TYPE_TIP:
             case TYPE_SYSTEM:
+                setBuffer(new byte[4 + message.length()]);
+                this.reset();
+                this.putByte(this.type);
                 this.putString(this.message);
                 break;
 
             case TYPE_TRANSLATION:
+                int size = 6 + message.length();
+                for (String parameter : this.parameters) {
+                    size += 2 + parameter.length();
+                }
+                setBuffer(new byte[size]);
+                this.reset();
+                this.putByte(this.type);
                 this.putString(this.message);
                 this.putByte((byte) this.parameters.length);
                 for (String parameter : this.parameters) {
                     this.putString(parameter);
                 }
+                break;
         }
     }
 
