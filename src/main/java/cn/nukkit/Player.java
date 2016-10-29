@@ -3,6 +3,8 @@ package cn.nukkit;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockDoor;
+import cn.nukkit.block.BlockSlab;
+import cn.nukkit.block.BlockStairs;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityItemFrame;
 import cn.nukkit.blockentity.BlockEntitySign;
@@ -1203,6 +1205,34 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
+    protected boolean shouldMakeCheckMoreLenient(Block b) {
+        Block check = null;
+        if (b instanceof BlockStairs || b instanceof BlockSlab) {
+            return true;
+        }
+        check = b.getSide(Vector3.SIDE_DOWN);
+        if (check instanceof BlockStairs || check instanceof BlockSlab) {
+            return true;
+        }
+        check = b.getSide(Vector3.SIDE_EAST);
+        if (check instanceof BlockStairs || check instanceof BlockSlab) {
+            return true;
+        }
+        check = b.getSide(Vector3.SIDE_NORTH);
+        if (check instanceof BlockStairs || check instanceof BlockSlab) {
+            return true;
+        }
+        check = b.getSide(Vector3.SIDE_SOUTH);
+        if (check instanceof BlockStairs || check instanceof BlockSlab) {
+            return true;
+        }
+        check = b.getSide(Vector3.SIDE_WEST);
+        if (check instanceof BlockStairs || check instanceof BlockSlab) {
+            return true;
+        }
+        return false;
+    }
+    
     protected void processMovement(int tickDiff) {
         if (!this.isAlive() || !this.spawned || this.newPosition == null || this.teleportPosition != null) {
             return;
@@ -1251,7 +1281,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (this.checkMovement && !server.getAllowFlight() && this.isSurvival()) {
                 if (!this.isSleeping()) {
-                    if (diff > 0.125) {
+                    double max = 0.125;
+                    if (shouldMakeCheckMoreLenient(this.getLevelBlock())) {
+                        if (this.isSprinting()) {
+                            max = 0.32;
+                        } else {
+                            max = 0.19;
+                        }
+                    }
+                    if (diff > max) {
                         PlayerInvalidMoveEvent ev;
                         this.getServer().getPluginManager().callEvent(ev = new PlayerInvalidMoveEvent(this, true));
                         if (!ev.isCancelled()) {
