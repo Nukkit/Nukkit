@@ -126,7 +126,8 @@ public class Level implements ChunkManager, Metadatable {
     private final Map<Long, Long> unloadQueue = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private final AtomicLong time = new AtomicLong();
-    public final AtomicBoolean stopTime = new AtomicBoolean();
+//    public final AtomicBoolean stopTime = new AtomicBoolean();
+    public volatile boolean stopTime;
 
     private final String folderName;
 
@@ -607,13 +608,13 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void checkTime() {
-        if (!this.stopTime.get()) {
+        if (!this.stopTime) {
             this.time.addAndGet(tickRate.get());
         }
     }
 
     public void sendTime(Player player) {
-        if (this.stopTime.get()) {
+        if (this.stopTime) {
             SetTimePacket pk0 = new SetTimePacket();
             pk0.time = (int) this.time.get();
             pk0.started = true;
@@ -622,13 +623,13 @@ public class Level implements ChunkManager, Metadatable {
 
         SetTimePacket pk = new SetTimePacket();
         pk.time = (int) this.time.get();
-        pk.started = !this.stopTime.get();
+        pk.started = !this.stopTime;
 
         player.dataPacket(pk);
     }
 
     public void sendTime() {
-        if (this.stopTime.get()) {
+        if (this.stopTime) {
             SetTimePacket pk0 = new SetTimePacket();
             pk0.time = (int) this.time.get();
             pk0.started = true;
@@ -637,7 +638,7 @@ public class Level implements ChunkManager, Metadatable {
 
         SetTimePacket pk = new SetTimePacket();
         pk.time = (int) this.time.get();
-        pk.started = !this.stopTime.get();
+        pk.started = !this.stopTime;
 
         Server.broadcastPacket(this.players.values().stream().toArray(Player[]::new), pk);
     }
@@ -2757,13 +2758,18 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void stopTime() {
-        this.stopTime.set(true);
-        this.sendTime();
+        synchronized (time) {
+            this.stopTime = true;
+            this.sendTime();
+        }
     }
 
     public void startTime() {
-        this.stopTime.set(false);
-        this.sendTime();
+        synchronized (time) {
+            this.stopTime = false;
+            ;
+            this.sendTime();
+        }
     }
 
     @Override

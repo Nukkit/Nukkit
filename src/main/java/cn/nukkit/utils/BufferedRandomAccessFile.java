@@ -424,6 +424,17 @@ public class BufferedRandomAccessFile extends RandomAccessFile
         this.dirty_ = true;
     }
 
+    public void write(long pos, byte[] data) throws IOException {
+        if (pos + data.length < lo_ || pos >= hi_) {
+            super.seek(pos);
+            super.write(data);
+            super.seek(curr_);
+        } else {
+            seek(pos);
+            write(data);
+        }
+    }
+
     @Override
     public void write(byte[] b) throws IOException
     {

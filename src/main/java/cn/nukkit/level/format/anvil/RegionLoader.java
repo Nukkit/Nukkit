@@ -123,8 +123,7 @@ public class RegionLoader extends BaseRegionLoader {
             table[2] = (int) (System.currentTimeMillis() / 1000d);
 
             this.locationTable.put(index, table);
-            this.randomAccessFile.seek(table[0] << 12);
-            this.randomAccessFile.write(data);
+            this.randomAccessFile.write(table[0] << 12, data);
         }
 
         if (indexChanged) {
@@ -273,8 +272,7 @@ public class RegionLoader extends BaseRegionLoader {
                     this.randomAccessFile.seek(sector << 12);
                     byte[] old = new byte[4096];
                     this.randomAccessFile.readFully(old);
-                    this.randomAccessFile.seek((sector - shift) << 12);
-                    this.randomAccessFile.write(old);
+                    this.randomAccessFile.write((sector - shift) << 12, old);
                 }
                 Integer[] v = this.locationTable.get(index);
                 v[0] -= shift;
