@@ -5,6 +5,7 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.command.data.CommandParameterOptional;
 import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Location;
@@ -21,8 +22,8 @@ public class TeleportCommand extends VanillaCommand {
         super(name, "%nukkit.command.tp.description", "%commands.tp.usage");
         this.setPermission("nukkit.command.teleport");
         this.commandParameters = new CommandParameter[]{
-                new CommandParameter("target player", CommandParameter.ARG_TYPE_TARGET, false),
-                new CommandParameter("args ...", true)
+                new CommandParameter("target player", CommandParameter.ARG_TYPE_TARGET, CommandParameterOptional.FALSE),
+                new CommandParameter("args ...", CommandParameterOptional.TRUE)
         };
     }
 

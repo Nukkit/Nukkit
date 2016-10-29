@@ -3,6 +3,7 @@ package cn.nukkit.command.defaults;
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.command.data.CommandParameterOptional;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.utils.TextFormat;
 
@@ -16,7 +17,7 @@ public class MeCommand extends VanillaCommand {
         super(name, "%nukkit.command.me.description", "%commands.me.usage");
         this.setPermission("nukkit.command.me");
         this.commandParameters = new CommandParameter[] {
-                new CommandParameter("action ...", CommandParameter.ARG_TYPE_STRING_ENUM, false)
+                new CommandParameter("action ...", CommandParameter.ARG_TYPE_STRING_ENUM, CommandParameterOptional.FALSE)
         };
     }
 

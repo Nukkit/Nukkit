@@ -3,6 +3,7 @@ package cn.nukkit.command.defaults;
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.command.data.CommandParameterOptional;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.utils.TextFormat;
 
@@ -18,7 +19,7 @@ public class TellCommand extends VanillaCommand {
         super(name, "%nukkit.command.tell.description", "%commands.message.usage", new String[]{"w", "msg"});
         this.setPermission("nukkit.command.tell");
         this.commandParameters = new CommandParameter[]{
-                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
+                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, CommandParameterOptional.FALSE),
                 new CommandParameter("message")
         };
     }
