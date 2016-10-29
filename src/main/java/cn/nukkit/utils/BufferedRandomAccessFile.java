@@ -207,6 +207,17 @@ public class BufferedRandomAccessFile extends RandomAccessFile
         return cnt;
     }
 
+    public void writeInt(long pos, int value) throws IOException {
+        if (pos >= this.hi_ || pos < this.lo_) {
+            super.seek(pos);
+            super.writeInt(value);
+            super.seek(curr_);
+        } else {
+            seek(pos);
+            writeInt(value);
+        }
+    }
+
     /*
      * This method positions <code>this.curr</code> at position <code>pos</code>.
      * If <code>pos</code> does not fall in the current buffer, it flushes the

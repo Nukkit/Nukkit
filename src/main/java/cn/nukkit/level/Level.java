@@ -2522,7 +2522,8 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isChunkInUse(long hash) {
-        return this.chunkLoaders.containsKey(hash) && !this.chunkLoaders.get(hash).isEmpty();
+        Map<Integer, ChunkLoader> loaderMap = this.chunkLoaders.get(hash);
+        return loaderMap != null && !loaderMap.isEmpty();
     }
 
     public void loadRadius(int rad) {

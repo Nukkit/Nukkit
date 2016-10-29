@@ -40,7 +40,7 @@ public class BinaryStream extends OutputStream{
     public BinaryStream(byte[] buffer, int offset) {
         this.buffer = buffer;
         this.offset = offset;
-        this.count = buffer.length;
+        this.count = buffer != null ? buffer.length : 0;
     }
 
     public int getBlockSize() {

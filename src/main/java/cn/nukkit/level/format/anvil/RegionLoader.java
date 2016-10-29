@@ -289,11 +289,9 @@ public class RegionLoader extends BaseRegionLoader {
     @Override
     protected void writeLocationIndex(int index) throws IOException {
         synchronized (randomAccessFile) {
-            Integer[] table = this.locationTable.get(index);
-            this.randomAccessFile.seek(index << 2);
-            this.randomAccessFile.writeInt((table[0] << 8) | table[1]);
-            this.randomAccessFile.seek(4096 + (index << 2));
-            this.randomAccessFile.writeInt(table[2]);
+            Integer[] array = this.locationTable.get(index);
+            this.randomAccessFile.writeInt(index << 2, (array[0] << 8) | array[1]);
+            this.randomAccessFile.writeInt(4096 + (index << 2), array[2]);
         }
     }
 
@@ -301,7 +299,7 @@ public class RegionLoader extends BaseRegionLoader {
     protected void createBlank() throws IOException {
         synchronized (randomAccessFile) {
             this.randomAccessFile.seek(0);
-            this.randomAccessFile.setLength(0);
+            this.randomAccessFile.setLength(8192);
             this.lastSector = 1;
             int time = (int) (System.currentTimeMillis() / 1000d);
             for (int i = 0; i < 1024; ++i) {

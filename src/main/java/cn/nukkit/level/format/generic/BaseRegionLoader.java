@@ -5,7 +5,6 @@ import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.utils.BufferedRandomAccessFile;
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,7 +23,7 @@ abstract public class BaseRegionLoader {
     protected int z;
     protected String filePath;
     protected File file;
-    protected RandomAccessFile randomAccessFile;
+    protected BufferedRandomAccessFile randomAccessFile;
     protected int lastSector;
     protected LevelProvider levelProvider;
     protected final Map<Integer, Integer[]> locationTable = new ConcurrentHashMap<>(8, 0.9f, 1);
