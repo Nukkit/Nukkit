@@ -12,6 +12,11 @@ public class PlayerMoveEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private Location from;
     private Location to;
 

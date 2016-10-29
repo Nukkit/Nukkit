@@ -23,17 +23,13 @@ public class MethodEventExecutor implements EventExecutor {
     @Override
     public void execute(Listener listener, Event event) throws EventException {
         try {
-            Class<Event>[] params = (Class<Event>[]) method.getParameterTypes();
-            for (Class<Event> param : params) {
-                if (param.isAssignableFrom(event.getClass())) {
-                    method.invoke(listener, event);
-                    break;
-                }
-            }
+            method.invoke(listener, event);
         } catch (InvocationTargetException ex) {
             throw new EventException(ex.getCause());
         } catch (ClassCastException ex) {
-            // We are going to ignore ClassCastException because EntityDamageEvent can't be cast to EntityDamageByEntityEvent
+            // We shouldn't ignore it, it's a valid error.
+            // If the method shouldn't be called, don't register it instead of registering it, calling it and catching the exception
+            throw new EventException(ex.getCause());
         } catch (Throwable t) {
             throw new EventException(t);
         }

@@ -561,11 +561,12 @@ public class PluginManager {
 
     public void callEvent(Event event) {
         try {
-            for (RegisteredListener registration : getEventListeners(event.getClass()).getRegisteredListeners()) {
+            HandlerList handler = event.getHandlerList();
+            RegisteredListener[] listeners = handler.getRegisteredListeners();
+            for (RegisteredListener registration : listeners) {
                 if (!registration.getPlugin().isEnabled()) {
                     continue;
                 }
-
                 try {
                     registration.callEvent(event);
                 } catch (Exception e) {

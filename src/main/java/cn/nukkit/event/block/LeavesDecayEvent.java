@@ -16,6 +16,11 @@ public class LeavesDecayEvent extends BlockEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public LeavesDecayEvent(Block block) {
         super(block);
     }

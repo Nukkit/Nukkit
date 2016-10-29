@@ -22,6 +22,11 @@ public class PluginEvent extends Event {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public Plugin getPlugin() {
         return plugin;
     }

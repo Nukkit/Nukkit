@@ -32,4 +32,9 @@ public class DataPacketReceiveEvent extends ServerEvent implements Cancellable {
     public static HandlerList getHandlers() {
         return handlers;
     }
+
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
 }

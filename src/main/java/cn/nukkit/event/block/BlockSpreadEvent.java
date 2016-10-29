@@ -16,6 +16,11 @@ public class BlockSpreadEvent extends BlockFormEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final Block source;
 
     public BlockSpreadEvent(Block block, Block source, Block newState) {

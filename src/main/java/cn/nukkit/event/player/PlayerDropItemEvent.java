@@ -12,6 +12,11 @@ public class PlayerDropItemEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final Item drop;
 
     public PlayerDropItemEvent(Player player, Item drop) {

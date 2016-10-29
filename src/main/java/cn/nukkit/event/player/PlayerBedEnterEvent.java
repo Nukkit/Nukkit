@@ -12,6 +12,11 @@ public class PlayerBedEnterEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final Block bed;
 
     public PlayerBedEnterEvent(Player player, Block bed) {

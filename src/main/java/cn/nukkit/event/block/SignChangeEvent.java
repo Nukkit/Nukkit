@@ -16,6 +16,11 @@ public class SignChangeEvent extends BlockEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final Player player;
 
     private String[] lines = new String[4];

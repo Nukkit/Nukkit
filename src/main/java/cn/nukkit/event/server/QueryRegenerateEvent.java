@@ -24,6 +24,11 @@ public class QueryRegenerateEvent extends ServerEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private static final String GAME_ID = "MINECRAFTPE";
 
     private int timeout;

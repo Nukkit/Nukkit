@@ -1,6 +1,8 @@
 package cn.nukkit.event;
 
 import cn.nukkit.utils.EventException;
+import cn.nukkit.utils.Utils;
+import java.lang.reflect.Method;
 
 /**
  * 描述服务器中可能发生的事情的类。<br>
@@ -46,6 +48,30 @@ public abstract class Event {
             throw new EventException("Event is not Cancellable");
         }
         isCancelled = value;
+    }
+
+    public HandlerList getHandlerList() throws IllegalAccessException {
+        try {
+            Method method = getRegistrationMethod(this.getClass());
+            method.setAccessible(true);
+            return (HandlerList) method.invoke(null);
+        } catch (Exception e) {
+            throw new IllegalAccessException(Utils.getExceptionMessage(e));
+        }
+    }
+
+    private Method getRegistrationMethod(Class<? extends Event> clazz) throws IllegalAccessException {
+        try {
+            return clazz.getDeclaredMethod("getHandlers");
+        } catch (NoSuchMethodException e) {
+            if (clazz.getSuperclass() != null
+                    && !clazz.getSuperclass().equals(Event.class)
+                    && Event.class.isAssignableFrom(clazz.getSuperclass())) {
+                return getRegistrationMethod(clazz.getSuperclass().asSubclass(Event.class));
+            } else {
+                throw new IllegalAccessException("Unable to find handler list for event " + clazz.getName() + ". Static getHandlers method required!");
+            }
+        }
     }
 
 
