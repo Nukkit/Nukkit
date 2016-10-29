@@ -40,7 +40,7 @@ public class BinaryStream extends OutputStream{
     public BinaryStream(byte[] buffer, int offset) {
         this.buffer = buffer;
         this.offset = offset;
-        this.count = buffer != null ? buffer.length : 0;
+        this.count = 0;
     }
 
     public int getBlockSize() {
@@ -60,7 +60,6 @@ public class BinaryStream extends OutputStream{
         this.offset = 0;
         this.count = 0;
         this.buffer = buffer;
-        this.count = buffer == null ? -1 : buffer.length;
     }
 
     public final void setBuffer(byte[] buffer, int offset) {
@@ -168,10 +167,10 @@ public class BinaryStream extends OutputStream{
 
     public final byte[] get(int len) {
         if (len < 0) {
-            this.offset = this.count - 1;
+            this.offset = buffer.length - 1;
             return new byte[0];
         }
-        len = Math.min(len, this.getCount() - this.offset);
+        len = Math.min(len, buffer.length - this.offset);
         this.offset += len;
         return Arrays.copyOfRange(this.buffer, this.offset - len, this.offset);
     }
@@ -195,7 +194,8 @@ public class BinaryStream extends OutputStream{
                     System.arraycopy(buffer, 0, buf2, 0, offset);
                     buffer = buf2;
                 }
-                addBuffer();
+                buffers.addLast(buffer);
+                count += buffer.length;
             }
             buffer = b;
             offset = b.length;
