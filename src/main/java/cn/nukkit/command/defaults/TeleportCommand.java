@@ -21,8 +21,7 @@ public class TeleportCommand extends VanillaCommand {
         super(name, "%nukkit.command.tp.description", "%commands.tp.usage");
         this.setPermission("nukkit.command.teleport");
         this.commandParameters = new CommandParameter[]{
-                new CommandParameter("target player", CommandParameter.ARG_TYPE_STRING, false),
-                new CommandParameter("args ...", true)
+                new CommandParameter("args ...", false)
         };
     }
 

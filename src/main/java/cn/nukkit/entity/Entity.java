@@ -1679,7 +1679,7 @@ public abstract class Entity extends Location implements Metadatable {
     public void setDataFlag(int propertyId, int id, boolean value) {
         if (this.getDataFlag(propertyId, id) != value) {
             if (propertyId == EntityHuman.DATA_PLAYER_FLAGS) {
-                int flags = this.getDataPropertyByte(propertyId);
+                byte flags = (byte)this.getDataPropertyByte(propertyId);
                 flags ^= 1 << id;
                 this.setDataProperty(new ByteEntityData(propertyId, flags));
             } else {
