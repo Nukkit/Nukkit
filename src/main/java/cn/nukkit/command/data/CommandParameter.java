@@ -12,33 +12,22 @@ public class CommandParameter {
     public final static String ARG_TYPE_RAW_TEXT = "rawtext";
     public final static String ARG_TYPE_INT = "int";
 
-    private String name;
-    private String type;
-    private CommandParameterOptional optional;
+    public String name;
+    public String type;
+    public boolean optional;
 
-    public CommandParameter(String name, String type, CommandParameterOptional optional) {
+    public CommandParameter(String name, String type, boolean optional) {
         this.name = name;
         this.type = type;
         this.optional = optional;
     }
 
-    public CommandParameter(String name, CommandParameterOptional optional) {
+    public CommandParameter(String name, boolean optional) {
         this(name, ARG_TYPE_RAW_TEXT, optional);
     }
 
     public CommandParameter(String name) {
-        this(name, CommandParameterOptional.FALSE);
+        this(name, false);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public CommandParameterOptional getOptional() {
-        return optional;
-    }
 }
