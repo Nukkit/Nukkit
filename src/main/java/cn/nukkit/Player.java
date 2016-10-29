@@ -2754,7 +2754,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             if (arg.getClass() == int.class || arg instanceof String) commandText += " " + arg;
                         }
                     }
-                    this.server.dispatchCommand(this, commandText);
+                    PlayerCommandPreprocessEvent playerCommandPreprocessEvent = new PlayerCommandPreprocessEvent(this, "/" + commandText);
+                    if (playerCommandPreprocessEvent.isCancelled()) {
+                        break;
+                    }
+
+                    Timings.playerCommandTimer.startTiming();
+                    this.server.dispatchCommand(playerCommandPreprocessEvent.getPlayer(), playerCommandPreprocessEvent.getMessage().substring(1));
+                    Timings.playerCommandTimer.stopTiming();
                     break;
                 case ProtocolInfo.TEXT_PACKET:
                     if (!this.spawned || !this.isAlive()) {
