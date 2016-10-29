@@ -1031,7 +1031,6 @@ public abstract class Entity extends Location implements Metadatable, Runnable {
                         return;
                     }
                 }
-                this.level.setBlock(down, new BlockDirt(), false, true);
             }
         }
     }
