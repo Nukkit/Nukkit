@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
-import cn.nukkit.command.data.CommandParameterOptional;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.TranslationContainer;
@@ -19,9 +18,9 @@ public class EnchantCommand extends VanillaCommand {
         super(name, "%nukkit.command.enchant.description", "%commands.enchant.usage");
         this.setPermission("nukkit.command.enchant");
         this.commandParameters = new CommandParameter[]{
-                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, CommandParameterOptional.FALSE),
-                new CommandParameter("enchantment ID", CommandParameter.ARG_TYPE_INT, CommandParameterOptional.FALSE),
-                new CommandParameter("level", CommandParameter.ARG_TYPE_INT, CommandParameterOptional.FALSE),
+                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
+                new CommandParameter("enchantment ID", CommandParameter.ARG_TYPE_INT, false),
+                new CommandParameter("level", CommandParameter.ARG_TYPE_INT, true),
         };
     }
 

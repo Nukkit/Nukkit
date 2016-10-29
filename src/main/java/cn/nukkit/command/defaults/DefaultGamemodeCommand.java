@@ -3,7 +3,6 @@ package cn.nukkit.command.defaults;
 import cn.nukkit.Server;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
-import cn.nukkit.command.data.CommandParameterOptional;
 import cn.nukkit.lang.TranslationContainer;
 
 /**
@@ -16,7 +15,7 @@ public class DefaultGamemodeCommand extends VanillaCommand {
         super(name, "%nukkit.command.defaultgamemode.description", "%commands.defaultgamemode.usage");
         this.setPermission("nukkit.command.defaultgamemode");
         this.commandParameters = new CommandParameter[]{
-                new CommandParameter("mode", CommandParameter.ARG_TYPE_INT, CommandParameterOptional.TRUE)
+                new CommandParameter("mode", CommandParameter.ARG_TYPE_INT, false)
         };
     }
 
