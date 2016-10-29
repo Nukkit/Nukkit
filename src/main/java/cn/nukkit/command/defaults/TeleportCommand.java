@@ -1,5 +1,6 @@
 package cn.nukkit.command.defaults;
 
+
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
@@ -11,6 +12,7 @@ import cn.nukkit.level.Location;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.utils.TextFormat;
 
+
 /**
  * Created on 2015/11/12 by Pub4Game and milkice.
  * Package cn.nukkit.command.defaults in project Nukkit .
@@ -20,8 +22,8 @@ public class TeleportCommand extends VanillaCommand {
         super(name, "%nukkit.command.tp.description", "%commands.tp.usage");
         this.setPermission("nukkit.command.teleport");
         this.commandParameters = new CommandParameter[]{
-                new CommandParameter("target player", CommandParameter.ARG_TYPE_STRING, CommandParameterOptional.FALSE),
-                new CommandParameter("args ...", CommandParameterOptional.TRUE)
+                new CommandParameter("target player", CommandParameter.ARG_TYPE_STRING, false),
+                new CommandParameter("args ...", true)
         };
     }
 

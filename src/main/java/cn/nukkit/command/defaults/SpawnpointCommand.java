@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
-import cn.nukkit.command.data.CommandParameterOptional;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
@@ -21,9 +20,9 @@ public class SpawnpointCommand extends VanillaCommand {
         super(name, "%nukkit.command.spawnpoint.description", "%commands.spawnpoint.usage");
         this.setPermission("nukkit.command.spawnpoint");
         this.commandParameters = new CommandParameter[]{
-                new CommandParameter("x", CommandParameter.ARG_TYPE_BLOCK_POS, CommandParameterOptional.TRUE),
-                new CommandParameter("y", CommandParameter.ARG_TYPE_BLOCK_POS, CommandParameterOptional.TRUE),
-                new CommandParameter("z", CommandParameter.ARG_TYPE_BLOCK_POS, CommandParameterOptional.TRUE)
+                new CommandParameter("x", CommandParameter.ARG_TYPE_BLOCK_POS, true),
+                new CommandParameter("y", CommandParameter.ARG_TYPE_BLOCK_POS, true),
+                new CommandParameter("z", CommandParameter.ARG_TYPE_BLOCK_POS, true)
         };
     }
 
