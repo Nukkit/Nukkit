@@ -75,7 +75,7 @@ public class CraftingDataPacket extends DataPacket {
     }
 
     private static int writeFurnaceRecipe(FurnaceRecipe recipe, BinaryStream stream) {
-        if (recipe.getInput().getDamage() != 0) { //Data recipe
+        if (!recipe.getInput().hasMeta()) { //Data recipe
             stream.putVarInt(recipe.getInput().getId());
             stream.putVarInt(recipe.getInput().getDamage());
             stream.putSlot(recipe.getResult());

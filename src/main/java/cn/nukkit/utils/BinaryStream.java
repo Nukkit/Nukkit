@@ -278,7 +278,7 @@ public class BinaryStream {
         }
 
         this.putSignedVarInt(item.getId());
-        int auxValue = (item.getDamage() << 8) | item.getCount();
+        int auxValue = ((item.hasMeta() ? item.getDamage() : -1) << 8) | item.getCount();
         this.putSignedVarInt(auxValue);
         byte[] nbt = item.getCompoundTag();
         this.putLShort(nbt.length);

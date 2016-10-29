@@ -74,8 +74,9 @@ public abstract class Entity extends Location implements Metadatable {
 	 * 29 (block coords) bed position */
     public static final int DATA_LEAD_HOLDER_EID = 38; //long
     public static final int DATA_SCALE = 39; //float
-    public static final int DATA_BUTTON_TEXT = 40; //string
+    public static final int DATA_INTERACTIVE_TAG = 40; //string (button text)
 	/* 41 (long) */
+    public static final int DATA_URL_TAG = 43; //string
     public static final int DATA_MAX_AIR = 44; //short
     public static final int DATA_MARK_VARIANT = 45; //int
 	/* 46 (byte)
@@ -91,10 +92,6 @@ public abstract class Entity extends Location implements Metadatable {
 	 * 57 (byte)
 	 * 58 (float)
 	 * 59 (float) */
-
-	/*
- 	const DATA_SILENT = 4;
- 	*/
 
     public static final int DATA_FLAG_ONFIRE = 0;
     public static final int DATA_FLAG_SNEAKING = 1;
@@ -149,7 +146,6 @@ public abstract class Entity extends Location implements Metadatable {
             .putShort(DATA_AIR, 400)
             .putShort(DATA_MAX_AIR, 400)
             .putString(DATA_NAMETAG, "")
-            //.putByte(DATA_SILENT, 0)
             .putLong(DATA_LEAD_HOLDER_EID, -1)
             .putFloat(DATA_SCALE, 1f);
 
