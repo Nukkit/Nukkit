@@ -20,9 +20,7 @@ public class SetWorldSpawnCommand extends VanillaCommand {
         super(name, "%nukkit.command.setworldspawn.description", "%commands.setworldspawn.usage");
         this.setPermission("nukkit.command.setworldspawn");
         this.commandParameters = new CommandParameter[]{
-                new CommandParameter("x", CommandParameter.ARG_TYPE_BLOCK_POS, CommandParameterOptional.TRUE),
-                new CommandParameter("y", CommandParameter.ARG_TYPE_BLOCK_POS, CommandParameterOptional.TRUE),
-                new CommandParameter("z", CommandParameter.ARG_TYPE_BLOCK_POS, CommandParameterOptional.TRUE),
+                new CommandParameter("pos", CommandParameter.ARG_TYPE_BLOCK_POS, CommandParameterOptional.TRUE)
         };
     }
 

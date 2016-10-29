@@ -9,8 +9,10 @@ import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
-import cn.nukkit.command.data.CommandArgs;
 import cn.nukkit.command.data.CommandDataVersions;
+import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.command.data.args.CommandArg;
+import cn.nukkit.command.data.args.CommandArgBlockVector;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
@@ -70,10 +72,9 @@ import cn.nukkit.potion.Potion;
 import cn.nukkit.timings.Timing;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.Binary;
-import cn.nukkit.utils.SimpleConfig;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
-import com.google.gson.Gson;
+import com.google.gson.*;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -2749,9 +2750,30 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.craftingType = 0;
                     CommandStepPacket commandStepPacket = (CommandStepPacket) packet;
                     String commandText = commandStepPacket.command;
-                    if(commandStepPacket.args != null && commandStepPacket.args.size() > 0){
-                        for (Object arg: commandStepPacket.args.values()){ //command ordering will be an issue
-                            if (arg.getClass() == int.class || arg instanceof String) commandText += " " + arg;
+                    Command command = this.getServer().getCommandMap().getCommand(commandText);
+                    if (command != null) {
+                        if(commandStepPacket.args != null && commandStepPacket.args.size() > 0) {
+                            int index = 0;
+                            CommandParameter[] pars = command.getCommandParameters();
+                            for (JsonElement arg : commandStepPacket.args.values()) {
+                                if (index < pars.length) {
+                                    CommandParameter par = pars[index];
+                                    switch (par.getType()) {
+                                        case CommandParameter.ARG_TYPE_TARGET:
+                                            CommandArg rules = new Gson().fromJson(arg, CommandArg.class);
+                                            commandText += " " + rules.getRules()[0].getValue();
+                                            break;
+                                        case CommandParameter.ARG_TYPE_BLOCK_POS:
+                                            CommandArgBlockVector bv = new Gson().fromJson(arg, CommandArgBlockVector.class);
+                                            commandText += " " + bv.getX() + " " + bv.getY() + " " + bv.getZ();
+                                            break;
+                                        default:
+                                            commandText += " " + arg.toString();
+                                            break;
+                                    }
+                                }
+                                index++;
+                            }
                         }
                     }
                     PlayerCommandPreprocessEvent playerCommandPreprocessEvent = new PlayerCommandPreprocessEvent(this, "/" + commandText);
