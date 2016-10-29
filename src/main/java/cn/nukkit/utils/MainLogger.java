@@ -201,36 +201,41 @@ public class MainLogger extends ThreadedLogger {
         replacements.put(TextFormat.RESET, Ansi.ansi().a(Ansi.Attribute.RESET).toString());
         this.shutdown = false;
         do {
-            if (logBuffer.isEmpty()) {
-                try {
-                    synchronized (this) {
-                        wait(25000); // Wait for next message
-                    }
-                    Thread.sleep(5); // Buffer for 5ms to reduce back and forth between disk
-                } catch (InterruptedException ignore) {}
-            }
-            try {
-                OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(logFile, true), StandardCharsets.UTF_8);
-                Date now = new Date();
-                String dateFormat = new SimpleDateFormat("Y-M-d").format(now);
-                int count = 0;
-                while (!logBuffer.isEmpty()) {
-                    String message = logBuffer.poll();
-                    if (message != null) {
-                        writer.write(dateFormat);
-                        writer.write(TextFormat.clean(message));
-                        writer.write("\r\n");
-                        CommandReader.getInstance().stashLine();
-                        System.out.println(colorize(TextFormat.AQUA + dateFormat + TextFormat.RESET + " " + message + TextFormat.RESET));
-                        CommandReader.getInstance().unstashLine();
-                    }
-                }
-                writer.flush();
-                writer.close();
-            } catch (Exception e) {
-                this.logException(e);
-            }
+            flushBuffer(logFile);
         } while (!this.shutdown);
+        flushBuffer(logFile);
+    }
+
+    private void flushBuffer(File logFile) {
+        if (logBuffer.isEmpty()) {
+            try {
+                synchronized (this) {
+                    wait(25000); // Wait for next message
+                }
+                Thread.sleep(5); // Buffer for 5ms to reduce back and forth between disk
+            } catch (InterruptedException ignore) {}
+        }
+        try {
+            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile, true), StandardCharsets.UTF_8), 1024);
+            Date now = new Date();
+            String dateFormat = new SimpleDateFormat("Y-M-d").format(now);
+            int count = 0;
+            while (!logBuffer.isEmpty()) {
+                String message = logBuffer.poll();
+                if (message != null) {
+                    writer.write(dateFormat);
+                    writer.write(TextFormat.clean(message));
+                    writer.write("\r\n");
+                    CommandReader.getInstance().stashLine();
+                    System.out.println(colorize(TextFormat.AQUA + dateFormat + TextFormat.RESET + " " + message + TextFormat.RESET));
+                    CommandReader.getInstance().unstashLine();
+                }
+            }
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            this.logException(e);
+        }
     }
 
     @Override

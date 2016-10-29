@@ -68,7 +68,6 @@ import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.*;
-
 import java.io.*;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
@@ -459,6 +458,7 @@ public class Server {
                         Generator.addGenerator(Flat.class, "flat", Generator.TYPE_FLAT);
                         Generator.addGenerator(Normal.class, "normal", Generator.TYPE_INFINITE);
                         Generator.addGenerator(Normal.class, "default", Generator.TYPE_INFINITE);
+                        Generator.addGenerator(Normal.class, "nether", Generator.TYPE_NETHER);
                         //todo: add old generator and hell generator
 
                         for (String name : ((Map<String, Object>) getConfig("worlds", new HashMap<>())).keySet()) {

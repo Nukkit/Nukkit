@@ -33,6 +33,7 @@ public class ItemGlassBottle extends Item {
                 player.getInventory().setItemInHand(potion);
             } else if (this.count > 1) {
                 this.count--;
+                player.getInventory().setItemInHand(this);
                 Item[] left = player.getInventory().addItem(potion);
                 for (Item current : left) {
                     player.getLevel().dropItem(player.add(0, 1.3, 0), current, player.getDirectionVector().multiply(0.4));

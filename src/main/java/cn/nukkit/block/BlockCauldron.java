@@ -146,6 +146,7 @@ public class BlockCauldron extends BlockSolidMeta {
                     player.getInventory().setItemInHand(new ItemBlock(new BlockAir()));
                 } else if (item.getCount() > 1) {
                     item.setCount(item.getCount() - 1);
+                    player.getInventory().setItemInHand(item);
 
                     Item bottle = new ItemGlassBottle();
                     Item[] left = player.getInventory().addItem(bottle);
@@ -169,6 +170,7 @@ public class BlockCauldron extends BlockSolidMeta {
                     player.getInventory().setItemInHand(new ItemPotion());
                 } else if (item.getCount() > 1) {
                     item.setCount(item.getCount() - 1);
+                    player.getInventory().setItemInHand(item);
 
                     Item potion = new ItemPotion();
                     Item[] left = player.getInventory().addItem(potion);

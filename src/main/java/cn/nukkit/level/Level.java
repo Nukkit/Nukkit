@@ -215,7 +215,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private LongAdder levelCurrentTick = new LongAdder();
 
-    private final int dimension = DIMENSION_OVERWORLD;
+    private int dimension;
 
     public Level(Server server, String name, String path, Class<? extends LevelProvider> provider) {
         this.blockStates = Block.fullList;
@@ -361,6 +361,7 @@ public class Level implements ChunkManager, Metadatable {
             throw new RuntimeException(e);
         }
         this.generatorInstance.init(this, new NukkitRandom(this.getSeed()));
+        this.dimension = this.generatorInstance.getDimension();
 
         this.registerGenerator();
     }
