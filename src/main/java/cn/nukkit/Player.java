@@ -533,7 +533,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.usedChunks.clear();
             SetTimePacket pk = new SetTimePacket();
             pk.time = this.level.getTime();
-            pk.started = !this.level.stopTime.get();
+            pk.started = !this.level.stopTime;
             this.dataPacket(pk);
             return true;
         }
@@ -684,10 +684,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.inventory.sendContents(this);
         this.inventory.sendArmorContents(this);
 
-        if (level.stopTime.get()) {
+        if (level.stopTime) {
             SetTimePacket setTimePacket = new SetTimePacket();
             setTimePacket.time = this.level.getTime();
-            setTimePacket.started = !this.level.stopTime.get();
+            setTimePacket.started = !this.level.stopTime;
             this.dataPacket(setTimePacket);
         }
 
@@ -1692,7 +1692,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         SetTimePacket setTimePacket = new SetTimePacket();
         setTimePacket.time = this.level.getTime();
-        setTimePacket.started = !this.level.stopTime.get();
+        setTimePacket.started = !this.level.stopTime;
         this.dataPacket(setTimePacket);
 
         SetSpawnPositionPacket setSpawnPositionPacket = new SetSpawnPositionPacket();
