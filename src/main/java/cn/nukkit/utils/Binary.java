@@ -396,6 +396,10 @@ public class Binary {
         return temp.xor(raw.and(BigInteger.ONE.shiftLeft(63))).longValue();
     }
 
+    public static byte[] writeVarLong(long v) {
+        return writeVarLong(BigInteger.valueOf(v));
+    }
+
     public static byte[] writeVarLong(BigInteger v){
         return writeUnsignedVarLong(v.shiftLeft(1).xor(v.shiftRight(63)));
     }
@@ -414,10 +418,18 @@ public class Binary {
         return value.or(BigInteger.valueOf(b << i));
     }
 
+    public static byte[] writeUnsignedVarLong(long v) {
+        return writeUnsignedVarLong(BigInteger.valueOf(v));
+    }
+
     public static byte[] writeUnsignedVarLong(BigInteger v){
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        while(!v.and(BigInteger.valueOf(0xFFFFFFFFFFFFFF80L)).equals(BigInteger.ZERO)){
-            buf.write((byte) (v.and(BigInteger.valueOf(0x7f)).longValue() | 0x80));
+        v = v.and(new BigInteger("ffffffffffffffff", 16));
+        BigInteger b1 = BigInteger.valueOf(0xFFFFFFFFFFFFFF80L);
+        BigInteger b2 = BigInteger.valueOf(0x7f);
+        BigInteger b3 = BigInteger.valueOf(0x80);
+        while (!v.and(b1).equals(BigInteger.ZERO)) {
+            buf.write(v.and(b2).or(b3).byteValue());
             v = v.shiftRight(7);
         }
         buf.write(v.byteValue());
