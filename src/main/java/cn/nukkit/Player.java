@@ -1021,10 +1021,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean setGamemode(int gamemode) {
-        return this.setGamemode(gamemode, null);
+        return this.setGamemode(gamemode, false, null);
     }
 
-    public boolean setGamemode(int gamemode, AdventureSettings newSettings) {
+    public boolean setGamemode(int gamemode, boolean clientSide) {
+        return this.setGamemode(gamemode, clientSide, null);
+    }
+
+    public boolean setGamemode(int gamemode, boolean clientSide, AdventureSettings newSettings) {
         if (gamemode < 0 || gamemode > 3 || this.gamemode == gamemode) {
             return false;
         }
@@ -1056,9 +1060,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.namedTag.putInt("playerGameType", this.gamemode);
 
-        SetPlayerGameTypePacket pk = new SetPlayerGameTypePacket();
-        pk.gamemode = this.gamemode & 0x01;
-        this.dataPacket(pk);
+        if (!clientSide) {
+            SetPlayerGameTypePacket pk = new SetPlayerGameTypePacket();
+            pk.gamemode = this.gamemode & 0x01;
+            this.dataPacket(pk);
+        }
 
         this.setAdventureSettings(ev.getNewAdventureSettings());
 
@@ -3287,7 +3293,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.getAdventureSettings().update();
                             break;
                         }
-                        this.setGamemode(setPlayerGameTypePacket.gamemode);
+                        this.setGamemode(setPlayerGameTypePacket.gamemode, true);
+                        Command.broadcastCommandMessage(this, new TranslationContainer("commands.gamemode.success.self", Server.getGamemodeString(this.gamemode)));
                     }
                     break;
                 case ProtocolInfo.ITEM_FRAME_DROP_ITEM_PACKET:
