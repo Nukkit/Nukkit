@@ -4,6 +4,8 @@ import cn.nukkit.Server;
 import cn.nukkit.command.data.CommandArgs;
 import com.google.gson.Gson;
 
+import java.math.BigInteger;
+
 /**
  * author: MagicDroidX
  * Nukkit Project
@@ -30,7 +32,7 @@ public class CommandStepPacket extends DataPacket {
     public long uvarint1;
     public long uvarint2;
     public boolean bool;
-    public long uvarint64;
+    public BigInteger uvarint64;
     public CommandArgs args = new CommandArgs(); //JSON formatted command arguments
     public String string4;
 
