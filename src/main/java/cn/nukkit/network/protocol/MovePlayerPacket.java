@@ -31,8 +31,8 @@ public class MovePlayerPacket extends DataPacket {
         this.y = v.y;
         this.z = v.z;
         pitch = getLFloat();
-        yaw = getLFloat();
         headYaw = getLFloat();
+        yaw = getLFloat();
         mode = (byte) getByte();
         onGround = getBoolean();
     }

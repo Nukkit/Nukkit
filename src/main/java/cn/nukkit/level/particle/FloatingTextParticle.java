@@ -70,7 +70,8 @@ public class FloatingTextParticle extends Particle {
             AddPlayerPacket pk = new AddPlayerPacket();
             pk.uuid = UUID.randomUUID();
             pk.username = "";
-            pk.eid = this.entityId;
+            pk.entityUniqueId = this.entityId;
+            pk.entityRuntimeId = this.entityId;
             pk.x = (float) this.x;
             pk.y = (float) (this.y - 1.62);
             pk.z = (float) this.z;

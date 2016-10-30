@@ -15,7 +15,8 @@ public class AddEntityPacket extends DataPacket {
         return NETWORK_ID;
     }
 
-    public long eid;
+    public long entityUniqueId;
+    public long entityRuntimeId;
     public int type;
     public float x;
     public float y;
@@ -37,8 +38,8 @@ public class AddEntityPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putVarLong(this.eid);
-        this.putEntityId(this.eid);
+        this.putVarLong(this.entityUniqueId);
+        this.putEntityId(this.entityRuntimeId);
         this.putUnsignedVarInt(this.type);
         this.putVector3f(x, y, z);
         this.putVector3f(speedX, speedY, speedZ);

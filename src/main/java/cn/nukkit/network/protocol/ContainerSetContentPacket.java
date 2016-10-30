@@ -64,7 +64,7 @@ public class ContainerSetContentPacket extends DataPacket {
                 this.putVarInt(slot);
             }
         } else {
-            this.putShort(0);
+            this.putUnsignedVarInt(0);
         }
     }
 
