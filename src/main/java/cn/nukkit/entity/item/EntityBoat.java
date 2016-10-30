@@ -63,7 +63,8 @@ public class EntityBoat extends EntityVehicle {
     @Override
     public void spawnTo(Player player) {
         AddEntityPacket pk = new AddEntityPacket();
-        pk.eid = this.getId();
+        pk.entityUniqueId = this.getId();
+        pk.entityRuntimeId = this.getId();
         pk.type = EntityBoat.NETWORK_ID;
         pk.x = (float) this.x;
         pk.y = (float) this.y;
