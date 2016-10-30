@@ -1,7 +1,5 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.math.BlockVector3;
-
 public class SpawnExperienceOrbPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.SPAWN_EXPERIENCE_ORB_PACKET;
@@ -20,7 +18,7 @@ public class SpawnExperienceOrbPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putVector3f(this.x, this.y, this.z);
-        this.putVarInt(amount);
+        this.putUnsignedVarInt(amount);
     }
 
     @Override

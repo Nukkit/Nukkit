@@ -53,7 +53,10 @@ public class StartGamePacket extends DataPacket {
         this.putVarInt(generator);
         this.putVarInt(gamemode);
         this.putVarInt(difficulty);
-        this.putBlockCoords(spawnX, spawnY, spawnZ);
+        //this.putBlockCoords(spawnX, spawnY, spawnZ);
+        this.putVarInt(spawnX);
+        this.putVarInt(spawnY);
+        this.putVarInt(spawnZ);
         this.putBoolean(hasAchievementsDisabled);
         this.putVarInt(dayCycleStopTime);
         this.putBoolean(eduMode);

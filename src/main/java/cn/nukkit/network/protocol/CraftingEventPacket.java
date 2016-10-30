@@ -22,7 +22,7 @@ public class CraftingEventPacket extends DataPacket {
     @Override
     public void decode() {
         windowId = getByte();
-        type = getVarInt();
+        type = (int)getUnsignedVarInt();
         id = getUUID();
 
         int inputSize = (int) getUnsignedVarInt();
