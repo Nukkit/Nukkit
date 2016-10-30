@@ -395,13 +395,10 @@ public class Binary {
         BigInteger temp = raw.shiftLeft(63).shiftRight(63).xor(raw).shiftRight(1);
         return temp.xor(raw.and(BigInteger.ONE.shiftLeft(63))).longValue();
     }
+    
 
-    public static byte[] writeVarLong(long v) {
-        return writeVarLong(BigInteger.valueOf(v));
-    }
-
-    public static byte[] writeVarLong(BigInteger v){
-        return writeUnsignedVarLong(v.shiftLeft(1).xor(v.shiftRight(63)));
+    public static byte[] writeVarLong(long v){
+        return writeUnsignedVarLong((v << 1) ^ (v >> 63));
     }
 
     public static BigInteger readUnsignedVarLong(BinaryStream stream){
