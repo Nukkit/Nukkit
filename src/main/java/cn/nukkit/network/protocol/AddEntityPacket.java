@@ -27,7 +27,7 @@ public class AddEntityPacket extends DataPacket {
     public float yaw;
     public float pitch;
     public int modifiers;
-    public EntityMetadata metadata;
+    public EntityMetadata metadata = new EntityMetadata();
     public final Object[][] links = new Object[0][3];
 
     @Override

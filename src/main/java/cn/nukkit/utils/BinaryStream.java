@@ -325,6 +325,10 @@ public class BinaryStream {
         return Binary.readUnsignedVarLong(this);
     }
 
+    public void putUnsignedVarLong(long v) {
+        this.putUnsignedVarLong(BigInteger.valueOf(v));
+    }
+
     public void putUnsignedVarLong(BigInteger v) {
         this.put(Binary.writeUnsignedVarLong(v));
     }
