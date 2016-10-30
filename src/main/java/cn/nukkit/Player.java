@@ -2537,102 +2537,106 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         cancelled = true;
                     }
 
-                    if (targetEntity != null && this.isAlive() && targetEntity.isAlive()) {
-                        if (this.getGamemode() == Player.VIEW) {
-                            cancelled = true;
-                        }
-                        if (targetEntity instanceof EntityItem || targetEntity instanceof EntityArrow) {
-                            this.kick(PlayerKickEvent.Reason.INVALID_PVE, "Attempting to attack an invalid entity");
-                            this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.getName()));
-                            break;
-                        }
-
-                        item = this.inventory.getItemInHand();
-                        float itemDamage = item.getAttackDamage();
-
-                        for (Enchantment enchantment : item.getEnchantments()) {
-                            itemDamage += enchantment.getDamageBonus(targetEntity);
-                        }
-
-                        HashMap<Integer, Float> damage = new HashMap<>();
-                        damage.put(EntityDamageEvent.MODIFIER_BASE, itemDamage);
-
-                        if (!this.canInteract(targetEntity, isCreative() ? 8 : 5)) {
-                            cancelled = true;
-                        } else if (targetEntity instanceof Player) {
-                            if ((((Player) targetEntity).getGamemode() & 0x01) > 0) {
-                                break;
-                            } else if (!this.server.getPropertyBoolean("pvp") || this.server.getDifficulty() == 0) {
+                    if (((InteractPacket) packet).action != InteractPacket.ACTION_MOUSEOVER) {
+                        if (targetEntity != null && this.isAlive() && targetEntity.isAlive()) {
+                            if (this.getGamemode() == Player.VIEW) {
                                 cancelled = true;
                             }
-                        } else if (targetEntity instanceof EntityVehicle) {
-                            SetEntityLinkPacket pk;
-                            switch (((InteractPacket) packet).action) {
-                                case InteractPacket.ACTION_RIGHT_CLICK:
-                                    cancelled = true;
+                            if (targetEntity instanceof EntityItem || targetEntity instanceof EntityArrow) {
+                                this.kick(PlayerKickEvent.Reason.INVALID_PVE, "Attempting to attack an invalid entity");
+                                this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.getName()));
+                                break;
+                            }
 
-                                    if (((EntityVehicle) targetEntity).linkedEntity != null) {
+                            item = this.inventory.getItemInHand();
+                            float itemDamage = item.getAttackDamage();
+
+                            for (Enchantment enchantment : item.getEnchantments()) {
+                                itemDamage += enchantment.getDamageBonus(targetEntity);
+                            }
+
+                            HashMap<Integer, Float> damage = new HashMap<>();
+                            damage.put(EntityDamageEvent.MODIFIER_BASE, itemDamage);
+
+                            if (!this.canInteract(targetEntity, isCreative() ? 8 : 5)) {
+                                cancelled = true;
+                            } else if (targetEntity instanceof Player) {
+                                if ((((Player) targetEntity).getGamemode() & 0x01) > 0) {
+                                    break;
+                                } else if (!this.server.getPropertyBoolean("pvp") || this.server.getDifficulty() == 0) {
+                                    cancelled = true;
+                                }
+                            } else if (targetEntity instanceof EntityVehicle) {
+                                SetEntityLinkPacket pk;
+                                switch (((InteractPacket) packet).action) {
+                                    case InteractPacket.ACTION_RIGHT_CLICK:
+                                        cancelled = true;
+
+                                        if (((EntityVehicle) targetEntity).linkedEntity != null) {
+                                            break;
+                                        }
+                                        pk = new SetEntityLinkPacket();
+                                        pk.rider = targetEntity.getId();
+                                        pk.riding = this.id;
+                                        pk.type = 2;
+                                        Server.broadcastPacket(this.hasSpawned.values(), pk);
+
+                                        pk = new SetEntityLinkPacket();
+                                        pk.rider = targetEntity.getId();
+                                        pk.riding = 0;
+                                        pk.type = 2;
+                                        dataPacket(pk);
+
+                                        riding = targetEntity;
+                                        ((EntityVehicle) targetEntity).linkedEntity = this;
+
+                                        this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
                                         break;
-                                    }
-                                    pk = new SetEntityLinkPacket();
-                                    pk.rider = targetEntity.getId();
-                                    pk.riding = this.id;
-                                    pk.type = 2;
-                                    Server.broadcastPacket(this.hasSpawned.values(), pk);
+                                    case InteractPacket.ACTION_VEHICLE_EXIT:
+                                        pk = new SetEntityLinkPacket();
+                                        pk.rider = targetEntity.getId();
+                                        pk.riding = this.id;
+                                        pk.type = 3;
+                                        Server.broadcastPacket(this.hasSpawned.values(), pk);
 
-                                    pk = new SetEntityLinkPacket();
-                                    pk.rider = targetEntity.getId();
-                                    pk.riding = 0;
-                                    pk.type = 2;
-                                    dataPacket(pk);
+                                        pk = new SetEntityLinkPacket();
+                                        pk.rider = targetEntity.getId();
+                                        pk.riding = 0;
+                                        pk.type = 3;
+                                        dataPacket(pk);
 
-                                    riding = targetEntity;
-                                    ((EntityVehicle) targetEntity).linkedEntity = this;
-
-                                    this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
-                                    break;
-                                case InteractPacket.ACTION_VEHICLE_EXIT:
-                                    pk = new SetEntityLinkPacket();
-                                    pk.rider = targetEntity.getId();
-                                    pk.riding = this.id;
-                                    pk.type = 3;
-                                    Server.broadcastPacket(this.hasSpawned.values(), pk);
-
-                                    pk = new SetEntityLinkPacket();
-                                    pk.rider = targetEntity.getId();
-                                    pk.riding = 0;
-                                    pk.type = 3;
-                                    dataPacket(pk);
-
-                                    cancelled = true;
-                                    riding = null;
-                                    ((EntityVehicle) targetEntity).linkedEntity = null;
-                                    this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
-                                    break;
+                                        cancelled = true;
+                                        riding = null;
+                                        ((EntityVehicle) targetEntity).linkedEntity = null;
+                                        this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
+                                        break;
+                                }
                             }
-                        }
 
-                        EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(this, targetEntity, EntityDamageEvent.CAUSE_ENTITY_ATTACK, damage);
-                        if (cancelled) {
-                            entityDamageByEntityEvent.setCancelled();
-                        }
+                            EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(this, targetEntity, EntityDamageEvent.CAUSE_ENTITY_ATTACK, damage);
+                            if (cancelled) {
+                                entityDamageByEntityEvent.setCancelled();
+                            }
 
-                        targetEntity.attack(entityDamageByEntityEvent);
+                            targetEntity.attack(entityDamageByEntityEvent);
 
-                        if (entityDamageByEntityEvent.isCancelled()) {
+                            if (entityDamageByEntityEvent.isCancelled()) {
+                                if (item.isTool() && this.isSurvival()) {
+                                    this.inventory.sendContents(this);
+                                }
+                                break;
+                            }
+
                             if (item.isTool() && this.isSurvival()) {
-                                this.inventory.sendContents(this);
-                            }
-                            break;
-                        }
-
-                        if (item.isTool() && this.isSurvival()) {
-                            if (item.useOn(targetEntity) && item.getDamage() >= item.getMaxDurability()) {
-                                this.inventory.setItemInHand(new ItemBlock(new BlockAir()));
-                            } else {
-                                this.inventory.setItemInHand(item);
+                                if (item.useOn(targetEntity) && item.getDamage() >= item.getMaxDurability()) {
+                                    this.inventory.setItemInHand(new ItemBlock(new BlockAir()));
+                                } else {
+                                    this.inventory.setItemInHand(item);
+                                }
                             }
                         }
+                    } else {
+                        //TODO: check ACTION_MOUSEOVER
                     }
 
                     break;
