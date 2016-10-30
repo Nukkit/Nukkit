@@ -19,8 +19,8 @@ public class WeatherCommand extends VanillaCommand {
         super(name, "%nukkit.command.weather.description", "%commands.weather.usage");
         this.setPermission("nukkit.command.weather");
         this.commandParameters = new CommandParameter[]{
-                new CommandParameter("clear|rain|thunder"),
-                new CommandParameter("duration in seconds", false)
+                new CommandParameter("clear|rain|thunder", CommandParameter.ARG_TYPE_STRING, false),
+                new CommandParameter("duration in seconds", CommandParameter.ARG_TYPE_INT, true)
         };
     }
 
