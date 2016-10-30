@@ -1,6 +1,7 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.raknet.protocol.EncapsulatedPacket;
+import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
 
 /**
@@ -70,27 +71,17 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
     }
 
     public static byte[] join(DataPacket[] packets) {
-        int size = 0;
+        BinaryStream out = new BinaryStream();
         for (DataPacket packet : packets) {
             if (!packet.isEncoded) {
                 packet.encode();
                 packet.isEncoded = true;
             }
-            size += 4 + packet.getCount();
-        }
-        byte[] data = new byte[size];
-        byte[] rawBuf;
-        int i = 0;
-        for (DataPacket packet : packets) {
-            rawBuf = packet.getRawBuffer();
+            byte[] rawBuf = packet.getRawBuffer();
             int len = packet.getCount();
-            data[i] = (byte) ((len >>> 24) & 0xFF);
-            data[i + 1] = (byte) ((len >>> 16) & 0xFF);
-            data[i + 2] = (byte) ((len >>> 8) & 0xFF);
-            data[i + 3] = (byte) ((len) & 0xFF);
-            System.arraycopy(rawBuf, 0, data, i + 4, len);
-            i += 4 + len;
+            Binary.writeUnsignedVarInt(len, out);
+            out.write(rawBuf, 0, len);
         }
-        return data;
+        return out.toByteArray();
     }
 }

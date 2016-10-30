@@ -40,15 +40,13 @@ public class ExplodePacket extends DataPacket {
     public void encode() {
         setBuffer(new byte[21 + records.length * 3]);
         this.reset();
-        this.putFloat(this.x);
-        this.putFloat(this.y);
-        this.putFloat(this.z);
-        this.putFloat(this.radius);
-        this.putInt(this.records.length);
-        for (Vector3 record : records) {
-            this.putByte((byte) record.x);
-            this.putByte((byte) record.y);
-            this.putByte((byte) record.z);
+        this.putVector3f(x, y, z);
+        this.putLFloat(this.radius);
+        this.putUnsignedVarInt(this.records.length);
+        if (this.records.length > 0) {
+            for (Vector3 record : records) {
+                this.putBlockCoords((int) record.x, (int) record.y, (int) record.z);
+            }
         }
     }
 
