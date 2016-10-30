@@ -10,9 +10,9 @@ public class AddHangingEntityPacket extends DataPacket {
 
     public long entityUniqueId;
     public long entityRuntimeId;
-    public float x;
-    public float y;
-    public float z;
+    public int x;
+    public int y;
+    public int z;
     public int unknown;
 
     @Override
@@ -25,7 +25,7 @@ public class AddHangingEntityPacket extends DataPacket {
         this.reset();
         this.putVarLong(this.entityUniqueId);
         this.putEntityId(this.entityRuntimeId);
-        this.putVector3f(x, y, z);
+        this.putBlockCoords(x, y, z);
         this.putVarInt(unknown);
     }
 }

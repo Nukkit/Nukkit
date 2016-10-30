@@ -8,17 +8,17 @@ public class ChunkRadiusUpdatedPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.CHUNK_RADIUS_UPDATED_PACKET;
 
-    public int radius;
+    public long radius;
 
     @Override
     public void decode() {
-        this.radius = this.getVarInt();
+        this.radius = this.getUnsignedVarInt();
     }
 
     @Override
     public void encode() {
         super.reset();
-        this.putVarInt(this.radius);
+        this.putUnsignedVarInt(this.radius);
     }
 
     @Override

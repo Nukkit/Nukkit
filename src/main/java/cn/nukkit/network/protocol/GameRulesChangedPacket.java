@@ -1,7 +1,5 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.entity.data.EntityMetadata;
-import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.RuleData;
 
 /**
@@ -20,13 +18,12 @@ public class GameRulesChangedPacket extends DataPacket {
 
     @Override
     public void decode() {
-
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putVarInt(this.ruleDatas.length);
+        this.putInt(this.ruleDatas.length);
         for (RuleData rule: this.ruleDatas) {
             this.putString(rule.name);
             this.putBoolean(rule.unknown1);

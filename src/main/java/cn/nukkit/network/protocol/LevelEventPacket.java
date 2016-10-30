@@ -1,6 +1,5 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.math.Vector3;
 import cn.nukkit.math.Vector3f;
 
 /**
