@@ -23,8 +23,8 @@ public class LevelSoundEventPacket extends DataPacket {
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
-        this.volume = this.getSignedVarInt();
-        this.pitch = this.getSignedVarInt();
+        this.volume = this.getVarInt();
+        this.pitch = this.getVarInt();
         this.unknownBool = this.getBoolean();
         this.unknownBool2 = this.getBoolean();
     }
@@ -34,8 +34,8 @@ public class LevelSoundEventPacket extends DataPacket {
         this.reset();
         this.putByte(this.sound);
         this.putVector3f(this.x, this.y, this.z);
-        this.putSignedVarInt(this.volume);
-        this.putSignedVarInt(this.pitch);
+        this.putVarInt(this.volume);
+        this.putVarInt(this.pitch);
         this.putBoolean(unknownBool);
         this.putBoolean(unknownBool2);
     }

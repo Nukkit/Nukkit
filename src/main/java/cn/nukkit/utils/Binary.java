@@ -6,6 +6,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockVector3;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -87,7 +88,7 @@ public class Binary {
                     stream.putLShort(((ShortEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_INT:
-                    stream.putSignedVarInt(((IntEntityData) d).getData());
+                    stream.putVarInt(((IntEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_FLOAT:
                     stream.putLFloat(((FloatEntityData) d).getData());
@@ -105,9 +106,9 @@ public class Binary {
                     break;
                 case Entity.DATA_TYPE_POS:
                     IntPositionEntityData pos = (IntPositionEntityData) d;
-                    stream.putSignedVarInt(pos.x);
+                    stream.putVarInt(pos.x);
                     stream.putByte((byte) pos.y);
-                    stream.putSignedVarInt(pos.z);
+                    stream.putVarInt(pos.z);
                     break;
                 case Entity.DATA_TYPE_LONG:
                     stream.putVarLong(((LongEntityData) d).getData());
@@ -327,18 +328,10 @@ public class Binary {
         };
     }
 
-    //TODO: proper varlong support
-
     public static int readVarInt(BinaryStream stream) {
         long raw = readUnsignedVarInt(stream);
         long temp = (((raw << 31) >> 31) ^ raw) >> 1;
         return (int) (temp ^ (raw & (1 << 31)));
-    }
-
-    public static long readVarInt64(BinaryStream stream){
-        long raw = readUnsignedVarInt64(stream);
-        long temp = (((raw << 63) >> 63) ^ raw) >> 1;
-        return temp ^ (raw & 1 << 63);
     }
 
     public static int readVarInt(DataInputStream stream) throws IOException {
@@ -347,18 +340,8 @@ public class Binary {
         return (int) (temp ^ (raw & (1 << 31)));
     }
 
-    public static long readUnsignedVarInt(DataInputStream stream) throws IOException {
-        long value = 0;
-        int i = 0;
-        byte b;
-        do {
-            if (i > 63) {
-                throw new IllegalArgumentException("Varint did not terminate after 10 bytes!");
-            }
-            value |= (((b = stream.readByte()) & 0x7f) << i);
-            i += 7;
-        } while ((b & 0x80) != 0);
-        return value;
+    public static byte[] writeVarInt(int v) {
+        return writeUnsignedVarInt((v << 1) ^ (v >> 31));
     }
 
     public static long readUnsignedVarInt(BinaryStream stream) {
@@ -375,26 +358,18 @@ public class Binary {
         return value;
     }
 
-    public static long readUnsignedVarInt64(BinaryStream stream){
+    public static long readUnsignedVarInt(DataInputStream stream) throws IOException {
         long value = 0;
         int i = 0;
-        int b;
-        while(((b = stream.getByte()) & 0x80) != 0){
-            value |= (b & 0x7f) << i;
-            i += 7;
-            if(i > 63){
-                throw new IllegalArgumentException("Value is too long to be an int64");
+        byte b;
+        do {
+            if (i > 63) {
+                throw new IllegalArgumentException("Varint did not terminate after 10 bytes!");
             }
-        }
-        return value | (b << i);
-    }
-
-    public static byte[] writeVarInt(int v) {
-        return writeUnsignedVarInt((v << 1) ^ (v >> 31));
-    }
-
-    public static byte[] writeVarInt64(long v){
-        return writeUnsignedVarInt64((v << 1) ^ (v >> 63));
+            value |= (((b = stream.readByte()) & 0x7f) << i);
+            i += 7;
+        } while ((b & 0x80) != 0);
+        return value;
     }
 
     public static byte[] writeUnsignedVarInt(long v) {
@@ -415,13 +390,37 @@ public class Binary {
         return stream.toByteArray();
     }
 
-    public static byte[] writeUnsignedVarInt64(long v){
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        while((v & 0xFFFFFFFFFFFFFF80L) != 0){
-            buf.write(((byte) v & 0x7f) | 0x80);
-            v >>= 7;
+    public static long readVarLong(BinaryStream stream){
+        BigInteger raw = readUnsignedVarLong(stream);
+        BigInteger temp = raw.shiftLeft(63).shiftRight(63).xor(raw).shiftRight(1);
+        return temp.xor(raw.and(BigInteger.valueOf(1 << 63))).longValue();
+    }
+
+    public static byte[] writeVarLong(BigInteger v){
+        return writeUnsignedVarLong(v.shiftLeft(1).xor(v.shiftRight(63)));
+    }
+
+    public static BigInteger readUnsignedVarLong(BinaryStream stream){
+        BigInteger value = BigInteger.ZERO;
+        int i = 0;
+        int b;
+        while(((b = stream.getByte()) & 0x80) != 0){
+            value = value.or(BigInteger.valueOf((b & 0x7f) << i));
+            i += 7;
+            if(i > 63){
+                throw new IllegalArgumentException("Value is too long to be an int64");
+            }
         }
-        buf.write((byte)v);
+        return value.or(BigInteger.valueOf(b << i));
+    }
+
+    public static byte[] writeUnsignedVarLong(BigInteger v){
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        while(!v.and(BigInteger.valueOf(0xFFFFFFFFFFFFFF80L)).equals(BigInteger.ZERO)){
+            buf.write(v.and(BigInteger.valueOf(0x7f)).byteValue() | 0x80);
+            v = v.shiftRight(7);
+        }
+        buf.write(v.byteValue());
         return buf.toByteArray();
     }
 

@@ -40,7 +40,7 @@ public class UseItemPacket extends DataPacket {
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
-        this.face = this.getSignedVarInt();
+        this.face = this.getVarInt();
         Vector3f faceVector3 = this.getVector3f();
         this.fx = faceVector3.x;
         this.fy = faceVector3.y;
