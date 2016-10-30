@@ -417,7 +417,7 @@ public class Binary {
     public static byte[] writeUnsignedVarLong(BigInteger v){
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         while(!v.and(BigInteger.valueOf(0xFFFFFFFFFFFFFF80L)).equals(BigInteger.ZERO)){
-            buf.write(v.and(BigInteger.valueOf(0x7f)).byteValue() | 0x80);
+            buf.write((byte) (v.and(BigInteger.valueOf(0x7f)).longValue() | 0x80));
             v = v.shiftRight(7);
         }
         buf.write(v.byteValue());
