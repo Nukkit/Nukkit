@@ -68,13 +68,13 @@ public class VarInt {
         int b;
 
         do {
-            b = stream.getByte();
-            result = result.or(BigInteger.valueOf((b & 0x7f) << offset));
-            offset += 7;
-
             if (offset >= maxSize) {
                 throw new IllegalArgumentException("VarInt too big");
             }
+
+            b = stream.getByte();
+            result = result.or(BigInteger.valueOf((b & 0x7f) << (offset * 7)));
+            offset++;
         } while ((b & 0x80) > 0);
 
         return result;
@@ -96,18 +96,16 @@ public class VarInt {
         return _readVarInt(stream, 10);
     }
 
-    static void _writeVarInt(BinaryStream stream, BigInteger v) {
+    private static void _writeVarInt(BinaryStream stream, BigInteger v) {
+        BigInteger i = BigInteger.valueOf(-128);
         BigInteger BIX7F = BigInteger.valueOf(0x7f);
         BigInteger BIX80 = BigInteger.valueOf(0x80);
-        do {
-            BigInteger var = v.and(BIX7F);
-            if (!var.shiftRight(7).equals(BigInteger.ZERO)) {
-                var = v.or(BIX80);
-            }
-
-            stream.putByte(var.byteValue());
+        while (!v.and(i).equals(BigInteger.ZERO)) {
+            stream.putByte(v.and(BIX7F).or(BIX80).byteValue());
             v = v.shiftRight(7);
-        } while (v.compareTo(BigInteger.ZERO) > 0);
+        }
+
+        stream.putByte(v.byteValue());
     }
 
     public static void writeVarInt(BinaryStream stream, int value) {
