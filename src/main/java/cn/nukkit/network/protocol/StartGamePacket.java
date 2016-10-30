@@ -26,14 +26,14 @@ public class StartGamePacket extends DataPacket {
     public int spawnY;
     public int spawnZ;
     public boolean hasAchievementsDisabled = true;
-	public int dayCycleStopTime = -1; //-1 = not stopped, any positive value = stopped at that time
-	public boolean eduMode = false;
-	public float rainLevel;
-	public float lightningLevel;
-	public boolean commandsEnabled;
-	public boolean isTexturePacksRequired = false;
-    public String unknown;
-	public String worldName;
+    public int dayCycleStopTime = -1; //-1 = not stopped, any positive value = stopped at that time
+    public boolean eduMode = false;
+    public float rainLevel;
+    public float lightningLevel;
+    public boolean commandsEnabled;
+    public boolean isTexturePacksRequired = false;
+    public String levelId = ""; //base64 string, usually the same as world folder name in vanilla
+    public String worldName;
 
     @Override
     public void decode() {
@@ -43,7 +43,7 @@ public class StartGamePacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putEntityId(entityUniqueId);
+        this.putVarLong(entityUniqueId);
         this.putEntityId(entityRuntimeId);
         this.putVector3f(this.x, this.y, this.z);
         this.putLFloat(0);
@@ -61,7 +61,7 @@ public class StartGamePacket extends DataPacket {
         this.putLFloat(lightningLevel);
         this.putBoolean(commandsEnabled);
         this.putBoolean(isTexturePacksRequired);
-        this.putString(unknown);
+        this.putString(levelId);
         this.putString(worldName);
     }
 
