@@ -1037,7 +1037,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             newSettings.setCanDestroyBlock((gamemode & 0x02) == 0);
             newSettings.setCanFly((gamemode & 0x01) > 0);
             newSettings.setNoclip(gamemode == 0x03);
-            newSettings.setFlying(this.isSpectator());
+            newSettings.setFlying(gamemode == 0x03);
         }
 
         PlayerGameModeChangeEvent ev;
