@@ -69,7 +69,7 @@ public abstract class EntityProjectile extends Entity {
     }
 
     @Override
-    public synchronized boolean onUpdate(int currentTick) {
+    public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;
         }

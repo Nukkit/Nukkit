@@ -18,7 +18,7 @@ public class EntityMinecartTNT extends EntityMinecartEmpty {
         super(chunk, nbt);
     }
 
-    public synchronized boolean onUpdate(int currentTick) {
+    public boolean onUpdate(int currentTick) {
         Block downSide = this.getLocation().floor().getLevelBlock();
         if (downSide.getId() == Block.ACTIVATOR_RAIL && downSide.isPowered()) {
             explode();

@@ -921,7 +921,7 @@ public abstract class Entity extends Location implements Metadatable, Runnable {
         }
     }
 
-    public synchronized boolean onUpdate(int currentTick) {
+    public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;
         }

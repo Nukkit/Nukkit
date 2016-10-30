@@ -74,7 +74,7 @@ public class EntityArrow extends EntityProjectile {
     }
 
     @Override
-    public synchronized boolean onUpdate(int currentTick) {
+    public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;
         }

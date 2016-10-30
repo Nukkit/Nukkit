@@ -196,7 +196,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
     }
 
     @Override
-    public synchronized boolean onUpdate() {
+    public boolean onUpdate() {
         if (this.closed) {
             return false;
         }

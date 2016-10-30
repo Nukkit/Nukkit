@@ -144,7 +144,7 @@ public abstract class BlockEntity extends Position implements Runnable {
 
     public abstract boolean isBlockEntityValid();
 
-    public synchronized boolean onUpdate() {
+    public boolean onUpdate() {
         return false;
     }
 
