@@ -89,6 +89,8 @@ public class Server {
 
     private static Server instance = null;
 
+    private Watchdog watchdog;
+
     private volatile Thread mainThread;
 
     private volatile BanList banByName;
@@ -572,7 +574,10 @@ public class Server {
         }
         
         this.enablePlugins(PluginLoadOrder.POSTWORLD);
-        
+
+        this.watchdog = new Watchdog(this, 60000);
+        this.watchdog.start();
+
         this.start();
     }
 
@@ -825,6 +830,9 @@ public class Server {
     }
 
     public void shutdown() {
+        if (this.watchdog != null) {
+            this.watchdog.kill();
+        }
         if (this.isRunning) {
             ServerKiller killer = new ServerKiller(90);
             killer.start();
@@ -924,12 +932,6 @@ public class Server {
                     this.tick();
                 } catch (RuntimeException e) {
                     this.getLogger().logException(e);
-                }
-
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    Server.getInstance().getLogger().logException(e);
                 }
             }
         } catch (Throwable e) {
@@ -1111,11 +1113,16 @@ public class Server {
 
     private boolean tick() {
         long tickTime = System.currentTimeMillis();
-        long tickTimeNano = System.nanoTime();
-        if ((tickTime - this.nextTick) < -25) {
+        long sleepTime = tickTime - this.nextTick;
+        if (sleepTime < -25) {
+            try {
+                Thread.sleep(Math.max(5, -sleepTime - 25));
+            } catch (InterruptedException e) {
+                Server.getInstance().getLogger().logException(e);
+            }
             return false;
         }
-
+        long tickTimeNano = System.nanoTime();
         Timings.fullServerTickTimer.startTiming();
 
         ++this.tickCounter;
@@ -1204,6 +1211,10 @@ public class Server {
         }
 
         return true;
+    }
+
+    public long getNextTick() {
+        return nextTick;
     }
 
     public void titleTick() {
