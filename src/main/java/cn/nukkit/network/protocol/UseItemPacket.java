@@ -51,7 +51,6 @@ public class UseItemPacket extends DataPacket {
         this.posZ = playerPos.z;
         this.unknown = this.getByte();
         this.item = this.getSlot();
-        this.posX = playerPos.x;
     }
 
     @Override

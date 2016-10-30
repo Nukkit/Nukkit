@@ -23,7 +23,7 @@ public class AddHangingEntityPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putEntityId(this.entityUniqueId);
+        this.putVarLong(this.entityUniqueId);
         this.putEntityId(this.entityRuntimeId);
         this.putVector3f(x, y, z);
         this.putVarInt(unknown);

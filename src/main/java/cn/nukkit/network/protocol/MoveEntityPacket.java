@@ -43,24 +43,4 @@ public class MoveEntityPacket extends DataPacket {
         this.putByte((byte) (this.headYaw / (360d / 256d)));
         this.putByte((byte) (this.yaw / (360d / 256d)));
     }
-
-    public static class Entry {
-        public final long eid;
-        public final double x;
-        public final double y;
-        public final double z;
-        public final double yaw;
-        public final double headyaw;
-        public final double pitch;
-
-        public Entry(long eid, double x, double y, double z, double yaw, double headyaw, double pitch) {
-            this.eid = eid;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.yaw = yaw;
-            this.headyaw = headyaw;
-            this.pitch = pitch;
-        }
-    }
 }

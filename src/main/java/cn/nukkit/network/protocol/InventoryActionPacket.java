@@ -6,7 +6,7 @@ public class InventoryActionPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.INVENTORY_ACTION_PACKET;
 
-    public long unknown;
+    public int unknown;
     public Item item;
 
     @Override
@@ -17,7 +17,7 @@ public class InventoryActionPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putUnsignedVarInt(unknown);
+        this.putVarInt(unknown);
         this.putSlot(item);
     }
 
