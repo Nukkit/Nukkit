@@ -136,7 +136,13 @@ public class EntityPotion extends EntityProjectile {
             hasUpdate = true;
             Entity[] entities = this.getLevel().getNearbyEntities(this.getBoundingBox().grow(8.25, 4.24, 8.25));
             for (Entity anEntity : entities) {
-                potion.applyPotion(anEntity);
+                double distance = anEntity.distanceSquared(this);
+
+                if (distance < 16) {
+                    double d = 1 - Math.sqrt(distance) / 4;
+
+                    potion.applyPotion(anEntity, d);
+                }
             }
         }
         this.timing.stopTiming();
@@ -147,7 +153,8 @@ public class EntityPotion extends EntityProjectile {
     public void spawnTo(Player player) {
         AddEntityPacket pk = new AddEntityPacket();
         pk.type = EntityPotion.NETWORK_ID;
-        pk.eid = this.getId();
+        pk.entityUniqueId = this.getId();
+        pk.entityRuntimeId = this.getId();
         pk.x = (float) this.x;
         pk.y = (float) this.y;
         pk.z = (float) this.z;
