@@ -1288,6 +1288,10 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean hasCollision(Entity entity, AxisAlignedBB bb, boolean entities) {
+        return hasCollision(entity, bb, true, entities);
+    }
+
+    public boolean hasCollision(Entity entity, AxisAlignedBB bb, boolean blocks, boolean entities) {
         int minX = NukkitMath.floorDouble(bb.minX);
         int minY = NukkitMath.floorDouble(bb.minY);
         int minZ = NukkitMath.floorDouble(bb.minZ);
@@ -1295,12 +1299,14 @@ public class Level implements ChunkManager, Metadatable {
         int maxY = NukkitMath.ceilDouble(bb.maxY);
         int maxZ = NukkitMath.ceilDouble(bb.maxZ);
 
-        for (int z = minZ; z <= maxZ; ++z) {
-            for (int x = minX; x <= maxX; ++x) {
-                for (int y = minY; y <= maxY; ++y) {
-                    Block block = this.getBlock(this.temporalVector.setComponents(x, y, z));
-                    if (!block.canPassThrough() && block.collidesWithBB(bb)) {
-                        return true;
+        if (blocks) {
+            for (int z = minZ; z <= maxZ; ++z) {
+                for (int x = minX; x <= maxX; ++x) {
+                    for (int y = minY; y <= maxY; ++y) {
+                        Block block = this.getBlock(temporalVector.setComponents(x, y, z));
+                        if (!block.canPassThrough() && block.collidesWithBB(bb)) {
+                            return true;
+                        }
                     }
                 }
             }

@@ -182,8 +182,8 @@ public class BlockVector3 implements Cloneable {
         if (ob == this) return true;
 
         if (!(ob instanceof BlockVector3)) return false;
-
-        return this.x == ((BlockVector3)ob).x && this.z == ((BlockVector3)ob).z;
+        BlockVector3 other = (BlockVector3) ob;
+        return this.x == other.x && this.z == other.z && this.y == other.y;
     }
 
     @Override
@@ -193,7 +193,7 @@ public class BlockVector3 implements Cloneable {
 
     @Override
     public String toString() {
-        return "BlockPosition(level=" + ",x=" + this.x + ",y=" + this.y + ",z=" + this.z + ")";
+        return "BlockPosition(x=" + this.x + ",y=" + this.y + ",z=" + this.z + ")";
     }
 
     @Override

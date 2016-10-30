@@ -113,10 +113,10 @@ public class AxisAlignedBB implements Cloneable {
     }
 
     public double calculateXOffset(AxisAlignedBB bb, double x) {
-        if (bb.maxY <= this.minY || bb.minY >= this.maxY) {
+        if (x == 0 || bb.maxY < this.minY || bb.minY > this.maxY) {
             return x;
         }
-        if (bb.maxZ <= this.minZ || bb.minZ >= this.maxZ) {
+        if (bb.maxZ < this.minZ || bb.minZ > this.maxZ) {
             return x;
         }
         if (x > 0 && bb.maxX <= this.minX) {
@@ -136,10 +136,10 @@ public class AxisAlignedBB implements Cloneable {
     }
 
     public double calculateYOffset(AxisAlignedBB bb, double y) {
-        if (bb.maxX <= this.minX || bb.minX >= this.maxX) {
+        if (y == 0 || bb.maxX < this.minX || bb.minX > this.maxX) {
             return y;
         }
-        if (bb.maxZ <= this.minZ || bb.minZ >= this.maxZ) {
+        if (bb.maxZ < this.minZ || bb.minZ > this.maxZ) {
             return y;
         }
         if (y > 0 && bb.maxY <= this.minY) {
@@ -159,10 +159,10 @@ public class AxisAlignedBB implements Cloneable {
     }
 
     public double calculateZOffset(AxisAlignedBB bb, double z) {
-        if (bb.maxX <= this.minX || bb.minX >= this.maxX) {
+        if (z == 0 || bb.maxX < this.minX || bb.minX > this.maxX) {
             return z;
         }
-        if (bb.maxY <= this.minY || bb.minY >= this.maxY) {
+        if (bb.maxY < this.minY || bb.minY > this.maxY) {
             return z;
         }
         if (z > 0 && bb.maxZ <= this.minZ) {
@@ -182,9 +182,9 @@ public class AxisAlignedBB implements Cloneable {
     }
 
     public boolean intersectsWith(AxisAlignedBB bb) {
-        if (bb.maxX > this.minX && bb.minX < this.maxX) {
-            if (bb.maxY > this.minY && bb.minY < this.maxY) {
-                return bb.maxZ > this.minZ && bb.minZ < this.maxZ;
+        if (bb.maxX >= this.minX && bb.minX <= this.maxX) {
+            if (bb.maxY >= this.minY && bb.minY <= this.maxY) {
+                return bb.maxZ >= this.minZ && bb.minZ <= this.maxZ;
             }
         }
 

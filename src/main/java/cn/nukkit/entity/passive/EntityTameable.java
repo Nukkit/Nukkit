@@ -20,45 +20,45 @@ public abstract class EntityTameable extends EntityAnimal implements EntityOwnab
         super(chunk, nbt);
     }
 
-    @Override
-    protected void initEntity() {
-        super.initEntity();
-        if (getDataProperty(DATA_TAMED_FLAG) == null) {
-            setDataProperty(new ByteEntityData(DATA_TAMED_FLAG, (byte) 0));
-        }
-
-        if (getDataProperty(DATA_OWNER_NAME) == null) {
-            setDataProperty(new StringEntityData(DATA_OWNER_NAME, ""));
-        }
-
-        String ownerName = "";
-
-        if (namedTag != null) {
-            if (namedTag.contains("Owner")) {
-                ownerName = namedTag.getString("Owner");
-            }
-
-            if (ownerName.length() > 0) {
-                this.setOwnerName(ownerName);
-                this.setTamed(true);
-            }
-
-            this.setSitting(namedTag.getBoolean("Sitting"));
-        }
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-
-        if (this.getOwnerName() == null) {
-            namedTag.putString("Owner", "");
-        } else {
-            namedTag.putString("Owner", getOwnerName());
-        }
-
-        namedTag.putBoolean("Sitting", isSitting());
-    }
+//    @Override
+//    protected void initEntity() {
+//        super.initEntity();
+//        if (getDataProperty(DATA_TAMED_FLAG) == null) {
+//            setDataProperty(new ByteEntityData(DATA_TAMED_FLAG, (byte) 0));
+//        }
+//
+//        if (getDataProperty(DATA_OWNER_NAME) == null) {
+//            setDataProperty(new StringEntityData(DATA_OWNER_NAME, ""));
+//        }
+//
+//        String ownerName = "";
+//
+//        if (namedTag != null) {
+//            if (namedTag.contains("Owner")) {
+//                ownerName = namedTag.getString("Owner");
+//            }
+//
+//            if (ownerName.length() > 0) {
+//                this.setOwnerName(ownerName);
+//                this.setTamed(true);
+//            }
+//
+//            this.setSitting(namedTag.getBoolean("Sitting"));
+//        }
+//    }
+//
+//    @Override
+//    public void saveNBT() {
+//        super.saveNBT();
+//
+//        if (this.getOwnerName() == null) {
+//            namedTag.putString("Owner", "");
+//        } else {
+//            namedTag.putString("Owner", getOwnerName());
+//        }
+//
+//        namedTag.putBoolean("Sitting", isSitting());
+//    }
 
     @Override
     public String getOwnerName() {
