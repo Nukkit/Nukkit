@@ -274,6 +274,8 @@ public class Item implements Cloneable {
     public static final int DARK_OAK_WOODEN_STAIRS = 164;
 
     public static final int SLIME_BLOCK = 165;
+    
+    public static final int PRISMARINE = 168;
 
     public static final int IRON_TRAPDOOR = 167;
     public static final int HAY_BALE = 170;
@@ -495,7 +497,9 @@ public class Item implements Cloneable {
 
     public static final int MINECART_WITH_TNT = 407;
     public static final int MINECART_WITH_HOPPER = 408;
-
+    
+    public static final int PRISMARINE_SHARD = 409;
+    
     public static final int HOPPER = 410;
 
     public static final int RAW_RABBIT = 411;
@@ -735,6 +739,8 @@ public class Item implements Cloneable {
             list[IRON_HORSE_ARMOR] = ItemIronHorseArmor.class;
             list[GOLD_HORSE_ARMOR] = ItemGoldHorseArmor.class;
             list[DIAMOND_HORSE_ARMOR] = ItemDiamondHorseArmor.class;
+            
+            list[PRISMARINE_SHARD] = ItemPrismarineShard.class;
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
