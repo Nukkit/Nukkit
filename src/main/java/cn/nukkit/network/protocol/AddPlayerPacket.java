@@ -46,9 +46,9 @@ public class AddPlayerPacket extends DataPacket {
         this.putEntityId(this.eid);
         this.putVector3f(x, y, z);
         this.putVector3f(speedX, speedY, speedZ);
+        this.putLFloat(this.pitch);
         this.putLFloat(this.yaw);
         this.putLFloat(this.yaw); //TODO headrot
-        this.putLFloat(this.pitch);
         this.putSlot(this.item);
 
         this.put(Binary.writeMetadata(this.metadata));
