@@ -4,11 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
-import cn.nukkit.command.data.CommandParameterOptional;
 import cn.nukkit.event.player.PlayerKickEvent;
 import cn.nukkit.lang.TranslationContainer;
-
-import java.util.Objects;
 
 /**
  * author: MagicDroidX

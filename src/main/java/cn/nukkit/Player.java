@@ -206,12 +206,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected boolean enableClientCommand = true;
 
-    @Override
-    protected void initEntity() {
-        super.initEntity();
-        this.setDataProperty(new StringEntityData(EntityHuman.DATA_PLAYER_BUTTON_TEXT, this.buttonText));
-    }
-
     public TranslationContainer getLeaveMessage() {
         return new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.left", this.getDisplayName());
     }
@@ -399,7 +393,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.recalculatePermissions();
         this.getAdventureSettings().update();
         if (this.isEnableClientCommand()) this.sendCommandData();
-        //TODO: Send command data
     }
 
     @Override
@@ -579,7 +572,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void setButtonText(String text) {
         this.buttonText = text;
-        this.setDataProperty(new StringEntityData(EntityHuman.DATA_PLAYER_BUTTON_TEXT, text));
+        this.setDataProperty(new StringEntityData(Entity.DATA_INTERACTIVE_TAG, this.buttonText));
     }
 
     @Override
