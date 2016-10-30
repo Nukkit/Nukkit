@@ -50,7 +50,7 @@ Build JAR file
 
 Running
 -------------
-Simply run `start.sh` or `start.cmd`. Or execute `java -jar Nukkit.jar`.
+Simply run `start.sh` or `start.cmd`. Or execute `java -jar Nukkit.jar`
 
 Plugin API
 -------------
