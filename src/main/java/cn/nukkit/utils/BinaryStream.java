@@ -143,6 +143,7 @@ public class BinaryStream extends OutputStream{
             return buffer;
         }
         byte[] data = new byte[getCount()];
+
         // Check if we have a list of buffers
         int pos = 0;
 
@@ -152,8 +153,10 @@ public class BinaryStream extends OutputStream{
                 pos += bytes.length;
             }
         }
+
         // write the internal buffer directly
-        System.arraycopy(buffer, 0, data, pos, buffer.length);
+        System.arraycopy(buffer, 0, data, pos, offset);
+
         this.offset = count + offset;
         this.count = 0;
         this.buffer = data;

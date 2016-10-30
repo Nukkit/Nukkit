@@ -33,7 +33,6 @@ import cn.nukkit.level.format.leveldb.LevelDB;
 import cn.nukkit.level.format.mcregion.McRegion;
 import cn.nukkit.level.generator.Flat;
 import cn.nukkit.level.generator.Generator;
-import cn.nukkit.level.generator.Nether;
 import cn.nukkit.level.generator.Normal;
 import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.math.NukkitMath;
@@ -187,6 +186,7 @@ public class Server {
     private volatile QueryRegenerateEvent queryRegenerateEvent;
 
     private ForkJoinPool executor;
+    private ForkJoinPool networkExecutor;
 
     private final Object propertiesLock = new Object();
     private volatile Config properties;
@@ -210,6 +210,7 @@ public class Server {
         this.mainThread = Thread.currentThread();
         this.filePath = filePath;
         this.executor = new ForkJoinPool();
+        this.networkExecutor = new ForkJoinPool();
         { // Initialize some classes
             this.executor.submit(new Runnable() {
                 @Override
@@ -699,13 +700,13 @@ public class Server {
             }
             this.getScheduler().scheduleAsyncTask(new CompressBatchedTask(data, targets, this.networkCompressionLevel));
         } else {
-            int parallelism = Math.min(packets.length, executor.getParallelism());
+            int parallelism = Math.min(packets.length, networkExecutor.getParallelism());
             int chunkSize = (packets.length + parallelism - 1) / parallelism;
             int chunks = (packets.length + chunkSize - 1) / chunkSize;
 
             for (int index = 0, offset = 0; index < chunks; index++, offset += chunkSize) {
                 final DataPacket[] range = Arrays.copyOfRange(packets, offset, Math.min(packets.length, offset + chunkSize));
-                executor.submit(new Runnable() {
+                networkExecutor.submit(new Runnable() {
                     @Override
                     public void run() {
                         try {
@@ -721,7 +722,7 @@ public class Server {
             }
         }
         if (!parallel) {
-            executor.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            networkExecutor.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         }
         Timings.playerNetworkSendTimer.stopTiming();
     }

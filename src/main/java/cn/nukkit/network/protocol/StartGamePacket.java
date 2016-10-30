@@ -46,7 +46,7 @@ public class StartGamePacket extends DataPacket {
 
     @Override
     public void encode() {
-        setBuffer(new byte[51 + unknownstr.length()]);
+        setBuffer(new byte[51]);
         this.reset();
         this.putVarLong(entityUniqueId);
         this.putEntityId(entityRuntimeId);

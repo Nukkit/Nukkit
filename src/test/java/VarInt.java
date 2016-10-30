@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 import cn.nukkit.utils.Binary;
-=======
->>>>>>> 7d86abf6927286930190819450aa90e244288eca
 import cn.nukkit.utils.BinaryStream;
 
 import java.math.BigInteger;
@@ -78,13 +75,8 @@ public class VarInt {
             }
 
             b = stream.getByte();
-<<<<<<< HEAD
-            result = result.or(BigInteger.valueOf((b & 0x7f) << offset));
-            offset += 7;
-=======
             result = result.or(BigInteger.valueOf((b & 0x7f) << (offset * 7)));
             offset++;
->>>>>>> 7d86abf6927286930190819450aa90e244288eca
         } while ((b & 0x80) > 0);
 
         return result;
@@ -125,19 +117,6 @@ public class VarInt {
     private static void _writeVarInt(BinaryStream stream, BigInteger v) {
         _assert(v);
         v = v.and(UNSIGNED_LONG_MAX_VALUE);
-<<<<<<< HEAD
-        BigInteger BIX7F = BigInteger.valueOf(0x7f);
-        BigInteger BIX80 = BigInteger.valueOf(0x80);
-        do {
-            BigInteger var = v.and(BIX7F);
-            if (!v.shiftRight(7).equals(BigInteger.ZERO)) {
-                var = v.or(BIX80);
-            }
-
-            stream.putByte(var.byteValue());
-            v = v.shiftRight(7);
-        } while (v.compareTo(BigInteger.ZERO) > 0);
-=======
         BigInteger i = BigInteger.valueOf(-128);
         BigInteger BIX7F = BigInteger.valueOf(0x7f);
         BigInteger BIX80 = BigInteger.valueOf(0x80);
@@ -147,7 +126,6 @@ public class VarInt {
         }
 
         stream.putByte(v.byteValue());
->>>>>>> 7d86abf6927286930190819450aa90e244288eca
     }
 
     /**
@@ -182,7 +160,6 @@ public class VarInt {
         _assert(value);
         _writeVarInt(stream, value);
     }
-<<<<<<< HEAD
 
     public static void main(String[] args) {
         BinaryStream stream = new BinaryStream();
@@ -197,6 +174,4 @@ public class VarInt {
         //System.out.println(VarInt.readVarInt(stream));
         System.out.println(VarInt.readUnsignedVarInt(stream));
     }
-=======
->>>>>>> 7d86abf6927286930190819450aa90e244288eca
 }

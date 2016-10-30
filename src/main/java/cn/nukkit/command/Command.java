@@ -9,17 +9,9 @@ import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.permission.Permissible;
-import cn.nukkit.permission.Permission;
 import cn.nukkit.timings.Timing;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.TextFormat;
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -112,7 +104,7 @@ public abstract class Command {
         CommandData customData = this.commandData.clone();
         customData.aliases = this.getAliases();
         customData.description = player.getServer().getLanguage().translateString(this.getDescription());
-        customData.permission = player.hasPermission(this.getPermission()) ? "any" : "false";
+        customData.permission = (this.getPermission() == null || player.hasPermission(this.getPermission())) ? "any" : "false";
         CommandOverload overload = new CommandOverload();
         overload.input.parameters = this.commandParameters;
         customData.overloads.put("default", overload);

@@ -39,7 +39,7 @@ public class UpdateBlockPacket extends DataPacket {
 
     @Override
     public void encode() {
-        setBuffer(new byte[1 + 11 * this.records.length ]);
+        setBuffer(new byte[12]);
         this.reset();
         this.putBlockCoords(x, y, z);
         this.putUnsignedVarInt(blockId);

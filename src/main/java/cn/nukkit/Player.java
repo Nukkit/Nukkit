@@ -73,9 +73,10 @@ import cn.nukkit.timings.Timing;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.TextFormat;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.Zlib;
-import com.google.gson.*;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.*;
@@ -188,7 +189,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected boolean checkMovement = true;
 
-    private final Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();
+    private final Map<Integer, Queue<DataPacket>> batchedPackets = new TreeMap<>();
 
     private final PermissibleBase perm;
 
@@ -479,7 +480,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if(count > 0){
             //TODO: structure checking
             pk.commands = new Gson().toJson(data);
-            Server.getInstance().getLogger().warning(pk.commands);
+//            Server.getInstance().getLogger().warning(pk.commands);
             this.dataPacket(pk);
         }
     }
@@ -867,7 +868,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return true;
     }
 
-    public synchronized boolean batchDataPacket(DataPacket packet) {
+    public boolean batchDataPacket(DataPacket packet) {
         if (!this.connected) {
             return false;
         }
@@ -879,12 +880,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 timing.stopTiming();
                 return false;
             }
-
-            if (!this.batchedPackets.containsKey(packet.getChannel())) {
-                this.batchedPackets.put(packet.getChannel(), new ArrayList<>());
-            }
-
-            this.batchedPackets.get(packet.getChannel()).add(packet.clone());
+            Queue queue = Utils.getOrCreate(this.batchedPackets, ArrayDeque.class, packet.getChannel());
+            queue.add(packet.clone());
         }
         return true;
     }
