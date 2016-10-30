@@ -580,16 +580,20 @@ public class Level implements ChunkManager, Metadatable {
                 this.unloadChunkRequest(chunkX, chunkZ, true);
             }
             AtomicInteger count = this.loaderCounter.get(hash);
-            if (count.decrementAndGet() <= 0) {
-                this.loaderCounter.remove(hash);
-                if (count.get() > 0) {
-                    AtomicInteger existingCount = this.loaderCounter.putIfAbsent(hash, count);
-                    if (existingCount != null) {
-                        existingCount.addAndGet(count.get());
+            if (count != null) {
+                if (count.decrementAndGet() <= 0) {
+                    this.loaderCounter.remove(hash);
+                    if (count.get() > 0) {
+                        AtomicInteger existingCount = this.loaderCounter.putIfAbsent(hash, count);
+                        if (existingCount != null) {
+                            existingCount.addAndGet(count.get());
+                        }
+                    } else {
+                        this.loaders.remove(hash);
                     }
-                } else {
-                    this.loaders.remove(hash);
                 }
+            } else {
+                this.loaders.remove(hash);
             }
         }
     }
