@@ -23,6 +23,7 @@ public class EntityHuman extends EntityHumanType {
 
     public static final int DATA_PLAYER_FLAGS = 27;
     public static final int DATA_PLAYER_BED_POSITION = 17;
+    public static final int DATA_PLAYER_BUTTON_TEXT = 40;
 
     protected UUID uuid;
     protected byte[] rawUUID;

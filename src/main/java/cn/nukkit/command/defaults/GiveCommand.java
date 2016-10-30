@@ -19,9 +19,6 @@ public class GiveCommand extends VanillaCommand {
         this.commandParameters = new CommandParameter[]{
                 new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
                 new CommandParameter("item[:damage]", CommandParameter.ARG_TYPE_STRING, false),
-                new CommandParameter("amount", CommandParameter.ARG_TYPE_INT, false),
-                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
-                new CommandParameter("item[:damage]"),
                 new CommandParameter("amount", CommandParameter.ARG_TYPE_INT, true),
                 new CommandParameter("tags...")
         };
