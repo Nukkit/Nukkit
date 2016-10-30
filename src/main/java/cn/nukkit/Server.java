@@ -75,6 +75,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -87,6 +88,8 @@ public class Server {
     public static final String BROADCAST_CHANNEL_USERS = "nukkit.broadcast.user";
 
     private static Server instance = null;
+
+    private Watchdog watchdog;
 
     private volatile Thread mainThread;
 
@@ -160,6 +163,7 @@ public class Server {
     private volatile int baseTickRate = 1;
     private volatile Boolean getAllowFlight = null;
     public volatile boolean storeGeneratedChunks = false;
+    public volatile boolean parallelTick = true;
 
     private int autoSaveTicker = 0;
     private int autoSaveTicks = 6000;
@@ -181,7 +185,7 @@ public class Server {
 
     private volatile QueryRegenerateEvent queryRegenerateEvent;
 
-    private final ForkJoinPool executor;
+    private ForkJoinPool executor;
 
     private final Object propertiesLock = new Object();
     private volatile Config properties;
@@ -387,6 +391,16 @@ public class Server {
             @Override
             public void run() {
                 storeGeneratedChunks = (boolean) getConfig("chunk-generation.save-newly-generated", true);
+                parallelTick = (boolean) getConfig("level-settings.parallel-tick", true);
+                if (!parallelTick) {
+                    executor = new ForkJoinPool() {
+                        @Override
+                        public ForkJoinTask<?> submit(Runnable task) {
+                            task.run();
+                            return null;
+                        }
+                    };
+                }
                 maxPlayers = getPropertyInt("max-players", 20);
                 setAutoSave(getPropertyBoolean("auto-save", true));
 
@@ -560,7 +574,10 @@ public class Server {
         }
         
         this.enablePlugins(PluginLoadOrder.POSTWORLD);
-        
+
+        this.watchdog = new Watchdog(this, 60000);
+        this.watchdog.start();
+
         this.start();
     }
 
@@ -645,7 +662,7 @@ public class Server {
         packet.encode();
         packet.isEncoded = true;
         if (Network.BATCH_THRESHOLD >= 0 && packet.getBuffer().length >= Network.BATCH_THRESHOLD) {
-            Server.getInstance().batchPackets(players, new DataPacket[]{packet}, false);
+            Server.getInstance().batchPackets(players, new DataPacket[]{packet}, false, true);
             return;
         }
 
@@ -659,10 +676,14 @@ public class Server {
     }
 
     public void batchPackets(Player[] players, DataPacket[] packets) {
-        this.batchPackets(players, packets, false);
+        this.batchPackets(players, packets, false, true);
     }
 
     public void batchPackets(Player[] players, DataPacket[] packets, boolean forceSync) {
+        this.batchPackets(players, packets, forceSync, !forceSync);
+    }
+
+    public void batchPackets(Player[] players, DataPacket[] packets, boolean forceSync, boolean parallel) {
         if (players == null || packets == null || players.length == 0 || packets.length == 0) {
             return;
         }
@@ -677,15 +698,13 @@ public class Server {
             }
             this.getScheduler().scheduleAsyncTask(new CompressBatchedTask(data, targets, this.networkCompressionLevel));
         } else {
-            ForkJoinPool pool = new ForkJoinPool();
-
-            int parallelism = Math.min(packets.length, pool.getParallelism());
+            int parallelism = Math.min(packets.length, executor.getParallelism());
             int chunkSize = (packets.length + parallelism - 1) / parallelism;
             int chunks = (packets.length + chunkSize - 1) / chunkSize;
 
             for (int index = 0, offset = 0; index < chunks; index++, offset += chunkSize) {
                 final DataPacket[] range = Arrays.copyOfRange(packets, offset, Math.min(packets.length, offset + chunkSize));
-                pool.submit(new Runnable() {
+                executor.submit(new Runnable() {
                     @Override
                     public void run() {
                         try {
@@ -699,9 +718,9 @@ public class Server {
                     }
                 });
             }
-
-            pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-            pool.shutdownNow();
+        }
+        if (!parallel) {
+            executor.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         }
         Timings.playerNetworkSendTimer.stopTiming();
     }
@@ -811,6 +830,9 @@ public class Server {
     }
 
     public void shutdown() {
+        if (this.watchdog != null) {
+            this.watchdog.kill();
+        }
         if (this.isRunning) {
             ServerKiller killer = new ServerKiller(90);
             killer.start();
@@ -910,12 +932,6 @@ public class Server {
                     this.tick();
                 } catch (RuntimeException e) {
                     this.getLogger().logException(e);
-                }
-
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    Server.getInstance().getLogger().logException(e);
                 }
             }
         } catch (Throwable e) {
@@ -1097,11 +1113,16 @@ public class Server {
 
     private boolean tick() {
         long tickTime = System.currentTimeMillis();
-        long tickTimeNano = System.nanoTime();
-        if ((tickTime - this.nextTick) < -25) {
+        long sleepTime = tickTime - this.nextTick;
+        if (sleepTime < -25) {
+            try {
+                Thread.sleep(Math.max(5, -sleepTime - 25));
+            } catch (InterruptedException e) {
+                Server.getInstance().getLogger().logException(e);
+            }
             return false;
         }
-
+        long tickTimeNano = System.nanoTime();
         Timings.fullServerTickTimer.startTiming();
 
         ++this.tickCounter;
@@ -1190,6 +1211,10 @@ public class Server {
         }
 
         return true;
+    }
+
+    public long getNextTick() {
+        return nextTick;
     }
 
     public void titleTick() {

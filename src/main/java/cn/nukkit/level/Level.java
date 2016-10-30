@@ -429,7 +429,7 @@ public class Level implements ChunkManager, Metadatable {
                 if (packets.length == 1) {
                     Server.broadcastPacket(players, packets[0]);
                 } else {
-                    this.server.batchPackets(players, packets, false);
+                    this.server.batchPackets(players, packets, false, true);
                 }
             }
         }
@@ -461,7 +461,7 @@ public class Level implements ChunkManager, Metadatable {
                 if (packets.length == 1) {
                     Server.broadcastPacket(players, packets[0]);
                 } else {
-                    this.server.batchPackets(players, packets, false);
+                    this.server.batchPackets(players, packets, false, true);
                 }
             }
         }
@@ -577,20 +577,6 @@ public class Level implements ChunkManager, Metadatable {
                 Utils.remove(playerLoaders, index, hash);
             }
             if (removeResult == 0) {
-                this.unloadChunkRequest(chunkX, chunkZ, true);
-            }
-        }
-
-        Map<Integer, ChunkLoader> existing = chunkLoaders.get(index);
-        if (existing != null) {
-
-        }
-        if (this.chunkLoaders.containsKey(index) && this.chunkLoaders.get(index).containsKey(hash)) {
-            this.chunkLoaders.get(index).remove(hash);
-            this.playerLoaders.get(index).remove(hash);
-            if (this.chunkLoaders.get(index).isEmpty()) {
-                this.chunkLoaders.remove(index);
-                this.playerLoaders.remove(index);
                 this.unloadChunkRequest(chunkX, chunkZ, true);
             }
             AtomicInteger count = this.loaderCounter.get(hash);
@@ -787,22 +773,27 @@ public class Level implements ChunkManager, Metadatable {
                         long index = entry.getKey();
                         Map<Short, Object> blocks = entry.getValue().get();
                         this.chunkCache.remove(index);
-                        int chunkX = Level.getHashX(index);
-                        int chunkZ = Level.getHashZ(index);
                         if (blocks == null || blocks.size() > MAX_BLOCK_CACHE) {
+                            int chunkX = Level.getHashX(index);
+                            int chunkZ = Level.getHashZ(index);
                             FullChunk chunk = this.getChunk(chunkX, chunkZ);
-                            for (Player p : this.getChunkPlayers(chunkX, chunkZ).values()) {
-                                p.onChunkChanged(chunk);
+                            Map<Integer, Player> chunkPlayers = this.playerLoaders.get(index);
+                            if (chunkPlayers != null) {
+                                for (Player p : chunkPlayers.values()) {
+                                    p.onChunkChanged(chunk);
+                                }
                             }
                         } else {
-                            Collection<Player> toSend = this.getChunkPlayers(chunkX, chunkZ).values();
-                            Player[] playerArray = toSend.toArray(new Player[toSend.size()]);
-                            Vector3[] blocksArray = new Vector3[blocks.size()];
-                            int i = 0;
-                            for (short blockHash : blocks.keySet()) {
-                                blocksArray[i++] = getBlockXYZ(index, blockHash);
+                            Map<Integer, Player> chunkPlayers = this.playerLoaders.get(index);
+                            if (chunkPlayers != null) {
+                                Player[] playerArray = chunkPlayers.values().toArray(new Player[chunkPlayers.size()]);
+                                Vector3[] blocksArray = new Vector3[blocks.size()];
+                                int i = 0;
+                                for (short blockHash : blocks.keySet()) {
+                                    blocksArray[i++] = getBlockXYZ(index, blockHash);
+                                }
+                                this.sendBlocks(playerArray, blocksArray, UpdateBlockPacket.FLAG_ALL);
                             }
-                            this.sendBlocks(playerArray, blocksArray, UpdateBlockPacket.FLAG_ALL);
                         }
                     }
                 }
@@ -862,15 +853,18 @@ public class Level implements ChunkManager, Metadatable {
                     Iterator<Map.Entry<Long, ConcurrentLinkedQueue<DataPacket>>> iter = chunkPackets.entrySet().iterator();
                     while (iter.hasNext()) {
                         Map.Entry<Long, ConcurrentLinkedQueue<DataPacket>> entry = iter.next();
-                        long index = entry.getKey();
-                        int chunkX = Level.getHashX(index);
-                        int chunkZ = Level.getHashZ(index);
                         iter.remove();
-                        ConcurrentLinkedQueue<DataPacket> packets = entry.getValue();
-                        Player[] chunkPlayers = this.getChunkPlayers(chunkX, chunkZ).values().stream().toArray(Player[]::new);
-                        if (chunkPlayers.length > 0) {
-                            for (DataPacket pk : packets) {
-                                Server.broadcastPacket(chunkPlayers, pk);
+                        long index = entry.getKey();
+                        Map<Integer, Player> chunkPlayers = this.playerLoaders.get(index);
+                        if (chunkPlayers != null) {
+                            Player[] playerArray = chunkPlayers.values().stream().toArray(Player[]::new);
+                            if (playerArray.length > 0) {
+                                int chunkX = Level.getHashX(index);
+                                int chunkZ = Level.getHashZ(index);
+                                ConcurrentLinkedQueue<DataPacket> packets = entry.getValue();
+                                for (DataPacket pk : packets) {
+                                    Server.broadcastPacket(playerArray, pk);
+                                }
                             }
                         }
                     }
@@ -993,7 +987,7 @@ public class Level implements ChunkManager, Metadatable {
                 packets.add(packet);
             }
         }
-        this.server.batchPackets(target, packets.toArray(new DataPacket[packets.size()]));
+        this.server.batchPackets(target, packets.toArray(new DataPacket[packets.size()]), true, false);
     }
 
     public void clearCache() {
