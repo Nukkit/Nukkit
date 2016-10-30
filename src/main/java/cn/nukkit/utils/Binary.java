@@ -393,7 +393,7 @@ public class Binary {
     public static long readVarLong(BinaryStream stream){
         BigInteger raw = readUnsignedVarLong(stream);
         BigInteger temp = raw.shiftLeft(63).shiftRight(63).xor(raw).shiftRight(1);
-        return temp.xor(raw.and(BigInteger.valueOf(1 << 63))).longValue();
+        return temp.xor(raw.and(BigInteger.valueOf(1L << 63))).longValue();
     }
 
     public static byte[] writeVarLong(BigInteger v){
