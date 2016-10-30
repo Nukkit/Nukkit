@@ -362,7 +362,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
-    public synchronized boolean isOnline() {
+    public boolean isOnline() {
         return this.connected && this.loggedIn;
     }
 
@@ -1404,7 +1404,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
-    public synchronized boolean onUpdate(int currentTick) {
+    public boolean onUpdate(int currentTick) {
         if (!this.loggedIn) {
             return false;
         }
@@ -1479,7 +1479,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.checkTeleportPosition();
-
         return true;
     }
 

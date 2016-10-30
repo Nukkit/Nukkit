@@ -152,7 +152,7 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
     }
 
     @Override
-    public synchronized boolean onUpdate() {
+    public boolean onUpdate() {
         if (closed) {
             return false;
         }
