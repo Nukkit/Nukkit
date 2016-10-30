@@ -53,9 +53,7 @@ public class GamemodeCommand extends VanillaCommand {
             return true;
         }
 
-        ((Player) target).setGamemode(gameMode);
-
-        if (gameMode != ((Player) target).getGamemode()) {
+        if (!((Player) target).setGamemode(gameMode)) {
             sender.sendMessage("Game mode update for " + target.getName() + " failed");
         } else {
             if (target.equals(sender)) {
