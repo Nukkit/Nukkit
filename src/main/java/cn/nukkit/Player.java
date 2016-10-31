@@ -101,6 +101,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final int CRAFTING_ANVIL = 2;
     public static final int CRAFTING_ENCHANT = 3;
 
+    public static final float DEFAULT_SPEED = 0.1f;
+    public static final float MAXIMUM_SPEED = 0.5f;
+
     protected final SourceInterface interfaz;
 
     public boolean playedBefore;
@@ -1776,6 +1779,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         setTimePacket.started = !this.level.stopTime;
         this.dataPacket(setTimePacket);
 
+        this.setMovementSpeed(DEFAULT_SPEED);
         this.sendAttributes(true);
         this.setNameTagVisible(true);
         this.setNameTagAlwaysVisible(true);
@@ -2412,7 +2416,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             this.teleport(playerRespawnEvent.getRespawnPosition(), null);
 
-                            this.setSprinting(false);
+                            this.setSprinting(false, true);
                             this.setSneaking(false);
 
                             this.extinguish();
@@ -2426,7 +2430,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.removeAllEffects();
                             this.sendData(this);
 
-                            this.setMovementSpeed(0.1f);
+                            this.setMovementSpeed(DEFAULT_SPEED);
 
                             this.getAdventureSettings().update();
                             this.inventory.sendContents(this);
@@ -4243,6 +4247,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public synchronized Locale getLocale() {
         return this.locale.get();
+    }
+
+    public void setSprinting(boolean value, boolean setDefault) {
+        super.setSprinting(value);
+        if (setDefault) {
+            this.movementSpeed = DEFAULT_SPEED;
+        } else {
+            float sprintSpeedChange = DEFAULT_SPEED * 0.3f;
+            if (!value) sprintSpeedChange *= -1;
+            this.movementSpeed += sprintSpeedChange;
+        }
+        this.setMovementSpeed(this.movementSpeed);
     }
 
     @Override
