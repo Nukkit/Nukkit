@@ -731,9 +731,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.sendRecipeList(this);
         this.getAdventureSettings().update();
 
-        this.server.sendFullPlayerListData(this);
-        this.server.updatePlayerListData(this.getUniqueId(), this.getId(), this.getDisplayName(), this.getSkin());
-
         this.sendPotionEffects(this);
         this.sendData(this);
         this.inventory.sendContents(this);
@@ -1811,6 +1808,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.setEnableClientCommand(true);
+
+        this.server.sendFullPlayerListData(this);
 
         this.forceMovement = this.teleportPosition = this.getPosition();
 
