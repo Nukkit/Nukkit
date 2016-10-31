@@ -482,7 +482,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if(count > 0){
             //TODO: structure checking
             pk.commands = new Gson().toJson(data);
-            Server.getInstance().getLogger().warning(pk.commands);
             this.dataPacket(pk);
         }
     }
@@ -2537,7 +2536,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         cancelled = true;
                     }
 
-                    if (((InteractPacket) packet).action != InteractPacket.ACTION_MOUSEOVER) {
+                    if (((InteractPacket) packet).action == InteractPacket.ACTION_MOUSEOVER) {
+                        this.getServer().getPluginManager().callEvent(new PlayerMouseOverEntityEvent(this, targetEntity));
+                    } else {
                         if (targetEntity != null && this.isAlive() && targetEntity.isAlive()) {
                             if (this.getGamemode() == Player.VIEW) {
                                 cancelled = true;
@@ -2635,8 +2636,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 }
                             }
                         }
-                    } else {
-                        //TODO: check ACTION_MOUSEOVER
                     }
 
                     break;
