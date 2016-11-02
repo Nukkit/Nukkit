@@ -2,26 +2,35 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.redstone.IndirectRedstoneSource;
+import cn.nukkit.block.redstone.RedstonePowerMode;
+import cn.nukkit.block.redstone.RedstoneSource;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.range.EffectRange;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.RedstoneUtil;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
 
 /**
- * author: MagicDroidX
+ * author: MagicDroidX & PeratX
  * Nukkit Project
  */
-public abstract class Block extends Position implements Metadatable, Cloneable {
+public abstract class Block extends Position implements Metadatable, Cloneable, IndirectRedstoneSource{
+    public static short REDSTONE_POWER_MAX = 15;
+    public static short REDSTONE_POWER_MIN = 0;
+
+
     public static final int AIR = 0;
     public static final int STONE = 1;
     public static final int GRASS = 2;
@@ -280,6 +289,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int BEETROOT_BLOCK = 244;
     public static final int STONECUTTER = 245;
     public static final int GLOWING_OBSIDIAN = 246;
+    //TODO: Move to blockId class
 
     public static Class[] list = null;
     public static Block[] fullList = null;
@@ -290,8 +300,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static boolean[] transparent = null;
     public AxisAlignedBB boundingBox = null;
     protected int meta = 0;
-    protected int powerLevel = 0;
-    protected boolean powerSource = false;
 
     protected Block(Integer meta) {
         this.meta = (meta != null ? meta : 0);
@@ -601,6 +609,25 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
     public boolean onBreak(Item item) {
         return this.getLevel().setBlock(this, new BlockAir(), true, true);
+    }
+
+    /**
+     * True if this block requires physic updates when a neighbor block changes, false if not.
+     *
+     * @return if this block requires physics updates
+     */
+    public boolean hasPhysics() {
+        return false;
+    }
+
+    /**
+     * Returns the maximum range of effect for physics updates to this material. This is triggered when the material is set to this material, or when the data is changed. <br> When triggered, all blocks
+     * in this range are queued for updating.
+     *
+     * @return the maximum range of updates
+     */
+    public EffectRange getPhysicsRange() {
+        return EffectRange.THIS_AND_NEIGHBORS;
     }
 
     public int onUpdate(int type) {
@@ -915,48 +942,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return (Block) super.clone();
     }
 
-    public int getPowerLevel() {
-        return powerLevel;
-    }
-
-    public void setPowerLevel(int powerLevel) {
-        this.powerLevel = powerLevel;
-    }
-
-    public int getPowerLevel(int side) {
-        return this.getSide(side).getPowerLevel();
-    }
-
-    public boolean isNeighborPowered() {
-        return this.getNeighborPowerLevel() > 0;
-    }
-
-    public int getNeighborPowerLevel() {
-        int energy = 0;
-        int tempLevel;
-        tempLevel = this.getSide(SIDE_DOWN).getPowerLevel();
-        energy = tempLevel > energy ? tempLevel : energy;
-        tempLevel = this.getSide(SIDE_UP).getPowerLevel();
-        energy = tempLevel > energy ? tempLevel : energy;
-        for (int side : new int[]{Vector3.SIDE_NORTH, Vector3.SIDE_SOUTH, Vector3.SIDE_WEST, Vector3.SIDE_EAST}) {
-            tempLevel = this.getSide(side).getPowerLevel();
-            energy = tempLevel > energy ? tempLevel : energy;
-        }
-        return energy;
-    }
-
-    public boolean isPowered() {
-        return this.powerLevel > 0;
-    }
-
-    public boolean isPowerSource() {
-        return this.powerSource;
-    }
-
-    public void setPowerSource(boolean isSource) {
-        this.powerSource = isSource;
-    }
-
     public String getLocationHash() {
         String str = "";
         str = String.valueOf((int) this.x);
@@ -971,4 +956,48 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return 0;
     }
 
+    @Override
+    public boolean isRedstoneConductor() {
+        return false;
+    }
+
+    public short getIndirectRedstonePower(Block block, int direction, RedstonePowerMode powerMode) {
+        return this.getRedstonePower(block);
+    }
+
+    public final boolean hasIndirectRedstonePower(Block block, int direction, RedstonePowerMode powerMode) {
+        return this.getIndirectRedstonePower(block, direction, powerMode) > 0;
+    }
+
+    @Override
+    public final short getRedstonePower(Block block) {
+        return this.getRedstonePower(block, RedstonePowerMode.ALL);
+    }
+
+    @Override
+    public short getRedstonePower(Block block, RedstonePowerMode powerMode) {
+        if (!this.isRedstoneConductor()) {
+            return REDSTONE_POWER_MIN;
+        }
+
+        short power = 0;
+        Block neigh;
+        for (int face : RedstoneUtil.NESWDU) {
+            neigh = block.getSide(face);
+            if (neigh instanceof RedstoneSource) {
+                power = (short) Math.max(power, ((RedstoneSource) neigh).getDirectRedstonePower(neigh, Vector3.getOppositeSide(face), powerMode));
+            }
+        }
+        return power;
+    }
+
+    @Override
+    public final boolean hasRedstonePower(Block block) {
+        return this.hasRedstonePower(block, RedstonePowerMode.ALL);
+    }
+
+    @Override
+    public final boolean hasRedstonePower(Block block, RedstonePowerMode powerMode) {
+        return this.getRedstonePower(block, powerMode) > 0;
+    }
 }

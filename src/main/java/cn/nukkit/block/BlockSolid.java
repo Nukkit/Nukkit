@@ -21,4 +21,9 @@ public abstract class BlockSolid extends Block {
     public BlockColor getColor() {
         return BlockColor.STONE_BLOCK_COLOR;
     }
+
+    @Override
+    public boolean isRedstoneConductor() {
+        return true;
+    }
 }

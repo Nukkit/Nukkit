@@ -300,6 +300,18 @@ public class Vector3 implements Cloneable {
         return this;
     }
 
+    public void setX(double x){
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public void setZ(double z) {
+        this.z = z;
+    }
+
     @Override
     public String toString() {
         return "Vector3(x=" + this.x + ",y=" + this.y + ",z=" + this.z + ")";

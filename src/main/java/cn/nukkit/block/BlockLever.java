@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.LeverSound;
-import cn.nukkit.redstone.Redstone;
 
 /**
  * @author Nukkit Project Team
@@ -17,7 +16,6 @@ public class BlockLever extends BlockFlowable {
 
     public BlockLever(int meta) {
         super(meta);
-        this.setPowerLevel(Redstone.POWER_STRONGEST);
     }
 
     @Override
@@ -62,13 +60,6 @@ public class BlockLever extends BlockFlowable {
 
         this.getLevel().setBlock(this, this, true, true);
         this.getLevel().addSound(new LeverSound(this, this.isPowerOn()));
-        if (this.isPowerOn()) {
-            this.setPowerSource(true);
-            Redstone.active(this);
-        } else {
-            this.setPowerSource(false);
-            Redstone.deactive(this, this.getPowerLevel());
-        }
         return true;
     }
 
@@ -127,7 +118,6 @@ public class BlockLever extends BlockFlowable {
     @Override
     public boolean onBreak(Item item) {
         this.getLevel().setBlock(this, new BlockAir(), true, true);
-        Redstone.deactive(this, this.getPowerLevel());
         return true;
     }
 

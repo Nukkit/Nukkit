@@ -15,7 +15,6 @@ import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.block.BlockUpdateEvent;
 import cn.nukkit.event.level.*;
 import cn.nukkit.event.player.PlayerInteractEvent;
-import cn.nukkit.event.redstone.RedstoneUpdateEvent;
 import cn.nukkit.event.weather.LightningStrikeEvent;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
@@ -32,6 +31,8 @@ import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.generator.task.*;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.particle.Particle;
+import cn.nukkit.level.physics.PhysicsQueue;
+import cn.nukkit.level.physics.UpdateQueue;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.math.*;
 import cn.nukkit.metadata.BlockMetadataStore;
@@ -42,7 +43,6 @@ import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
-import cn.nukkit.redstone.Redstone;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.timings.LevelTimings;
 import cn.nukkit.timings.Timings;
@@ -157,6 +157,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private Position temporalPosition;
     private Vector3 temporalVector;
+    private Vector3 temporalPhysicsVector;
 
     private final Block[] blockStates;
 
@@ -219,6 +220,8 @@ public class Level implements ChunkManager, Metadatable {
 
     private int dimension;
 
+    private final PhysicsQueue physicsQueue = new PhysicsQueue(this);
+
     public Level(Server server, String name, String path, Class<? extends LevelProvider> provider) {
         this.blockStates = Block.fullList;
         this.levelId = levelIdCounter++;
@@ -280,6 +283,7 @@ public class Level implements ChunkManager, Metadatable {
         this.timings = new LevelTimings(this);
         this.temporalPosition = new Position(0, 0, 0, this);
         this.temporalVector = new Vector3(0, 0, 0);
+        this.temporalPhysicsVector = new Vector3(0, 0, 0);
         this.tickRate = 1;
     }
 
@@ -289,6 +293,10 @@ public class Level implements ChunkManager, Metadatable {
 
     public static BlockVector3 blockHash(Vector3 block) {
         return blockHash(block.x, block.y, block.z);
+    }
+
+    public static int blockHash(BlockVector3 block) {
+        return localBlockHash(block.x, block.y, block.z);
     }
 
     public static short localBlockHash(double x, double y, double z) {
@@ -1166,36 +1174,6 @@ public class Level implements ChunkManager, Metadatable {
         }
     }
 
-    public void updateAroundRedstone(Block block) {
-        BlockUpdateEvent ev = new BlockUpdateEvent(block);
-        this.server.getPluginManager().callEvent(ev);
-        if (!ev.isCancelled()) {
-            for (Entity entity : this.getNearbyEntities(
-                    new AxisAlignedBB(block.x - 1, block.y - 1, block.z - 1, block.x + 1, block.y + 1, block.z + 1))) {
-                entity.scheduleUpdate();
-            }
-            ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
-
-            RedstoneUpdateEvent rsEv = new RedstoneUpdateEvent(ev.getBlock());
-            this.server.getPluginManager().callEvent(rsEv);
-            if (!rsEv.isCancelled()) {
-                Block redstoneWire = rsEv.getBlock().getSide(Vector3.SIDE_DOWN);
-                if (redstoneWire instanceof BlockRedstoneWire) {
-                    if (rsEv.getBlock() instanceof BlockSolid) {
-                        int level = redstoneWire.getPowerLevel();
-                        redstoneWire.setPowerLevel(redstoneWire.getNeighborPowerLevel() - 1);
-                        redstoneWire.getLevel().setBlock(redstoneWire, redstoneWire, true, true);
-                        Redstone.deactive(redstoneWire, level);
-                    } else {
-                        redstoneWire.setPowerLevel(redstoneWire.getNeighborPowerLevel() - 1);
-                        redstoneWire.getLevel().setBlock(redstoneWire, redstoneWire, true, true);
-                        Redstone.active(redstoneWire);
-                    }
-                }
-            }
-        }
-    }
-
     public void scheduleUpdate(Vector3 pos, int delay) {
         BlockVector3 index = Level.blockHash((int) pos.x, (int) pos.y, (int) pos.z);
         if (this.updateQueueIndex.containsKey(index) && this.updateQueueIndex.get(index) <= delay) {
@@ -1528,8 +1506,7 @@ public class Level implements ChunkManager, Metadatable {
                     }
                     ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
                 }
-                this.updateAroundRedstone(block);
-                this.updateAround(position);
+                this.physicsQueue.queueForUpdateAsync(block.getFloorX(), block.getFloorY(), block.getFloorZ(), block.getPhysicsRange());
             }
 
             return true;
@@ -2954,4 +2931,26 @@ public class Level implements ChunkManager, Metadatable {
         return this.getHighestBlockAt(pos.getFloorX(), pos.getFloorZ()) < pos.getY();
     }
 
+    public boolean runPhysics(){
+        boolean updated = false;
+        updated |= physicsQueue.commitAsyncQueue();
+
+        UpdateQueue queue = physicsQueue.getUpdateQueue();
+
+        while (queue.hasNext()) {
+            int x = queue.getX();
+            int y = queue.getY();
+            int z = queue.getZ();
+            callOnUpdatePhysicsForRange(x, y, z);
+        }
+        return updated;
+    }
+
+    private void callOnUpdatePhysicsForRange(int x, int y, int z) {
+        Block block = this.getBlock(temporalPhysicsVector.setComponents(x, y, z));
+        System.out.println(String.valueOf(x) + " " + String.valueOf(y) + " " + String.valueOf(z) + " " + block.getName());
+        if (block.hasPhysics()) {
+            block.onUpdate(BLOCK_UPDATE_NORMAL);
+        }
+    }
 }

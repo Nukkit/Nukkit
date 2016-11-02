@@ -88,9 +88,6 @@ public class BlockTNT extends BlockSolid {
 
     @Override
     public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL && this.getNeighborPowerLevel() > 0) {
-            this.prime();
-        }
         return 0;
     }
 
