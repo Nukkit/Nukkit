@@ -44,8 +44,8 @@ public class AddEntityPacket extends DataPacket {
         byte[] meta = Binary.writeMetadata(this.metadata);
         setBuffer(new byte[51 + meta.length + links.length * 9]);
         this.reset();
-        this.putVarLong(this.entityUniqueId);
-        this.putEntityId(this.entityRuntimeId);
+        this.putEntityId(this.entityUniqueId);
+        this.putUnsignedVarLong(this.entityRuntimeId);
         this.putUnsignedVarInt(this.type);
         this.putVector3f(x, y, z);
         this.putVector3f(speedX, speedY, speedZ);

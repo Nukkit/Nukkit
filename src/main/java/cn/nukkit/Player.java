@@ -103,6 +103,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final int CRAFTING_ANVIL = 2;
     public static final int CRAFTING_ENCHANT = 3;
 
+    public static final float DEFAULT_SPEED = 0.1f;
+    public static final float MAXIMUM_SPEED = 0.5f;
+
     protected final SourceInterface interfaz;
 
     public boolean playedBefore;
@@ -480,7 +483,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if(count > 0){
             //TODO: structure checking
             pk.commands = new Gson().toJson(data);
-//            Server.getInstance().getLogger().warning(pk.commands);
             this.dataPacket(pk);
         }
     }
@@ -727,9 +729,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.server.sendRecipeList(this);
         this.getAdventureSettings().update();
-
-        this.server.sendFullPlayerListData(this);
-        this.server.updatePlayerListData(this.getUniqueId(), this.getId(), this.getDisplayName(), this.getSkin());
 
         this.sendPotionEffects(this);
         this.sendData(this);
@@ -1786,6 +1785,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         setTimePacket.started = !this.level.stopTime;
         this.dataPacket(setTimePacket);
 
+        this.setMovementSpeed(DEFAULT_SPEED);
         this.sendAttributes(true);
         this.setNameTagVisible(true);
         this.setNameTagAlwaysVisible(true);
@@ -1817,6 +1817,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.setEnableClientCommand(true);
+
+        this.server.sendFullPlayerListData(this);
 
         this.forceMovement = this.teleportPosition = this.getPosition();
 
@@ -2422,7 +2424,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             this.teleport(playerRespawnEvent.getRespawnPosition(), null);
 
-                            this.setSprinting(false);
+                            this.setSprinting(false, true);
                             this.setSneaking(false);
 
                             this.extinguish();
@@ -2436,7 +2438,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.removeAllEffects();
                             this.sendData(this);
 
-                            this.setMovementSpeed(0.1f);
+                            this.setMovementSpeed(DEFAULT_SPEED);
 
                             this.getAdventureSettings().update();
                             this.inventory.sendContents(this);
@@ -2546,7 +2548,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         cancelled = true;
                     }
 
-                    if (((InteractPacket) packet).action != InteractPacket.ACTION_MOUSEOVER) {
+                    if (((InteractPacket) packet).action == InteractPacket.ACTION_MOUSEOVER) {
+                        this.getServer().getPluginManager().callEvent(new PlayerMouseOverEntityEvent(this, targetEntity));
+                    } else {
                         if (targetEntity != null && this.isAlive() && targetEntity.isAlive()) {
                             if (this.getGamemode() == Player.VIEW) {
                                 cancelled = true;
@@ -2644,8 +2648,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 }
                             }
                         }
-                    } else {
-                        //TODO: check ACTION_MOUSEOVER
                     }
 
                     break;
@@ -2760,26 +2762,34 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     Command command = this.getServer().getCommandMap().getCommand(commandText);
                     if (command != null) {
                         if(commandStepPacket.args != null && commandStepPacket.args.size() > 0) {
-                            int index = 0;
-                            CommandParameter[] pars = command.getCommandParameters();
-                            for (JsonElement arg : commandStepPacket.args.values()) {
-                                if (index < pars.length) {
-                                    CommandParameter par = pars[index];
-                                    switch (par.type) {
-                                        case CommandParameter.ARG_TYPE_TARGET:
-                                            CommandArg rules = new Gson().fromJson(arg, CommandArg.class);
-                                            commandText += " " + rules.getRules()[0].getValue();
-                                            break;
-                                        case CommandParameter.ARG_TYPE_BLOCK_POS:
-                                            CommandArgBlockVector bv = new Gson().fromJson(arg, CommandArgBlockVector.class);
-                                            commandText += " " + bv.getX() + " " + bv.getY() + " " + bv.getZ();
-                                            break;
-                                        default:
-                                            commandText += " " + arg.toString();
-                                            break;
+                            CommandParameter[] pars = command.getCommandParameters(commandStepPacket.overload);
+                            if (pars != null) {
+                                for (CommandParameter par: pars) {
+                                    JsonElement arg = commandStepPacket.args.get(par.name);
+                                    if (arg != null) {
+                                        switch (par.type) {
+                                            case CommandParameter.ARG_TYPE_TARGET:
+                                                CommandArg rules = new Gson().fromJson(arg, CommandArg.class);
+                                                commandText += " " + rules.getRules()[0].getValue();
+                                                break;
+                                            case CommandParameter.ARG_TYPE_BLOCK_POS:
+                                                CommandArgBlockVector bv = new Gson().fromJson(arg, CommandArgBlockVector.class);
+                                                commandText += " " + bv.getX() + " " + bv.getY() + " " + bv.getZ();
+                                                break;
+                                            case CommandParameter.ARG_TYPE_STRING:
+                                            case CommandParameter.ARG_TYPE_STRING_ENUM:
+                                            case CommandParameter.ARG_TYPE_RAW_TEXT:
+                                                String string = new Gson().fromJson(arg, String.class);
+                                                commandText += " " + string;
+                                                break;
+                                            default:
+                                                commandText += " " + arg.toString();
+                                                break;
+                                        }
                                     }
                                 }
-                                index++;
+                            } else {
+                                this.sendMessage(this.getServer().getLanguage().translateString(command.getUsage()));
                             }
                         }
                     }
@@ -4252,6 +4262,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public synchronized Locale getLocale() {
         return this.locale.get();
+    }
+
+    public void setSprinting(boolean value, boolean setDefault) {
+        super.setSprinting(value);
+        if (setDefault) {
+            this.movementSpeed = DEFAULT_SPEED;
+        } else {
+            float sprintSpeedChange = DEFAULT_SPEED * 0.3f;
+            if (!value) sprintSpeedChange *= -1;
+            this.movementSpeed += sprintSpeedChange;
+        }
+        this.setMovementSpeed(this.movementSpeed);
     }
 
     @Override
