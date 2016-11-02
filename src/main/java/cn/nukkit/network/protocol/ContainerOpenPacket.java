@@ -30,8 +30,10 @@ public class ContainerOpenPacket extends DataPacket {
         this.reset();
         this.putByte(this.windowid);
         this.putByte(this.type);
-        this.putVarInt(this.slots);
-        this.putBlockCoords(x, y, z);
-        this.putVarLong(this.entityId);
+        this.putSignedVarInt(this.slots);
+        this.putSignedVarInt(this.x);
+  		this.putByte(this.y);
+  		this.putSignedVarInt(this.z);
+        this.putVarInt(this.entityId);
     }
 }
