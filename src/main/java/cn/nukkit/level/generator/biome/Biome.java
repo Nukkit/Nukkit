@@ -21,6 +21,11 @@ public abstract class Biome {
     public static final int TAIGA = 5;
     public static final int SWAMP = 6;
     public static final int RIVER = 7;
+	 public static final int JUNGLE = 21;
+	 public static final int SAVANNA = 35;
+	 public static final int ROOFED_FOREST = 29;
+	 public static final int ROOFED_FOREST_M = 157;
+	 public static final int MUSHROOM_ISLAND = 14;
 
     public static final int HELL = 8;
 
