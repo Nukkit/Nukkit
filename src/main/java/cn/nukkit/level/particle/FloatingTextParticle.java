@@ -68,10 +68,10 @@ public class FloatingTextParticle extends Particle {
 
         if (!this.invisible) {
             AddPlayerPacket pk = new AddPlayerPacket();
-            pk.entityUniqueId = this.entityId;
-            pk.entityRuntimeId = this.entityId;
             pk.uuid = UUID.randomUUID();
             pk.username = "";
+            pk.entityUniqueId = this.entityId;
+            pk.entityRuntimeId = this.entityId;
             pk.x = (float) this.x;
             pk.y = (float) (this.y - 1.65);
             pk.z = (float) this.z;
