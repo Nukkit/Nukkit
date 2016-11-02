@@ -73,7 +73,7 @@ public class FloatingTextParticle extends Particle {
             pk.entityUniqueId = this.entityId;
             pk.entityRuntimeId = this.entityId;
             pk.x = (float) this.x;
-            pk.y = (float) (this.y - 1.62);
+            pk.y = (float) (this.y - 1.65);
             pk.z = (float) this.z;
             pk.speedX = 0;
             pk.speedY = 0;
@@ -89,7 +89,7 @@ public class FloatingTextParticle extends Particle {
                     .putLong(Entity.DATA_FLAGS, flags)
                     .putString(Entity.DATA_NAMETAG, this.title + (!"".equals(this.text) ? "\n" + this.text : ""))
                     .putLong(Entity.DATA_LEAD_HOLDER, -1)
-                    .putByte(Entity.DATA_LEAD, 0);
+                    //.putByte(Entity.DATA_LEAD, 0);
             pk.item = Item.get(Item.AIR);
             packets.add(pk);
         }
