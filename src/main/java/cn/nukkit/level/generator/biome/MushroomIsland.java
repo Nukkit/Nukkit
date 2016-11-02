@@ -3,6 +3,7 @@ package cn.nukkit.level.generator.biome;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockDirt;
 import cn.nukkit.block.BlockMycelium;
+import cn.nukkit.level.generator.populator.MushroomPopulator;
 
 public class MushroomIsland extends NormalBiome implements CaveBiome {
 
