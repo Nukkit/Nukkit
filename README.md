@@ -16,7 +16,7 @@ Nukkit
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-__A Nuclear-Powered Server Software For Minecraft: Pocket Edition__
+__Nukkit is a Server Software For Minecraft: Pocket Edition__
 
 [![PayPayl donate button](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/MagicDroidX)
 [![Gitter](https://img.shields.io/gitter/room/Nukkit/Nukkit.js.svg?style=flat)](https://gitter.im/Nukkit/Nukkit)
@@ -25,48 +25,52 @@ __A Nuclear-Powered Server Software For Minecraft: Pocket Edition__
 
 -------------
 
-Get Nukkit
+Download Nukkit:
 -------------
 * __[Official Site](https://nukkit.io)__
 * __[Circle CI](https://circleci.com/gh/Nukkit/Nukkit/tree/master/)__ (**login required**)
 * __[Jenkins](https://ci.itxtech.org/job/Nukkit/lastSuccessfulBuild/)__
 
-Introduction
+Introduction:
 -------------
 
-Nukkit is nuclear-powered server software for Minecraft: Pocket Edition.
+Nukkit is software for Minecraft: Pocket Edition.
 It has a few key advantages over PocketMine-MP:
 
-* Written in Java, Nukkit is faster and more stable.
-* Having a similar structure with PocketMine-MP, because of this it's easy to contribute to Nukkit's development. And it is also easy to rewrite PocketMine-MP plugins into Nukkit plugins.
+* Nukkit is written in Java, which is faster than PhP.
+* Rewriting PocketMine plugins and Bukkit plugins are super easy because of Nukkit's similar API.
 
-However, Nukkit is **not finished** yet. We welcome contributions.
+Nukkit is currently stable, we welcome contributions however.
 
-Build JAR file
+Compile Nukkit:
 -------------
+You can compile Nukkit with maven.
+First select a dictionary.
+Clone Nukkit in the dictionary, then execute these commands:
 - `git submodule update --init`
 - `mvn clean`
 - `mvn package`
 
-Running
+How to run:
 -------------
-Simply run `start.sh` or `start.cmd`. Or execute `java -jar Nukkit.jar`.
+Execute `java -jar Nukkit.jar`
+Alternativly, you can create a start.sh or a start.cmd file.
 
 Plugin API
 -------------
 ####**Example Plugin**
-Example Plugin which shows the API of Nukkit.
+Here is a Example Plugin to demonstrate Nukkits's API:
 
 * __[Example Plugin](http://github.com/Nukkit/ExamplePlugin)__
 
 Devtools
 -------------
-There's some developer's tools for Nukkit.
+Here are some useful developer tools for Nukkit:
 
 * __[FDevTools](https://github.com/fengberd/FDevTools)__ (**Load source and pack them easily**)
 * __[PocketServer](https://github.com/fengberd/MinecraftPEServer)__ (**Run Nukkit on android devices**)
 
-Discussion
+Discussion & Fourms
 -------------
 * __[Forums](https://forums.nukkit.io)__
 * __[百度 Nukkit 吧](http://tieba.baidu.com/f?kw=nukkit)__
