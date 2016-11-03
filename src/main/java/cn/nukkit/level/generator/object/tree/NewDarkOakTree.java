@@ -1,10 +1,9 @@
-package cn.nukkit.level.generator.object.dev.tree;
+package cn.nukkit.level.generator.object.tree;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockLeaves2;
 import cn.nukkit.block.BlockWood2;
 import cn.nukkit.level.ChunkManager;
-import cn.nukkit.level.generator.object.tree.TreeGenerator;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.EnumFacing;
@@ -12,7 +11,7 @@ import cn.nukkit.utils.EnumFacing;
 /**
  * Created by CreeperFace on 23. 10. 2016.
  */
-public class DevDarkOakTree extends TreeGenerator {
+public class NewDarkOakTree extends TreeGenerator {
     private static final Block DARK_OAK_LOG = new BlockWood2(BlockWood2.DARK_OAK);
     private static final Block DARK_OAK_LEAVES = new BlockLeaves2(BlockLeaves2.DARK_OAK);
 

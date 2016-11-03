@@ -1,13 +1,12 @@
-package cn.nukkit.level.generator.object.dev.tree;
+package cn.nukkit.level.generator.object.tree;
 
 import cn.nukkit.block.*;
 import cn.nukkit.level.ChunkManager;
-import cn.nukkit.level.generator.object.tree.TreeGenerator;
 import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 
-public class DevSwampTree extends TreeGenerator {
+public class NewSwampTree extends TreeGenerator {
     
     /**
      * The metadata value of the wood to use in tree generation.

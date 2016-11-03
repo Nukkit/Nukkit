@@ -1,8 +1,7 @@
-package cn.nukkit.level.generator.object.dev.tree;
+package cn.nukkit.level.generator.object.tree;
 
 import cn.nukkit.block.*;
 import cn.nukkit.level.ChunkManager;
-import cn.nukkit.level.generator.object.tree.TreeGenerator;
 import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
@@ -11,7 +10,7 @@ import cn.nukkit.utils.EnumFacing;
 /**
  * Created by CreeperFace on 26. 10. 2016.
  */
-public class DevJungleTree extends TreeGenerator {
+public class NewJungleTree extends TreeGenerator {
 
     /**
      * The minimum height of a generated tree.
@@ -28,7 +27,7 @@ public class DevJungleTree extends TreeGenerator {
      */
     private final Block metaLeaves = new BlockLeaves(BlockLeaves.JUNGLE);
 
-    public DevJungleTree(int minTreeHeight) {
+    public NewJungleTree(int minTreeHeight) {
         this.minTreeHeight = minTreeHeight;
     }
 

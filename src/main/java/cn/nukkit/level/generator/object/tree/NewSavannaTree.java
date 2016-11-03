@@ -1,15 +1,14 @@
-package cn.nukkit.level.generator.object.dev.tree;
+package cn.nukkit.level.generator.object.tree;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockLeaves2;
 import cn.nukkit.block.BlockWood2;
 import cn.nukkit.level.ChunkManager;
-import cn.nukkit.level.generator.object.tree.TreeGenerator;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.EnumFacing;
 
-public class DevSavannaTree extends TreeGenerator {
+public class NewSavannaTree extends TreeGenerator {
     private static final Block TRUNK = new BlockWood2(BlockWood2.ACACIA);
     private static final Block LEAF = new BlockLeaves2(BlockLeaves2.ACACIA);
 

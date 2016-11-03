@@ -1,15 +1,14 @@
-package cn.nukkit.level.generator.object.dev.tree;
+package cn.nukkit.level.generator.object.tree;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockVine;
 import cn.nukkit.level.ChunkManager;
-import cn.nukkit.level.generator.object.tree.HugeTreesGenerator;
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 
-public class DevJungleBigTree extends HugeTreesGenerator {
-    public DevJungleBigTree(int baseHeightIn, int extraRandomHeightIn, Block woodMetadataIn, Block leavesMetadataIn) {
+public class NewJungleBigTree extends HugeTreesGenerator {
+    public NewJungleBigTree(int baseHeightIn, int extraRandomHeightIn, Block woodMetadataIn, Block leavesMetadataIn) {
         super(baseHeightIn, extraRandomHeightIn, woodMetadataIn, leavesMetadataIn);
     }
 

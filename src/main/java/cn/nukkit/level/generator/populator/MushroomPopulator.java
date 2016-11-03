@@ -2,7 +2,7 @@ package cn.nukkit.level.generator.populator;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.level.ChunkManager;
-import cn.nukkit.level.generator.object.dev.mushroom.DevBigMushroom;
+import cn.nukkit.level.generator.object.mushroom.BigMushroom;
 import cn.nukkit.level.generator.populator.Populator;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
@@ -45,7 +45,7 @@ public class MushroomPopulator extends Populator {
             if (y == -1) {
                 continue;
             }
-            new DevBigMushroom(type).generate(level, random, v.setComponents(x, y, z));
+            new BigMushroom(type).generate(level, random, v.setComponents(x, y, z));
         }
     }
 
