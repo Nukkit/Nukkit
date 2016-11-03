@@ -77,6 +77,12 @@ public abstract class Biome {
         register(ICE_PLAINS, new IcePlainsBiome());
         register(SMALL_MOUNTAINS, new SmallMountainsBiome());
         register(BIRCH_FOREST, new ForestBiome(ForestBiome.TYPE_BIRCH));
+        
+        register(JUNGLE, new JungleBiome());
+        register(ROOFED_FOREST, new RoofedForestBiome());
+        register(ROOFED_FOREST_M, new RoofedForestMBiome());
+        register(MUSHROOM_ISLAND, new MushroomIsland());
+        register(SAVANNA, new SavannaBiome());
 
         register(BEACH, new BeachBiome());
 

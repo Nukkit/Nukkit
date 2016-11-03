@@ -29,7 +29,7 @@ public class BiomeSelector {
     }
 
     public int lookup(double temperature, double rainfall) {
-        if (temperature < 0.8f) {
+       if (temperature < 0.8f) {
             if (rainfall < 0.4f) {
                 return Biome.PLAINS;
             } else if (rainfall < 0.9f) {
