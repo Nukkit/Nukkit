@@ -126,7 +126,6 @@ public class Normal extends Generator {
 
     @Override
     public void init(ChunkManager level, NukkitRandom random) {
-    	System.out.println("Im being INIT");
         this.level = level;
         this.nukkitRandom = random;
         this.random = new Random();
