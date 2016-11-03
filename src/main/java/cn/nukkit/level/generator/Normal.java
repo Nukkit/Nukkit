@@ -15,6 +15,28 @@ import cn.nukkit.math.Vector3;
 import java.util.*;
 
 /**
+ * This generator was written by Creeperface and Nycuro
+ * 
+ * The following classes are theirs and are intended for NUKKIT USAGE and should not be copied/translated to other software
+ * such as BukkitPE, ClearSky, Genisys , Pocketmine-MP
+ *
+ * Normal.java
+ * MushroomPopulator.java
+ * DarkOakTreePopulator.java
+ * JungleBigTreePopulator.java
+ * JungleTreePopulaotr.java
+ * SavannaTreePopulator.java
+ * SwampTreePopulator.java
+ * BasicPopulator.java
+ * MesaBiome.java
+ * JungleBiome.java
+ * SavannaBiome.java
+ * RoofedForestBiome.java
+ * RoofedForestMBiome.java
+ * MushroomIsland.java
+ * TreeGenerator.java
+ * HugeTreesGenerator.java
+ * 
  * Created by CreeperFace on 26. 10. 2016.
  */
 public class Normal extends Generator {
