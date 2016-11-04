@@ -8,11 +8,6 @@ import cn.nukkit.utils.BlockColor;
 
 public class BlockSeaLantern extends BlockTransparent {
     public BlockSeaLantern() {
-        this(0);
-    }
-
-    public BlockSeaLantern(int meta) {
-        super(0);
     }
 
     @Override

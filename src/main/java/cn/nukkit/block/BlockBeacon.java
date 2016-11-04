@@ -10,11 +10,6 @@ import cn.nukkit.item.ItemTool;
 public class BlockBeacon extends BlockSolid {
 
 	public BlockBeacon() {
-		this(0);
-	}
-
-	public BlockBeacon(int meta) {
-		super(meta);
 	}
 
 	@Override

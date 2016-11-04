@@ -4,7 +4,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 
 
-public class BlockPrismarine extends BlockSolid {
+public class BlockPrismarine extends BlockSolidMeta {
 	
     public static final int NORMAL = 0;
     public static final int BRICKS = 1;
