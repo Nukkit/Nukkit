@@ -246,7 +246,7 @@ public class BinaryStream {
 
     public Skin getSkin() {
         String modelId = this.getString();
-        byte[] skinData = this.get((int)this.getUnsignedVarInt());
+        byte[] skinData = this.get((int) this.getUnsignedVarInt());
         return new Skin(skinData, modelId);
     }
 
@@ -340,7 +340,7 @@ public class BinaryStream {
     }
 
     public BlockVector3 getBlockCoords() {
-        return new BlockVector3(this.getVarInt(), (int)this.getUnsignedVarInt(), this.getVarInt());
+        return new BlockVector3(this.getVarInt(), (int) this.getUnsignedVarInt(), this.getVarInt());
     }
 
     public void putBlockCoords(int x, int y, int z) {

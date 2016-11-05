@@ -74,7 +74,8 @@ import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -455,7 +456,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.hasPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE)) {
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE, this);
         }
-        
+
         if (this.isEnableClientCommand()) this.sendCommandData();
     }
 
@@ -475,15 +476,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         AvailableCommandsPacket pk = new AvailableCommandsPacket();
         Map<String, CommandDataVersions> data = new HashMap<>();
         int count = 0;
-        for (Command command: this.server.getCommandMap().getCommands().values()){
-            if(!command.testPermissionSilent(this)){
+        for (Command command : this.server.getCommandMap().getCommands().values()) {
+            if (!command.testPermissionSilent(this)) {
                 continue;
             }
             ++count;
             CommandDataVersions data0 = command.generateCustomCommandData(this);
             data.put(command.getName(), data0);
         }
-        if(count > 0){
+        if (count > 0) {
             //TODO: structure checking
             pk.commands = new Gson().toJson(data);
             this.dataPacket(pk);
@@ -2749,7 +2750,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false);
                     break;
                 case ProtocolInfo.COMMAND_STEP_PACKET:
-                    if(!this.spawned || !this.isAlive()){
+                    if (!this.spawned || !this.isAlive()) {
                         break;
                     }
                     this.craftingType = 0;
@@ -2757,10 +2758,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     String commandText = commandStepPacket.command;
                     Command command = this.getServer().getCommandMap().getCommand(commandText);
                     if (command != null) {
-                        if(commandStepPacket.args != null && commandStepPacket.args.size() > 0) {
+                        if (commandStepPacket.args != null && commandStepPacket.args.size() > 0) {
                             CommandParameter[] pars = command.getCommandParameters(commandStepPacket.overload);
                             if (pars != null) {
-                                for (CommandParameter par: pars) {
+                                for (CommandParameter par : pars) {
                                     JsonElement arg = commandStepPacket.args.get(par.name);
                                     if (arg != null) {
                                         switch (par.type) {
@@ -3234,8 +3235,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.currentTransaction = null;
                     } else {
                         if (containerSetSlotPacket.item.getId() != 0) {
-                           inventory.sendSlot(containerSetSlotPacket.hotbarSlot, this);
-                           inventory.sendSlot(containerSetSlotPacket.slot, this);
+                            inventory.sendSlot(containerSetSlotPacket.hotbarSlot, this);
+                            inventory.sendSlot(containerSetSlotPacket.slot, this);
                         }
                     }
 
@@ -3289,7 +3290,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET:
                     RequestChunkRadiusPacket requestChunkRadiusPacket = (RequestChunkRadiusPacket) packet;
                     ChunkRadiusUpdatedPacket chunkRadiusUpdatePacket = new ChunkRadiusUpdatedPacket();
-                    this.chunkRadius = Math.max(5, Math.min((int)requestChunkRadiusPacket.radius, this.viewDistance));
+                    this.chunkRadius = Math.max(5, Math.min((int) requestChunkRadiusPacket.radius, this.viewDistance));
                     chunkRadiusUpdatePacket.radius = this.chunkRadius;
                     this.dataPacket(chunkRadiusUpdatePacket);
                     break;

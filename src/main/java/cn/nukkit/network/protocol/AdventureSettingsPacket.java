@@ -7,17 +7,17 @@ public class AdventureSettingsPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.ADVENTURE_SETTINGS_PACKET;
 
     public boolean worldImmutable;
-	public boolean noPvp;
-	public boolean noPvm;
-	public boolean noMvp;
+    public boolean noPvp;
+    public boolean noPvm;
+    public boolean noMvp;
 
     public boolean autoJump;
-	public boolean allowFlight;
-	public boolean noClip;
-	public boolean isFlying;
+    public boolean allowFlight;
+    public boolean noClip;
+    public boolean isFlying;
 
     /*
-	 bit mask | flag name
+     bit mask | flag name
 	0x00000001 world_immutable
 	0x00000002 no_pvp
 	0x00000004 no_pvm
@@ -55,7 +55,7 @@ public class AdventureSettingsPacket extends DataPacket {
         this.flags |= (this.noPvp ? 1 : 0) << 1;
         this.flags |= (this.noPvm ? 1 : 0) << 2;
         this.flags |= (this.noMvp ? 1 : 0) << 3;
-        
+
         this.flags |= (this.autoJump ? 1 : 0) << 5;
         this.flags |= (this.allowFlight ? 1 : 0) << 6;
         this.flags |= (this.noClip ? 1 : 0) << 7;

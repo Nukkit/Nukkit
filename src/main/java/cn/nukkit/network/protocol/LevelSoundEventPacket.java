@@ -8,13 +8,13 @@ public class LevelSoundEventPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.LEVEL_SOUND_EVENT_PACKET;
 
     public byte sound;
-	public float x;
-	public float y;
-	public float z;
-	public int volume;
-	public int pitch;
-	public boolean unknownBool;
-	public boolean unknownBool2;
+    public float x;
+    public float y;
+    public float z;
+    public int volume;
+    public int pitch;
+    public boolean unknownBool;
+    public boolean unknownBool2;
 
     @Override
     public void decode() {

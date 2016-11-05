@@ -5,7 +5,9 @@ import cn.nukkit.entity.data.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockVector3;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -130,8 +132,8 @@ public class Binary {
         long count = stream.getUnsignedVarInt();
         EntityMetadata m = new EntityMetadata();
         for (int i = 0; i < count; i++) {
-            int key = (int)stream.getUnsignedVarInt();
-            int type = (int)stream.getUnsignedVarInt();
+            int key = (int) stream.getUnsignedVarInt();
+            int type = (int) stream.getUnsignedVarInt();
             EntityData value = null;
             switch (type) {
                 case Entity.DATA_TYPE_BYTE:
@@ -390,25 +392,25 @@ public class Binary {
         return stream.toByteArray();
     }
 
-    public static long readVarLong(BinaryStream stream){
+    public static long readVarLong(BinaryStream stream) {
         BigInteger raw = readUnsignedVarLong(stream);
         BigInteger temp = raw.shiftLeft(63).shiftRight(63).xor(raw).shiftRight(1);
         return temp.xor(raw.and(BigInteger.ONE.shiftLeft(63))).longValue();
     }
-    
 
-    public static byte[] writeVarLong(long v){
+
+    public static byte[] writeVarLong(long v) {
         return writeUnsignedVarLong((v << 1) ^ (v >> 63));
     }
 
-    public static BigInteger readUnsignedVarLong(BinaryStream stream){
+    public static BigInteger readUnsignedVarLong(BinaryStream stream) {
         BigInteger value = BigInteger.ZERO;
         int i = 0;
         int b;
-        while(((b = stream.getByte()) & 0x80) != 0){
+        while (((b = stream.getByte()) & 0x80) != 0) {
             value = value.or(BigInteger.valueOf((b & 0x7f) << i));
             i += 7;
-            if(i > 63){
+            if (i > 63) {
                 throw new IllegalArgumentException("Value is too long to be an int64");
             }
         }
@@ -419,7 +421,7 @@ public class Binary {
         return writeUnsignedVarLong(BigInteger.valueOf(v));
     }
 
-    public static byte[] writeUnsignedVarLong(BigInteger v){
+    public static byte[] writeUnsignedVarLong(BigInteger v) {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         v = v.and(new BigInteger("ffffffffffffffff", 16));
         BigInteger b1 = BigInteger.valueOf(0xFFFFFFFFFFFFFF80L);

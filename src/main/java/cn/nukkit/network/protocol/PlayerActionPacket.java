@@ -1,7 +1,6 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.math.BlockVector3;
-import cn.nukkit.math.Vector3f;
 
 /**
  * @author Nukkit Project Team
