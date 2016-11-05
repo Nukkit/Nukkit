@@ -330,6 +330,18 @@ public class Binary {
         };
     }
 
+    public static byte[] writeVarInt(int v) {
+        BinaryStream stream = new BinaryStream();
+        stream.putVarInt(v);
+        return stream.getBuffer();
+    }
+
+    public static byte[] writeUnsignedVarInt(long v) {
+        BinaryStream stream = new BinaryStream();
+        stream.putUnsignedVarInt(v);
+        return stream.getBuffer();
+    }
+
     public static byte[] reserveBytes(byte[] bytes) {
         byte[] newBytes = new byte[bytes.length];
         for (int i = 0; i < bytes.length; i++) {
