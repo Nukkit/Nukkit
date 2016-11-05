@@ -40,7 +40,7 @@ public class TextPacket extends DataPacket {
 
             case TYPE_TRANSLATION:
                 this.message = this.getString();
-                int count = this.getByte();
+                int count = (int) this.getUnsignedVarInt();
                 parameters = new String[count];
                 for (int i = 0; i < count; i++) {
                     parameters[i] = getString();
@@ -64,7 +64,7 @@ public class TextPacket extends DataPacket {
 
             case TYPE_TRANSLATION:
                 this.putString(this.message);
-                this.putByte((byte) this.parameters.length);
+                this.putUnsignedVarInt(this.parameters.length);
                 for (String parameter : this.parameters) {
                     this.putString(parameter);
                 }

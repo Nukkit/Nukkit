@@ -395,7 +395,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.recalculatePermissions();
         this.getAdventureSettings().update();
-        if (this.isEnableClientCommand()) this.sendCommandData();
     }
 
     @Override
@@ -456,6 +455,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.hasPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE)) {
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE, this);
         }
+        
+        if (this.isEnableClientCommand()) this.sendCommandData();
     }
 
     public boolean isEnableClientCommand() {
@@ -1922,7 +1923,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:
-
+                    if (this.teleportPosition != null) {
+                        break;
+                    }
 
                     MovePlayerPacket movePlayerPacket = (MovePlayerPacket) packet;
                     Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
@@ -1933,8 +1936,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.forceMovement = new Vector3(this.x, this.y, this.z);
                     }
 
-                    if (this.teleportPosition != null || this.forceMovement != null && (newPos.distanceSquared(this.forceMovement) > 0.1 || revert)) {
-                        this.sendPosition(this.teleportPosition == null ? this.forceMovement : this.teleportPosition, movePlayerPacket.yaw, movePlayerPacket.pitch);
+                    if (this.forceMovement != null && (newPos.distanceSquared(this.forceMovement) > 0.1 || revert)) {
+                        this.sendPosition(this.forceMovement, movePlayerPacket.yaw, movePlayerPacket.pitch);
                     } else {
 
                         movePlayerPacket.yaw %= 360;
