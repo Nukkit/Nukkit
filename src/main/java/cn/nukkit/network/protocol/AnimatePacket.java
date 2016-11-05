@@ -12,7 +12,7 @@ public class AnimatePacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.action = this.getVarInt();
+        this.action = (int) this.getUnsignedVarInt();
         this.eid = getEntityId();
     }
 
