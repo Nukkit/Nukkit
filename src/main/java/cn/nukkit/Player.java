@@ -1459,16 +1459,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.level.addPlayerMovement(this.chunk.getX(), this.chunk.getZ(), this.id, x, y, z, yaw, pitch, this.isOnGround());
     }
 
-    //TODO: CHECK
     public void sendAttributes() {
         UpdateAttributesPacket pk = new UpdateAttributesPacket();
         pk.entityId = 0;
         pk.entries = new Attribute[]{
                 Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getMaxHealth()).setValue(health > 0 ? (health < getMaxHealth() ? health : getMaxHealth()) : 0),
+                Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(this.getFoodData().getLevel()),
                 Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(this.getMovementSpeed()),
-                Attribute.getAttribute(Attribute.EXPERIENCE).setValue(this.getExperience()),
                 Attribute.getAttribute(Attribute.EXPERIENCE_LEVEL).setValue(this.getExperienceLevel()),
-                Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(this.getFoodData().getLevel())
+                Attribute.getAttribute(Attribute.EXPERIENCE).setValue((float) this.getExperience()) / calculateRequireExperience(this.getExperienceLevel()))
         };
         this.dataPacket(pk);
     }
