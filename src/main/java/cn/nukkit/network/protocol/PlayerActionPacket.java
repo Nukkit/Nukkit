@@ -36,22 +36,22 @@ public class PlayerActionPacket extends DataPacket {
 
     @Override
     public void decode() {
-        entityId = getEntityId();
-        action = getVarInt();
+        this.entityId = this.getVarLong();
+        this.action = this.getVarInt();
         BlockVector3 v = this.getBlockCoords();
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
-        face = getVarInt();
+        this.face = this.getVarInt();
     }
 
     @Override
     public void encode() {
-        reset();
-        putEntityId(entityId);
-        putVarInt(action);
-        putBlockCoords(x, y, z);
-        putVarInt(face);
+        this.reset();
+        this. putVarLong(this.entityId);
+        this.putVarInt(this.action);
+        this.putBlockCoords(this.x, this.y, this.z);
+        this.putVarInt(this.face);
     }
 
     @Override

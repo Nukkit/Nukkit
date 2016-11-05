@@ -41,9 +41,9 @@ public class TextPacket extends DataPacket {
             case TYPE_TRANSLATION:
                 this.message = this.getString();
                 int count = (int) this.getUnsignedVarInt();
-                parameters = new String[count];
+                this.parameters = new String[count];
                 for (int i = 0; i < count; i++) {
-                    parameters[i] = getString();
+                    this.parameters[i] = this.getString();
                 }
         }
     }

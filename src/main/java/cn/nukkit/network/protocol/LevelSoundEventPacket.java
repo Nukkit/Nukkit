@@ -36,8 +36,8 @@ public class LevelSoundEventPacket extends DataPacket {
         this.putVector3f(this.x, this.y, this.z);
         this.putVarInt(this.volume);
         this.putVarInt(this.pitch);
-        this.putBoolean(unknownBool);
-        this.putBoolean(unknownBool2);
+        this.putBoolean(this.unknownBool);
+        this.putBoolean(this.unknownBool2);
     }
 
     @Override

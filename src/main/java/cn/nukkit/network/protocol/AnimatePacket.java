@@ -13,14 +13,14 @@ public class AnimatePacket extends DataPacket {
     @Override
     public void decode() {
         this.action = (int) this.getUnsignedVarInt();
-        this.eid = getEntityId();
+        this.eid = getVarLong();
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putUnsignedVarInt(action);
-        this.putEntityId(eid);
+        this.putUnsignedVarInt(this.action);
+        this.putVarLong(this.eid);
     }
 
     @Override

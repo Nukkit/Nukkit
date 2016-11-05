@@ -50,7 +50,6 @@ public class CommandStepPacket extends DataPacket {
         this.bool = this.getBoolean();
         this.uvarint64 = this.getUnsignedVarLong();
         String argsString = this.getString();
-        Server.getInstance().getLogger().debug(argsString);
         this.args = new Gson().fromJson(argsString, CommandArgs.class);
         this.string4 = this.getString();
         while (!this.feof()) {
