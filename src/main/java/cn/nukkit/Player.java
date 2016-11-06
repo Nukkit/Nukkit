@@ -1527,8 +1527,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             if (this.inAirTicks < 100) {
                                 //this.sendSettings();
                                 this.setMotion(new Vector3(0, expectedVelocity, 0));
-                            } else if (this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server")) {
-                                return false;
                             }
                         }
                     }
