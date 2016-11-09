@@ -56,10 +56,7 @@ import cn.nukkit.level.sound.LaunchSound;
 import cn.nukkit.math.*;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.nbt.NBTIO;
-import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.DoubleTag;
-import cn.nukkit.nbt.tag.FloatTag;
-import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.SourceInterface;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.permission.PermissibleBase;
@@ -129,7 +126,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public boolean blocked = false;
 
-    //todo: achievements
+    public final HashSet<String> achievements = new HashSet<>();
 
     protected SimpleTransactionGroup currentTransaction = null;
 
@@ -525,6 +522,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public boolean isPlayer() {
         return true;
+    }
+
+    public void removeAchievement(String achievementId) {
+        achievements.remove(achievementId);
+    }
+
+    public boolean hasAchievement(String achievementId) {
+        return achievements.contains(achievementId);
     }
 
     public boolean isConnected() {
@@ -1008,6 +1013,30 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.action = 3; //Wake up
             this.dataPacket(pk);
         }
+    }
+
+    public boolean awardAchievement(String achievementId) {
+        Achievement.AchievementEntry entry = Achievement.achievements.get(achievementId);
+
+        if (entry == null || hasAchievement(achievementId)) {
+            return false;
+        }
+
+        for (String id : entry.requires) {
+            if (!this.hasAchievement(id)) {
+                return false;
+            }
+        }
+        PlayerAchievementAwardedEvent event = new PlayerAchievementAwardedEvent(this, achievementId);
+        this.server.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            return false;
+        }
+
+        this.achievements.add(achievementId);
+        entry.broadcast(this);
+        return true;
     }
 
     public int getGamemode() {
@@ -1692,7 +1721,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.setLevel(level);
         }
 
-        //todo achievement
+        for (Tag achievement : nbt.getCompound("Achievements").getAllTags()) {
+            if (!(achievement instanceof ByteTag)) {
+                continue;
+            }
+
+            if (((ByteTag) achievement).getData() > 0) {
+                this.achievements.add(achievement.getName());
+            }
+        }
+
         nbt.putLong("lastPlayed", System.currentTimeMillis() / 1000);
 
         if (this.server.getAutoSave()) {
@@ -3578,7 +3616,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.namedTag.putInt("SpawnZ", (int) this.spawnPosition.z);
             }
 
-            //todo save achievement
+            CompoundTag achievements = new CompoundTag();
+            for (String achievement : this.achievements) {
+                achievements.putByte(achievement, 1);
+            }
+
+            this.namedTag.putCompound("Achievements", achievements);
 
             this.namedTag.putInt("playerGameType", this.gamemode);
             this.namedTag.putLong("lastPlayed", System.currentTimeMillis() / 1000);
