@@ -9,19 +9,19 @@ import java.util.HashMap;
  */
 public class Achievement {
 
-    public static final HashMap<String, AchievementEntry> achievements = new HashMap<String, AchievementEntry>() {
+    public static final HashMap<String, Achievement> achievements = new HashMap<String, Achievement>() {
         {
-            put("mineWood", new AchievementEntry("Getting Wood"));
-            put("buildWorkBench", new AchievementEntry("Benchmarking", "mineWood"));
-            put("buildPickaxe", new AchievementEntry("Time to Mine!", "buildWorkBench"));
-            put("buildFurnace", new AchievementEntry("Hot Topic", "buildPickaxe"));
-            put("acquireIron", new AchievementEntry("Acquire hardware", "buildFurnace"));
-            put("buildHoe", new AchievementEntry("Time to Farm!", "buildWorkBench"));
-            put("makeBread", new AchievementEntry("Bake Bread", "buildHoe"));
-            put("bakeCake", new AchievementEntry("The Lie", "buildHoe"));
-            put("buildBetterPickaxe", new AchievementEntry("Getting an Upgrade", "buildPickaxe"));
-            put("buildSword", new AchievementEntry("Time to Strike!", "buildWorkBench"));
-            put("diamonds", new AchievementEntry("DIAMONDS!", "acquireIron"));
+            put("mineWood", new Achievement("Getting Wood"));
+            put("buildWorkBench", new Achievement("Benchmarking", "mineWood"));
+            put("buildPickaxe", new Achievement("Time to Mine!", "buildWorkBench"));
+            put("buildFurnace", new Achievement("Hot Topic", "buildPickaxe"));
+            put("acquireIron", new Achievement("Acquire hardware", "buildFurnace"));
+            put("buildHoe", new Achievement("Time to Farm!", "buildWorkBench"));
+            put("makeBread", new Achievement("Bake Bread", "buildHoe"));
+            put("bakeCake", new Achievement("The Lie", "buildHoe"));
+            put("buildBetterPickaxe", new Achievement("Getting an Upgrade", "buildPickaxe"));
+            put("buildSword", new Achievement("Time to Strike!", "buildWorkBench"));
+            put("diamonds", new Achievement("DIAMONDS!", "acquireIron"));
         }
     };
 
@@ -39,7 +39,7 @@ public class Achievement {
         return true;
     }
 
-    public static boolean add(String name, AchievementEntry achievement) {
+    public static boolean add(String name, Achievement achievement) {
         if (achievements.containsKey(name)) {
             return false;
         }
@@ -48,28 +48,25 @@ public class Achievement {
         return true;
     }
 
-    public static class AchievementEntry {
+    public final String message;
+    public final String[] requires;
 
-        public final String message;
-        public final String[] requires;
+    public Achievement(String message, String... requires) {
+        this.message = message;
+        this.requires = requires;
+    }
 
-        public AchievementEntry(String message, String... requires) {
-            this.message = message;
-            this.requires = requires;
-        }
+    public String getMessage() {
+        return message;
+    }
 
-        public String getMessage() {
-            return message;
-        }
+    public void broadcast(Player player) {
+        String translation = Server.getInstance().getLanguage().translateString("chat.type.achievement", player.getDisplayName(), TextFormat.GREEN + this.getMessage());
 
-        public void broadcast(Player player) {
-            String translation = Server.getInstance().getLanguage().translateString("chat.type.achievement", player.getDisplayName(), TextFormat.GREEN + this.getMessage());
-
-            if (Server.getInstance().getPropertyBoolean("announce-player-achievements", true)) {
-                Server.getInstance().broadcastMessage(translation);
-            } else {
-                player.sendMessage(translation);
-            }
+        if (Server.getInstance().getPropertyBoolean("announce-player-achievements", true)) {
+            Server.getInstance().broadcastMessage(translation);
+        } else {
+            player.sendMessage(translation);
         }
     }
 }

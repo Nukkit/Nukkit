@@ -1013,13 +1013,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean awardAchievement(String achievementId) {
-        Achievement.AchievementEntry entry = Achievement.achievements.get(achievementId);
+        Achievement achievement = Achievement.achievements.get(achievementId);
 
-        if (entry == null || hasAchievement(achievementId)) {
+        if (achievement == null || hasAchievement(achievementId)) {
             return false;
         }
 
-        for (String id : entry.requires) {
+        for (String id : achievement.requires) {
             if (!this.hasAchievement(id)) {
                 return false;
             }
@@ -1032,7 +1032,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.achievements.add(achievementId);
-        entry.broadcast(this);
+        achievement.broadcast(this);
         return true;
     }
 
