@@ -35,10 +35,7 @@ import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.event.server.DataPacketSendEvent;
 import cn.nukkit.inventory.*;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemArrow;
-import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemGlassBottle;
+import cn.nukkit.item.*;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.food.Food;
 import cn.nukkit.lang.TextContainer;
@@ -1254,7 +1251,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             continue;
                         }
 
-                        //todo: achievement
+                        switch (item.getId()) {
+                            case Item.WOOD:
+                            case Item.WOOD2:
+                                this.awardAchievement("mineWood");
+                                break;
+                            case Item.DIAMOND:
+                                this.awardAchievement("diamond");
+                                break;
+                        }
                         /*switch (item.getId()) {
                             case Item.WOOD:
                                 this.awardAchievement("mineWood");
@@ -3195,7 +3200,41 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                         }
                     }
-                    //todo: achievement
+
+                    switch(recipe.getResult().getId()) {
+                        case Item.WORKBENCH:
+                            this.awardAchievement("buildWorkBench");
+                            break;
+                        case Item.WOODEN_PICKAXE:
+                            this.awardAchievement("buildPickaxe");
+                            break;
+                        case Item.FURNACE:
+                            this.awardAchievement("buildFurnace");
+                            break;
+                        case Item.WOODEN_HOE:
+                            this.awardAchievement("buildHoe");
+                            break;
+                        case Item.BREAD:
+                            this.awardAchievement("makeBread");
+                            break;
+                        case Item.CAKE:
+                            //TODO: detect complex recipes like cake that leave remains
+                            this.awardAchievement("bakeCake");
+                            this.inventory.addItem(new ItemBucket(0, 3));
+                            break;
+                        case Item.STONE_PICKAXE:
+                        case Item.GOLD_PICKAXE:
+                        case Item.IRON_PICKAXE:
+                        case Item.DIAMOND_PICKAXE:
+                            this.awardAchievement("buildBetterPickaxe");
+                            break;
+                        case Item.WOODEN_SWORD:
+                            this.awardAchievement("buildSword");
+                            break;
+                        case Item.DIAMOND:
+                            this.awardAchievement("diamond");
+                            break;
+                    }
 
                     break;
                 case ProtocolInfo.CONTAINER_SET_SLOT_PACKET:
@@ -3263,8 +3302,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.currentTransaction.addTransaction(transaction);
 
                     if (this.currentTransaction.canExecute() || this.isCreative()) {
-                        //todo achievement
-                        this.currentTransaction.execute(this.isCreative());
+                        HashSet<String> achievements = new HashSet<>();
+
+                        for (Transaction tr : this.currentTransaction.getTransactions()) {
+                            Inventory inv = tr.getInventory();
+
+                            if (inv instanceof FurnaceInventory) {
+                                if (tr.getSlot() == 2) {
+                                    switch (((FurnaceInventory) inv).getResult().getId()) {
+                                        case Item.IRON_INGOT:
+                                            achievements.add("acquireIron");
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (this.currentTransaction.execute(this.isCreative())) {
+                            for (String achievement : achievements) {
+                                this.awardAchievement(achievement);
+                            }
+                        }
 
                         this.currentTransaction = null;
                     } else {
