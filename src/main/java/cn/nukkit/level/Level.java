@@ -1357,7 +1357,7 @@ public class Level implements ChunkManager, Metadatable {
         int fullState = 0;
         if (cached && this.blockCache.containsKey(index)) {
             return this.blockCache.get(index);
-        } else if (pos.y >= 0 && pos.y < 128 && this.chunks.containsKey(chunkIndex)) {
+        } else if (pos.y >= 0 && pos.y < 256 && this.chunks.containsKey(chunkIndex)) {
             fullState = this.chunks.get(chunkIndex).getFullBlock((int) pos.x & 0x0f, (int) pos.y & 0x7f,
                     (int) pos.z & 0x0f);
         } else {
@@ -1494,7 +1494,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean setBlock(Vector3 pos, Block block, boolean direct, boolean update) {
-        if (pos.y < 0 || pos.y >= 128) {
+        if (pos.y < 0 || pos.y >= 256) {
             return false;
         }
 
@@ -1810,7 +1810,7 @@ public class Level implements ChunkManager, Metadatable {
         Block target = this.getBlock(vector);
         Block block = target.getSide(face);
 
-        if (block.y > 127 || block.y < 0) {
+        if (block.y > 255 || block.y < 0) {
             return null;
         }
 
@@ -2580,7 +2580,7 @@ public class Level implements ChunkManager, Metadatable {
                     }
                 }
 
-                for (; y >= 0 && y < 128; ++y) {
+                for (; y >= 0 && y < 256; ++y) {
                     int b = chunk.getFullBlock(x, y + 1, z);
                     Block block = Block.get(b >> 4, b & 0x0f);
                     if (!this.isFullBlock(block)) {
