@@ -1,6 +1,7 @@
 package cn.nukkit.level.format.generic;
 
 import cn.nukkit.level.format.ChunkSection;
+import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
 
 import java.util.Arrays;
@@ -121,6 +122,21 @@ public class EmptyChunkSection implements ChunkSection {
     @Override
     public void setBlockSkyLight(int x, int y, int z, int level) throws ChunkException {
         throw new ChunkException("Tried to modify an empty Chunk");
+    }
+
+    @Override
+    public boolean isAllAir() {
+        return true;
+    }
+
+    @Override
+    public byte[] getBytes() {
+        BinaryStream stream = new BinaryStream();
+        stream.put(this.getIdArray());
+        stream.put(this.getDataArray());
+        stream.put(this.getSkyLightArray());
+        stream.put(this.getLightArray());
+        return stream.getBuffer();
     }
 
     @Override
