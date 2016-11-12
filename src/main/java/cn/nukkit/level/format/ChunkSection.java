@@ -47,5 +47,9 @@ public interface ChunkSection extends Cloneable {
 
     byte[] getLightArray();
 
+    boolean isAllAir();
+
+    byte[] getBytes();
+
     ChunkSection clone();
 }
