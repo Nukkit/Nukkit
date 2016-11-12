@@ -134,7 +134,7 @@ public class ParticleCommand extends VanillaCommand {
             case "crit":
                 return new CriticalParticle(pos);
             case "smoke":
-                return new SmokeParticle(pos, data ? 0);
+                return new SmokeParticle(pos, data ?:?: 0);
             case "spell":
                 return new EnchantParticle(pos);
             case "instantspell":
@@ -153,7 +153,7 @@ public class ParticleCommand extends VanillaCommand {
             case "lava":
                 return new LavaParticle(pos);
             case "reddust":
-                return new RedstoneParticle(pos, data ? 1);
+                return new RedstoneParticle(pos, data ?:?: 1);
             case "snowballpoof":
                 return new ItemBreakParticle(pos, Item.get(Item.SNOWBALL));
             case "slime":
@@ -169,9 +169,9 @@ public class ParticleCommand extends VanillaCommand {
                 }
                 break;
             case "heart":
-                return new HeartParticle(pos, data ? 0);
+                return new HeartParticle(pos, data ?:?: 0);
             case "ink":
-                return new InkParticle(pos, data ? 0);
+                return new InkParticle(pos, data ?:?: 0);
             case "droplet":
                 return new RainSplashParticle(pos);
             case "enchantmenttable":
@@ -181,7 +181,7 @@ public class ParticleCommand extends VanillaCommand {
             case "angryvillager":
                 return new AngryVillagerParticle(pos);
             case "forcefield":
-		return new BlockForceFieldParticle(pos, data ? 0);
+		return new BlockForceFieldParticle(pos, data ?:?: 0);
         }
 
         if (name.startsWith("iconcrack_")) {
