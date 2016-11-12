@@ -98,7 +98,7 @@ public class Chunk extends BaseChunk {
         }
 
         if (!(this.nbt.contains("HeightMap") && (this.nbt.get("HeightMap") instanceof IntArrayTag))) {
-            this.nbt.putIntArray("HeightMap", new int[256]);
+            this.nbt.putIntArray("HeightMap", new int[512]);
         }
 
         cn.nukkit.level.format.ChunkSection[] sections = new cn.nukkit.level.format.ChunkSection[16];
@@ -151,9 +151,9 @@ public class Chunk extends BaseChunk {
         this.biomeColors = biomeColors;
 
         int[] heightMap = this.nbt.getIntArray("HeightMap");
-        if (heightMap.length != 256) {
-            heightMap = new int[256];
-            Arrays.fill(heightMap, 255);
+        if (heightMap.length != 512) {
+            heightMap = new int[512];
+            Arrays.fill(heightMap, 512);
         }
         this.heightMap = heightMap;
 
@@ -399,7 +399,7 @@ public class Chunk extends BaseChunk {
                 chunk.sections[y] = new EmptyChunkSection(y);
             }
 
-            chunk.heightMap = new int[256];
+            chunk.heightMap = new int[512];
             chunk.biomeColors = new int[256];
 
             chunk.nbt.putByte("V", 1);
