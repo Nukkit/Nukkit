@@ -1,6 +1,7 @@
 package cn.nukkit.level.format.anvil;
 
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.BinaryStream;
 
 import java.nio.ByteBuffer;
 
@@ -233,6 +234,26 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     @Override
     public byte[] getLightArray() {
         return this.blockLight;
+    }
+
+    @Override
+    public boolean isAllAir() {
+        for (byte b : this.blocks) {
+            if ((b & 0xff) != 0x00) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public byte[] getBytes() {
+        BinaryStream stream = new BinaryStream();
+        stream.put(this.blocks);
+        stream.put(this.data);
+        stream.put(this.skyLight);
+        stream.put(this.blockLight);
+        return stream.getBuffer();
     }
 
     @Override

@@ -112,7 +112,7 @@ public class Anvil extends BaseLevelProvider {
 
     @Override
     public AsyncTask requestChunkTask(int x, int z) throws ChunkException {
-        FullChunk chunk = this.getChunk(x, z, false);
+        Chunk chunk = this.getChunk(x, z, false);
         if (chunk == null) {
             throw new ChunkException("Invalid Chunk Set");
         }
@@ -149,10 +149,20 @@ public class Anvil extends BaseLevelProvider {
         }
 
         BinaryStream stream = new BinaryStream();
-        stream.put(chunk.getBlockIdArray());
-        stream.put(chunk.getBlockDataArray());
-        stream.put(chunk.getBlockSkyLightArray());
-        stream.put(chunk.getBlockLightArray());
+        int topEmpty = 0;
+        cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
+        for (int ci = 15; ci > 0; ci--) {
+            if (sections[ci].isAllAir()) {
+                topEmpty = ci + 1;
+            } else {
+                break;
+            }
+        }
+        stream.putByte((byte) topEmpty);
+        for (int ci = 0; ci < topEmpty; ci++) {
+            stream.putByte((byte) 0);
+            stream.put(sections[ci].getBytes());
+        }
         for (int height : chunk.getHeightMapArray()) {
             stream.putByte((byte) (height & 0xff));
         }
