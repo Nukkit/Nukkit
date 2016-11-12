@@ -101,7 +101,7 @@ public class Chunk extends BaseChunk {
             this.nbt.putIntArray("HeightMap", new int[256]);
         }
 
-        cn.nukkit.level.format.ChunkSection[] sections = new cn.nukkit.level.format.ChunkSection[8];
+        cn.nukkit.level.format.ChunkSection[] sections = new cn.nukkit.level.format.ChunkSection[16];
         for (Tag section : this.nbt.getList("Sections").getAll()) {
             if (section instanceof CompoundTag) {
                 int y = ((CompoundTag) section).getByte("Y");
