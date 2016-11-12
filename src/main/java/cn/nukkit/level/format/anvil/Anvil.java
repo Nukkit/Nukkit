@@ -166,7 +166,7 @@ public class Anvil extends BaseLevelProvider {
         }
         stream.put(blockEntities);
 
-        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer(), FullChunkDataPacket.ORDER_LAYERED);
+        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer());
 
         return null;
     }

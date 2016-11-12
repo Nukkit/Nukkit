@@ -2329,15 +2329,11 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void chunkRequestCallback(int x, int z, byte[] payload) {
-        this.chunkRequestCallback(x, z, payload, FullChunkDataPacket.ORDER_COLUMNS);
-    }
-
-    public void chunkRequestCallback(int x, int z, byte[] payload, byte ordering) {
         this.timings.syncChunkSendTimer.startTiming();
         Long index = Level.chunkHash(x, z);
 
         if (this.cacheChunks && !this.chunkCache.containsKey(index)) {
-            this.chunkCache.put(index, Player.getChunkCacheFromData(x, z, payload, ordering));
+            this.chunkCache.put(index, Player.getChunkCacheFromData(x, z, payload));
             this.sendChunkFromCache(x, z);
             this.timings.syncChunkSendTimer.stopTiming();
             return;
@@ -2346,7 +2342,7 @@ public class Level implements ChunkManager, Metadatable {
         if (this.chunkSendTasks.containsKey(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
-                    player.sendChunk(x, z, payload, ordering);
+                    player.sendChunk(x, z, payload);
                 }
             }
 
