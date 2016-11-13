@@ -162,7 +162,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public byte[] getBlockDataColumn(int x, int z) {
-        ByteBuffer buffer = ByteBuffer.allocate(64);
+        ByteBuffer buffer = ByteBuffer.allocate(256);
         for (int y = 0; y < SECTION_COUNT; y++) {
             buffer.put(this.sections[y].getBlockDataColumn(x, z));
         }
@@ -171,7 +171,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public byte[] getBlockSkyLightColumn(int x, int z) {
-        ByteBuffer buffer = ByteBuffer.allocate(64);
+        ByteBuffer buffer = ByteBuffer.allocate(256);
         for (int y = 0; y < SECTION_COUNT; y++) {
             buffer.put(this.sections[y].getBlockSkyLightColumn(x, z));
         }
@@ -180,7 +180,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public byte[] getBlockLightColumn(int x, int z) {
-        ByteBuffer buffer = ByteBuffer.allocate(64);
+        ByteBuffer buffer = ByteBuffer.allocate(256);
         for (int y = 0; y < SECTION_COUNT; y++) {
             buffer.put(this.sections[y].getBlockLightColumn(x, z));
         }
@@ -200,7 +200,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     @Override
     public boolean setSection(float fY, ChunkSection section) {
         byte[] emptyIdArray = new byte[4096];
-        byte[] emptyDataArray = new byte[2048];
+        byte[] emptyDataArray = new byte[4096];
         Arrays.fill(emptyIdArray, (byte) 0x00);
         Arrays.fill(emptyDataArray, (byte) 0x00);
         if (Arrays.equals(emptyIdArray, section.getIdArray()) && Arrays.equals(emptyDataArray, section.getDataArray())) {
@@ -238,7 +238,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public byte[] getBlockDataArray() {
-        ByteBuffer buffer = ByteBuffer.allocate(2048 * SECTION_COUNT);
+        ByteBuffer buffer = ByteBuffer.allocate(4096 * SECTION_COUNT);
         for (int y = 0; y < SECTION_COUNT; y++) {
             buffer.put(this.sections[y].getDataArray());
         }
@@ -247,7 +247,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public byte[] getBlockSkyLightArray() {
-        ByteBuffer buffer = ByteBuffer.allocate(2048 * SECTION_COUNT);
+        ByteBuffer buffer = ByteBuffer.allocate(4096 * SECTION_COUNT);
         for (int y = 0; y < SECTION_COUNT; y++) {
             buffer.put(this.sections[y].getSkyLightArray());
         }
@@ -256,7 +256,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public byte[] getBlockLightArray() {
-        ByteBuffer buffer = ByteBuffer.allocate(2048 * SECTION_COUNT);
+        ByteBuffer buffer = ByteBuffer.allocate(4096 * SECTION_COUNT);
         for (int y = 0; y < SECTION_COUNT; y++) {
             buffer.put(this.sections[y].getLightArray());
         }
