@@ -298,7 +298,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public static short localBlockHash(double x, double y, double z) {
-        byte hi = (byte) (((int) x & 15) + (((int) z & 15) << 4));
+        byte hi = (byte) (((int) x & 15) + (((int) z & 15) << 5));
         byte lo = (byte) y;
         return (short) (((hi & 0xFF) << 8) | (lo & 0xFF));
     }
@@ -317,7 +317,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public static int chunkBlockHash(int x, int y, int z) {
-        return (x << 11) | (z << 7) | y;
+        return (x << 12) | (z << 8) | y;
     }
 
     public static int getHashX(long hash) {
