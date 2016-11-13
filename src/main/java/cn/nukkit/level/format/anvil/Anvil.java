@@ -337,11 +337,11 @@ public class Anvil extends BaseLevelProvider {
         CompoundTag nbt = new CompoundTag();
         nbt.putByte("Y", Y);
         nbt.putByteArray("Blocks", new byte[4096]);
-        nbt.putByteArray("Data", new byte[2048]);
-        byte[] sl = new byte[2048];
+        nbt.putByteArray("Data", new byte[4096]);
+        byte[] sl = new byte[4096];
         Arrays.fill(sl, (byte) 0xff);
         nbt.putByteArray("SkyLight", sl);
-        nbt.putByteArray("BlockLight", new byte[2048]);
+        nbt.putByteArray("BlockLight", new byte[4096]);
         return new ChunkSection(nbt);
     }
 
