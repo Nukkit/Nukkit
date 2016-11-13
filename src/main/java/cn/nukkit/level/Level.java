@@ -32,6 +32,7 @@ import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.generator.task.*;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.particle.Particle;
+import cn.nukkit.level.sound.BlockPlaceSound;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.math.*;
 import cn.nukkit.metadata.BlockMetadataStore;
@@ -1711,7 +1712,7 @@ public class Level implements ChunkManager, Metadatable {
         if (createParticles) {
             Map<Integer, Player> players = this.getChunkPlayers((int) target.x >> 4, (int) target.z >> 4);
 
-            this.addParticle(new DestroyBlockParticle(target.add(0.5), target), players.values());
+            this.addParticle(new DestroyBlockParticle(target.add(0.5, 0.5, 0.5), target), players.values());
 
             if (player != null) {
                 players.remove(player.getLoaderId());
@@ -1922,8 +1923,14 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
-        if (player != null && !player.isCreative()) {
-            item.setCount(item.getCount() - 1);
+        if (player != null) {
+            BlockPlaceSound sound = new BlockPlaceSound(block.add(0.5, 0.5, 0.5));
+            Map<Integer, Player> players = getChunkPlayers((int) block.x >> 4, (int) block.z >> 4);
+            addSound(sound, players.values());
+
+            if (!player.isCreative()) {
+                item.setCount(item.getCount() - 1);
+            }
         }
 
         if (item.getCount() <= 0) {
