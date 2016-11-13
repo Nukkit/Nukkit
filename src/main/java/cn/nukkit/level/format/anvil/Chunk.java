@@ -153,7 +153,7 @@ public class Chunk extends BaseChunk {
         int[] heightMap = this.nbt.getIntArray("HeightMap");
         if (heightMap.length != 512) {
             heightMap = new int[512];
-            Arrays.fill(heightMap, 512);
+            Arrays.fill(heightMap, 255);
         }
         this.heightMap = heightMap;
 
