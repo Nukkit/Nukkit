@@ -42,22 +42,12 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public int getBlockData(int x, int y, int z) {
-        int b = this.data[(x << 8) + (z << 4) + y] & 0xff;
-        if ((x & 1) == 0) {
-            return b & 0x0f;
-        }
-        return b >> 4;
+        return this.data[(x << 8) + (z << 4) + y] & 0xff;
     }
 
     @Override
     public void setBlockData(int x, int y, int z, int data) {
-        int i = (x << 8) + (z << 4) + y;
-        int old = this.data[i] & 0xff;
-        if ((x & 1) == 0) {
-            this.data[i] = (byte) (((((old & 0xf0) | data & 0x0f)) & 0xff) & 0xff);
-        } else {
-            this.data[i] = (byte) (((((data & 0x0f) << 4) | (old & 0x0f)) & 0xff) & 0xff);
-        }
+        this.data[(x << 8) + (z << 4) + y] = (byte) (data & 0xff);
     }
 
     @Override
@@ -65,10 +55,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
         int i = (x << 8) + (z << 4) + y;
         int block = this.blocks[i] & 0xff;
         int data = this.data[i] & 0xff;
-        if ((x & 1) == 0) {
-            return (block << 4) | (data & 0x0F);
-        }
-        return (block << 4) | (data >> 4);
+        return (block << 4) | data;
     }
 
     @Override
@@ -94,17 +81,10 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
         }
 
         if (meta != null) {
-            int old = this.data[i] & 0xff;
-            if ((x & 1) == 0) {
-                this.data[i] = (byte) ((((old & 0xf0) | meta & 0x0f)) & 0xff);
-                if (!meta.equals(old & 0x0f)) {
-                    changed = true;
-                }
-            } else {
-                this.data[i] = (byte) ((((meta & 0x0f) << 4) | (old & 0x0f)) & 0xff);
-                if (!meta.equals((old & 0xf0) >> 4)) {
-                    changed = true;
-                }
+            byte m = (byte) (meta & 0xff);
+            if (this.data[i] != m) {
+                this.data[i] = m;
+                changed = true;
             }
         }
 
@@ -113,42 +93,22 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public int getBlockSkyLight(int x, int y, int z) {
-        int sl = this.skyLight[(x << 8) + (z << 4) + y] & 0xff;
-        if ((x & 1) == 0) {
-            return sl & 0x0f;
-        }
-        return sl >> 4;
+        return this.skyLight[(x << 8) + (z << 4) + y] & 0xff;
     }
 
     @Override
     public void setBlockSkyLight(int x, int y, int z, int level) {
-        int i = (x << 8) + (z << 4) + y;
-        int old = this.skyLight[i] & 0xff;
-        if ((x & 1) == 0) {
-            this.skyLight[i] = (byte) (((old & 0xf0) | (level & 0x0f)) & 0xff);
-        } else {
-            this.skyLight[i] = (byte) ((((level & 0x0f) << 4) | (old & 0x0f)) & 0xff);
-        }
+        this.skyLight[(x << 8) + (z << 4) + y] = (byte) (level & 0xff);
     }
 
     @Override
     public int getBlockLight(int x, int y, int z) {
-        int l = this.blockLight[(x << 8) + (z << 4) + y] & 0xff;
-        if ((x & 1) == 0) {
-            return l & 0x0f;
-        }
-        return l >> 4;
+        return this.blockLight[(x << 8) + (z << 4) + y] & 0xff;
     }
 
     @Override
     public void setBlockLight(int x, int y, int z, int level) {
-        int i = (x << 8) + (z << 4) + y;
-        int old = this.blockLight[i] & 0xff;
-        if ((x & 1) == 0) {
-            this.blockLight[i] = (byte) (((old & 0xf0) | (level & 0x0f)) & 0xff);
-        } else {
-            this.blockLight[i] = (byte) ((((level & 0x0f) << 4) | (old & 0x0f)) & 0xff);
-        }
+        this.blockLight[(x << 8) + (z << 4) + y] = (byte) (level & 0xff);
     }
 
     @Override
