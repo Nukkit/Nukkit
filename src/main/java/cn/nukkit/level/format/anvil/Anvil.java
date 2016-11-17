@@ -80,7 +80,7 @@ public class Anvil extends BaseLevelProvider {
                 .putInt("GameType", 0)
                 .putString("generatorName", Generator.getGeneratorName(generator))
                 .putString("generatorOptions", options.containsKey("preset") ? options.get("preset") : "")
-                .putUnSignedVarInt("generatorVersion", 1)
+                .putInt("generatorVersion", 1)
                 .putBoolean("hardcore", false)
                 .putBoolean("initialized", true)
                 .putLong("LastPlayed", System.currentTimeMillis() / 1000)
@@ -92,8 +92,8 @@ public class Anvil extends BaseLevelProvider {
                 .putInt("SpawnY", 70)
                 .putInt("SpawnZ", 128)
                 .putBoolean("thundering", false)
-                .putUnSignedVarInt("thunderTime", 0)
-                .putUnSignedVarInt("version", 19133)
+                .putInt("thunderTime", 0)
+                .putInt("version", 19133)
                 .putLong("Time", 0)
                 .putLong("SizeOnDisk", 0);
 
