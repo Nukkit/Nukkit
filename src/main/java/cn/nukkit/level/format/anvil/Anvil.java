@@ -77,7 +77,7 @@ public class Anvil extends BaseLevelProvider {
                 .putCompound("GameRules", new CompoundTag())
 
                 .putLong("DayTime", 0)
-                .putVarInt("GameType", 0)
+                .putInt("GameType", 0)
                 .putString("generatorName", Generator.getGeneratorName(generator))
                 .putString("generatorOptions", options.containsKey("preset") ? options.get("preset") : "")
                 .putUnSignedVarInt("generatorVersion", 1)
@@ -168,7 +168,7 @@ public class Anvil extends BaseLevelProvider {
         if (extraData != null) {
             stream.put(extraData.getBuffer());
         } else {
-            stream.putUnSignedVarInt(0);
+            stream.putInt(0);
         }
         stream.put(blockEntities);
 
