@@ -165,7 +165,7 @@ public class RegionLoader extends BaseRegionLoader {
             this.randomAccessFile.seek(table[0] << 12);
             byte[] chunk = new byte[table[1] << 12];
             this.randomAccessFile.read(chunk);
-            int length = Binary.readInt(Arrays.copyOfRange(chunk, 0, 3));
+            int length = Binary.readVarInt(Arrays.copyOfRange(chunk, 0, 3));// check if is VarInt or other
             if (length <= 1) {
                 this.locationTable.put(i, (table = new Integer[]{0, 0, 0}));
             }
@@ -205,7 +205,7 @@ public class RegionLoader extends BaseRegionLoader {
         this.lastSector = 1;
         int[] data = new int[1024 * 2]; //1024 records * 2 times
         for (int i = 0; i < 1024 * 2; i++) {
-            data[i] = this.randomAccessFile.readInt();
+            data[i] = this.randomAccessFile.readVarInt(); // check if is VarInt 
         }
         for (int i = 0; i < 1024; ++i) {
             int index = data[i];
@@ -221,11 +221,11 @@ public class RegionLoader extends BaseRegionLoader {
         this.randomAccessFile.seek(0);
         for (int i = 0; i < 1024; ++i) {
             Integer[] array = this.locationTable.get(i);
-            this.randomAccessFile.writeInt(((array[0] << 8) | array[1]));
+            this.randomAccessFile.writeVarInt(((array[0] << 8) | array[1])); // check
         }
         for (int i = 0; i < 1024; ++i) {
             Integer[] array = this.locationTable.get(i);
-            this.randomAccessFile.writeInt(array[2]);
+            this.randomAccessFile.writeVarInt(array[2]); // check
         }
     }
 
@@ -275,9 +275,9 @@ public class RegionLoader extends BaseRegionLoader {
     protected void writeLocationIndex(int index) throws IOException {
         Integer[] array = this.locationTable.get(index);
         this.randomAccessFile.seek(index << 2);
-        this.randomAccessFile.writeInt((array[0] << 8) | array[1]);
+        this.randomAccessFile.writeVarInt((array[0] << 8) | array[1]); //check
         this.randomAccessFile.seek(4096 + (index << 2));
-        this.randomAccessFile.writeInt(array[2]);
+        this.randomAccessFile.writeVarInt(array[2]); //check
     }
 
     @Override
@@ -288,10 +288,10 @@ public class RegionLoader extends BaseRegionLoader {
         int time = (int) (System.currentTimeMillis() / 1000d);
         for (int i = 0; i < 1024; ++i) {
             this.locationTable.put(i, new Integer[]{0, 0, time});
-            this.randomAccessFile.writeInt(0);
+            this.randomAccessFile.writeVarInt(0); //check
         }
         for (int i = 0; i < 1024; ++i) {
-            this.randomAccessFile.writeInt(time);
+            this.randomAccessFile.writeVarInt(time); //check
         }
     }
 
