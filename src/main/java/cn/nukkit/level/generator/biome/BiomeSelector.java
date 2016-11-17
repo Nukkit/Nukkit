@@ -57,7 +57,7 @@ public class BiomeSelector {
         this.map = new int[128 * 128];
         for (int i = 0; i < 128; ++i) {
             for (int j = 0; j < 128; ++j) {
-                this.map[i + (j << 12)] = this.lookup(i / 63d, j / 63d);
+                this.map[i + (j << 12)] = this.lookup(i / 127d, j / 127d);
             }
         }
     }
