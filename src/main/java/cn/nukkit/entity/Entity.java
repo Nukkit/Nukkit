@@ -352,6 +352,12 @@ public abstract class Entity extends Location implements Metadatable {
             this.namedTag.putBoolean("Invulnerable", false);
         }
         this.invulnerable = this.namedTag.getBoolean("Invulnerable");
+	    
+	if (!this.namedTag.contains("Scale")) {
+            this.namedTag.putFloat("Scale", 1);
+        }
+        this.scale = this.namedTag.getFloat("Scale");
+        this.setDataProperty(new FloatEntityData(DATA_SCALE, scale), false);
 
         this.chunk.addEntity(this);
         this.level.addEntity(this);
@@ -634,6 +640,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.namedTag.putShort("Air", this.getDataPropertyShort(DATA_AIR));
         this.namedTag.putBoolean("OnGround", this.onGround);
         this.namedTag.putBoolean("Invulnerable", this.invulnerable);
+	this.namedTag.putFloat("Scale", this.scale);
 
         if (!this.effects.isEmpty()) {
             ListTag<CompoundTag> list = new ListTag<>("ActiveEffects");
