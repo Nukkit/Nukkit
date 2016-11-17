@@ -28,11 +28,11 @@ public class AddPaintingPacket extends DataPacket {
     public void encode() {
         setBuffer(new byte[27 + title.length()]);
         this.reset();
-        this.putVarLong(entityUniqueId);
-        this.putEntityId(entityRuntimeId);
-        this.putBlockCoords(x, y, z);
-        this.putVarInt(direction);
-        this.putString(title);
+        this.putVarLong(this.entityUniqueId);
+        this.putVarLong(this.entityRuntimeId);
+        this.putBlockCoords(this.x, this.y, this.z);
+        this.putVarInt(this.direction);
+        this.putString(this.title);
     }
 
     @Override

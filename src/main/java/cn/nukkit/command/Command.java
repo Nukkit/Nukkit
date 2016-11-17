@@ -12,9 +12,9 @@ import cn.nukkit.permission.Permissible;
 import cn.nukkit.timings.Timing;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.TextFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.*;
 
 /**
  * author: MagicDroidX
@@ -106,8 +106,8 @@ public abstract class Command {
      *
      * @return CommandData|null
      */
-    public CommandDataVersions generateCustomCommandData(Player player){
-        if(!this.testPermission(player)){
+    public CommandDataVersions generateCustomCommandData(Player player) {
+        if (!this.testPermission(player)) {
             return null;
         }
 
@@ -126,7 +126,7 @@ public abstract class Command {
         return versions;
     }
 
-    public Map<String, CommandOverload> getOverloads(){
+    public Map<String, CommandOverload> getOverloads() {
         return this.commandData.overloads;
     }
 
@@ -249,7 +249,7 @@ public abstract class Command {
     }
 
     public static final CommandData generateDefaultData() {
-        if(defaultDataTemplate == null){
+        if (defaultDataTemplate == null) {
             //defaultDataTemplate = new Gson().fromJson(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("command_default.json")));
         }
         return defaultDataTemplate.clone();

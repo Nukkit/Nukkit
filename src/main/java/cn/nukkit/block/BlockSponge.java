@@ -34,7 +34,7 @@ public class BlockSponge extends BlockSolidMeta {
     public double getResistance() {
         return 3;
     }
-    
+
     @Override
     public String getName() {
         String[] names = new String[]{
@@ -43,11 +43,11 @@ public class BlockSponge extends BlockSolidMeta {
         };
         return names[this.meta & 0x07];
     }
-    
-	@Override
-	public int[][] getDrops(Item item) {
-		return new int[][] { { Item.SPONGE, this.getDamage(), 1 } };
-	}
+
+    @Override
+    public int[][] getDrops(Item item) {
+        return new int[][]{{Item.SPONGE, this.getDamage(), 1}};
+    }
 
     @Override
     public BlockColor getColor() {

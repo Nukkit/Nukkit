@@ -127,7 +127,6 @@ public class Normal extends Generator {
         this.selector.recalculate();
 
 
-
         PopulatorCaves caves = new PopulatorCaves();
         this.populators.add(caves);
 

@@ -32,7 +32,7 @@ public class SetEntityDataPacket extends DataPacket {
         byte[] meta = Binary.writeMetadata(this.metadata);
         setBuffer(new byte[9 + meta.length]);
         this.reset();
-        this.putEntityId(this.eid);
+        this.putVarLong(this.eid);
         this.put(Binary.writeMetadata(this.metadata));
     }
 }

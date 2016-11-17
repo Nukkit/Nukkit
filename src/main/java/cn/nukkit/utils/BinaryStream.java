@@ -404,13 +404,12 @@ public class BinaryStream extends OutputStream{
 
     public final void putSkin(Skin skin) {
         this.putString(skin.getModel());
-        this.putUnsignedVarInt(skin.getData().length);
-        this.put(skin.getData());
+        this.putByteArray(skin.getData());
     }
 
     public Skin getSkin() {
         String modelId = this.getString();
-        byte[] skinData = this.get((int)this.getUnsignedVarInt());
+        byte[] skinData = this.getByteArray();
         return new Skin(skinData, modelId);
     }
 
@@ -449,14 +448,22 @@ public class BinaryStream extends OutputStream{
         this.put(nbt);
     }
 
+    public byte[] getByteArray() {
+        return this.get((int) this.getUnsignedVarInt());
+    }
+
+    public void putByteArray(byte[] b) {
+        this.putUnsignedVarInt(b.length);
+        this.put(b);
+    }
+
     public String getString() {
-        return new String(this.get((int) this.getUnsignedVarInt()), StandardCharsets.UTF_8);
+        return new String(this.getByteArray(), StandardCharsets.UTF_8);
     }
 
     public final void putString(String string) {
         byte[] b = string.getBytes(StandardCharsets.UTF_8);
-        this.putUnsignedVarInt(b.length);
-        this.put(b);
+        this.putByteArray(b);
     }
 
     public long getUnsignedVarInt() {
@@ -495,16 +502,8 @@ public class BinaryStream extends OutputStream{
         VarInt.writeUnsignedVarLong(this, v);
     }
 
-    public long getEntityId() {
-        return this.getVarLong();
-    }
-
-    public void putEntityId(long v) {
-        this.putVarLong(v);
-    }
-
     public BlockVector3 getBlockCoords() {
-        return new BlockVector3(this.getVarInt(), (int)this.getUnsignedVarInt(), this.getVarInt());
+        return new BlockVector3(this.getVarInt(), (int) this.getUnsignedVarInt(), this.getVarInt());
     }
 
     public void putBlockCoords(int x, int y, int z) {

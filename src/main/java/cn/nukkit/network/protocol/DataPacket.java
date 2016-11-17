@@ -3,6 +3,7 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.raknet.protocol.EncapsulatedPacket;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
+import cn.nukkit.utils.VarInt;
 
 /**
  * author: MagicDroidX
@@ -79,7 +80,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
             }
             byte[] rawBuf = packet.getRawBuffer();
             int len = packet.getCount();
-            Binary.writeUnsignedVarInt(len, out);
+            VarInt.writeUnsignedVarInt(out, len);
             out.write(rawBuf, 0, len);
         }
         return out.toByteArray();

@@ -42,9 +42,9 @@ public class AddItemEntityPacket extends DataPacket {
         }
         this.reset();
         this.putVarLong(this.entityUniqueId);
-        this.putEntityId(this.entityRuntimeId);
+        this.putVarLong(this.entityRuntimeId);
         this.putSlot(this.item);
-        this.putVector3f(x, y, z);
-        this.putVector3f(speedX, speedY, speedZ);
+        this.putVector3f(this.x, this.y, this.z);
+        this.putVector3f(this.speedX, this.speedY, this.speedZ);
     }
 }

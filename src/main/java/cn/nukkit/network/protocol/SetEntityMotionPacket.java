@@ -30,7 +30,7 @@ public class SetEntityMotionPacket extends DataPacket {
     public void encode() {
         setBuffer(new byte[21]);
         this.reset();
-        this.putEntityId(eid);
+        this.putVarLong(this.eid);
         this.putVector3f(this.motionX, this.motionY, this.motionZ);
     }
 }

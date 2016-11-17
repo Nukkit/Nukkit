@@ -397,7 +397,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.recalculatePermissions();
         this.getAdventureSettings().update();
-        if (this.isEnableClientCommand()) this.sendCommandData();
     }
 
     @Override
@@ -454,6 +453,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.hasPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE)) {
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE, this);
         }
+
+        if (this.isEnableClientCommand()) this.sendCommandData();
     }
 
     public boolean isEnableClientCommand() {
@@ -472,15 +473,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         AvailableCommandsPacket pk = new AvailableCommandsPacket();
         Map<String, CommandDataVersions> data = new HashMap<>();
         int count = 0;
-        for (Command command: this.server.getCommandMap().getCommands().values()){
-            if(!command.testPermissionSilent(this)){
+        for (Command command : this.server.getCommandMap().getCommands().values()) {
+            if (!command.testPermissionSilent(this)) {
                 continue;
             }
             ++count;
             CommandDataVersions data0 = command.generateCustomCommandData(this);
             data.put(command.getName(), data0);
         }
-        if(count > 0){
+        if (count > 0) {
             //TODO: structure checking
             pk.commands = new Gson().toJson(data);
             this.dataPacket(pk);
@@ -1469,19 +1470,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendAttributes() {
-        this.sendAttributes(false);
-    }
-
-    //TODO: send all or not
-    public void sendAttributes(boolean sendAll) {
         UpdateAttributesPacket pk = new UpdateAttributesPacket();
         pk.entityId = 0;
         pk.entries = new Attribute[]{
-                Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getMaxHealth()).setValue(this.getHealth()),
+                Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getMaxHealth()).setValue(health > 0 ? (health < getMaxHealth() ? health : getMaxHealth()) : 0),
+                Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(this.getFoodData().getLevel()),
                 Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(this.getMovementSpeed()),
-                Attribute.getAttribute(Attribute.EXPERIENCE).setValue(this.getExperience()),
                 Attribute.getAttribute(Attribute.EXPERIENCE_LEVEL).setValue(this.getExperienceLevel()),
-                Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(this.getFoodData().getLevel())
+                Attribute.getAttribute(Attribute.EXPERIENCE).setValue(((float) this.getExperience()) / calculateRequireExperience(this.getExperienceLevel()))
         };
         this.dataPacket(pk);
     }
@@ -1533,7 +1529,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.inAirTicks = 0;
                     this.highestPosition = this.y;
                 } else {
-                    if (!this.getAdventureSettings().canFly() && this.inAirTicks > 10 && !this.isSleeping() && !this.isImmobile()) {
+                    if (!server.getAllowFlight() && !this.getAdventureSettings().canFly() && this.inAirTicks > 10 && !this.isSleeping() && !this.isImmobile()) {
                         double expectedVelocity = (-this.getGravity()) / ((double) this.getDrag()) - ((-this.getGravity()) / ((double) this.getDrag())) * Math.exp(-((double) this.getDrag()) * ((double) (this.inAirTicks - this.startAirTicks)));
                         double diff = (this.speed.y - expectedVelocity) * (this.speed.y - expectedVelocity);
 
@@ -1786,7 +1782,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.dataPacket(setTimePacket);
 
         this.setMovementSpeed(DEFAULT_SPEED);
-        this.sendAttributes(true);
+        this.sendAttributes();
         this.setNameTagVisible(true);
         this.setNameTagAlwaysVisible(true);
 
@@ -1931,7 +1927,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:
-
+                    if (this.teleportPosition != null) {
+                        break;
+                    }
 
                     MovePlayerPacket movePlayerPacket = (MovePlayerPacket) packet;
                     Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
@@ -1942,8 +1940,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.forceMovement = new Vector3(this.x, this.y, this.z);
                     }
 
-                    if (this.teleportPosition != null || this.forceMovement != null && (newPos.distanceSquared(this.forceMovement) > 0.1 || revert)) {
-                        this.sendPosition(this.teleportPosition == null ? this.forceMovement : this.teleportPosition, movePlayerPacket.yaw, movePlayerPacket.pitch);
+                    if (this.forceMovement != null && (newPos.distanceSquared(this.forceMovement) > 0.1 || revert)) {
+                        this.sendPosition(this.forceMovement, movePlayerPacket.yaw, movePlayerPacket.pitch);
                     } else {
 
                         movePlayerPacket.yaw %= 360;
@@ -1969,7 +1967,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     //TODO: player abilities, check for other changes
                     AdventureSettingsPacket adventureSettingsPacket = (AdventureSettingsPacket) packet;
                     if (adventureSettingsPacket.isFlying && !this.getAdventureSettings().canFly()) {
-                        this.kick("Flying is not enabled on this server");
+                        this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server");
                         break;
                     }
                     PlayerToggleFlightEvent playerToggleFlightEvent = new PlayerToggleFlightEvent(this, adventureSettingsPacket.isFlying);
@@ -2753,7 +2751,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false);
                     break;
                 case ProtocolInfo.COMMAND_STEP_PACKET:
-                    if(!this.spawned || !this.isAlive()){
+                    if (!this.spawned || !this.isAlive()) {
                         break;
                     }
                     this.craftingType = 0;
@@ -2761,10 +2759,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     String commandText = commandStepPacket.command;
                     Command command = this.getServer().getCommandMap().getCommand(commandText);
                     if (command != null) {
-                        if(commandStepPacket.args != null && commandStepPacket.args.size() > 0) {
+                        if (commandStepPacket.args != null && commandStepPacket.args.size() > 0) {
                             CommandParameter[] pars = command.getCommandParameters(commandStepPacket.overload);
                             if (pars != null) {
-                                for (CommandParameter par: pars) {
+                                for (CommandParameter par : pars) {
                                     JsonElement arg = commandStepPacket.args.get(par.name);
                                     if (arg != null) {
                                         switch (par.type) {
@@ -2794,6 +2792,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
                     }
                     PlayerCommandPreprocessEvent playerCommandPreprocessEvent = new PlayerCommandPreprocessEvent(this, "/" + commandText);
+                    this.server.getPluginManager().callEvent(playerCommandPreprocessEvent);
                     if (playerCommandPreprocessEvent.isCancelled()) {
                         break;
                     }
@@ -3240,8 +3239,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.currentTransaction = null;
                     } else {
                         if (containerSetSlotPacket.item.getId() != 0) {
-                           inventory.sendSlot(containerSetSlotPacket.hotbarSlot, this);
-                           inventory.sendSlot(containerSetSlotPacket.slot, this);
+                            inventory.sendSlot(containerSetSlotPacket.hotbarSlot, this);
+                            inventory.sendSlot(containerSetSlotPacket.slot, this);
                         }
                     }
 
@@ -3295,7 +3294,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET:
                     RequestChunkRadiusPacket requestChunkRadiusPacket = (RequestChunkRadiusPacket) packet;
                     ChunkRadiusUpdatedPacket chunkRadiusUpdatePacket = new ChunkRadiusUpdatedPacket();
-                    this.chunkRadius = Math.max(5, Math.min((int)requestChunkRadiusPacket.radius, this.viewDistance));
+                    this.chunkRadius = Math.max(5, Math.min((int) requestChunkRadiusPacket.radius, this.viewDistance));
                     chunkRadiusUpdatePacket.radius = this.chunkRadius;
                     this.dataPacket(chunkRadiusUpdatePacket);
                     break;
@@ -3373,12 +3372,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             String message;
             if (isAdmin) {
                 if (!this.isBanned()) {
-                    message = "Kicked by admin." + (!"".equals(reason) ? " Reason: " + reason : "");
+                    message = "Kicked by admin." + (!"".equals(reasonString) ? " Reason: " + reasonString : "");
                 } else {
                     message = reasonString;
                 }
             } else {
-                if ("".equals(reason)) {
+                if ("".equals(reasonString)) {
                     message = "disconnectionScreen.noReason";
                 } else {
                     message = reasonString;
@@ -4246,9 +4245,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     //todo a lot on dimension
 
-    public void setDimension() {
+    public void setDimension(int dimension) {
         ChangeDimensionPacket pk = new ChangeDimensionPacket();
-        pk.dimension = (byte) (getLevel().getDimension() & 0xff);
+        pk.dimension = getLevel().getDimension();
         this.dataPacket(pk);
     }
 

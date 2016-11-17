@@ -68,6 +68,7 @@ import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.*;
+
 import java.io.*;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
@@ -1003,13 +1004,13 @@ public class Server {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
         List<PlayerListPacket.Entry> entries = new ArrayList<>();
-        for (Player p: this.playerList.values()) {
+        for (Player p : this.playerList.values()) {
             if (p != player) entries.add(
                     new PlayerListPacket.Entry(
-                    p.getUniqueId(),
-                    p.getId(),
-                    p.getDisplayName(),
-                    p.getSkin()));
+                            p.getUniqueId(),
+                            p.getId(),
+                            p.getDisplayName(),
+                            p.getSkin()));
         }
         pk.entries = entries.stream().toArray(PlayerListPacket.Entry[]::new);
         player.dataPacket(pk);
@@ -2089,7 +2090,7 @@ public class Server {
     public boolean shouldSavePlayerData() {
         return this.getPropertyBoolean("player.save-player-data", true);
     }
-    
+
     private void registerEntities() {
         Entity.registerEntity("Arrow", EntityArrow.class);
         Entity.registerEntity("Item", EntityItem.class);
