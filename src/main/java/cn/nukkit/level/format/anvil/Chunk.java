@@ -11,10 +11,7 @@ import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.stream.NBTOutputStream;
 import cn.nukkit.nbt.tag.*;
-import cn.nukkit.utils.Binary;
-import cn.nukkit.utils.BinaryStream;
-import cn.nukkit.utils.ChunkException;
-import cn.nukkit.utils.Zlib;
+import cn.nukkit.utils.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -151,8 +148,8 @@ public class Chunk extends BaseChunk {
         this.biomeColors = biomeColors;
 
         int[] heightMap = this.nbt.getIntArray("HeightMap");
-        if (heightMap.length != 512) {
-            heightMap = new int[512];
+        if (heightMap.length != 256) {
+            heightMap = new int[256];
             Arrays.fill(heightMap, 255);
         }
         this.heightMap = heightMap;
@@ -317,8 +314,8 @@ public class Chunk extends BaseChunk {
     public byte[] toBinary() {
         CompoundTag nbt = this.getNBT().copy();
 
-        nbt.putInt("xPos", this.x);
-        nbt.putInt("zPos", this.z);
+        nbt.putVarInt("xPos", this.x);
+        nbt.putVarInt("zPos", this.z);
 
         ListTag<CompoundTag> sectionList = new ListTag<>("Sections");
         for (cn.nukkit.level.format.ChunkSection section : this.getSections()) {
@@ -335,7 +332,7 @@ public class Chunk extends BaseChunk {
         }
         nbt.putList(sectionList);
 
-        nbt.putIntArray("BiomeColors", this.getBiomeColorArray());
+        nbt.putIntArray("BiomeColors", this.getBiomeColorArray());// Int is outdated ,idk level uses Int and not components of VarInt
         nbt.putIntArray("HeightMap", this.getHeightMapArray());
 
         ArrayList<CompoundTag> entities = new ArrayList<>();
@@ -399,7 +396,7 @@ public class Chunk extends BaseChunk {
                 chunk.sections[y] = new EmptyChunkSection(y);
             }
 
-            chunk.heightMap = new int[512];
+            chunk.heightMap = new int[256];
             chunk.biomeColors = new int[256];
 
             chunk.nbt.putByte("V", 1);
