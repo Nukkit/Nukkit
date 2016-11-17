@@ -11,6 +11,11 @@ public class PlayerQuitEvent extends PlayerEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     protected TextContainer quitMessage;
     protected boolean autoSave = true;
     protected String reason;

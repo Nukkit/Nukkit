@@ -72,7 +72,6 @@ public class BlockSapling extends BlockFlowable {
 
             return true;
         }
-        this.getLevel().loadChunk((int) this.x >> 4, (int) this.z >> 4);
         return false;
     }
 

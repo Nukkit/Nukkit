@@ -11,6 +11,10 @@ import java.net.InetSocketAddress;
 public class SERVER_HANDSHAKE_DataPacket extends Packet {
     public static final byte ID = (byte) 0x10;
 
+    public SERVER_HANDSHAKE_DataPacket() {
+        super(96);
+    }
+
     @Override
     public byte getID() {
         return ID;

@@ -11,6 +11,11 @@ public class PlayerRespawnEvent extends PlayerEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private Position position;
 
     public PlayerRespawnEvent(Player player, Position position) {

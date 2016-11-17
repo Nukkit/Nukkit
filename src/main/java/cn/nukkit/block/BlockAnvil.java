@@ -11,12 +11,24 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockAnvil extends BlockFallable {
 
+    public int meta;
+
+    @Override
+    public final int getDamage() {
+        return this.meta;
+    }
+
+    @Override
+    public final void setDamage(Integer meta) {
+        this.meta = (meta == null ? 0 : meta & 0x0f);
+    }
+
     public BlockAnvil() {
         this(0);
     }
 
     public BlockAnvil(int meta) {
-        super(meta);
+        this.meta = meta;
     }
 
     @Override

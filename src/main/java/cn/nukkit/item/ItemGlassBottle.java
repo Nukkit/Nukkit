@@ -34,10 +34,9 @@ public class ItemGlassBottle extends Item {
             } else if (this.count > 1) {
                 this.count--;
                 player.getInventory().setItemInHand(this);
-                if (player.getInventory().canAddItem(potion)) {
-                    player.getInventory().addItem(potion);
-                } else {
-                    player.getLevel().dropItem(player.add(0, 1.3, 0), potion, player.getDirectionVector().multiply(0.4));
+                Item[] left = player.getInventory().addItem(potion);
+                for (Item current : left) {
+                    player.getLevel().dropItem(player.add(0, 1.3, 0), current, player.getDirectionVector().multiply(0.4));
                 }
             }
         }

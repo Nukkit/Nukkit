@@ -17,6 +17,11 @@ public class InventoryOpenEvent extends InventoryEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final Player who;
 
     public InventoryOpenEvent(Inventory inventory, Player who) {

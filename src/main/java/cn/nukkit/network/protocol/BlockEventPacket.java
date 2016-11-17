@@ -7,6 +7,10 @@ package cn.nukkit.network.protocol;
 public class BlockEventPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.BLOCK_EVENT_PACKET;
 
+    public BlockEventPacket() {
+        super(21);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;

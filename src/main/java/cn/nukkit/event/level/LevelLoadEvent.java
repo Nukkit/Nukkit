@@ -15,6 +15,11 @@ public class LevelLoadEvent extends LevelEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public LevelLoadEvent(Level level) {
         super(level);
     }

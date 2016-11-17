@@ -24,6 +24,11 @@ public class ContainerSetContentPacket extends DataPacket {
     public int[] hotbar = new int[0];
 
     @Override
+    public int getBlockSize() {
+        return 1024;
+    }
+
+    @Override
     public DataPacket clean() {
         this.slots = new Item[0];
         this.hotbar = new int[0];
@@ -57,7 +62,6 @@ public class ContainerSetContentPacket extends DataPacket {
         for (Item slot : this.slots) {
             this.putSlot(slot);
         }
-
         if (this.windowid == SPECIAL_INVENTORY && this.hotbar.length > 0) {
             this.putUnsignedVarInt(this.hotbar.length);
             for (int slot : this.hotbar) {

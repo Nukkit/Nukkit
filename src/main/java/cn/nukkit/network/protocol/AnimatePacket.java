@@ -10,6 +10,10 @@ public class AnimatePacket extends DataPacket {
     public long eid;
     public int action;
 
+    public AnimatePacket() {
+        super(10);
+    }
+
     @Override
     public void decode() {
         this.action = (int) this.getUnsignedVarInt();

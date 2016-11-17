@@ -20,12 +20,8 @@ import java.util.Map;
  */
 public class BlockEnchantingTable extends BlockSolid {
     public BlockEnchantingTable() {
-        this(0);
     }
 
-    public BlockEnchantingTable(int meta) {
-        super(meta);
-    }
 
     @Override
     public int getId() {

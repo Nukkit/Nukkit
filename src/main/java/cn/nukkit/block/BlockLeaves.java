@@ -9,7 +9,7 @@ import cn.nukkit.utils.BlockColor;
  * author: Angelic47
  * Nukkit Project
  */
-public class BlockLeaves extends BlockTransparent {
+public class BlockLeaves extends BlockTransparentMeta {
     public static final int OAK = 0;
     public static final int SPRUCE = 1;
     public static final int BRICH = 2;

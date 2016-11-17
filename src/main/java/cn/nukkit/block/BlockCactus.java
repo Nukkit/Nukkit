@@ -15,7 +15,7 @@ import cn.nukkit.utils.BlockColor;
 /**
  * @author Nukkit Project Team
  */
-public class BlockCactus extends BlockTransparent {
+public class BlockCactus extends BlockTransparentMeta {
 
     public BlockCactus(int meta) {
         super(meta);

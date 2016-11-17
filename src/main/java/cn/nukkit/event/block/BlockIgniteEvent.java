@@ -13,6 +13,11 @@ public class BlockIgniteEvent extends BlockEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final Block source;
     private final Entity entity;
     private final BlockIgniteCause cause;

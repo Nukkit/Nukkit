@@ -12,9 +12,9 @@ import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -62,7 +62,7 @@ public class Flat extends Generator {
     }
 
     public Flat() {
-        this(new HashMap<>());
+        this(new ConcurrentHashMap<>(8, 0.9f, 1));
     }
 
     public Flat(Map<String, Object> options) {
@@ -132,7 +132,7 @@ public class Flat extends Generator {
                 } else if (Pattern.matches("^[0-9a-z_]+\\([0-9a-z_ =]+\\)$", option)) {
                     String name = option.substring(0, option.indexOf("("));
                     String extra = option.substring(option.indexOf("(") + 1, option.indexOf(")"));
-                    Map<String, Float> map = new HashMap<>();
+                    Map<String, Float> map = new ConcurrentHashMap<>(8, 0.9f, 1);
                     for (String kv : extra.split(" ")) {
                         String[] data = kv.split("=");
                         map.put(data[0], Float.valueOf(data[1]));

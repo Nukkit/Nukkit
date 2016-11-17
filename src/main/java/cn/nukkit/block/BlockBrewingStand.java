@@ -18,11 +18,6 @@ import java.util.Map;
 public class BlockBrewingStand extends BlockSolid {
 
     public BlockBrewingStand() {
-        this(0);
-    }
-
-    public BlockBrewingStand(int meta) {
-        super(meta);
     }
 
     @Override

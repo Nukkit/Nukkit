@@ -9,11 +9,6 @@ import cn.nukkit.item.Item;
 public class BlockDaylightDetectorInverted extends BlockDaylightDetector {
 
     public BlockDaylightDetectorInverted() {
-        this(0);
-    }
-
-    public BlockDaylightDetectorInverted(int meta) {
-        super(meta);
     }
 
     @Override

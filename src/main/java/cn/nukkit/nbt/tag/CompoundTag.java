@@ -2,15 +2,14 @@ package cn.nukkit.nbt.tag;
 
 import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.stream.NBTOutputStream;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CompoundTag extends Tag {
-    private final Map<String, Tag> tags = new HashMap<>();
+    private final Map<String, Tag> tags = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public CompoundTag() {
         super("");
@@ -193,7 +192,7 @@ public class CompoundTag extends Tag {
     }
 
     public Map<String, Tag> getTags() {
-        return new HashMap<>(this.tags);
+        return new ConcurrentHashMap<>(this.tags);
     }
 
     public boolean getBoolean(String name) {

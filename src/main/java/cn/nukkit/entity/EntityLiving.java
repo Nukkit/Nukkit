@@ -15,7 +15,6 @@ import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.BlockIterator;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -175,12 +174,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     @Override
-    public boolean entityBaseTick() {
+    public synchronized boolean entityBaseTick() {
         return this.entityBaseTick(1);
     }
 
     @Override
-    public boolean entityBaseTick(int tickDiff) {
+    public synchronized boolean entityBaseTick(int tickDiff) {
         Timings.livingEntityBaseTickTimer.startTiming();
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_BREATHING, !this.isInsideOfWater());
 

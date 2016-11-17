@@ -15,11 +15,6 @@ import cn.nukkit.utils.BlockColor;
 public class BlockMycelium extends BlockSolid {
 
     public BlockMycelium() {
-        this(0);
-    }
-
-    public BlockMycelium(int meta) {
-        super(0);
     }
 
     @Override

@@ -1,14 +1,19 @@
 package cn.nukkit.utils;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.data.*;
+import cn.nukkit.entity.data.ByteEntityData;
+import cn.nukkit.entity.data.EntityData;
+import cn.nukkit.entity.data.EntityMetadata;
+import cn.nukkit.entity.data.FloatEntityData;
+import cn.nukkit.entity.data.IntEntityData;
+import cn.nukkit.entity.data.IntPositionEntityData;
+import cn.nukkit.entity.data.LongEntityData;
+import cn.nukkit.entity.data.ShortEntityData;
+import cn.nukkit.entity.data.SlotEntityData;
+import cn.nukkit.entity.data.StringEntityData;
+import cn.nukkit.entity.data.Vector3fEntityData;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockVector3;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;

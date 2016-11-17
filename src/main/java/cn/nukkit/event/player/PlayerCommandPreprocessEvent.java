@@ -11,6 +11,11 @@ public class PlayerCommandPreprocessEvent extends PlayerMessageEvent implements 
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public PlayerCommandPreprocessEvent(Player player, String message) {
         this.player = player;
         this.message = message;

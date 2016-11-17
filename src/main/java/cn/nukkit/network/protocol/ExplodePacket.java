@@ -16,6 +16,10 @@ public class ExplodePacket extends DataPacket {
     public float radius;
     public Vector3[] records = new Vector3[0];
 
+    public ExplodePacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -34,6 +38,7 @@ public class ExplodePacket extends DataPacket {
 
     @Override
     public void encode() {
+        setBuffer(new byte[21 + records.length * 3]);
         this.reset();
         this.putVector3f(this.x, this.y, this.z);
         this.putLFloat(this.radius);

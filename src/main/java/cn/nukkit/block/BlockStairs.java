@@ -9,7 +9,7 @@ import cn.nukkit.math.AxisAlignedBB;
  * author: MagicDroidX
  * Nukkit Project
  */
-public abstract class BlockStairs extends BlockTransparent {
+public abstract class BlockStairs extends BlockTransparentMeta {
 
     protected BlockStairs(int meta) {
         super(meta);

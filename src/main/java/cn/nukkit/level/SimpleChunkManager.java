@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Nukkit Project
  */
 public class SimpleChunkManager implements ChunkManager {
-    protected Map<Long, FullChunk> chunks = new ConcurrentHashMap<>();
+    protected Map<Long, FullChunk> chunks = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     protected final long seed;
 
@@ -75,7 +75,7 @@ public class SimpleChunkManager implements ChunkManager {
     }
 
     public void cleanChunks() {
-        this.chunks = new HashMap<>();
+        this.chunks = new ConcurrentHashMap<>(8, 0.9f, 1);
     }
 
     @Override

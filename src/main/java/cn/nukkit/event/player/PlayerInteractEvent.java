@@ -20,6 +20,11 @@ public class PlayerInteractEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public static final int LEFT_CLICK_BLOCK = 0;
     public static final int RIGHT_CLICK_BLOCK = 1;
     public static final int LEFT_CLICK_AIR = 2;

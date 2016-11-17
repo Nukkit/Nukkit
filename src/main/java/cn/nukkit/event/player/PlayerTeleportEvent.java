@@ -15,6 +15,11 @@ public class PlayerTeleportEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private TeleportCause cause;
     private Location from;
     private Location to;

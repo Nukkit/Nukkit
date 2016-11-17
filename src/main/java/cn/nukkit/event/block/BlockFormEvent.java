@@ -16,6 +16,11 @@ public class BlockFormEvent extends BlockGrowEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public BlockFormEvent(Block block, Block newState) {
         super(block, newState);
     }

@@ -5,16 +5,16 @@ import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.Level;
-import cn.nukkit.level.format.generic.BaseFullChunk;
+import cn.nukkit.level.format.FullChunk;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import java.lang.management.ManagementFactory;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 import static cn.nukkit.timings.Timings.fullServerTickTimer;
 import static cn.nukkit.timings.TimingsManager.MINUTE_REPORTS;
@@ -31,9 +31,9 @@ public class TimingsHistory {
     public static long activatedEntityTicks;
 
     private static int levelIdPool = 1;
-    static Map<String, Integer> levelMap = new HashMap<>();
-    static Map<Integer, String> entityMap = new HashMap<>();
-    static Map<Integer, String> blockEntityMap = new HashMap<>();
+    static Map<String, Integer> levelMap = new ConcurrentHashMap<>(8, 0.9f, 1);
+    static Map<Integer, String> entityMap = new ConcurrentHashMap<>(8, 0.9f, 1);
+    static Map<Integer, String> blockEntityMap = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private final long endTime;
     private final long startTime;
@@ -70,13 +70,13 @@ public class TimingsHistory {
             this.entries[i++] = new TimingsHistoryEntry(timing);
         }
 
-        final Map<Integer, AtomicInteger> entityCounts = new HashMap<>();
-        final Map<Integer, AtomicInteger> blockEntityCounts = new HashMap<>();
+        final Map<Integer, AtomicInteger> entityCounts = new ConcurrentHashMap<>(8, 0.9f, 1);
+        final Map<Integer, AtomicInteger> blockEntityCounts = new ConcurrentHashMap<>(8, 0.9f, 1);
         final Gson GSON = new Gson();
         // Information about all loaded entities/block entities
         for (Level level : Server.getInstance().getLevels().values()) {
             JsonArray jsonLevel = new JsonArray();
-            for (BaseFullChunk chunk : level.getChunks().values()) {
+            for (FullChunk chunk : level.getChunks().values()) {
                 entityCounts.clear();
                 blockEntityCounts.clear();
 

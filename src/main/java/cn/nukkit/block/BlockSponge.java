@@ -7,10 +7,10 @@ import cn.nukkit.utils.BlockColor;
  * author: Angelic47
  * Nukkit Project
  */
-public class BlockSponge extends BlockSolid {
-
-    public static final int DRY = 0;
-    public static final int WET = 1;
+public class BlockSponge extends BlockSolidMeta {
+	
+	 public static final int DRY = 0;
+	 public static final int WET = 1;
 
     public BlockSponge() {
         this(0);

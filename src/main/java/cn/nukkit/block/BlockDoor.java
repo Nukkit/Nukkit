@@ -12,7 +12,7 @@ import cn.nukkit.math.Vector3;
  * author: MagicDroidX
  * Nukkit Project
  */
-public abstract class BlockDoor extends BlockTransparent {
+public abstract class BlockDoor extends BlockTransparentMeta {
 
     protected BlockDoor(int meta) {
         super(meta);

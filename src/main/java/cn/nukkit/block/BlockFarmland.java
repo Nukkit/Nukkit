@@ -18,7 +18,6 @@ public class BlockFarmland extends BlockTransparent {
     }
 
     public BlockFarmland(int meta) {
-        super(meta);
     }
 
     @Override
@@ -63,7 +62,7 @@ public class BlockFarmland extends BlockTransparent {
         if (type == Level.BLOCK_UPDATE_RANDOM) {
             Vector3 v = new Vector3();
 
-            if (this.level.getBlock(v.setComponents(x, this.y + 1, z)) instanceof BlockCrops) {
+            if (this.level.getTemporalBlock((int) x, (int) this.y + 1, (int) z) instanceof BlockCrops) {
                 return 0;
             }
 
@@ -75,7 +74,7 @@ public class BlockFarmland extends BlockTransparent {
                         continue;
                     }
 
-                    Block block = this.level.getBlock(v.setComponents(x, this.y, z));
+                    Block block = this.level.getTemporalBlock(v.setComponents(x, this.y, z));
 
                     if (block instanceof BlockWater) {
                         found = true;
@@ -84,12 +83,12 @@ public class BlockFarmland extends BlockTransparent {
                 }
             }
 
-            Block block = this.level.getBlock(v.setComponents(x, y - 1, z));
+            Block block = this.level.getTemporalBlock(v.setComponents(x, y - 1, z));
             if (found || block instanceof BlockWater) {
                 return Level.BLOCK_UPDATE_RANDOM;
             }
 
-            this.level.setBlock(this, new BlockDirt(), true, true);
+            this.level.setBlock(this, new BlockDirt(), false, true);
 
             return Level.BLOCK_UPDATE_RANDOM;
         }

@@ -17,6 +17,11 @@ public class PotionCollideEvent extends PotionEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final EntityPotion thrownPotion;
 
     public PotionCollideEvent(Potion potion, EntityPotion thrownPotion) {

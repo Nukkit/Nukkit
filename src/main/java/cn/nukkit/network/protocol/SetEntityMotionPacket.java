@@ -12,6 +12,10 @@ public class SetEntityMotionPacket extends DataPacket {
     public float motionY;
     public float motionZ;
 
+    public SetEntityMotionPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -24,6 +28,7 @@ public class SetEntityMotionPacket extends DataPacket {
 
     @Override
     public void encode() {
+        setBuffer(new byte[21]);
         this.reset();
         this.putVarLong(this.eid);
         this.putVector3f(this.motionX, this.motionY, this.motionZ);

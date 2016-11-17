@@ -12,6 +12,11 @@ public class PlayerBucketEmptyEvent extends PlayerBucketEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public PlayerBucketEmptyEvent(Player who, Block blockClicked, Integer blockFace, Item bucket, Item itemInHand) {
         super(who, blockClicked, blockFace, bucket, itemInHand);
     }

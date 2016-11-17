@@ -15,7 +15,6 @@ public class BlockOreCoal extends BlockSolid {
     }
 
     public BlockOreCoal(int meta) {
-        super(meta);
     }
 
     @Override

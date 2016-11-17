@@ -16,6 +16,11 @@ public class LevelUnloadEvent extends LevelEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public LevelUnloadEvent(Level level) {
         super(level);
     }

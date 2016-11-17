@@ -11,6 +11,11 @@ public class PlayerAchievementAwardedEvent extends PlayerEvent implements Cancel
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     protected final String achievement;
 
     public PlayerAchievementAwardedEvent(Player player, String achievementId) {

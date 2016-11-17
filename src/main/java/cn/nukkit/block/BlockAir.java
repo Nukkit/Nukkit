@@ -10,11 +10,6 @@ import cn.nukkit.math.AxisAlignedBB;
 public class BlockAir extends BlockTransparent {
 
     public BlockAir() {
-        this(0);
-    }
-
-    public BlockAir(int meta) {
-        super(0);
     }
 
     @Override

@@ -33,6 +33,10 @@ public class AdventureSettingsPacket extends DataPacket {
     public int flags = 0;
     public int userPermission;
 
+    public AdventureSettingsPacket() {
+        super(13);
+    }
+
     @Override
     public void decode() {
         this.flags = (int) this.getUnsignedVarInt();

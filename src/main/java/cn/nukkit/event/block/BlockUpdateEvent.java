@@ -16,6 +16,11 @@ public class BlockUpdateEvent extends BlockEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public BlockUpdateEvent(Block block) {
         super(block);
     }

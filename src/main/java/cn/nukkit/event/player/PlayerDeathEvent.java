@@ -14,6 +14,11 @@ public class PlayerDeathEvent extends EntityDeathEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private TextContainer deathMessage;
     private boolean keepInventory = false;
     private boolean keepExperience = false;

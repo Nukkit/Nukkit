@@ -17,6 +17,10 @@ public class MoveEntityPacket extends DataPacket {
     public double headYaw;
     public double pitch;
 
+    public MoveEntityPacket() {
+        super(24);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;

@@ -1,82 +1,39 @@
 package cn.nukkit.raknet.protocol;
 
-import cn.nukkit.utils.Binary;
-
+import cn.nukkit.utils.BinaryStream;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
-public abstract class Packet implements Cloneable {
+public abstract class Packet extends BinaryStream implements Cloneable {
 
-    protected int offset = 0;
-    public byte[] buffer;
     public Long sendTime;
+
+    public Packet(){}
+
+    public Packet(byte[] buffer) {
+        super(buffer);
+    }
+
+    public Packet(int buffer) {
+        super(buffer);
+    }
 
     public abstract byte getID();
 
-    protected byte[] get(int len) {
-        if (len < 0) {
-            this.offset = this.buffer.length - 1;
-            return new byte[0];
-        }
-
-        byte[] buffer = new byte[len];
-        for (int i = 0; i < len; i++) {
-            buffer[i] = this.buffer[this.offset++];
-        }
-        return buffer;
+    @Override
+    public int getBlockSize() {
+        return 32;
     }
 
     protected byte[] getAll() {
         return this.get();
     }
 
-    protected byte[] get() {
-        try {
-            return Arrays.copyOfRange(this.buffer, this.offset, this.buffer.length - 1);
-        } catch (Exception e) {
-            return new byte[0];
-        }
-    }
-
-    protected long getLong() {
-        return Binary.readLong(this.get(8));
-    }
-
-    protected int getInt() {
-        return Binary.readInt(this.get(4));
-    }
-
-    protected short getSignedShort() {
-        return (short) this.getShort();
-    }
-
-    protected int getShort() {
-        return Binary.readShort(this.get(2));
-    }
-
-    protected int getTriad() {
-        return Binary.readTriad(this.get(3));
-    }
-
-    protected int getLTriad() {
-        return Binary.readLTriad(this.get(3));
-    }
-
-    protected byte getByte() {
-        return this.buffer[this.offset++];
-    }
-
-    protected String getString() {
-        return new String(this.get(this.getSignedShort()), StandardCharsets.UTF_8);
-    }
-
     protected InetSocketAddress getAddress() {
-        byte version = this.getByte();
+        int version = this.getByte();
         if (version == 4) {
             String addr = ((~this.getByte()) & 0xff) + "." + ((~this.getByte()) & 0xff) + "." + ((~this.getByte()) & 0xff) + "." + ((~this.getByte()) & 0xff);
             int port = this.getShort();
@@ -85,51 +42,6 @@ public abstract class Packet implements Cloneable {
             //todo IPV6 SUPPORT
             return null;
         }
-    }
-
-    protected boolean feof() {
-        return !(this.offset >= 0 && this.offset + 1 <= this.buffer.length);
-    }
-
-    protected void put(byte[] b) {
-        this.buffer = Binary.appendBytes(this.buffer, b);
-    }
-
-    protected void putLong(long v) {
-        this.put(Binary.writeLong(v));
-    }
-
-    protected void putInt(int v) {
-        this.put(Binary.writeInt(v));
-    }
-
-    protected void putShort(int v) {
-        this.put(Binary.writeShort(v));
-    }
-
-    protected void putSignedShort(short v) {
-        this.put(Binary.writeShort(v & 0xffff));
-    }
-
-    protected void putTriad(int v) {
-        this.put(Binary.writeTriad(v));
-    }
-
-    protected void putLTriad(int v) {
-        this.put(Binary.writeLTriad(v));
-    }
-
-    protected void putByte(byte b) {
-        byte[] newBytes = new byte[this.buffer.length + 1];
-        System.arraycopy(this.buffer, 0, newBytes, 0, this.buffer.length);
-        newBytes[this.buffer.length] = b;
-        this.buffer = newBytes;
-    }
-
-    protected void putString(String str) {
-        byte[] b = str.getBytes(StandardCharsets.UTF_8);
-        this.putShort(b.length);
-        this.put(b);
     }
 
     protected void putAddress(String addr, int port) {
@@ -153,7 +65,10 @@ public abstract class Packet implements Cloneable {
     }
 
     public void encode() {
-        this.buffer = new byte[]{getID()};
+        if (offset != 0) {
+            setBuffer(new byte[1]);
+        }
+        put(getID());
     }
 
     public void decode() {
@@ -161,16 +76,15 @@ public abstract class Packet implements Cloneable {
     }
 
     public Packet clean() {
-        this.buffer = null;
-        this.offset = 0;
+        reset();
         this.sendTime = null;
         return this;
     }
 
     @Override
     public Packet clone() throws CloneNotSupportedException {
+        getRawBuffer();
         Packet packet = (Packet) super.clone();
-        packet.buffer = this.buffer.clone();
         return packet;
     }
 

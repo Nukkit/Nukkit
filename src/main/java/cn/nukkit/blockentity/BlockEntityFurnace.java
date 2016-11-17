@@ -94,7 +94,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         if (!this.closed) {
             for (Player player : new HashSet<>(this.getInventory().getViewers())) {
                 player.removeWindow(this.getInventory());
@@ -118,7 +118,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
 
     @Override
     public boolean isBlockEntityValid() {
-        int blockID = getBlock().getId();
+        int blockID = this.level.getBlockIdAt((int) x, (int) y, (int) z);
         return blockID == Block.FURNACE || blockID == Block.BURNING_FURNACE;
     }
 
@@ -182,7 +182,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
         maxTime = ev.getBurnTime();
         burnTime = ev.getBurnTime();
         burnDuration = 0;
-        if (this.getBlock().getId() == Item.FURNACE) {
+        if (this.getTemporalBlock().getId() == Item.FURNACE) {
             this.getLevel().setBlock(this, new BlockFurnaceBurning(this.getBlock().getDamage()), true);
         }
 
@@ -245,8 +245,9 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
             }
             ret = true;
         } else {
-            if (this.getBlock().getId() == Item.BURNING_FURNACE) {
-                this.getLevel().setBlock(this, new BlockFurnace(this.getBlock().getDamage()), true);
+            Block block = this.getTemporalBlock();
+            if (block.getId() == Item.BURNING_FURNACE) {
+                this.getLevel().setBlock(this, new BlockFurnace(block.getDamage()), true);
             }
             burnTime = 0;
             cookTime = 0;

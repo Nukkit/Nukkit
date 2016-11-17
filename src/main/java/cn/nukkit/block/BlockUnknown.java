@@ -4,7 +4,7 @@ package cn.nukkit.block;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class BlockUnknown extends Block {
+public class BlockUnknown extends BlockMeta {
 
     private final int id;
 
@@ -25,5 +25,10 @@ public class BlockUnknown extends Block {
     @Override
     public String getName() {
         return "Unknown";
+    }
+
+    @Override
+    public boolean canBePlaced() {
+        return false;
     }
 }

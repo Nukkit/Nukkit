@@ -4,7 +4,8 @@ import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -22,6 +23,59 @@ public class Utils {
 
     public static void writeFile(File file, String content) throws IOException {
         writeFile(file, new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    public static <T,U,V> Map<U,V> getOrCreate(Map<T, Map<U, V>> map, T key) {
+        Map<U, V> existing = map.get(key);
+        if (existing == null) {
+            ConcurrentHashMap<U, V> toPut = new ConcurrentHashMap<U, V>();
+            existing = map.putIfAbsent(key, toPut);
+            if (existing == null) {
+                existing = toPut;
+            }
+        }
+        return existing;
+    }
+
+    public static <T, U, V> int remove(Map<T, Map<U, V>> map, T key, U value) {
+        Map<U, V> curMap = map.get(key);
+        while(true) {
+            if((curMap == null) || !curMap.containsKey(value))  {
+                return -1;
+            }
+            if(curMap.size() <= 1) {
+                if(!map.remove(key, curMap)) {
+                    curMap = map.get(key);
+                    continue;
+                }
+                return 0;
+            } else {
+                Map<U, V> newMap = new ConcurrentHashMap<>(curMap);
+                newMap.remove(value);
+                if(!map.replace(key, curMap, newMap)) {
+                    curMap = map.get(key);
+                    continue;
+                }
+                return newMap.size();
+            }
+        }
+    }
+
+    public static <T, U, V extends U> U getOrCreate(Map<T, U> map, Class<V> clazz, T key) {
+        U existing = map.get(key);
+        if (existing != null) {
+            return existing;
+        }
+        try {
+            U toPut = clazz.newInstance();
+            existing = map.putIfAbsent(key, toPut);
+            if (existing == null) {
+                return toPut;
+            }
+            return existing;
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void writeFile(File file, InputStream content) throws IOException {
@@ -103,15 +157,7 @@ public class Utils {
     }
 
     public static UUID dataToUUID(byte[]... params) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        for (byte[] param : params) {
-            try {
-                stream.write(param);
-            } catch (IOException e) {
-                break;
-            }
-        }
-        return UUID.nameUUIDFromBytes(stream.toByteArray());
+        return UUID.nameUUIDFromBytes(Binary.appendBytes(params));
     }
 
 }

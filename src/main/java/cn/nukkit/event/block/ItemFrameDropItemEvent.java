@@ -28,6 +28,11 @@ public class ItemFrameDropItemEvent extends BlockEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public Player getPlayer() {
         return player;
     }

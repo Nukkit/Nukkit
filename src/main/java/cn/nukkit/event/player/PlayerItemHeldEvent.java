@@ -17,6 +17,11 @@ public class PlayerItemHeldEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final Item item;
     private final int slot;
     private final int inventorySlot;

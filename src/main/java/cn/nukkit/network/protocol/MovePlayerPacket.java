@@ -23,6 +23,10 @@ public class MovePlayerPacket extends DataPacket {
     public byte mode = MODE_NORMAL;
     public boolean onGround;
 
+    public MovePlayerPacket() {
+        super(35);
+    }
+
     @Override
     public void decode() {
         this.eid = this.getVarLong();

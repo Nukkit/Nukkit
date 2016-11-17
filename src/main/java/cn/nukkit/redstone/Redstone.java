@@ -4,7 +4,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockRedstoneWire;
 import cn.nukkit.block.BlockSolid;
 import cn.nukkit.math.Vector3;
-
 import java.util.*;
 
 /**
@@ -48,7 +47,7 @@ public class Redstone {
             currentLevel = updatingObj.getPopulation();
             if (currentLevel > updating.getPowerLevel()) {
                 updating.setPowerLevel(currentLevel);
-                updating.getLevel().setBlock(updating, updating, true, true);
+                updating.getLevel().setBlock(updating, updating, false, true);
                 addToQueue(updateQueue, updating);
             }
         }
@@ -67,7 +66,7 @@ public class Redstone {
             currentLevel = updatingObj.getPopulation();
             if (currentLevel > updating.getPowerLevel()) {
                 updating.setPowerLevel(currentLevel);
-                updating.getLevel().setBlock(updating, updating, true, true);
+                updating.getLevel().setBlock(updating, updating, false, true);
                 if (allBlocks.containsKey(updating.getLocationHash())) {
                     allBlocks.remove(updating.getLocationHash());
                 }
@@ -106,7 +105,7 @@ public class Redstone {
 
         for (Block block : updateMap.values()) {
             block.setPowerLevel(0);
-            block.getLevel().setBlock(block, block, true, true);
+            block.getLevel().setBlock(block, block, false, true);
         }
     }
 

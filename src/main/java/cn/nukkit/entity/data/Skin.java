@@ -1,15 +1,15 @@
 package cn.nukkit.entity.data;
 
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
-import java.awt.*;
+import cn.nukkit.utils.BinaryStream;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Base64;
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 
 /**
  * author: MagicDroidX
@@ -113,7 +113,7 @@ public class Skin {
     }
 
     public void parseBufferedImage(BufferedImage image) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        BinaryStream outputStream = new BinaryStream();
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 Color color = new Color(image.getRGB(x, y), true);

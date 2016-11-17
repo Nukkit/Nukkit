@@ -33,13 +33,13 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
 
     private final RakNetServer raknet;
 
-    private final Map<String, Player> players = new ConcurrentHashMap<>();
+    private final Map<String, Player> players = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    private final Map<String, Integer> networkLatency = new ConcurrentHashMap<>();
+    private final Map<String, Integer> networkLatency = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    private final Map<Integer, String> identifiers = new ConcurrentHashMap<>();
+    private final Map<Integer, String> identifiers = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    private final Map<String, Integer> identifiersACK = new ConcurrentHashMap<>();
+    private final Map<String, Integer> identifiersACK = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     private final ServerHandler handler;
 
@@ -71,7 +71,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     }
 
     @Override
-    public void closeSession(String identifier, String reason) {
+    public synchronized void closeSession(String identifier, String reason) {
         if (this.players.containsKey(identifier)) {
             Player player = this.players.get(identifier);
             this.identifiers.remove(player.rawHashCode());
@@ -88,12 +88,12 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     }
 
     @Override
-    public void close(Player player) {
+    public synchronized void close(Player player) {
         this.close(player, "unknown reason");
     }
 
     @Override
-    public void close(Player player, String reason) {
+    public synchronized void close(Player player, String reason) {
         if (this.identifiers.containsKey(player.rawHashCode())) {
             String id = this.identifiers.get(player.rawHashCode());
             this.players.remove(id);
@@ -140,8 +140,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
             try {
                 if (packet.buffer.length > 0) {
                     if (packet.buffer[0] == PING_DataPacket.ID) {
-                        PING_DataPacket pingPacket = new PING_DataPacket();
-                        pingPacket.buffer = packet.buffer;
+                        PING_DataPacket pingPacket = new PING_DataPacket(packet.buffer);
                         pingPacket.decode();
 
                         this.networkLatency.put(identifier, (int) pingPacket.pingID);
@@ -233,13 +232,14 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     @Override
     public Integer putPacket(Player player, DataPacket packet, boolean needACK, boolean immediate) {
         if (this.identifiers.containsKey(player.rawHashCode())) {
-            byte[] buffer = packet.getBuffer();
             String identifier = this.identifiers.get(player.rawHashCode());
             EncapsulatedPacket pk = null;
+            final byte[] buffer;
             if (!packet.isEncoded) {
                 packet.encode();
                 buffer = packet.getBuffer();
             } else if (!needACK) {
+                buffer = packet.getBuffer();
                 if (packet.encapsulatedPacket == null) {
                     packet.encapsulatedPacket = new CacheEncapsulatedPacket();
                     packet.encapsulatedPacket.identifierACK = null;
@@ -253,6 +253,8 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
                     }
                 }
                 pk = packet.encapsulatedPacket;
+            } else {
+                buffer = packet.getBuffer();
             }
 
 

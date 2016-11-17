@@ -16,6 +16,10 @@ public class ContainerSetDataPacket extends DataPacket {
     public int property;
     public int value;
 
+    public ContainerSetDataPacket() {
+        super(6);
+    }
+
     @Override
     public void decode() {
 

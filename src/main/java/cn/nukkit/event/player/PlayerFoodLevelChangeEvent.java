@@ -11,6 +11,11 @@ public class PlayerFoodLevelChangeEvent extends PlayerEvent implements Cancellab
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     protected int foodLevel;
     protected float foodSaturationLevel;
 

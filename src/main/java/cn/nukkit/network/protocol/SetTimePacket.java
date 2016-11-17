@@ -7,6 +7,10 @@ package cn.nukkit.network.protocol;
 public class SetTimePacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.SET_TIME_PACKET;
 
+    public SetTimePacket() {
+        super(6);
+    }
+
     public int time;
     public boolean started = true;
 

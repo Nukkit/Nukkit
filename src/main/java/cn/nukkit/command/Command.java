@@ -12,7 +12,6 @@ import cn.nukkit.permission.Permissible;
 import cn.nukkit.timings.Timing;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.TextFormat;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -115,7 +114,7 @@ public abstract class Command {
         CommandData customData = this.commandData.clone();
         customData.aliases = this.getAliases();
         customData.description = player.getServer().getLanguage().translateString(this.getDescription());
-        customData.permission = player.hasPermission(this.getPermission()) ? "any" : "false";
+        customData.permission = (this.getPermission() == null || player.hasPermission(this.getPermission())) ? "any" : "false";
         this.commandParameters.forEach((key, par) -> {
             CommandOverload overload = new CommandOverload();
             overload.input.parameters = par;

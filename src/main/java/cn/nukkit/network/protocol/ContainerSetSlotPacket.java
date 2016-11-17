@@ -9,6 +9,10 @@ import cn.nukkit.item.Item;
 public class ContainerSetSlotPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.CONTAINER_SET_SLOT_PACKET;
 
+    public ContainerSetSlotPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -29,6 +33,11 @@ public class ContainerSetSlotPacket extends DataPacket {
 
     @Override
     public void encode() {
+        if (item == null) {
+            setBuffer(new byte[8]);
+        } else {
+            setBuffer(new byte[13]);
+        }
         this.reset();
         this.putByte((byte) this.windowid);
         this.putVarInt(this.slot);

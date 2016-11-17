@@ -2,12 +2,11 @@ package cn.nukkit.level.format.generic;
 
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
-
+import cn.nukkit.utils.BufferedRandomAccessFile;
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -24,10 +23,10 @@ abstract public class BaseRegionLoader {
     protected int z;
     protected String filePath;
     protected File file;
-    protected RandomAccessFile randomAccessFile;
+    protected BufferedRandomAccessFile randomAccessFile;
     protected int lastSector;
     protected LevelProvider levelProvider;
-    protected final Map<Integer, Integer[]> locationTable = new HashMap<>();
+    protected final Map<Integer, Integer[]> locationTable = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public long lastUsed;
 
@@ -42,10 +41,14 @@ abstract public class BaseRegionLoader {
             if (!exists) {
                 file.createNewFile();
             }
-            this.randomAccessFile = new RandomAccessFile(this.filePath, "rw");
+            this.randomAccessFile = new BufferedRandomAccessFile(this.filePath, "rw", 1024);
             if (!exists) {
                 this.createBlank();
             } else {
+                if (randomAccessFile.length() < 8192) {
+                    randomAccessFile.setLength(0);
+                    randomAccessFile.setLength(8192);
+                }
                 this.loadLocationTable();
             }
 

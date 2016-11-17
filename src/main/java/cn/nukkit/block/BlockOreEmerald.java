@@ -11,11 +11,9 @@ import cn.nukkit.math.NukkitRandom;
 public class BlockOreEmerald extends BlockSolid {
 
     public BlockOreEmerald() {
-        this(0);
     }
 
     public BlockOreEmerald(int meta) {
-        super(0);
     }
 
     @Override

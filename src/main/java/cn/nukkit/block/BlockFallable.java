@@ -17,8 +17,7 @@ import cn.nukkit.nbt.tag.ListTag;
  */
 public abstract class BlockFallable extends BlockSolid {
 
-    protected BlockFallable(int meta) {
-        super(meta);
+    protected BlockFallable() {
     }
 
     @Override

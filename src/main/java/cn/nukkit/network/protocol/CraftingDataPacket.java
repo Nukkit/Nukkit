@@ -29,6 +29,10 @@ public class CraftingDataPacket extends DataPacket {
     public List<Object> entries = new ArrayList<>();
     public boolean cleanRecipes;
 
+    public CraftingDataPacket() {
+        super(1024);
+    }
+
     private static int writeEntry(Object entry, BinaryStream stream) {
         if (entry instanceof ShapelessRecipe) {
             return writeShapelessRecipe(((ShapelessRecipe) entry), stream);
@@ -40,6 +44,11 @@ public class CraftingDataPacket extends DataPacket {
             return writeEnchantList(((EnchantmentList) entry), stream);
         }
         return -1;
+    }
+
+    @Override
+    public int getBlockSize() {
+        return 1024;
     }
 
     private static int writeShapelessRecipe(ShapelessRecipe recipe, BinaryStream stream) {
@@ -136,7 +145,12 @@ public class CraftingDataPacket extends DataPacket {
         this.reset();
         this.putUnsignedVarInt(entries.size());
 
-        BinaryStream writer = new BinaryStream();
+        BinaryStream writer = new BinaryStream(128) {
+            @Override
+            public int getBlockSize() {
+                return 52;
+            }
+        };
 
         for (Object entry : entries) {
             int entryType = writeEntry(entry, writer);
@@ -146,7 +160,6 @@ public class CraftingDataPacket extends DataPacket {
             } else {
                 this.putVarInt(-1);
             }
-
             writer.reset();
         }
 

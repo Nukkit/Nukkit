@@ -15,6 +15,11 @@ public class PlayerItemConsumeEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final Item item;
 
     public PlayerItemConsumeEvent(Player player, Item item) {

@@ -23,6 +23,11 @@ public class PlayerListPacket extends DataPacket {
     }
 
     @Override
+    public int getBlockSize() {
+        return 1024;
+    }
+
+    @Override
     public void encode() {
         this.reset();
         this.putByte(this.type);

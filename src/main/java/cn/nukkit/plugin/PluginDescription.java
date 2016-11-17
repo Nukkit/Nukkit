@@ -2,10 +2,9 @@ package cn.nukkit.plugin;
 
 import cn.nukkit.permission.Permission;
 import cn.nukkit.utils.PluginException;
+import java.util.*;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-
-import java.util.*;
 
 /* TODO Add these to Javadoc：
  *     <li><i>softdepend</i><br>

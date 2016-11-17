@@ -15,7 +15,6 @@ public class BlockEmerald extends BlockSolid {
     }
 
     public BlockEmerald(int meta) {
-        super(0);
     }
 
     @Override

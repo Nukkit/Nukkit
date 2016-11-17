@@ -11,11 +11,9 @@ import cn.nukkit.utils.BlockColor;
 public class BlockNetherrack extends BlockSolid {
 
     public BlockNetherrack() {
-        this(0);
     }
 
     public BlockNetherrack(int meta) {
-        super(0);
     }
 
     @Override

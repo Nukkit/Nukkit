@@ -14,6 +14,10 @@ public class BlockEntityDataPacket extends DataPacket {
     public int z;
     public byte[] namedTag;
 
+    public BlockEntityDataPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -30,6 +34,7 @@ public class BlockEntityDataPacket extends DataPacket {
 
     @Override
     public void encode() {
+        setBuffer(new byte[13 + namedTag.length]);
         this.reset();
         this.putBlockCoords(this.x, this.y, this.z);
         this.put(this.namedTag);

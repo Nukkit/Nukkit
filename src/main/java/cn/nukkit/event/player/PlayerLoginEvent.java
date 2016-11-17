@@ -11,6 +11,11 @@ public class PlayerLoginEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     protected String kickMessage;
 
 

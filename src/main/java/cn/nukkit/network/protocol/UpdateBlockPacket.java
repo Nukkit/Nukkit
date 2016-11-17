@@ -23,6 +23,10 @@ public class UpdateBlockPacket extends DataPacket {
     public int blockData;
     public int flags;
 
+    public UpdateBlockPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -35,6 +39,7 @@ public class UpdateBlockPacket extends DataPacket {
 
     @Override
     public void encode() {
+        setBuffer(new byte[12]);
         this.reset();
         this.putBlockCoords(x, y, z);
         this.putUnsignedVarInt(blockId);

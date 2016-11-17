@@ -15,6 +15,11 @@ public class ChunkPopulateEvent extends ChunkEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public ChunkPopulateEvent(FullChunk chunk) {
         super(chunk);
     }

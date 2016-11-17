@@ -17,6 +17,11 @@ public class PlayerCreationEvent extends Event {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final SourceInterface interfaz;
 
     private final Long clientId;

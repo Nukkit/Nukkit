@@ -12,6 +12,11 @@ public class PlayerBucketFillEvent extends PlayerBucketEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public PlayerBucketFillEvent(Player who, Block blockClicked, int blockFace, Item bucket, Item itemInHand) {
         super(who, blockClicked, blockFace, bucket, itemInHand);
     }

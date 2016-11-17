@@ -15,15 +15,18 @@ import java.io.IOException;
  */
 public class CommandReader extends Thread implements InterruptibleThread {
 
-    private ConsoleReader reader;
+    private final ConsoleReader reader;
 
     public static CommandReader instance;
 
-    private CursorBuffer stashed;
+    private volatile CursorBuffer stashed;
 
     private boolean running = true;
 
     public static CommandReader getInstance() {
+        if (instance == null) {
+            instance = new CommandReader();
+        }
         return instance;
     }
 
@@ -37,13 +40,16 @@ public class CommandReader extends Thread implements InterruptibleThread {
             instance = this;
         } catch (IOException e) {
             Server.getInstance().getLogger().error("Unable to start Console Reader", e);
+            throw new RuntimeException(e);
         }
         this.setName("Console");
     }
 
     public String readLine() {
         try {
-            reader.resetPromptLine("", "", 0);
+            synchronized (reader) {
+                reader.resetPromptLine("", "", 0);
+            }
             return this.reader.readLine("> ");
         } catch (IOException e) {
             Server.getInstance().getLogger().logException(e);
@@ -89,19 +95,23 @@ public class CommandReader extends Thread implements InterruptibleThread {
         this.running = false;
     }
 
-    public synchronized void stashLine() {
-        this.stashed = reader.getCursorBuffer().copy();
+    public void stashLine() {
         try {
-            reader.getOutput().write("\u001b[1G\u001b[K");
-            reader.flush();
+            synchronized (reader) {
+                this.stashed = reader.getCursorBuffer().copy();
+                reader.getOutput().write("\u001b[1G\u001b[K");
+                reader.flush();
+            }
         } catch (IOException e) {
             // ignore
         }
     }
 
-    public synchronized void unstashLine() {
+    public void unstashLine() {
         try {
-            reader.resetPromptLine("> ", this.stashed.toString(), this.stashed.cursor);
+            synchronized (reader) {
+                reader.resetPromptLine("> ", this.stashed == null ? "" : this.stashed.toString(), this.stashed == null ? 0 : this.stashed.cursor);
+            }
         } catch (IOException e) {
             // ignore
         }
@@ -109,7 +119,9 @@ public class CommandReader extends Thread implements InterruptibleThread {
 
     public void removePromptLine() {
         try {
-            reader.resetPromptLine("", "", 0);
+            synchronized (reader) {
+                reader.resetPromptLine("", "", 0);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

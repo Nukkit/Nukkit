@@ -10,6 +10,10 @@ import cn.nukkit.utils.Binary;
 public class SetEntityDataPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.SET_ENTITY_DATA_PACKET;
 
+    public SetEntityDataPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -25,6 +29,8 @@ public class SetEntityDataPacket extends DataPacket {
 
     @Override
     public void encode() {
+        byte[] meta = Binary.writeMetadata(this.metadata);
+        setBuffer(new byte[9 + meta.length]);
         this.reset();
         this.putVarLong(this.eid);
         this.put(Binary.writeMetadata(this.metadata));

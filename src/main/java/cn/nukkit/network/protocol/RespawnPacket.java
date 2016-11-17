@@ -13,6 +13,10 @@ public class RespawnPacket extends DataPacket {
     public float y;
     public float z;
 
+    public RespawnPacket() {
+        super(13);
+    }
+
     @Override
     public void decode() {
         Vector3f v = this.getVector3f();

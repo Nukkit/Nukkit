@@ -77,6 +77,10 @@ public class LevelEventPacket extends DataPacket {
     public float z = 0;
     public int data;
 
+    public LevelEventPacket() {
+        super(null);
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -94,6 +98,7 @@ public class LevelEventPacket extends DataPacket {
 
     @Override
     public void encode() {
+        setBuffer(new byte[19]);
         this.reset();
         this.putVarInt(this.evid);
         this.putVector3f(this.x, this.y, this.z);

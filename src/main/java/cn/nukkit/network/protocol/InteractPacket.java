@@ -15,6 +15,10 @@ public class InteractPacket extends DataPacket {
     public byte action;
     public long target;
 
+    public InteractPacket() {
+        super(10);
+    }
+
     @Override
     public void decode() {
         this.action = (byte) this.getByte();

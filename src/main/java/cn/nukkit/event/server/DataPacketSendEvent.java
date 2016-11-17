@@ -17,6 +17,11 @@ public class DataPacketSendEvent extends ServerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final DataPacket packet;
     private final Player player;
 

@@ -16,6 +16,11 @@ public class SpawnChangeEvent extends LevelEvent {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     private final Position previousSpawn;
 
     public SpawnChangeEvent(Level level, Position previousSpawn) {

@@ -9,7 +9,7 @@ import cn.nukkit.utils.DyeColor;
  * Created on 2015/12/2 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockClayStained extends BlockSolid {
+public class BlockClayStained extends BlockSolidMeta {
 
     public BlockClayStained() {
         this(0);

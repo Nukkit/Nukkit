@@ -11,6 +11,11 @@ public class PlayerAnimationEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     public static final int ARM_SWING = 1;
 
     private final int animationType;

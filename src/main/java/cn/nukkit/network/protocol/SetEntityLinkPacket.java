@@ -15,6 +15,10 @@ public class SetEntityLinkPacket extends DataPacket {
     public long riding;
     public byte type;
 
+    public SetEntityLinkPacket() {
+        super(18);
+    }
+
     @Override
     public void decode() {
 

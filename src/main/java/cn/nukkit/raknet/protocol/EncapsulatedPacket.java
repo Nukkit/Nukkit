@@ -1,9 +1,7 @@
 package cn.nukkit.raknet.protocol;
 
 import cn.nukkit.utils.Binary;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import cn.nukkit.utils.BinaryStream;
 
 /**
  * author: MagicDroidX
@@ -25,6 +23,12 @@ public class EncapsulatedPacket implements Cloneable {
     public Integer identifierACK = null;
 
     private int offset;
+
+    public EncapsulatedPacket() {}
+
+    public EncapsulatedPacket(byte[] buffer) {
+        this.buffer = buffer;
+    }
 
     public int getOffset() {
         return offset;
@@ -90,37 +94,37 @@ public class EncapsulatedPacket implements Cloneable {
     }
 
     public byte[] toBinary(boolean internal) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        try {
-            stream.write((reliability << 5) | (hasSplit ? 0b00010000 : 0));
-            if (internal) {
-                stream.write(Binary.writeInt(buffer.length));
-                stream.write(Binary.writeInt(identifierACK == null ? 0 : identifierACK));
-            } else {
-                stream.write(Binary.writeShort(buffer.length << 3));
+        BinaryStream stream = new BinaryStream(64) {
+            @Override
+            public int getBlockSize() {
+                return 35;
             }
-
-            if (reliability > 0) {
-                if (reliability >= 2 && reliability != 5) {
-                    stream.write(Binary.writeLTriad(messageIndex == null ? 0 : messageIndex));
-                }
-                if (reliability <= 4 && reliability != 2) {
-                    stream.write(Binary.writeLTriad(orderIndex));
-                    stream.write((byte) (orderChannel & 0xff));
-                }
-            }
-
-            if (hasSplit) {
-                stream.write(Binary.writeInt(splitCount));
-                stream.write(Binary.writeShort(splitID));
-                stream.write(Binary.writeInt(splitIndex));
-            }
-
-            stream.write(buffer);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        };
+        stream.write((reliability << 5) | (hasSplit ? 0b00010000 : 0));
+        if (internal) {
+            stream.write(Binary.writeInt(buffer.length));
+            stream.write(Binary.writeInt(identifierACK == null ? 0 : identifierACK));
+        } else {
+            stream.write(Binary.writeShort(buffer.length << 3));
         }
 
+        if (reliability > 0) {
+            if (reliability >= 2 && reliability != 5) {
+                stream.write(Binary.writeLTriad(messageIndex == null ? 0 : messageIndex));
+            }
+            if (reliability <= 4 && reliability != 2) {
+                stream.write(Binary.writeLTriad(orderIndex));
+                stream.write((byte) (orderChannel & 0xff));
+            }
+        }
+
+        if (hasSplit) {
+            stream.write(Binary.writeInt(splitCount));
+            stream.write(Binary.writeShort(splitID));
+            stream.write(Binary.writeInt(splitIndex));
+        }
+
+        stream.write(buffer);
         return stream.toByteArray();
     }
 

@@ -5,7 +5,6 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.EventException;
-
 import java.util.HashMap;
 import java.util.Map;
 

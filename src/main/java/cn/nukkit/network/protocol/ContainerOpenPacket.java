@@ -20,6 +20,10 @@ public class ContainerOpenPacket extends DataPacket {
     public int z;
     public final long entityId = -1;
 
+    public ContainerOpenPacket() {
+        super(25);
+    }
+
     @Override
     public void decode() {
 

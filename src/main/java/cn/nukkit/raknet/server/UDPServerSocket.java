@@ -53,7 +53,7 @@ public class UDPServerSocket extends ChannelInboundHandlerAdapter {
         }
     }
 
-    public void close() {
+    public synchronized void close() {
         this.group.shutdownGracefully();
         try {
             this.channel.closeFuture().sync();

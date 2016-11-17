@@ -17,6 +17,11 @@ public class PlayerChatEvent extends PlayerMessageEvent implements Cancellable {
         return handlers;
     }
 
+    @Override
+    public HandlerList getHandlerList() {
+        return getHandlers();
+    }
+
     protected String format;
 
     protected Set<CommandSender> recipients = new HashSet<>();
