@@ -32,30 +32,30 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public int getBlockId(int x, int y, int z) {
-        return this.blocks[(x << 8) + (z << 4) + y] & 0xff;
+        return this.blocks[(x << 8) + (z << 8) + y] & 0xff;
     }
 
     @Override
     public void setBlockId(int x, int y, int z, int id) {
-        this.blocks[(x << 8) + (z << 4) + y] = (byte) (id & 0xFF);
+        this.blocks[(x << 8) + (z << 8) + y] = (byte) (id & 0xFF);
     }
 
     @Override
     public int getBlockData(int x, int y, int z) {
-        return this.data[(x << 8) + (z << 4) + y] & 0xff;
+        return this.data[(x << 8) + (z << 8) + y] & 0xff;
     }
 
     @Override
     public void setBlockData(int x, int y, int z, int data) {
-        this.data[(x << 8) + (z << 4) + y] = (byte) (data & 0xff);
+        this.data[(x << 8) + (z << 8) + y] = (byte) (data & 0xff);
     }
 
     @Override
     public int getFullBlock(int x, int y, int z) {
-        int i = (x << 8) + (z << 4) + y;
+        int i = (x << 8) + (z << 8) + y;
         int block = this.blocks[i] & 0xff;
         int data = this.data[i] & 0xff;
-        return (block << 4) | data;
+        return (block << 8) | data;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public boolean setBlock(int x, int y, int z, Integer blockId, Integer meta) {
-        int i = (x << 8) + (z << 4) + y;
+        int i = (x << 8) + (z << 8) + y;
         boolean changed = false;
         if (blockId != null) {
             byte id = (byte) (blockId & 0xff);
@@ -93,27 +93,27 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public int getBlockSkyLight(int x, int y, int z) {
-        return this.skyLight[(x << 8) + (z << 4) + y] & 0xff;
+        return this.skyLight[(x << 8) + (z << 8) + y] & 0xff;
     }
 
     @Override
     public void setBlockSkyLight(int x, int y, int z, int level) {
-        this.skyLight[(x << 8) + (z << 4) + y] = (byte) (level & 0xff);
+        this.skyLight[(x << 8) + (z << 8) + y] = (byte) (level & 0xff);
     }
 
     @Override
     public int getBlockLight(int x, int y, int z) {
-        return this.blockLight[(x << 8) + (z << 4) + y] & 0xff;
+        return this.blockLight[(x << 8) + (z << 8) + y] & 0xff;
     }
 
     @Override
     public void setBlockLight(int x, int y, int z, int level) {
-        this.blockLight[(x << 8) + (z << 4) + y] = (byte) (level & 0xff);
+        this.blockLight[(x << 8) + (z << 8) + y] = (byte) (level & 0xff);
     }
 
     @Override
     public byte[] getBlockIdColumn(int x, int z) {
-        int i = (x << 8) + (z << 4);
+        int i = (x << 8) + (z << 8);
         byte[] column = new byte[16];
         for (int y = 0; y < 16; y++) {
             column[y] = this.blocks[y + i];
@@ -123,7 +123,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public byte[] getBlockDataColumn(int x, int z) {
-        int i = (x << 8) + (z << 4);
+        int i = (x << 8) + (z << 8);
         byte[] column = new byte[16];
         for (int y = 0; y < 16; y++) {
             column[y] = this.data[y + i];
@@ -133,7 +133,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public byte[] getBlockSkyLightColumn(int x, int z) {
-        int i = (x << 8) + (z << 4);
+        int i = (x << 8) + (z << 8);
         byte[] column = new byte[16];
         for (int y = 0; y < 16; y++) {
             column[y] = this.skyLight[y + i];
@@ -143,7 +143,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public byte[] getBlockLightColumn(int x, int z) {
-        int i = (x << 8) + (z << 4);
+        int i = (x << 8) + (z << 8);
         byte[] column = new byte[16];
         for (int y = 0; y < 16; y++) {
             column[y] = this.blockLight[y + i];
