@@ -6,7 +6,7 @@ import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.level.Level;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.scheduler.AsyncTask;
-import cn.nukkit.utils.Binary;
+import cn.nukkit.utils.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -83,7 +83,7 @@ public class ChunkRequestTask extends AsyncTask {
         }
         ByteBuffer orderedBiomeColors = ByteBuffer.allocate(biomeColors.length * 4);
         for (int i : biomeColors) {
-            orderedBiomeColors.put(Binary.writeInt(i));
+            orderedBiomeColors.put(Binary.writeVarInt(i));
         }
 
         this.setResult(
@@ -100,24 +100,24 @@ public class ChunkRequestTask extends AsyncTask {
     }
 
     public byte[] getColumn(byte[] data, int x, int z) {
-        byte[] column = new byte[128];
-        int i = (z << 4) + x;
-        for (int y = 0; y < 128; ++y) {
-            column[y] = data[(y << 8) + i];
+        byte[] column = new byte[256];
+        int i = (z << 8) + x;
+        for (int y = 0; y < 256; ++y) {
+            column[y] = data[(y << 16) + i];
         }
         return column;
     }
 
     public byte[] getHalfColumn(byte[] data, int x, int z) {
-        byte[] column = new byte[64];
-        int i = (z << 3) + (x >> 1);
-        if ((x & 1) == 0) {
-            for (int y = 0; y < 128; y += 2) {
-                column[(y / 2)] = (byte) ((byte) (data[(y << 7) + i] & 0x0f) | (byte) (((data[((y + 1) << 7) + i] & 0x0f) & 0xff) << 4));
+        byte[] column = new byte[128];
+        int i = (z << 6) + (x >> 2);
+        if ((x & 2) == 0) {
+            for (int y = 0; y < 256; y += 2) {
+                column[(y / 2)] = (byte) ((byte) (data[(y << 8) + i] & 0x0f) | (byte) (((data[((y + 1) << 8) + i] & 0x0f) & 0xff) << 4));
             }
         } else {
-            for (int y = 0; y < 128; y += 2) {
-                column[(y / 2)] = (byte) ((byte) (((data[(y << 7) + i] & 0xf0) & 0xff) >> 4) | (byte) (data[((y + 1) << 7) + i] & 0xf0));
+            for (int y = 0; y < 256; y += 2) {
+                column[(y / 2)] = (byte) ((byte) (((data[(y << 8) + i] & 0xf0) & 0xff) >> 4) | (byte) (data[((y + 1) << 8) + i] & 0xf0));
             }
         }
         return column;
