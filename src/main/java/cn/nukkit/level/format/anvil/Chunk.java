@@ -314,8 +314,8 @@ public class Chunk extends BaseChunk {
     public byte[] toBinary() {
         CompoundTag nbt = this.getNBT().copy();
 
-        nbt.putVarInt("xPos", this.x);
-        nbt.putVarInt("zPos", this.z);
+        nbt.putInt("xPos", this.x);
+        nbt.putInt("zPos", this.z);
 
         ListTag<CompoundTag> sectionList = new ListTag<>("Sections");
         for (cn.nukkit.level.format.ChunkSection section : this.getSections()) {
