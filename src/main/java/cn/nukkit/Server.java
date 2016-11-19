@@ -256,7 +256,7 @@ public class Server {
                 put("motd", "Nukkit Server For Minecraft: PE");
                 put("server-port", 19132);
                 put("server-ip", "0.0.0.0");
-                put("view-distance", 10);
+                put("view-distance", 22);
                 put("white-list", false);
                 put("announce-player-achievements", true);
                 put("spawn-protection", 16);
@@ -1142,7 +1142,7 @@ public class Server {
     }
 
     public int getViewDistance() {
-        return this.getPropertyInt("view-distance", 10);
+        return this.getPropertyInt("view-distance", 22);
     }
 
     public String getIp() {
@@ -1604,12 +1604,11 @@ public class Server {
             generator = Generator.getGenerator(this.getLevelType());
         }
 
-        if (provider == null) {
-            String providerName;
-            if ((provider = LevelProviderManager.getProviderByName
-                    (providerName = (String) this.getConfig("level-settings.default-format", "mcregion"))) == null) {
-                provider = LevelProviderManager.getProviderByName(providerName = "mcregion");
-            }
+        Class<? extends LevelProvider> provider;
+        String providerName;
+        if ((provider = LevelProviderManager.getProviderByName
+                (providerName = (String) this.getConfig("level-settings.default-format", "anvil"))) == null) {
+            provider = LevelProviderManager.getProviderByName(providerName = "anvil");
         }
 
         Level level;

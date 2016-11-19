@@ -236,7 +236,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     }
 
     @Override
-    public boolean isAllAir() {
+    public boolean isEmpty() {
         for (byte b : this.blocks) {
             if ((b & 0xff) != 0x00) {
                 return false;
