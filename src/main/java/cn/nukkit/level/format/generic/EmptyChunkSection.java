@@ -125,7 +125,7 @@ public class EmptyChunkSection implements ChunkSection {
     }
 
     @Override
-    public boolean isAllAir() {
+    public boolean isEmpty() {
         return true;
     }
 
