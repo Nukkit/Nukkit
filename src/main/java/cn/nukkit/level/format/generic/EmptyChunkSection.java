@@ -1,9 +1,9 @@
 package cn.nukkit.level.format.generic;
 
 import cn.nukkit.level.format.ChunkSection;
-import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -131,12 +131,18 @@ public class EmptyChunkSection implements ChunkSection {
 
     @Override
     public byte[] getBytes() {
-        BinaryStream stream = new BinaryStream();
-        stream.put(this.getIdArray());
-        stream.put(this.getDataArray());
-        stream.put(this.getSkyLightArray());
-        stream.put(this.getLightArray());
-        return stream.getBuffer();
+        ByteBuffer buffer = ByteBuffer.allocate(4096 * 4);
+        byte[] blocks = new byte[4096];
+        byte[] data = new byte[4096];
+        byte[] skyLight = new byte[4096];
+        Arrays.fill(skyLight, (byte) 0x0f);
+        byte[] blockLight = new byte[4096];
+        return buffer
+                .put(blocks)
+                .put(data)
+                .put(skyLight)
+                .put(blockLight)
+                .array();
     }
 
     @Override
