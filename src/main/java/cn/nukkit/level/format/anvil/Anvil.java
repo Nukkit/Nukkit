@@ -166,6 +166,7 @@ public class Anvil extends BaseLevelProvider {
         for (int height : chunk.getHeightMapArray()) {
             stream.putByte((byte) (height & 0xff));
         }
+        stream.put(new byte[256]);
         stream.put(chunk.getBiomeIdArray());
         if (extraData != null) {
             stream.put(extraData.getBuffer());
