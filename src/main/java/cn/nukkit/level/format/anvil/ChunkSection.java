@@ -257,7 +257,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
                 for (int z = 0; z < 16; z++) {
                     blocks[(x << 8) + (z << 4) + y] = this.blocks[(y << 8) + (z << 4) + x];
                     byte d = this.data[(y << 7) + (z << 3) + (x >> 1)];
-                    data[(x << 8) + (z << 4) + y] = ((byte) ((d & 1) == 0 ? d & 0x0f : d >> 4));
+                    data[(x << 8) + (z << 4) + y] = (byte) ((d & 1) == 0 ? d & 0x0f : d >> 4);
                     byte sl = this.skyLight[(y << 7) + (z << 3) + (x >> 1)];
                     skyLight[(x << 8) + (z << 4) + y] = (byte) ((x & 1) == 0 ? sl & 0x0f : sl >> 4);
                     byte bl = this.blockLight[(y << 7) + (z << 3) + (x >> 1)];
