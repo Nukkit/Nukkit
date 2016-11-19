@@ -1,7 +1,6 @@
 package cn.nukkit.level.format.anvil;
 
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.BinaryStream;
 
 import java.nio.ByteBuffer;
 
@@ -248,12 +247,30 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public byte[] getBytes() {
-        BinaryStream stream = new BinaryStream();
-        stream.put(this.blocks);
-        stream.put(this.data);
-        stream.put(this.skyLight);
-        stream.put(this.blockLight);
-        return stream.getBuffer();
+        ByteBuffer buffer = ByteBuffer.allocate(4096 * 4);
+        byte[] blocks = new byte[4096];
+        byte[] data = new byte[4096];
+        byte[] skyLight = new byte[4096];
+        byte[] blockLight = new byte[4096];
+        for (int x = 0; x < 16; x++) {
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    blocks[(x << 8) + (z << 4) + y] = this.blocks[(y << 8) + (z << 4) + x];
+                    byte d = this.data[(y << 7) + (z << 3) + (x >> 1)];
+                    data[(x << 8) + (z << 4) + y] = ((byte) ((d & 1) == 0 ? d & 0x0f : d >> 4));
+                    byte sl = this.skyLight[(y << 7) + (z << 3) + (x >> 1)];
+                    skyLight[(x << 8) + (z << 4) + y] = (byte) ((x & 1) == 0 ? sl & 0x0f : sl >> 4);
+                    byte bl = this.blockLight[(y << 7) + (z << 3) + (x >> 1)];
+                    blockLight[(x << 8) + (z << 4) + y] = (byte) ((x & 1) == 0 ? bl & 0x0f : bl >> 4);
+                }
+            }
+        }
+        return buffer
+                .put(blocks)
+                .put(data)
+                .put(skyLight)
+                .put(blockLight)
+                .array();
     }
 
     @Override
