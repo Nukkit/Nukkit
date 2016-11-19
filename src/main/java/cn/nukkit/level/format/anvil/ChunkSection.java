@@ -247,21 +247,27 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public byte[] getBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(4096 * 4);
+        ByteBuffer buffer = ByteBuffer.allocate(10240);
         byte[] blocks = new byte[4096];
-        byte[] data = new byte[4096];
-        byte[] skyLight = new byte[4096];
-        byte[] blockLight = new byte[4096];
+        byte[] data = new byte[2048];
+        byte[] skyLight = new byte[2048];
+        byte[] blockLight = new byte[2048];
         for (int x = 0; x < 16; x++) {
-            for (int y = 0; y < 16; y++) {
-                for (int z = 0; z < 16; z++) {
-                    blocks[(x << 8) + (z << 4) + y] = this.blocks[(y << 8) + (z << 4) + x];
-                    byte d = this.data[(y << 7) + (z << 3) + (x >> 1)];
-                    data[(x << 8) + (z << 4) + y] = (byte) ((d & 1) == 0 ? d & 0x0f : d >> 4);
-                    byte sl = this.skyLight[(y << 7) + (z << 3) + (x >> 1)];
-                    skyLight[(x << 8) + (z << 4) + y] = (byte) ((x & 1) == 0 ? sl & 0x0f : sl >> 4);
-                    byte bl = this.blockLight[(y << 7) + (z << 3) + (x >> 1)];
-                    blockLight[(x << 8) + (z << 4) + y] = (byte) ((x & 1) == 0 ? bl & 0x0f : bl >> 4);
+            for (int z = 0; z < 16; z++) {
+                int i = (x << 7) + (z << 3);
+                for (int y = 0; y < 8; y++) {
+                    int j = y * 2;
+                    blocks[(x << 8) + (z << 4) + j] = this.blocks[(j << 8) + (z << 4) + x];
+                    blocks[(x << 8) + (z << 4) + j + 1] = this.blocks[((j + 1) << 8) + (z << 4) + x];
+                    int d1 = this.getBlockData(x, j, z);
+                    int d2 = this.getBlockData(x, j + 1, z);
+                    data[i + y] = (byte) ((d1 << 4) + d2);
+                    int sl1 = this.getBlockSkyLight(x, j, z);
+                    int sl2 = this.getBlockSkyLight(x, j + 1, z);
+                    skyLight[i + y] = (byte) ((sl1 << 4) + sl2);
+                    int bl1 = this.getBlockLight(x, j, z);
+                    int bl2 = this.getBlockLight(x, j + 1, z);
+                    blockLight[i + y] = (byte) ((bl1 << 4) + bl2);
                 }
             }
         }
