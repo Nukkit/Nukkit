@@ -131,17 +131,11 @@ public class EmptyChunkSection implements ChunkSection {
 
     @Override
     public byte[] getBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(4096 * 4);
-        byte[] blocks = new byte[4096];
-        byte[] data = new byte[4096];
-        byte[] skyLight = new byte[4096];
-        Arrays.fill(skyLight, (byte) 0x0f);
-        byte[] blockLight = new byte[4096];
+        ByteBuffer buffer = ByteBuffer.allocate(10240);
+        byte[] skyLight = new byte[2048];
+        Arrays.fill(skyLight, (byte) 0xff);
         return buffer
-                .put(blocks)
-                .put(data)
-                .put(skyLight)
-                .put(blockLight)
+                .put(skyLight, 6144)
                 .array();
     }
 
