@@ -251,15 +251,19 @@ public class Level implements ChunkManager, Metadatable {
             old.close();
             File oldPath = new File(path + "../" + name + ".old");
             oldPath.mkdir();
-            new File(path + "regions").renameTo(new File(oldPath, "regions"));
+            File pathFile = new File(path + "region");
+            pathFile.renameTo(new File(oldPath, "region"));
+            pathFile.mkdir();
             FileInputStream fi = null;
             FileChannel in = null;
             FileOutputStream fo = null;
             FileChannel out = null;
+            File oldData = new File(oldPath, "level.dat");
             try {
+                oldData.createNewFile();
                 fi = new FileInputStream(new File(path + "level.dat"));
                 in = fi.getChannel();
-                fo = new FileOutputStream(new File(oldPath + "level.dat"));
+                fo = new FileOutputStream(oldData);
                 out = fo.getChannel();
                 in.transferTo(0, in.size(), out);
             } catch (IOException e) {

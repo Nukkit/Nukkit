@@ -396,9 +396,9 @@ public class McRegion extends BaseLevelProvider {
         }
     }
 
-    private static final Pattern p = Pattern.compile("\\d+");
+    private static final Pattern p = Pattern.compile("(?=:).*?(?<=:)");
     private void loadRegions() {
-        for (File file : new File(path + "/region/").listFiles((dir, name) -> Pattern.matches("^r\\.[1-9]\\d*\\.[1-9]\\d*\\.mca$", name))) {
+        for (File file : new File(path + "/region/").listFiles((dir, name) -> Pattern.matches("^r\\..*?\\..*?\\.mca$", name))) {
             Matcher m = p.matcher(file.getName());
             int x, z;
             try {
