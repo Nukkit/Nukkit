@@ -28,6 +28,7 @@ import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
+import cn.nukkit.level.format.mcregion.McRegion;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.generator.task.*;
 import cn.nukkit.level.particle.DestroyBlockParticle;
@@ -50,7 +51,12 @@ import cn.nukkit.timings.Timings;
 import cn.nukkit.timings.TimingsHistory;
 import cn.nukkit.utils.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.ref.SoftReference;
+import java.nio.channels.FileChannel;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -237,6 +243,38 @@ public class Level implements ChunkManager, Metadatable {
             this.provider = provider.getConstructor(Level.class, String.class).newInstance(this, path);
         } catch (Exception e) {
             throw new LevelException("Caused by " + Utils.getExceptionMessage(e));
+        }
+
+        if (this.provider instanceof McRegion) {
+            McRegion old = (McRegion) this.provider;
+            this.provider = old.toAnvil(this);
+            old.close();
+            File oldPath = new File(path + "../" + name + ".old");
+            oldPath.mkdir();
+            new File(path + "regions").renameTo(new File(oldPath, "regions"));
+            FileInputStream fi = null;
+            FileChannel in = null;
+            FileOutputStream fo = null;
+            FileChannel out = null;
+            try {
+                fi = new FileInputStream(new File(path + "level.dat"));
+                in = fi.getChannel();
+                fo = new FileOutputStream(new File(oldPath + "level.dat"));
+                out = fo.getChannel();
+                in.transferTo(0, in.size(), out);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                try {
+                    if (fi != null) fi.close();
+                    if (in != null) in.close();
+                    if (fo != null) fo.close();
+                    if (out != null) out.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            this.provider.saveChunks();
         }
 
         this.provider.updateLevelName(name);

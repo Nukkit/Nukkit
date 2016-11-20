@@ -220,9 +220,17 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
         return this.blocks;
     }
 
+    public void setIdArray(byte[] b) {
+        this.blocks = b;
+    }
+
     @Override
     public byte[] getDataArray() {
         return this.data;
+    }
+
+    public void setDataArray(byte[] b) {
+        this.data = b;
     }
 
     @Override
@@ -230,9 +238,17 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
         return this.skyLight;
     }
 
+    public void setSkyLightArray(byte[] b) {
+        this.skyLight = b;
+    }
+
     @Override
     public byte[] getLightArray() {
         return this.blockLight;
+    }
+
+    public void setLightArray(byte[] b) {
+        this.blockLight = b;
     }
 
     @Override
