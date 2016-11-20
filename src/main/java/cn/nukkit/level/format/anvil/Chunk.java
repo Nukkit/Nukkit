@@ -415,27 +415,26 @@ public class Chunk extends BaseChunk {
     }
 
     public static Chunk fromMcRegion(cn.nukkit.level.format.mcregion.Chunk old, LevelProvider provider) {
-        Chunk chunk = new Chunk(provider);
+        Chunk chunk = Chunk.getEmptyChunk(old.getX(), old.getZ(), provider);
         byte[] blocks = old.getBlockIdArray();
         byte[] data = old.getBlockDataArray();
-        byte[] skyLight = old.getBlockSkyLightArray();
         byte[] blockLight = old.getBlockLightArray();
-        for (int y = 0; y < SECTION_COUNT; y++) {
-            ChunkSection section = (ChunkSection) chunk.sections[y];
-            int from = y * 2048;
-            int to = from + 2047;
-            section.setIdArray(Arrays.copyOfRange(blocks, from, to));
-            section.setDataArray(Arrays.copyOfRange(data, from, to));
-            section.setSkyLightArray(Arrays.copyOfRange(skyLight, from, to));
-            section.setLightArray(Arrays.copyOfRange(blockLight, from, to));
+        byte[] skyLight = old.getBlockSkyLightArray();
+        for (int y = 0; y < 8; y++) {
+            CompoundTag nbt = new CompoundTag();
+            nbt.putByte("Y", y);
+            nbt.putByteArray("Blocks", Arrays.copyOfRange(blocks, y * 4096, y * 4096 + 4095));
+            nbt.putByteArray("Data", Arrays.copyOfRange(data, y * 2048, y * 2048 + 2047));
+            nbt.putByteArray("BlockLight", Arrays.copyOfRange(blockLight, y * 2048, y * 2048 + 2047));
+            nbt.putByteArray("SkyLight", Arrays.copyOfRange(skyLight, y * 2048, y * 2048 + 2047));
+            ChunkSection section = new ChunkSection(nbt);
+            chunk.sections[y] = section;
         }
-        chunk.biomeColors = old.getBiomeColorArray().clone();
-        chunk.heightMap = old.getHeightMapArray().clone();
+        System.arraycopy(old.getBiomeColorArray(), 0, chunk.biomeColors, 0, 256);
+        System.arraycopy(old.getHeightMapArray(), 0, chunk.heightMap, 0, 256);
         chunk.NBTentities = old.getNBT().getList("Entities", CompoundTag.class).getAll();
         chunk.NBTtiles = old.getNBT().getList("TileEntities", CompoundTag.class).getAll();
         chunk.extraData.putAll(old.getBlockExtraDataArray());
-        chunk.x = old.getX();
-        chunk.z = old.getZ();
         chunk.initChunk();
         return chunk;
     }

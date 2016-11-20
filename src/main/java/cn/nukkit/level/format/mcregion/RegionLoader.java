@@ -309,8 +309,4 @@ public class RegionLoader extends BaseRegionLoader {
         return z;
     }
 
-    public Integer[] getLocationIndexes() {
-        return this.locationTable.keySet().stream().toArray(Integer[]::new);
-    }
-
 }
