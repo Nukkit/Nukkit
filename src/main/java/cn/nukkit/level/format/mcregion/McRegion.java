@@ -290,13 +290,13 @@ public class McRegion extends BaseLevelProvider {
                     continue;
                 }
                 Chunk chunk;
-                this.level.timings.syncChunkLoadDataTimer.startTiming();
+                if (this.getLevel().timings != null) this.level.timings.syncChunkLoadDataTimer.startTiming();
                 try {
                     chunk = region.readChunk(x, z);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                this.level.timings.syncChunkLoadDataTimer.stopTiming();
+                if (this.getLevel().timings != null) this.level.timings.syncChunkLoadDataTimer.stopTiming();
                 if (chunk == null) continue;
                 this.chunks.put(hash, chunk);
             }
@@ -396,10 +396,9 @@ public class McRegion extends BaseLevelProvider {
         }
     }
 
-    private static final Pattern p = Pattern.compile("(?=:).*?(?<=:)");
     private void loadRegions() {
-        for (File file : new File(path + "/region/").listFiles((dir, name) -> Pattern.matches("^r\\..*?\\..*?\\.mca$", name))) {
-            Matcher m = p.matcher(file.getName());
+        for (File file : new File(path + "/region/").listFiles()) {
+            Matcher m = Pattern.compile("-?\\d+").matcher(file.getName());
             int x, z;
             try {
                 if (m.find()) {
