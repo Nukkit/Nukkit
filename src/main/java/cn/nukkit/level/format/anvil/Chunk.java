@@ -413,4 +413,30 @@ public class Chunk extends BaseChunk {
             return null;
         }
     }
+
+    public static Chunk fromMcRegion(cn.nukkit.level.format.mcregion.Chunk old, LevelProvider provider) {
+        Chunk chunk = new Chunk(provider);
+        byte[] blocks = old.getBlockIdArray();
+        byte[] data = old.getBlockDataArray();
+        byte[] skyLight = old.getBlockSkyLightArray();
+        byte[] blockLight = old.getBlockLightArray();
+        for (int y = 0; y < SECTION_COUNT; y++) {
+            ChunkSection section = (ChunkSection) chunk.sections[y];
+            int from = y * 2048;
+            int to = from + 2047;
+            section.setIdArray(Arrays.copyOfRange(blocks, from, to));
+            section.setDataArray(Arrays.copyOfRange(data, from, to));
+            section.setSkyLightArray(Arrays.copyOfRange(skyLight, from, to));
+            section.setLightArray(Arrays.copyOfRange(blockLight, from, to));
+        }
+        chunk.biomeColors = old.getBiomeColorArray().clone();
+        chunk.heightMap = old.getHeightMapArray().clone();
+        chunk.NBTentities = old.getNBT().getList("Entities", CompoundTag.class).getAll();
+        chunk.NBTtiles = old.getNBT().getList("TileEntities", CompoundTag.class).getAll();
+        chunk.extraData.putAll(old.getBlockExtraDataArray());
+        chunk.x = old.getX();
+        chunk.z = old.getZ();
+        chunk.initChunk();
+        return chunk;
+    }
 }

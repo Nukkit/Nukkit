@@ -5,6 +5,7 @@ import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.format.anvil.Anvil;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.generator.Generator;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -112,6 +114,14 @@ public class McRegion extends BaseLevelProvider {
 
     public static int getRegionIndexZ(int chunkZ) {
         return chunkZ >> 5;
+    }
+
+    public static int getChunkIndexX(int regionX, int chunkX) {
+        return (regionX << 5) | chunkX;
+    }
+
+    public static int getChunkIndexZ(int regionZ, int chunkZ) {
+        return (regionZ << 5) | chunkZ;
     }
 
     @Override
@@ -265,6 +275,34 @@ public class McRegion extends BaseLevelProvider {
         return false;
     }
 
+    private void loadChunks() {
+        this.loadRegions();
+        for (RegionLoader region : this.regions.values()) {
+            int regionX = region.getX();
+            int regionZ = region.getZ();
+            for (Integer index : region.getLocationIndexes()) {
+                int x = index & 0x1f;
+                int z = index >> 5;
+                int chunkX = getChunkIndexX(regionX, x);
+                int chunkZ = getChunkIndexZ(regionZ, z);
+                long hash = Level.chunkHash(chunkX, chunkZ);
+                if (this.chunks.containsKey(hash)) {
+                    continue;
+                }
+                Chunk chunk;
+                this.level.timings.syncChunkLoadDataTimer.startTiming();
+                try {
+                    chunk = region.readChunk(x, z);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                this.level.timings.syncChunkLoadDataTimer.stopTiming();
+                if (chunk == null) continue;
+                this.chunks.put(hash, chunk);
+            }
+        }
+    }
+
     public Chunk getEmptyChunk(int chunkX, int chunkZ) {
         return Chunk.getEmptyChunk(chunkX, chunkZ, this);
     }
@@ -358,6 +396,25 @@ public class McRegion extends BaseLevelProvider {
         }
     }
 
+    private static final Pattern p = Pattern.compile("\\d+");
+    private void loadRegions() {
+        for (File file : new File(path + "/region/").listFiles((dir, name) -> Pattern.matches("^r\\.[1-9]\\d*\\.[1-9]\\d*\\.mca$", name))) {
+            Matcher m = p.matcher(file.getName());
+            int x, z;
+            try {
+                if (m.find()) {
+                    x = Integer.parseInt(m.group());
+                } else continue;
+                if (m.find()) {
+                    z = Integer.parseInt(m.group());
+                } else continue;
+            } catch (NumberFormatException e) {
+                continue;
+            }
+            this.loadRegion(x, z);
+        }
+    }
+
     @Override
     public void close() {
         this.unloadChunks();
@@ -371,5 +428,19 @@ public class McRegion extends BaseLevelProvider {
             this.regions.remove(index);
         }
         this.level = null;
+    }
+
+    public Anvil toAnvil(Level level) {
+        this.loadChunks();
+        Anvil anvil;
+        try {
+            anvil = new Anvil(level, this.path);
+        } catch (IOException e) {
+            return null;
+        }
+        for (Chunk chunk : this.chunks.values()) {
+            anvil.setChunk(chunk.getX(), chunk.getZ(), chunk.toAnvil(anvil));
+        }
+        return anvil;
     }
 }
