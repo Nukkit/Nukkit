@@ -258,7 +258,7 @@ public abstract class BaseFullChunk implements FullChunk {
         for (int z = 0; z < 16; ++z) {
             for (int x = 0; x < 16; ++x) {
                 int top = this.getHeightMap(x, z);
-                for (int y = 127; y > top; --y) {
+                for (int y = 255; y > top; --y) {
                     this.setBlockSkyLight(x, y, z, 15);
                 }
                 for (int y = top; y >= 0; --y) {
@@ -281,12 +281,12 @@ public abstract class BaseFullChunk implements FullChunk {
     public int getHighestBlockAt(int x, int z, boolean cache) {
         if (cache) {
             int h = this.getHeightMap(x, z);
-            if (h != 0 && h != 127) {
+            if (h != 0 && h != 255) {
                 return h;
             }
         }
         byte[] column = this.getBlockIdColumn(x, z);
-        for (int y = 127; y >= 0; --y) {
+        for (int y = 255; y >= 0; --y) {
             if (column[y] != 0x00) {
                 this.setHeightMap(x, z, y);
                 return y;

@@ -1797,7 +1797,7 @@ public class Level implements ChunkManager, Metadatable {
         Block target = this.getBlock(vector);
         Block block = target.getSide(face);
 
-        if (block.y > 127 || block.y < 0) {
+        if (block.y > 255 || block.y < 0) {
             return null;
         }
 
@@ -2571,7 +2571,7 @@ public class Level implements ChunkManager, Metadatable {
                     }
                 }
 
-                for (; y >= 0 && y < 128; ++y) {
+                for (; y >= 0 && y < 256; ++y) {
                     int b = chunk.getFullBlock(x, y + 1, z);
                     Block block = Block.get(b >> 4, b & 0x0f);
                     if (!this.isFullBlock(block)) {
