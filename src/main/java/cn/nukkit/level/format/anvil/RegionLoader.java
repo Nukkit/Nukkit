@@ -162,15 +162,15 @@ public class RegionLoader extends BaseRegionLoader {
             if (table[0] == 0 || table[1] == 0) {
                 continue;
             }
-            this.randomAccessFile.seek(table[0] << 12);
-            byte[] chunk = new byte[table[1] << 12];
+            this.randomAccessFile.seek(table[0] << 8);
+            byte[] chunk = new byte[table[1] << 16];
             this.randomAccessFile.read(chunk);
-            int length = Binary.readInt(Arrays.copyOfRange(chunk, 0, 3));
+            int length = Binary.readInt(Arrays.copyOfRange(chunk, 0, 8));
             if (length <= 1) {
                 this.locationTable.put(i, (table = new Integer[]{0, 0, 0}));
             }
             try {
-                chunk = Zlib.inflate(Arrays.copyOf(chunk, 5));
+                chunk = Zlib.inflate(Arrays.copyOf(chunk, 8));
             } catch (Exception e) {
                 this.locationTable.put(i, new Integer[]{0, 0, 0});
                 continue;
@@ -203,8 +203,8 @@ public class RegionLoader extends BaseRegionLoader {
     protected void loadLocationTable() throws IOException {
         this.randomAccessFile.seek(0);
         this.lastSector = 1;
-        int[] data = new int[1024 * 2]; //1024 records * 2 times
-        for (int i = 0; i < 1024 * 2; i++) {
+        int[] data = new int[1024 * 32]; //1024 records * 32 times
+        for (int i = 0; i < 1024 * 32; i++) {
             data[i] = this.randomAccessFile.readInt();
         }
         for (int i = 0; i < 1024; ++i) {
@@ -274,9 +274,9 @@ public class RegionLoader extends BaseRegionLoader {
     @Override
     protected void writeLocationIndex(int index) throws IOException {
         Integer[] array = this.locationTable.get(index);
-        this.randomAccessFile.seek(index << 2);
+        this.randomAccessFile.seek(index << 4);
         this.randomAccessFile.writeInt((array[0] << 8) | array[1]);
-        this.randomAccessFile.seek(4096 + (index << 2));
+        this.randomAccessFile.seek(4096 + (index << 4));
         this.randomAccessFile.writeInt(array[2]);
     }
 
@@ -284,7 +284,7 @@ public class RegionLoader extends BaseRegionLoader {
     protected void createBlank() throws IOException {
         this.randomAccessFile.seek(0);
         this.randomAccessFile.setLength(0);
-        this.lastSector = 1;
+        this.lastSector = 2;
         int time = (int) (System.currentTimeMillis() / 1000d);
         for (int i = 0; i < 1024; ++i) {
             this.locationTable.put(i, new Integer[]{0, 0, time});

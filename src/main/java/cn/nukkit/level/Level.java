@@ -299,7 +299,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public static short localBlockHash(double x, double y, double z) {
-        byte hi = (byte) (((int) x & 15) + (((int) z & 15) << 4));
+        byte hi = (byte) (((int) x & 15) + (((int) z & 15) << 5));
         byte lo = (byte) y;
         return (short) (((hi & 0xFF) << 8) | (lo & 0xFF));
     }
@@ -318,7 +318,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public static int chunkBlockHash(int x, int y, int z) {
-        return (x << 11) | (z << 7) | y;
+        return (x << 12) | (z << 8) | y;
     }
 
     public static int getHashX(long hash) {
@@ -1331,10 +1331,10 @@ public class Level implements ChunkManager, Metadatable {
         FullChunk chunk = this.getChunk((int) pos.x >> 4, (int) pos.z >> 4, false);
         int level = 0;
         if (chunk != null) {
-            level = chunk.getBlockSkyLight((int) pos.x & 0x0f, (int) pos.y & 0x7f, (int) pos.z & 0x0f);
+            level = chunk.getBlockSkyLight((int) pos.x & 0x0f, (int) pos.y & 0xff, (int) pos.z & 0x0f);
             // TODO: decrease light level by time of day
             if (level < 15) {
-                level = Math.max(chunk.getBlockLight((int) pos.x & 0x0f, (int) pos.y & 0x7f, (int) pos.z & 0x0f),
+                level = Math.max(chunk.getBlockLight((int) pos.x & 0x0f, (int) pos.y & 0xff, (int) pos.z & 0x0f),
                         level);
                 // todo: check this
             }
@@ -1344,7 +1344,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public int getFullBlock(int x, int y, int z) {
-        return this.getChunk(x >> 4, z >> 4, false).getFullBlock(x & 0x0f, y & 0x7f, z & 0x0f);
+        return this.getChunk(x >> 4, z >> 4, false).getFullBlock(x & 0x0f, y & 0xff, z & 0x0f);
     }
 
     public Block getBlock(Vector3 pos) {
@@ -1357,8 +1357,8 @@ public class Level implements ChunkManager, Metadatable {
         int fullState = 0;
         if (cached && this.blockCache.containsKey(index)) {
             return this.blockCache.get(index);
-        } else if (pos.y >= 0 && pos.y < 128 && this.chunks.containsKey(chunkIndex)) {
-            fullState = this.chunks.get(chunkIndex).getFullBlock((int) pos.x & 0x0f, (int) pos.y & 0x7f,
+        } else if (pos.y >= 0 && pos.y < 256 && this.chunks.containsKey(chunkIndex)) {
+            fullState = this.chunks.get(chunkIndex).getFullBlock((int) pos.x & 0x0f, (int) pos.y & 0xff,
                     (int) pos.z & 0x0f);
         } else {
             fullState = 0;
@@ -1494,11 +1494,11 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean setBlock(Vector3 pos, Block block, boolean direct, boolean update) {
-        if (pos.y < 0 || pos.y >= 128) {
+        if (pos.y < 0 || pos.y >= 256) {
             return false;
         }
 
-        if (this.getChunk((int) pos.x >> 4, (int) pos.z >> 4, true).setBlock((int) pos.x & 0x0f, (int) pos.y & 0x7f,
+        if (this.getChunk((int) pos.x >> 4, (int) pos.z >> 4, true).setBlock((int) pos.x & 0x0f, (int) pos.y & 0xff,
                 (int) pos.z & 0x0f, block.getId(), block.getDamage())) {
             Position position;
             if (!(pos instanceof Position)) {
@@ -1797,7 +1797,7 @@ public class Level implements ChunkManager, Metadatable {
         Block target = this.getBlock(vector);
         Block block = target.getSide(face);
 
-        if (block.y > 127 || block.y < 0) {
+        if (block.y > 255 || block.y < 0) {
             return null;
         }
 
@@ -2038,13 +2038,13 @@ public class Level implements ChunkManager, Metadatable {
 
     @Override
     public int getBlockIdAt(int x, int y, int z) {
-        return this.getChunk(x >> 4, z >> 4, true).getBlockId(x & 0x0f, y & 0x7f, z & 0x0f);
+        return this.getChunk(x >> 4, z >> 4, true).getBlockId(x & 0x0f, y & 0xff, z & 0x0f);
     }
 
     @Override
     public void setBlockIdAt(int x, int y, int z, int id) {
         this.blockCache.remove(Level.blockHash(x, y, z));
-        this.getChunk(x >> 4, z >> 4, true).setBlockId(x & 0x0f, y & 0x7f, z & 0x0f, id & 0xff);
+        this.getChunk(x >> 4, z >> 4, true).setBlockId(x & 0x0f, y & 0xff, z & 0x0f, id & 0xff);
         addBlockChange(x, y, z);
         temporalVector.setComponents(x, y, z);
         for (ChunkLoader loader : this.getChunkLoaders(x >> 4, z >> 4)) {
@@ -2053,24 +2053,24 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public int getBlockExtraDataAt(int x, int y, int z) {
-        return this.getChunk(x >> 4, z >> 4, true).getBlockExtraData(x & 0x0f, y & 0x7f, z & 0x0f);
+        return this.getChunk(x >> 4, z >> 4, true).getBlockExtraData(x & 0x0f, y & 0xff, z & 0x0f);
     }
 
     public void setBlockExtraDataat(int x, int y, int z, int id, int data) {
-        this.getChunk(x >> 4, z >> 4, true).setBlockExtraData(x & 0x0f, y & 0x7f, z & 0x0f, (data << 8) | id);
+        this.getChunk(x >> 4, z >> 4, true).setBlockExtraData(x & 0x0f, y & 0xff, z & 0x0f, (data << 8) | id);
 
         this.sendBlockExtraData(x, y, z, id, data);
     }
 
     @Override
     public int getBlockDataAt(int x, int y, int z) {
-        return this.getChunk(x >> 4, z >> 4, true).getBlockData(x & 0x0f, y & 0x7f, z & 0x0f);
+        return this.getChunk(x >> 4, z >> 4, true).getBlockData(x & 0x0f, y & 0xff, z & 0x0f);
     }
 
     @Override
     public void setBlockDataAt(int x, int y, int z, int data) {
         this.blockCache.remove(Level.blockHash(x, y, z));
-        this.getChunk(x >> 4, z >> 4, true).setBlockData(x & 0x0f, y & 0x7f, z & 0x0f, data & 0x0f);
+        this.getChunk(x >> 4, z >> 4, true).setBlockData(x & 0x0f, y & 0xff, z & 0x0f, data & 0x0f);
         addBlockChange(x, y, z);
         temporalVector.setComponents(x, y, z);
         for (ChunkLoader loader : this.getChunkLoaders(x >> 4, z >> 4)) {
@@ -2079,19 +2079,19 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public int getBlockSkyLightAt(int x, int y, int z) {
-        return this.getChunk(x >> 4, z >> 4, true).getBlockSkyLight(x & 0x0f, y & 0x7f, z & 0x0f);
+        return this.getChunk(x >> 4, z >> 4, true).getBlockSkyLight(x & 0x0f, y & 0xff, z & 0x0f);
     }
 
     public void setBlockSkyLightAt(int x, int y, int z, int level) {
-        this.getChunk(x >> 4, z >> 4, true).setBlockSkyLight(x & 0x0f, y & 0x7f, z & 0x0f, level & 0x0f);
+        this.getChunk(x >> 4, z >> 4, true).setBlockSkyLight(x & 0x0f, y & 0xff, z & 0x0f, level & 0x0f);
     }
 
     public int getBlockLightAt(int x, int y, int z) {
-        return this.getChunk(x >> 4, z >> 4, true).getBlockLight(x & 0x0f, y & 0x7f, z & 0x0f);
+        return this.getChunk(x >> 4, z >> 4, true).getBlockLight(x & 0x0f, y & 0xff, z & 0x0f);
     }
 
     public void setBlockLightAt(int x, int y, int z, int level) {
-        this.getChunk(x >> 4, z >> 4, true).setBlockLight(x & 0x0f, y & 0x7f, z & 0x0f, level & 0x0f);
+        this.getChunk(x >> 4, z >> 4, true).setBlockLight(x & 0x0f, y & 0xff, z & 0x0f, level & 0x0f);
     }
 
     public int getBiomeId(int x, int z) {
@@ -2316,15 +2316,11 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void chunkRequestCallback(int x, int z, byte[] payload) {
-        this.chunkRequestCallback(x, z, payload, FullChunkDataPacket.ORDER_COLUMNS);
-    }
-
-    public void chunkRequestCallback(int x, int z, byte[] payload, byte ordering) {
         this.timings.syncChunkSendTimer.startTiming();
         Long index = Level.chunkHash(x, z);
 
         if (this.cacheChunks && !this.chunkCache.containsKey(index)) {
-            this.chunkCache.put(index, Player.getChunkCacheFromData(x, z, payload, ordering));
+            this.chunkCache.put(index, Player.getChunkCacheFromData(x, z, payload));
             this.sendChunkFromCache(x, z);
             this.timings.syncChunkSendTimer.stopTiming();
             return;
@@ -2333,7 +2329,7 @@ public class Level implements ChunkManager, Metadatable {
         if (this.chunkSendTasks.containsKey(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
-                    player.sendChunk(x, z, payload, ordering);
+                    player.sendChunk(x, z, payload);
                 }
             }
 
@@ -2571,7 +2567,7 @@ public class Level implements ChunkManager, Metadatable {
                     }
                 }
 
-                for (; y >= 0 && y < 128; ++y) {
+                for (; y >= 0 && y < 256; ++y) {
                     int b = chunk.getFullBlock(x, y + 1, z);
                     Block block = Block.get(b >> 4, b & 0x0f);
                     if (!this.isFullBlock(block)) {

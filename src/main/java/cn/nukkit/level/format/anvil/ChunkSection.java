@@ -1,6 +1,7 @@
 package cn.nukkit.level.format.anvil;
 
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.BinaryStream;
 
 import java.nio.ByteBuffer;
 
@@ -31,43 +32,30 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public int getBlockId(int x, int y, int z) {
-        return this.blocks[(y << 8) + (z << 4) + x] & 0xff;
+        return this.blocks[(x << 8) + (z << 8) + y] & 0xff;
     }
 
     @Override
     public void setBlockId(int x, int y, int z, int id) {
-        this.blocks[(y << 8) + (z << 4) + x] = (byte) (id & 0xFF);
+        this.blocks[(x << 8) + (z << 8) + y] = (byte) (id & 0xFF);
     }
 
     @Override
     public int getBlockData(int x, int y, int z) {
-        int b = this.data[(y << 7) + (z << 3) + (x >> 1)] & 0xff;
-        if ((x & 1) == 0) {
-            return b & 0x0f;
-        }
-        return b >> 4;
+        return this.data[(x << 8) + (z << 8) + y] & 0xff;
     }
 
     @Override
     public void setBlockData(int x, int y, int z, int data) {
-        int i = (y << 7) + (z << 3) + (x >> 1);
-        int old = this.data[i] & 0xff;
-        if ((x & 1) == 0) {
-            this.data[i] = (byte) (((((old & 0xf0) | data & 0x0f)) & 0xff) & 0xff);
-        } else {
-            this.data[i] = (byte) (((((data & 0x0f) << 4) | (old & 0x0f)) & 0xff) & 0xff);
-        }
+        this.data[(x << 8) + (z << 8) + y] = (byte) (data & 0xff);
     }
 
     @Override
     public int getFullBlock(int x, int y, int z) {
-        int i = (y << 8) + (z << 4) + x;
+        int i = (x << 8) + (z << 8) + y;
         int block = this.blocks[i] & 0xff;
-        int data = this.data[i >> 1] & 0xff;
-        if ((x & 1) == 0) {
-            return (block << 4) | (data & 0x0F);
-        }
-        return (block << 4) | (data >> 4);
+        int data = this.data[i] & 0xff;
+        return (block << 8) | data;
     }
 
     @Override
@@ -82,7 +70,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public boolean setBlock(int x, int y, int z, Integer blockId, Integer meta) {
-        int i = (y << 8) + (z << 4) + x;
+        int i = (x << 8) + (z << 8) + y;
         boolean changed = false;
         if (blockId != null) {
             byte id = (byte) (blockId & 0xff);
@@ -93,18 +81,10 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
         }
 
         if (meta != null) {
-            i >>= 1;
-            int old = this.data[i] & 0xff;
-            if ((x & 1) == 0) {
-                this.data[i] = (byte) ((((old & 0xf0) | meta & 0x0f)) & 0xff);
-                if (!meta.equals(old & 0x0f)) {
-                    changed = true;
-                }
-            } else {
-                this.data[i] = (byte) ((((meta & 0x0f) << 4) | (old & 0x0f)) & 0xff);
-                if (!meta.equals((old & 0xf0) >> 4)) {
-                    changed = true;
-                }
+            byte m = (byte) (meta & 0xff);
+            if (this.data[i] != m) {
+                this.data[i] = m;
+                changed = true;
             }
         }
 
@@ -113,106 +93,62 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public int getBlockSkyLight(int x, int y, int z) {
-        int sl = this.skyLight[(y << 7) + (z << 3) + (x >> 1)] & 0xff;
-        if ((x & 1) == 0) {
-            return sl & 0x0f;
-        }
-        return sl >> 4;
+        return this.skyLight[(x << 8) + (z << 8) + y] & 0xff;
     }
 
     @Override
     public void setBlockSkyLight(int x, int y, int z, int level) {
-        int i = (y << 7) + (z << 3) + (x >> 1);
-        int old = this.skyLight[i] & 0xff;
-        if ((x & 1) == 0) {
-            this.skyLight[i] = (byte) (((old & 0xf0) | (level & 0x0f)) & 0xff);
-        } else {
-            this.skyLight[i] = (byte) ((((level & 0x0f) << 4) | (old & 0x0f)) & 0xff);
-        }
+        this.skyLight[(x << 8) + (z << 8) + y] = (byte) (level & 0xff);
     }
 
     @Override
     public int getBlockLight(int x, int y, int z) {
-        int l = this.blockLight[(y << 7) + (z << 3) + (x >> 1)] & 0xff;
-        if ((x & 1) == 0) {
-            return l & 0x0f;
-        }
-        return l >> 4;
+        return this.blockLight[(x << 8) + (z << 8) + y] & 0xff;
     }
 
     @Override
     public void setBlockLight(int x, int y, int z, int level) {
-        int i = (y << 7) + (z << 3) + (x >> 1);
-        int old = this.blockLight[i] & 0xff;
-        if ((x & 1) == 0) {
-            this.blockLight[i] = (byte) (((old & 0xf0) | (level & 0x0f)) & 0xff);
-        } else {
-            this.blockLight[i] = (byte) ((((level & 0x0f) << 4) | (old & 0x0f)) & 0xff);
-        }
+        this.blockLight[(x << 8) + (z << 8) + y] = (byte) (level & 0xff);
     }
 
     @Override
     public byte[] getBlockIdColumn(int x, int z) {
-        int i = (z << 4) + x;
+        int i = (x << 8) + (z << 8);
         byte[] column = new byte[16];
         for (int y = 0; y < 16; y++) {
-            column[y] = this.blocks[(y << 8) + i];
+            column[y] = this.blocks[y + i];
         }
         return column;
     }
 
     @Override
     public byte[] getBlockDataColumn(int x, int z) {
-        int i = (z << 3) + (x >> 1);
-        ByteBuffer column = ByteBuffer.allocate(8);
-        int data1 = this.data[(y << 7) + i] & 0xff;
-        int data2 = this.data[((y + 1) << 7) + i] & 0xff;
-        if ((x & 1) == 0) {
-            for (int y = 0; y < 16; y += 2) {
-                column.put((byte) ((data1 & 0x0f) | (((data2 & 0x0f) << 4) & 0xff)));
-            }
-        } else {
-            for (int y = 0; y < 16; y += 2) {
-                column.put((byte) ((((data1 & 0xf0) >> 4) & 0xff) | (data2 & 0xf0)));
-            }
+        int i = (x << 8) + (z << 8);
+        byte[] column = new byte[16];
+        for (int y = 0; y < 16; y++) {
+            column[y] = this.data[y + i];
         }
-        return column.array();
+        return column;
     }
 
     @Override
     public byte[] getBlockSkyLightColumn(int x, int z) {
-        int i = (z << 3) + (x >> 1);
-        ByteBuffer column = ByteBuffer.allocate(8);
-        int skyLight1 = this.skyLight[(y << 7) + i] & 0xff;
-        int skyLight2 = this.skyLight[((y + 1) << 7) + i] & 0xff;
-        if ((x & 1) == 0) {
-            for (int y = 0; y < 16; y += 2) {
-                column.put((byte) ((skyLight1 & 0x0f) | (((skyLight2 & 0x0f) << 4) & 0xff)));
-            }
-        } else {
-            for (int y = 0; y < 16; y += 2) {
-                column.put((byte) ((((skyLight1 & 0xf0) >> 4) & 0xff) | (skyLight2 & 0xf0)));
-            }
+        int i = (x << 8) + (z << 8);
+        byte[] column = new byte[16];
+        for (int y = 0; y < 16; y++) {
+            column[y] = this.skyLight[y + i];
         }
-        return column.array();
+        return column;
     }
 
     @Override
     public byte[] getBlockLightColumn(int x, int z) {
-        int i = (z << 3) + (x >> 1);
-        ByteBuffer column = ByteBuffer.allocate(8);
-        int blockLight1 = this.blockLight[(y << 7) + i] & 0xff;
-        int blockLight2 = this.blockLight[((y + 1) << 7) + i] & 0xff;
-        if ((x & 1) == 0) {
-            for (int y = 0; y < 16; y += 2) {
-                column.put((byte) ((blockLight1 & 0x0f) | (((blockLight2 & 0x0f) << 4) & 0xff)));
-            }
-        } else {
-            for (int y = 0; y < 16; y += 2) {
-                column.put((byte) ((((blockLight1 & 0xf0) >> 4) & 0xff) | (blockLight2 & 0xf0)));
-            }
+        int i = (x << 8) + (z << 8);
+        byte[] column = new byte[16];
+        for (int y = 0; y < 16; y++) {
+            column[y] = this.blockLight[y + i];
         }
-        return column.array();
+        return column;
     }
 
     @Override
@@ -233,6 +169,26 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     @Override
     public byte[] getLightArray() {
         return this.blockLight;
+    }
+
+    @Override
+    public boolean isAllAir() {
+        for (byte b : this.blocks) {
+            if ((b & 0xff) != 0x00) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public byte[] getBytes() {
+        BinaryStream stream = new BinaryStream();
+        stream.put(this.blocks);
+        stream.put(this.data);
+        stream.put(this.skyLight);
+        stream.put(this.blockLight);
+        return stream.getBuffer();
     }
 
     @Override

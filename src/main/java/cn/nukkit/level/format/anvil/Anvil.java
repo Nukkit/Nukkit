@@ -10,9 +10,7 @@ import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.FullChunkDataPacket;
 import cn.nukkit.scheduler.AsyncTask;
-import cn.nukkit.utils.Binary;
-import cn.nukkit.utils.BinaryStream;
-import cn.nukkit.utils.ChunkException;
+import cn.nukkit.utils.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -103,16 +101,16 @@ public class Anvil extends BaseLevelProvider {
     }
 
     public static int getRegionIndexX(int chunkX) {
-        return chunkX >> 5;
+        return chunkX >> 8;
     }
 
     public static int getRegionIndexZ(int chunkZ) {
-        return chunkZ >> 5;
+        return chunkZ >> 8;
     }
 
     @Override
     public AsyncTask requestChunkTask(int x, int z) throws ChunkException {
-        FullChunk chunk = this.getChunk(x, z, false);
+        Chunk chunk = this.getChunk(x, z, false);
         if (chunk == null) {
             throw new ChunkException("Invalid Chunk Set");
         }
@@ -149,24 +147,32 @@ public class Anvil extends BaseLevelProvider {
         }
 
         BinaryStream stream = new BinaryStream();
-        stream.put(chunk.getBlockIdArray());
-        stream.put(chunk.getBlockDataArray());
-        stream.put(chunk.getBlockSkyLightArray());
-        stream.put(chunk.getBlockLightArray());
+        int topEmpty = 0;
+        cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
+        for (int ci = 15; ci > 0; ci--) {
+            if (sections[ci].isAllAir()) {
+                topEmpty = ci + 1;
+            } else {
+                break;
+            }
+        }
+        stream.putByte((byte) topEmpty);
+        for (int ci = 0; ci < topEmpty; ci++) {
+            stream.putByte((byte) 0);
+            stream.put(sections[ci].getBytes());
+        }
         for (int height : chunk.getHeightMapArray()) {
             stream.putByte((byte) (height & 0xff));
         }
-        for (int color : chunk.getBiomeColorArray()) {
-            stream.put(Binary.writeInt(color));
-        }
+        stream.put(chunk.getBiomeIdArray());
         if (extraData != null) {
             stream.put(extraData.getBuffer());
         } else {
-            stream.putLInt(0);
+            stream.putInt(0);
         }
         stream.put(blockEntities);
 
-        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer(), FullChunkDataPacket.ORDER_LAYERED);
+        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer());
 
         return null;
     }
@@ -329,17 +335,17 @@ public class Anvil extends BaseLevelProvider {
         CompoundTag nbt = new CompoundTag();
         nbt.putByte("Y", Y);
         nbt.putByteArray("Blocks", new byte[4096]);
-        nbt.putByteArray("Data", new byte[2048]);
-        byte[] sl = new byte[2048];
+        nbt.putByteArray("Data", new byte[4096]);
+        byte[] sl = new byte[4096];
         Arrays.fill(sl, (byte) 0xff);
         nbt.putByteArray("SkyLight", sl);
-        nbt.putByteArray("BlockLight", new byte[2048]);
+        nbt.putByteArray("BlockLight", new byte[4096]);
         return new ChunkSection(nbt);
     }
 
     @Override
     public boolean isChunkGenerated(int chunkX, int chunkZ) {
-        RegionLoader region = this.getRegion(chunkX >> 5, chunkZ >> 5);
+        RegionLoader region = this.getRegion(chunkX >> 8, chunkZ >> 8);
         return region != null && region.chunkExists(chunkX - region.getX() * 32, chunkZ - region.getZ() * 32) && this.getChunk(chunkX - region.getX() * 32, chunkZ - region.getZ() * 32, true).isGenerated();
     }
 
