@@ -2,6 +2,7 @@ package cn.nukkit.level;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
+import cn.nukkit.block.BlockTNT;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityPrimedTNT;
 import cn.nukkit.event.block.BlockUpdateEvent;
@@ -17,6 +18,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.ExplodePacket;
+import cn.nukkit.level.sound.ExplodeSound;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -223,7 +225,8 @@ public class Explosion {
         pk.z = (float) this.source.z;
         pk.radius = (float) this.size;
         pk.records = send.stream().toArray(Vector3[]::new);
-
+        
+        this.level.addSound(new ExplodeSound(this.add(0.5, 0, 0.5)));
         this.level.addChunkPacket((int) source.x >> 4, (int) source.z >> 4, pk);
 
         return true;

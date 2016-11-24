@@ -2,7 +2,6 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.item.EntityPrimedTNT;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.TNTPrimeSound;
@@ -83,7 +82,6 @@ public class BlockTNT extends BlockSolid {
                 nbt
         );
         tnt.spawnToAll();
-        this.level.addSound(new TNTPrimeSound(this));
     }
 
     @Override
