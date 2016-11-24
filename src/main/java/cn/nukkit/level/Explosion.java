@@ -17,6 +17,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.ExplodePacket;
+import cn.nukkit.level.Level;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,17 +35,23 @@ public class Explosion {
     private final Level level;
     private final Position source;
     private final double size;
+    
+    private final double explosionX;
+    private final double explosionY;
+    private final double explosionZ;
+    private final float explosionSize;
 
     private List<Block> affectedBlocks = new ArrayList<>();
     private final double stepLen = 0.3d;
 
     private final Object what;
 
-    public Explosion(Position center, double size, Entity what) {
+    public Explosion(Position center, double size, Entity what, float sizeW) {
         this.level = center.getLevel();
         this.source = center;
         this.size = Math.max(size, 0);
         this.what = what;
+        this.explosionSize = sizeW;
     }
 
     /**
@@ -74,6 +81,20 @@ public class Explosion {
             for (int j = 0; j < this.rays; ++j) {
                 for (int k = 0; k < this.rays; ++k) {
                     if (i == 0 || i == mRays || j == 0 || j == mRays || k == 0 || k == mRays) {
+                        double d0 = (double)((float)i / 15.0F * 2.0F - 1.0F);
+                        double d1 = (double)((float)j / 15.0F * 2.0F - 1.0F);
+                        double d2 = (double)((float)k / 15.0F * 2.0F - 1.0F);
+                        double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
+                        d0 = d0 / d3;
+                        d1 = d1 / d3;
+                        d2 = d2 / d3;
+                        float f = this.explosionSize * (0.7F + this.level.rand.nextFloat() * 0.6F);
+                        double d4 = this.explosionX;
+                        double d6 = this.explosionY;
+                        double d8 = this.explosionZ;
+                        d4 += d0 * 0.30000001192092896D;
+                        d6 += d1 * 0.30000001192092896D;
+                        d8 += d2 * 0.30000001192092896D;
                         vector.setComponents((double) i / (double) mRays * 2d - 1, (double) j / (double) mRays * 2d - 1, (double) k / (double) mRays * 2d - 1);
                         double len = vector.length();
                         vector.setComponents((vector.x / len) * this.stepLen, (vector.y / len) * this.stepLen, (vector.z / len) * this.stepLen);
@@ -132,13 +153,13 @@ public class Explosion {
             }
         }
 
-        double explosionSize = this.size * 2d;
-        double minX = NukkitMath.floorDouble(this.source.x - explosionSize - 1);
-        double maxX = NukkitMath.ceilDouble(this.source.x + explosionSize + 1);
-        double minY = NukkitMath.floorDouble(this.source.y - explosionSize - 1);
-        double maxY = NukkitMath.ceilDouble(this.source.y + explosionSize + 1);
-        double minZ = NukkitMath.floorDouble(this.source.z - explosionSize - 1);
-        double maxZ = NukkitMath.ceilDouble(this.source.z + explosionSize + 1);
+        float f3 = this.explosionSize * 2.0F;
+        double minX = NukkitMath.floorDouble(this.explosionX - (double)f3 - 1.0D);
+        double maxX = NukkitMath.floorDouble(this.explosionX + (double)f3 + 1.0D);
+        double minY = NukkitMath.floorDouble(this.explosionY - (double)f3 - 1.0D);
+        double maxY = NukkitMath.floorDouble(this.explosionY + (double)f3 - 1.0D);
+        double minZ = NukkitMath.floorDouble(this.explosionY - (double)f3 - 1.0D);
+        double maxZ = NukkitMath.floorDouble(this.explosionY + (double)f3 - 1.0D);
 
         AxisAlignedBB explosionBB = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
 
