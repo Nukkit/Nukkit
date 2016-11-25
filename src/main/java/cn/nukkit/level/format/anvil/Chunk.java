@@ -421,13 +421,11 @@ public class Chunk extends BaseChunk {
         byte[] blockLight = old.getBlockLightArray();
         byte[] skyLight = old.getBlockSkyLightArray();
         for (int y = 0; y < 8; y++) {
-            CompoundTag nbt = new CompoundTag();
-            nbt.putByte("Y", y);
-            nbt.putByteArray("Blocks", Arrays.copyOfRange(blocks, y * 4096, y * 4096 + 4095));
-            nbt.putByteArray("Data", Arrays.copyOfRange(data, y * 2048, y * 2048 + 2047));
-            nbt.putByteArray("BlockLight", Arrays.copyOfRange(blockLight, y * 2048, y * 2048 + 2047));
-            nbt.putByteArray("SkyLight", Arrays.copyOfRange(skyLight, y * 2048, y * 2048 + 2047));
-            ChunkSection section = new ChunkSection(nbt);
+            ChunkSection section = new ChunkSection(y);
+            System.arraycopy(blocks, y * 4096, section.blocks, 0, 4096);
+            System.arraycopy(data, y * 2048, section.data, 0, 2048);
+            System.arraycopy(blockLight, y * 2048, section.blockLight, 0, 2048);
+            System.arraycopy(skyLight, y * 2048, section.skyLight, 0, 2048);
             chunk.sections[y] = section;
         }
         System.arraycopy(old.getBiomeColorArray(), 0, chunk.biomeColors, 0, 256);

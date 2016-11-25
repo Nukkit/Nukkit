@@ -108,22 +108,6 @@ public class McRegion extends BaseLevelProvider {
         NBTIO.writeGZIPCompressed(new CompoundTag().putCompound("Data", levelData), new FileOutputStream(path + "level.dat"), ByteOrder.BIG_ENDIAN);
     }
 
-    public static int getRegionIndexX(int chunkX) {
-        return chunkX >> 5;
-    }
-
-    public static int getRegionIndexZ(int chunkZ) {
-        return chunkZ >> 5;
-    }
-
-    public static int getChunkIndexX(int regionX, int chunkX) {
-        return (regionX << 5) | chunkX;
-    }
-
-    public static int getChunkIndexZ(int regionZ, int chunkZ) {
-        return (regionZ << 5) | chunkZ;
-    }
-
     @Override
     public AsyncTask requestChunkTask(int x, int z) throws ChunkException {
         BaseFullChunk chunk = this.getChunk(x, z, false);
@@ -252,8 +236,8 @@ public class McRegion extends BaseLevelProvider {
         if (this.chunks.containsKey(index)) {
             return true;
         }
-        int regionX = getRegionIndexX(chunkX);
-        int regionZ = getRegionIndexZ(chunkZ);
+        int regionX = chunkX >> 5;
+        int regionZ = chunkZ >> 5;
         this.loadRegion(regionX, regionZ);
         this.level.timings.syncChunkLoadDataTimer.startTiming();
         Chunk chunk;
@@ -273,34 +257,6 @@ public class McRegion extends BaseLevelProvider {
             return true;
         }
         return false;
-    }
-
-    private void loadChunks() {
-        this.loadRegions();
-        for (RegionLoader region : this.regions.values()) {
-            int regionX = region.getX();
-            int regionZ = region.getZ();
-            for (Integer index : region.getLocationIndexes()) {
-                int x = index & 0x1f;
-                int z = index >> 5;
-                int chunkX = getChunkIndexX(regionX, x);
-                int chunkZ = getChunkIndexZ(regionZ, z);
-                long hash = Level.chunkHash(chunkX, chunkZ);
-                if (this.chunks.containsKey(hash)) {
-                    continue;
-                }
-                Chunk chunk;
-                if (this.getLevel().timings != null) this.level.timings.syncChunkLoadDataTimer.startTiming();
-                try {
-                    chunk = region.readChunk(x, z);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                if (this.getLevel().timings != null) this.level.timings.syncChunkLoadDataTimer.stopTiming();
-                if (chunk == null) continue;
-                this.chunks.put(hash, chunk);
-            }
-        }
     }
 
     public Chunk getEmptyChunk(int chunkX, int chunkZ) {
@@ -361,8 +317,8 @@ public class McRegion extends BaseLevelProvider {
             throw new ChunkException("Invalid Chunk class");
         }
         chunk.setProvider(this);
-        int regionX = getRegionIndexX(chunkX);
-        int regionZ = getRegionIndexZ(chunkZ);
+        int regionX = chunkX >> 5;
+        int regionZ = chunkZ >> 5;
         this.loadRegion(regionX, regionZ);
         chunk.setX(chunkX);
         chunk.setZ(chunkZ);
@@ -396,24 +352,6 @@ public class McRegion extends BaseLevelProvider {
         }
     }
 
-    private void loadRegions() {
-        for (File file : new File(path + "/region/").listFiles()) {
-            Matcher m = Pattern.compile("-?\\d+").matcher(file.getName());
-            int x, z;
-            try {
-                if (m.find()) {
-                    x = Integer.parseInt(m.group());
-                } else continue;
-                if (m.find()) {
-                    z = Integer.parseInt(m.group());
-                } else continue;
-            } catch (NumberFormatException e) {
-                continue;
-            }
-            this.loadRegion(x, z);
-        }
-    }
-
     @Override
     public void close() {
         this.unloadChunks();
@@ -429,16 +367,48 @@ public class McRegion extends BaseLevelProvider {
         this.level = null;
     }
 
-    public Anvil toAnvil(Level level) {
-        this.loadChunks();
+    public Anvil toAnvil(Level level, String path, String oldPath) {
         Anvil anvil;
         try {
-            anvil = new Anvil(level, this.path);
+            anvil = new Anvil(level, path);
         } catch (IOException e) {
             return null;
         }
-        for (Chunk chunk : this.chunks.values()) {
-            anvil.setChunk(chunk.getX(), chunk.getZ(), chunk.toAnvil(anvil));
+        for (File file : new File(oldPath + "region/").listFiles()) {
+            Matcher m = Pattern.compile("-?\\d+").matcher(file.getName());
+            int regionX, regionZ;
+            try {
+                if (m.find()) {
+                    regionX = Integer.parseInt(m.group());
+                } else continue;
+                if (m.find()) {
+                    regionZ = Integer.parseInt(m.group());
+                } else continue;
+            } catch (NumberFormatException e) {
+                continue;
+            }
+            RegionLoader region = new RegionLoader(this, regionX, regionZ);
+            for (Integer index : region.getLocationIndexes()) {
+                int chunkX = index & 0x1f;
+                int chunkZ = index >> 5;
+                Chunk chunk;
+                try {
+                    chunk = region.readChunk(chunkX, chunkZ);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                if (chunk == null) continue;
+                int x = regionX << 5 | chunkX;
+                int z = regionZ << 5 | chunkZ;
+                anvil.setChunk(x, z, chunk.toAnvil(anvil));
+                anvil.saveChunk(x, z);
+                anvil.unloadChunk(x, z, false);
+            }
+            try {
+                region.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return anvil;
     }
