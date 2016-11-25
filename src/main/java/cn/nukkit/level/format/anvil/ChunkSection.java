@@ -1,5 +1,6 @@
 package cn.nukkit.level.format.anvil;
 
+import cn.nukkit.Server;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 import java.nio.ByteBuffer;
@@ -11,10 +12,18 @@ import java.nio.ByteBuffer;
 public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     private final int y;
-    private byte[] blocks;
-    private byte[] data;
-    private byte[] blockLight;
-    private byte[] skyLight;
+    byte[] blocks;
+    byte[] data;
+    byte[] blockLight;
+    byte[] skyLight;
+
+    public ChunkSection(int y) {
+        this.y = y;
+        this.blocks = new byte[4096];
+        this.data = new byte[2048];
+        this.blockLight = new byte[2048];
+        this.skyLight = new byte[2048];
+    }
 
     public ChunkSection(CompoundTag nbt) {
         this.y = nbt.getByte("Y");

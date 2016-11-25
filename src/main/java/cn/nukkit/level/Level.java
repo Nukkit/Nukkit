@@ -240,45 +240,24 @@ public class Level implements ChunkManager, Metadatable {
         this.autoSave = server.getAutoSave();
 
         try {
-            this.provider = provider.getConstructor(Level.class, String.class).newInstance(this, path);
+            if (provider == McRegion.class) {
+                File oldPath = new File(path);
+                File newPath = new File(path + "../" + name + ".old");
+                oldPath.renameTo(newPath);
+                new File(oldPath, "region").mkdirs();
+                Utils.copyFile(new File(newPath, "level.dat"), new File(oldPath, "level.dat"));
+                this.provider = provider.getConstructor(Level.class, String.class).newInstance(this, path + "../" + name + ".old/");
+            } else {
+                this.provider = provider.getConstructor(Level.class, String.class).newInstance(this, path);
+            }
         } catch (Exception e) {
             throw new LevelException("Caused by " + Utils.getExceptionMessage(e));
         }
 
-        if (this.provider instanceof McRegion) {
+        if (provider == McRegion.class) {
             McRegion old = (McRegion) this.provider;
-            this.provider = old.toAnvil(this);
+            this.provider = old.toAnvil(this, path, path + "../" + name + ".old/");
             old.close();
-            File oldPath = new File(path + "../" + name + ".old");
-            oldPath.mkdir();
-            File pathFile = new File(path + "region");
-            pathFile.renameTo(new File(oldPath, "region"));
-            pathFile.mkdir();
-            FileInputStream fi = null;
-            FileChannel in = null;
-            FileOutputStream fo = null;
-            FileChannel out = null;
-            File oldData = new File(oldPath, "level.dat");
-            try {
-                oldData.createNewFile();
-                fi = new FileInputStream(new File(path + "level.dat"));
-                in = fi.getChannel();
-                fo = new FileOutputStream(oldData);
-                out = fo.getChannel();
-                in.transferTo(0, in.size(), out);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                try {
-                    if (fi != null) fi.close();
-                    if (in != null) in.close();
-                    if (fo != null) fo.close();
-                    if (out != null) out.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            this.provider.saveChunks();
         }
 
         this.provider.updateLevelName(name);
