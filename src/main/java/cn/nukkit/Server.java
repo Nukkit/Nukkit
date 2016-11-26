@@ -1604,11 +1604,12 @@ public class Server {
             generator = Generator.getGenerator(this.getLevelType());
         }
 
-        Class<? extends LevelProvider> provider;
-        String providerName;
-        if ((provider = LevelProviderManager.getProviderByName
-                (providerName = (String) this.getConfig("level-settings.default-format", "anvil"))) == null) {
-            provider = LevelProviderManager.getProviderByName(providerName = "anvil");
+        if (provider == null) { 
+            String providerName;
+            if ((provider = LevelProviderManager.getProviderByName
+                    (providerName = (String) this.getConfig("level-settings.default-format", "anvil"))) == null) {
+                provider = LevelProviderManager.getProviderByName(providerName = "anvil");
+            }
         }
 
         Level level;
