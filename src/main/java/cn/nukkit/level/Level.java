@@ -254,6 +254,8 @@ public class Level implements ChunkManager, Metadatable {
             throw new LevelException("Caused by " + Utils.getExceptionMessage(e));
         }
 
+        this.timings = new LevelTimings(this);
+
         if (provider == McRegion.class) {
             this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.updating",
                     TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE));
@@ -311,7 +313,6 @@ public class Level implements ChunkManager, Metadatable {
         this.chunkTickList.clear();
         this.clearChunksOnTick = (boolean) this.server.getConfig("chunk-ticking.clear-tick-list", true);
         this.cacheChunks = (boolean) this.server.getConfig("chunk-sending.cache-chunks", false);
-        this.timings = new LevelTimings(this);
         this.temporalPosition = new Position(0, 0, 0, this);
         this.temporalVector = new Vector3(0, 0, 0);
         this.tickRate = 1;

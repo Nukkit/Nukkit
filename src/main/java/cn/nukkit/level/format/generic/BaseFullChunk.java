@@ -110,8 +110,7 @@ public abstract class BaseFullChunk implements FullChunk {
         if (this.getProvider() != null && !this.isInit) {
             boolean changed = false;
             if (this.NBTentities != null) {
-                boolean timings = this.getProvider().getLevel().timings != null;
-                if (timings) this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer.startTiming();
+                this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer.startTiming();
                 for (CompoundTag nbt : NBTentities) {
                     if (!nbt.contains("id")) {
                         this.setChanged();
@@ -130,9 +129,9 @@ public abstract class BaseFullChunk implements FullChunk {
                         continue;
                     }
                 }
-                if (timings) this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer.stopTiming();
+                this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer.stopTiming();
 
-                if (timings) this.getProvider().getLevel().timings.syncChunkLoadBlockEntitiesTimer.startTiming();
+                this.getProvider().getLevel().timings.syncChunkLoadBlockEntitiesTimer.startTiming();
                 for (CompoundTag nbt : NBTtiles) {
                     if (nbt != null) {
                         if (!nbt.contains("id")) {
@@ -151,7 +150,7 @@ public abstract class BaseFullChunk implements FullChunk {
                     }
                 }
 
-                if (timings) this.getProvider().getLevel().timings.syncChunkLoadBlockEntitiesTimer.stopTiming();
+                this.getProvider().getLevel().timings.syncChunkLoadBlockEntitiesTimer.stopTiming();
 
                 this.NBTentities = null;
                 this.NBTtiles = null;

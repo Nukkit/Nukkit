@@ -79,6 +79,9 @@ public class Utils {
     }
 
     public static void copyFile(File from, File to) throws IOException {
+        if (!from.exists()) {
+            throw new FileNotFoundException();
+        }
         if (from.isDirectory() || to.isDirectory()) {
             throw new FileNotFoundException();
         }
