@@ -134,8 +134,9 @@ public class EmptyChunkSection implements ChunkSection {
         ByteBuffer buffer = ByteBuffer.allocate(10240);
         byte[] skyLight = new byte[2048];
         Arrays.fill(skyLight, (byte) 0xff);
+        buffer.position(6144);
         return buffer
-                .put(skyLight, 6144, 2048)
+                .put(skyLight)
                 .array();
     }
 
