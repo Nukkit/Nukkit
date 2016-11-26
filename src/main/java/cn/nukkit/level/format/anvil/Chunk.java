@@ -416,17 +416,19 @@ public class Chunk extends BaseChunk {
 
     public static Chunk fromMcRegion(cn.nukkit.level.format.mcregion.Chunk old, LevelProvider provider) {
         Chunk chunk = Chunk.getEmptyChunk(old.getX(), old.getZ(), provider);
-        byte[] blocks = old.getBlockIdArray();
-        byte[] data = old.getBlockDataArray();
-        byte[] blockLight = old.getBlockLightArray();
-        byte[] skyLight = old.getBlockSkyLightArray();
-        for (int y = 0; y < 8; y++) {
-            ChunkSection section = new ChunkSection(y);
-            System.arraycopy(blocks, y * 4096, section.blocks, 0, 4096);
-            System.arraycopy(data, y * 2048, section.data, 0, 2048);
-            System.arraycopy(blockLight, y * 2048, section.blockLight, 0, 2048);
-            System.arraycopy(skyLight, y * 2048, section.skyLight, 0, 2048);
-            chunk.sections[y] = section;
+        for (int Y = 0; Y < 8; Y++) {
+            ChunkSection section = new ChunkSection(Y);
+            for (int x = 0; x < 16; x++) {
+                for (int y = 0; y < 16; y++) {
+                    for (int z = 0; z < 16; z++) {
+                        section.setBlockId(x, y, z, old.getBlockId(x, Y << 4 | y, z));
+                        section.setBlockData(x, y, z, old.getBlockData(x, Y << 4 | y, z));
+                        section.setBlockLight(x, y, z, old.getBlockLight(x, Y << 4 | y, z));
+                        section.setBlockSkyLight(x, y, z, old.getBlockSkyLight(x, Y << 4 | y, z));
+                    }
+                }
+            }
+            chunk.sections[Y] = section;
         }
         System.arraycopy(old.getBiomeColorArray(), 0, chunk.biomeColors, 0, 256);
         System.arraycopy(old.getHeightMapArray(), 0, chunk.heightMap, 0, 256);
