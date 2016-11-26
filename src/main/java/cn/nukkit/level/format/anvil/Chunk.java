@@ -435,6 +435,8 @@ public class Chunk extends BaseChunk {
         chunk.NBTentities = old.getNBT().getList("Entities", CompoundTag.class).getAll();
         chunk.NBTtiles = old.getNBT().getList("TileEntities", CompoundTag.class).getAll();
         chunk.extraData.putAll(old.getBlockExtraDataArray());
+        chunk.setGenerated();
+        chunk.setPopulated();
         chunk.initChunk();
         return chunk;
     }
