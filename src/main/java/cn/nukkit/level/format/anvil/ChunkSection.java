@@ -263,20 +263,19 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
         byte[] blockLight = new byte[2048];
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                int i = (x << 7) + (z << 3);
-                for (int y = 0; y < 8; y++) {
-                    int j = y * 2;
-                    blocks[(x << 8) + (z << 4) + j] = this.blocks[(j << 8) + (z << 4) + x];
-                    blocks[(x << 8) + (z << 4) + j + 1] = this.blocks[((j + 1) << 8) + (z << 4) + x];
-                    int d1 = this.getBlockData(x, j, z);
-                    int d2 = this.getBlockData(x, j + 1, z);
-                    data[i + y] = (byte) ((d1 << 4) + d2);
-                    int sl1 = this.getBlockSkyLight(x, j, z);
-                    int sl2 = this.getBlockSkyLight(x, j + 1, z);
-                    skyLight[i + y] = (byte) ((sl1 << 4) + sl2);
-                    int bl1 = this.getBlockLight(x, j, z);
-                    int bl2 = this.getBlockLight(x, j + 1, z);
-                    blockLight[i + y] = (byte) ((bl1 << 4) + bl2);
+                int i = (x << 7) | (z << 3);
+                for (int y = 0; y < 16; y += 2) {
+                    blocks[(i << 1) | y] = (byte) this.getBlockId(x, y, z);
+                    blocks[(i << 1) | (y + 1)] = (byte) this.getBlockId(x, y + 1, z);
+                    int b1 = this.getBlockData(x, y, z);
+                    int b2 = this.getBlockData(x, y + 1, z);
+                    data[i | (y >> 1)] = (byte) ((b2 << 4) | b1);
+                    b1 = this.getBlockSkyLight(x, y, z);
+                    b2 = this.getBlockSkyLight(x, y + 1, z);
+                    skyLight[i | (y >> 1)] = (byte) ((b2 << 4) | b1);
+                    b1 = this.getBlockLight(x, y, z);
+                    b2 = this.getBlockLight(x, y + 1, z);
+                    blockLight[i | (y >> 1)] = (byte) ((b2 << 4) | b1);
                 }
             }
         }

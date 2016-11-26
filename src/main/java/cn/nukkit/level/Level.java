@@ -255,6 +255,8 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (provider == McRegion.class) {
+            this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.updating",
+                    TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE));
             McRegion old = (McRegion) this.provider;
             try {
                 this.provider = old.toAnvil(this, path, path + "../" + name + ".old/");
@@ -265,7 +267,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         this.provider.updateLevelName(name);
-
+        
         this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.preparing",
                 TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE));
 
