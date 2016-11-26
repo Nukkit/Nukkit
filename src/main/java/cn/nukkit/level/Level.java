@@ -256,7 +256,11 @@ public class Level implements ChunkManager, Metadatable {
 
         if (provider == McRegion.class) {
             McRegion old = (McRegion) this.provider;
-            this.provider = old.toAnvil(this, path, path + "../" + name + ".old/");
+            try {
+                this.provider = old.toAnvil(this, path, path + "../" + name + ".old/");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             old.close();
         }
 

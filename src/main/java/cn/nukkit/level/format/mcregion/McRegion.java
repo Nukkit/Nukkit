@@ -290,6 +290,21 @@ public class McRegion extends BaseLevelProvider {
         }
     }
 
+    @Override
+    public void saveChunk(int X, int Z, FullChunk chunk) {
+        if (!(chunk instanceof Chunk)) {
+            throw new ChunkException("Invalid Chunk class");
+        }
+        this.loadRegion(X >> 5, Z >> 5);
+        chunk.setX(X);
+        chunk.setZ(Z);
+        try {
+            this.getRegion(X >> 5, Z >> 5).writeChunk((Chunk) chunk);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     protected RegionLoader getRegion(int x, int z) {
         long index = Level.chunkHash(x, z);
         return this.regions.containsKey(index) ? this.regions.get(index) : null;
@@ -367,13 +382,8 @@ public class McRegion extends BaseLevelProvider {
         this.level = null;
     }
 
-    public Anvil toAnvil(Level level, String path, String oldPath) {
-        Anvil anvil;
-        try {
-            anvil = new Anvil(level, path);
-        } catch (IOException e) {
-            return null;
-        }
+    public Anvil toAnvil(Level level, String path, String oldPath) throws IOException {
+        Anvil anvil = new Anvil(level, path);
         for (File file : new File(oldPath + "region/").listFiles()) {
             Matcher m = Pattern.compile("-?\\d+").matcher(file.getName());
             int regionX, regionZ;
@@ -391,25 +401,16 @@ public class McRegion extends BaseLevelProvider {
             for (Integer index : region.getLocationIndexes()) {
                 int chunkX = index & 0x1f;
                 int chunkZ = index >> 5;
-                Chunk chunk;
-                try {
-                    chunk = region.readChunk(chunkX, chunkZ);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                if (chunk == null) continue;
+                Chunk old = region.readChunk(chunkX, chunkZ);
+                if (old == null) continue;
                 int x = regionX << 5 | chunkX;
                 int z = regionZ << 5 | chunkZ;
-                anvil.setChunk(x, z, chunk.toAnvil(anvil));
-                anvil.saveChunk(x, z);
-                anvil.unloadChunk(x, z, false);
+                cn.nukkit.level.format.anvil.Chunk chunk = old.toAnvil(anvil);
+                anvil.saveChunk(x, z, chunk);
             }
-            try {
-                region.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            region.close();
         }
+        anvil.doGarbageCollection();
         return anvil;
     }
 }

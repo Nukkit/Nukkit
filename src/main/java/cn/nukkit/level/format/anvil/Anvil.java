@@ -102,14 +102,6 @@ public class Anvil extends BaseLevelProvider {
         NBTIO.writeGZIPCompressed(new CompoundTag().putCompound("Data", levelData), new FileOutputStream(path + "level.dat"), ByteOrder.BIG_ENDIAN);
     }
 
-    public static int getRegionIndexX(int chunkX) {
-        return chunkX >> 5;
-    }
-
-    public static int getRegionIndexZ(int chunkZ) {
-        return chunkZ >> 5;
-    }
-
     @Override
     public AsyncTask requestChunkTask(int x, int z) throws ChunkException {
         Chunk chunk = this.getChunk(x, z, false);
@@ -247,8 +239,8 @@ public class Anvil extends BaseLevelProvider {
         if (this.chunks.containsKey(index)) {
             return true;
         }
-        int regionX = getRegionIndexX(chunkX);
-        int regionZ = getRegionIndexZ(chunkZ);
+        int regionX = chunkX >> 5;
+        int regionZ = chunkZ >> 5;
         this.loadRegion(regionX, regionZ);
         Chunk chunk;
         try {
@@ -297,6 +289,23 @@ public class Anvil extends BaseLevelProvider {
         }
     }
 
+    @Override
+    public void saveChunk(int X, int Z, FullChunk chunk) {
+        if (!(chunk instanceof Chunk)) {
+            throw new ChunkException("Invalid Chunk class");
+        }
+        int regionX = X >> 5;
+        int regionZ = Z >> 5;
+        this.loadRegion(regionX, regionZ);
+        chunk.setX(X);
+        chunk.setZ(Z);
+        try {
+            this.getRegion(regionX, regionZ).writeChunk((Chunk) chunk);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     protected RegionLoader getRegion(int x, int z) {
         long index = Level.chunkHash(x, z);
         return this.regions.containsKey(index) ? this.regions.get(index) : null;
@@ -324,8 +333,8 @@ public class Anvil extends BaseLevelProvider {
             throw new ChunkException("Invalid Chunk class");
         }
         chunk.setProvider(this);
-        int regionX = getRegionIndexX(chunkX);
-        int regionZ = getRegionIndexZ(chunkZ);
+        int regionX = chunkX >> 5;
+        int regionZ = chunkZ >> 5;
         this.loadRegion(regionX, regionZ);
 
         chunk.setX(chunkX);
