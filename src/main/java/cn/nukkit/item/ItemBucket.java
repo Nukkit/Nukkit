@@ -96,13 +96,7 @@ public class ItemBucket extends Item {
             if (!ev.isCancelled()) {
                 player.getLevel().setBlock(block, targetBlock, true, true);
                 if (player.isSurvival()) {
-                    if (this.getCount() == 1) {
-                        player.getInventory().setItemInHand(ev.getItem());
-                    } else {
-                        this.setCount(this.getCount() - 1);
-                        player.getInventory().setItemInHand(this);
-                        player.getInventory().addItem(ev.getItem());
-                    }
+                    player.getInventory().setItemInHand(ev.getItem());
                 }
                 return true;
             } else {
