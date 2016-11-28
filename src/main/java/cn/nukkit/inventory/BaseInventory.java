@@ -275,7 +275,7 @@ public abstract class BaseInventory implements Inventory {
             }
 
             for (Item slot : new ArrayList<>(itemSlots)) {
-                if (slot.equals(item) && item.getCount() < item.getMaxStackSize()) {
+                if (slot.equals(item) && item.getCount() < item.getMaxStackSize() && slot.getDamage() == item.getDamage()) {
                     int amount = Math.min(item.getMaxStackSize() - item.getCount(), slot.getCount());
                     amount = Math.min(amount, this.getMaxStackSize());
                     if (amount > 0) {
