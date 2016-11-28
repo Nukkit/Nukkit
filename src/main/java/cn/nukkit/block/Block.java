@@ -342,7 +342,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[GOLD_BLOCK] = BlockGold.class;
             list[IRON_BLOCK] = BlockIron.class;
             list[DOUBLE_SLAB] = BlockDoubleSlabStone.class;
-            list[SLAB] = BlockSlab.class;
+            list[STONE_SLAB] = BlockSlabStone.class;
             list[BRICKS_BLOCK] = BlockBricks.class;
             list[TNT] = BlockTNT.class;
             list[BOOKSHELF] = BlockBookshelf.class;
