@@ -141,9 +141,9 @@ public class PlayerInventory extends BaseInventory {
         this.sendHeldItem(players.stream().toArray(Player[]::new));
     }
     
-    	public void getHotbatSlotItem(index) {
+    	public void getHotbatSlotIndex(index) {
             slot = this.getHotbarSlotIndex(index);
- 		return $this->getItem($slot);
+ 		return this.getItem(slot);
 	}
 
     @Override
