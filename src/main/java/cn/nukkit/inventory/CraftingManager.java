@@ -4,6 +4,7 @@ import cn.nukkit.block.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemPotion;
+import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.Utils;
 
 import java.util.*;
@@ -168,7 +169,7 @@ public class CraftingManager {
                 " B ",
                 "DOD",
                 "OOO"
-        )).setIngredient("D", Item.get(Item.DIAMOND, 0, 2)).setIngredient("O", Item.get(Item.OBSIDIAN, 0, 4)).setIngredient("B", Item.get(Item.BOOK, 0, 1)));
+        )).setIngredient("D", Item.get(Item.DIAMOND, 0, 1)).setIngredient("O", Item.get(Item.OBSIDIAN, 0, 1)).setIngredient("B", Item.get(Item.BOOK, 0, 1)));
 
         this.registerRecipe((new BigShapedRecipe(Item.get(Item.FENCE, BlockPlanks.OAK, 3),
                 "PSP",
@@ -512,7 +513,7 @@ public class CraftingManager {
                 " N "
         )).setIngredient("N", Item.get(Item.SLAB, BlockSlabStone.SANDSTONE, 1)));
 
-        this.registerRecipe((new BigShapedRecipe(Item.get(Item.STONE_BRICK, BlockBricksStone.NORMAL, 1),
+        this.registerRecipe((new BigShapedRecipe(Item.get(Item.STONE_BRICK, BlockBricksStone.NORMAL, 4),
                 "   ",
                 "SS ",
                 "SS "
@@ -1019,90 +1020,90 @@ public class CraftingManager {
             )).setIngredient('W', Item.get(Item.WOOL, i, 1)));
         }
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.YELLOW, 2),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.YELLOW.getDyeData(), 2),
                 "  ",
                 "D "
         )).setIngredient('D', Item.get(Item.DANDELION, 0, 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.WHITE, 3),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.WHITE.getDyeData(), 3),
                 "  ",
                 "B "
         )).setIngredient('B', Item.get(Item.BONE, 0, 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.BROWN, 2),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.BROWN.getDyeData(), 2),
                 " B",
                 "O "
-        )).setIngredient('O', Item.get(Item.DYE, ItemDye.ORANGE, 1)).setIngredient('B', Item.get(Item.DYE, ItemDye.BLACK, 1)));
+        )).setIngredient('O', Item.get(Item.DYE, DyeColor.ORANGE.getDyeData(), 1)).setIngredient('B', Item.get(Item.DYE, DyeColor.BLACK.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.BROWN, 3),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.BROWN.getDyeData(), 3),
                 "RB",
                 "Y "
-        )).setIngredient('R', Item.get(Item.DYE, ItemDye.RED, 1)).setIngredient('B', Item.get(Item.DYE, ItemDye.BLACK, 1)).setIngredient('Y', Item.get(Item.DYE, ItemDye.YELLOW, 1)));
+        )).setIngredient('R', Item.get(Item.DYE, DyeColor.RED.getDyeData(), 1)).setIngredient('B', Item.get(Item.DYE, DyeColor.BLACK.getDyeData(), 1)).setIngredient('Y', Item.get(Item.DYE, DyeColor.YELLOW.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.PINK, 2),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.PINK.getDyeData(), 2),
                 " R",
                 "W "
-        )).setIngredient('W', Item.get(Item.DYE, ItemDye.WHITE, 1)).setIngredient('R', Item.get(Item.DYE, ItemDye.RED, 1)));
+        )).setIngredient('W', Item.get(Item.DYE, DyeColor.WHITE.getDyeData(), 1)).setIngredient('R', Item.get(Item.DYE, DyeColor.RED.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.ORANGE, 2),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.ORANGE.getDyeData(), 2),
                 " R",
                 "Y "
-        )).setIngredient('Y', Item.get(Item.DYE, ItemDye.YELLOW, 1)).setIngredient('R', Item.get(Item.DYE, ItemDye.RED, 1)));
+        )).setIngredient('Y', Item.get(Item.DYE, DyeColor.YELLOW.getDyeData(), 1)).setIngredient('R', Item.get(Item.DYE, DyeColor.RED.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.LIME, 2),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.LIME.getDyeData(), 2),
                 " G",
                 "W "
-        )).setIngredient('G', Item.get(Item.DYE, ItemDye.GREEN, 1)).setIngredient('W', Item.get(Item.DYE, ItemDye.WHITE, 1)));
+        )).setIngredient('G', Item.get(Item.DYE, DyeColor.GREEN.getDyeData(), 1)).setIngredient('W', Item.get(Item.DYE, DyeColor.WHITE.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.LIGHT_BLUE, 2),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.LIGHT_BLUE.getDyeData(), 2),
                 " B",
                 "W "
-        )).setIngredient('B', Item.get(Item.DYE, ItemDye.BLUE, 1)).setIngredient('W', Item.get(Item.DYE, ItemDye.WHITE, 1)));
+        )).setIngredient('B', Item.get(Item.DYE, DyeColor.BLUE.getDyeData(), 1)).setIngredient('W', Item.get(Item.DYE, DyeColor.WHITE.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.CYAN, 2),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.CYAN.getDyeData(), 2),
                 " G",
                 "B "
-        )).setIngredient('B', Item.get(Item.DYE, ItemDye.BLUE, 1)).setIngredient('G', Item.get(Item.DYE, ItemDye.GREEN, 1)));
+        )).setIngredient('B', Item.get(Item.DYE, DyeColor.BLUE.getDyeData(), 1)).setIngredient('G', Item.get(Item.DYE, DyeColor.GREEN.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.PURPLE, 2),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.PURPLE.getDyeData(), 2),
                 " R",
                 "B "
-        )).setIngredient('B', Item.get(Item.DYE, ItemDye.BLUE, 1)).setIngredient('R', Item.get(Item.DYE, ItemDye.RED, 1)));
+        )).setIngredient('B', Item.get(Item.DYE, DyeColor.BLUE.getDyeData(), 1)).setIngredient('R', Item.get(Item.DYE, DyeColor.RED.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.MAGENTA, 3),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.MAGENTA.getDyeData(), 3),
                 "RW",
                 "B "
-        )).setIngredient('B', Item.get(Item.DYE, ItemDye.BLUE, 1)).setIngredient('R', Item.get(Item.DYE, ItemDye.RED, 1)).setIngredient('W', Item.get(Item.DYE, ItemDye.WHITE, 1)));
+        )).setIngredient('B', Item.get(Item.DYE, DyeColor.BLUE.getDyeData(), 1)).setIngredient('R', Item.get(Item.DYE, DyeColor.RED.getDyeData(), 1)).setIngredient('W', Item.get(Item.DYE, DyeColor.WHITE.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.RED, 1),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.RED.getDyeData(), 1),
                 "  ",
                 "B "
         )).setIngredient('B', Item.get(Item.BEETROOT, 0, 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.MAGENTA, 4),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.MAGENTA.getDyeData(), 4),
                 "RB",
                 "WR"
-        )).setIngredient('W', Item.get(Item.DYE, ItemDye.WHITE, 1)).setIngredient('R', Item.get(Item.DYE, ItemDye.RED, 1)).setIngredient('B', Item.get(Item.DYE, ItemDye.BLUE, 1)));
+        )).setIngredient('W', Item.get(Item.DYE, DyeColor.WHITE.getDyeData(), 1)).setIngredient('R', Item.get(Item.DYE, DyeColor.RED.getDyeData(), 1)).setIngredient('B', Item.get(Item.DYE, DyeColor.BLUE.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.MAGENTA, 2),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.MAGENTA.getDyeData(), 2),
                 "  D",
                 "P "
-        )).setIngredient('P', Item.get(Item.DYE, ItemDye.PURPLE, 1)).setIngredient('D', Item.get(Item.DYE, ItemDye.PINK, 1)));
+        )).setIngredient('P', Item.get(Item.DYE, DyeColor.PURPLE.getDyeData(), 1)).setIngredient('D', Item.get(Item.DYE, DyeColor.PINK.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.GRAY, 2),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.GRAY.getDyeData(), 2),
                 " W",
                 "B "
-        )).setIngredient('B', Item.get(Item.DYE, ItemDye.BLACK, 1)).setIngredient('W', Item.get(Item.DYE, ItemDye.WHITE, 1)));
+        )).setIngredient('B', Item.get(Item.DYE, DyeColor.BLACK.getDyeData(), 1)).setIngredient('W', Item.get(Item.DYE, DyeColor.WHITE.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.LIGHT_GRAY, 3),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.LIGHT_GRAY.getDyeData(), 3),
                 "B ",
                 "WW"
-        )).setIngredient('B', Item.get(Item.DYE, ItemDye.BLACK, 1)).setIngredient('W', Item.get(Item.DYE, ItemDye.WHITE, 1)));
+        )).setIngredient('B', Item.get(Item.DYE, DyeColor.BLACK.getDyeData(), 1)).setIngredient('W', Item.get(Item.DYE, DyeColor.WHITE.getDyeData(), 1)));
 
-        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, ItemDye.LIGHT_GRAY, 2),
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.DYE, DyeColor.LIGHT_GRAY.getDyeData(), 2),
                 " G",
                 "B "
-        )).setIngredient('B', Item.get(Item.DYE, ItemDye.BLACK, 1)).setIngredient('G', Item.get(Item.DYE, ItemDye.GRAY, 1)));
+        )).setIngredient('B', Item.get(Item.DYE, DyeColor.BLACK.getDyeData(), 1)).setIngredient('G', Item.get(Item.DYE, DyeColor.GRAY.getDyeData(), 1)));
     }
 
     protected void registerIngots() {
