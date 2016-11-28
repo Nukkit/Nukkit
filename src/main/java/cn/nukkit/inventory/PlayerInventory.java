@@ -84,7 +84,7 @@ public class PlayerInventory extends BaseInventory {
         return this.getHotbarSlotIndex(this.itemInHandIndex);
     }
 
-    public void setHeldItemSlot(int slot, isNeedSendToHolder = true) {
+    public void setHeldItemSlot(int slot, isNeedSendToHolder == true) {
         if (slot >= -1 && slot < this.getSize()) {
             Item item = this.getItem(slot);
 
