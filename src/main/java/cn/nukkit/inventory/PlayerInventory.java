@@ -142,7 +142,7 @@ public class PlayerInventory extends BaseInventory {
     }
     
     	public void getHotbatSlotIndex(int index) {
-            slot = this.getHotbarSlotIndex(index);
+            int slot = this.getHotbarSlotIndex(index);
  		return this.getItem(slot);
 	}
 
