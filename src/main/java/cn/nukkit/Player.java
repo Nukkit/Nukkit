@@ -2889,7 +2889,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
 
                 case ProtocolInfo.CRAFTING_EVENT_PACKET:
-                    System.out.println("CRAFTING_EVENT_PACKET");
                     CraftingEventPacket craftingEventPacket = (CraftingEventPacket) packet;
 
                     if (!this.spawned || !this.isAlive()) {
@@ -3239,7 +3238,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     break;
                 case ProtocolInfo.CONTAINER_SET_SLOT_PACKET:
-                    System.out.println("CONTAINER_SET_SLOT_PACKET");
                     if (!this.spawned || this.blocked || !this.isAlive()) {
                         break;
                     }
