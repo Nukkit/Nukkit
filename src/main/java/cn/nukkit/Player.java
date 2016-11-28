@@ -1084,6 +1084,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             SetPlayerGameTypePacket pk = new SetPlayerGameTypePacket();
             pk.gamemode = this.gamemode & 0x01;
             this.dataPacket(pk);
+            this.sendSettings();
         }
 
         this.setAdventureSettings(ev.getNewAdventureSettings());
