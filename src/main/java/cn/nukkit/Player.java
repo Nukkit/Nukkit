@@ -2055,7 +2055,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         } else {
                             if (mobEquipmentPacket.selectedSlot >= 0 && mobEquipmentPacket.selectedSlot < 9) {
                                 this.inventory.setHeldItemIndex(mobEquipmentPacket.selectedSlot);
+                                hotbarItem = this.inventory.getHotbatSlotItem(mobEquipmentPacket.selectedSlot);
+							    isNeedSendToHolder = !(hotbarItem.deepEquals(mobEquipmentPacket.item));
+							    this.inventory.setHeldItemIndex(mobEquipmentPacket.selectedSlot, isNeedSendToHolder);
                                 this.inventory.setHeldItemSlot(mobEquipmentPacket.slot);
+                                this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false);
+						    	break;
                             } else {
                                 this.inventory.sendContents(this);
                                 break;
@@ -2070,8 +2075,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.inventory.setHeldItemSlot(mobEquipmentPacket.selectedSlot);
                     } else {
                         if (mobEquipmentPacket.selectedSlot >= 0 && mobEquipmentPacket.selectedSlot < this.inventory.getHotbarSize()) {
-                            this.inventory.setHeldItemIndex(mobEquipmentPacket.selectedSlot);
-                            this.inventory.setHeldItemSlot(slot);
+                                this.inventory.setHeldItemIndex(mobEquipmentPacket.selectedSlot);
+                                hotbarItem = this.inventory.getHotbatSlotItem(mobEquipmentPacket.selectedSlot);
+							    isNeedSendToHolder = !(hotbarItem.deepEquals(mobEquipmentPacket.item));
+							    this.inventory.setHeldItemIndex(mobEquipmentPacket.selectedSlot, isNeedSendToHolder);
+                                this.inventory.setHeldItemSlot(slot);
+                                this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false);
+						    	break;
                         } else {
                             this.inventory.sendContents(this);
                             break;
