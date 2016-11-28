@@ -84,13 +84,13 @@ public class PlayerInventory extends BaseInventory {
         return this.getHotbarSlotIndex(this.itemInHandIndex);
     }
 
-    public void setHeldItemSlot(int slot, isNeedSendTOHolder = true) {
+    public void setHeldItemSlot(int slot, isNeedSendToHolder = true) {
         if (slot >= -1 && slot < this.getSize()) {
             Item item = this.getItem(slot);
 
             int itemIndex = this.getHeldItemIndex();
 
-            if (isNeedSendTOHolder == true && this.getHolder() instanceof Player) {
+            if (isNeedSendToHolder === true && this.getHolder() instanceof Player) {
                 PlayerItemHeldEvent ev = new PlayerItemHeldEvent((Player) this.getHolder(), item, slot, itemIndex);
                 Server.getInstance().getPluginManager().callEvent(ev);
                 if (ev.isCancelled()) {
@@ -141,7 +141,7 @@ public class PlayerInventory extends BaseInventory {
         this.sendHeldItem(players.stream().toArray(Player[]::new));
     }
     
-    	public void getHotbatSlotIndex(index) {
+    	public void getHotbatSlotIndex(int index) {
             slot = this.getHotbarSlotIndex(index);
  		return this.getItem(slot);
 	}
