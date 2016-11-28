@@ -1144,7 +1144,6 @@ public abstract class Entity extends Location implements Metadatable {
                         return;
                     }
                 }
-                this.level.setBlock(this.temporalVector.setComponents(down.x, down.y, down.z), new BlockDirt(), true, true);
             }
         }
     }
