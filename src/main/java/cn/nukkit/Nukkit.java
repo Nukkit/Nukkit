@@ -62,7 +62,7 @@ public class Nukkit {
             if (ANSI) {
                 System.out.print((char) 0x1b + "]0;Starting Nukkit Server For Minecraft: PE" + (char) 0x07);
             }
-            Server server = new Server(logger, PATH, DATA_PATH, PLUGIN_PATH);
+            new Server(logger, PATH, DATA_PATH, PLUGIN_PATH);
         } catch (Exception e) {
             logger.logException(e);
         }
