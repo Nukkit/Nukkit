@@ -421,10 +421,10 @@ public class Chunk extends BaseChunk {
             for (int x = 0; x < 16; x++) {
                 for (int y = 0; y < 16; y++) {
                     for (int z = 0; z < 16; z++) {
-                        section.setBlockId(x, y, z, old.getBlockId(x, Y << 4 | y, z));
-                        section.setBlockData(x, y, z, old.getBlockData(x, Y << 4 | y, z));
-                        section.setBlockLight(x, y, z, old.getBlockLight(x, Y << 4 | y, z));
-                        section.setBlockSkyLight(x, y, z, old.getBlockSkyLight(x, Y << 4 | y, z));
+                        section.setBlockId(x, y, z, old.getBlockId(x, (Y << 4) | y, z));
+                        section.setBlockData(x, y, z, old.getBlockData(x, (Y << 4) | y, z));
+                        section.setBlockLight(x, y, z, old.getBlockLight(x, (Y << 4) | y, z));
+                        section.setBlockSkyLight(x, y, z, old.getBlockSkyLight(x, (Y << 4) | y, z));
                     }
                 }
             }
