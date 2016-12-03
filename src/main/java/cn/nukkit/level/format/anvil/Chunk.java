@@ -415,20 +415,35 @@ public class Chunk extends BaseChunk {
     }
 
     public static Chunk fromMcRegion(cn.nukkit.level.format.mcregion.Chunk old, LevelProvider provider) {
-        Chunk chunk = Chunk.getEmptyChunk(old.getX(), old.getZ(), provider);
+        Chunk chunk = getEmptyChunk(old.getX(), old.getZ(), provider);
         for (int Y = 0; Y < 8; Y++) {
-            ChunkSection section = new ChunkSection(Y);
+            boolean empty = true;
             for (int x = 0; x < 16; x++) {
                 for (int y = 0; y < 16; y++) {
                     for (int z = 0; z < 16; z++) {
-                        section.setBlockId(x, y, z, old.getBlockId(x, (Y << 4) | y, z));
-                        section.setBlockData(x, y, z, old.getBlockData(x, (Y << 4) | y, z));
-                        section.setBlockLight(x, y, z, old.getBlockLight(x, (Y << 4) | y, z));
-                        section.setBlockSkyLight(x, y, z, old.getBlockSkyLight(x, (Y << 4) | y, z));
+                        if (old.getBlockId(x, (Y << 4) | y, z) != 0) {
+                            empty = false;
+                            break;
+                        }
+                    }
+                    if (!empty) break;
+                }
+                if (!empty) break;
+            }
+            if (!empty) {
+                ChunkSection section = new ChunkSection(Y);
+                for (int x = 0; x < 16; x++) {
+                    for (int y = 0; y < 16; y++) {
+                        for (int z = 0; z < 16; z++) {
+                            section.setBlockId(x, y, z, old.getBlockId(x, (Y << 4) | y, z));
+                            section.setBlockData(x, y, z, old.getBlockData(x, (Y << 4) | y, z));
+                            section.setBlockLight(x, y, z, old.getBlockLight(x, (Y << 4) | y, z));
+                            section.setBlockSkyLight(x, y, z, old.getBlockSkyLight(x, (Y << 4) | y, z));
+                        }
                     }
                 }
+                chunk.sections[Y] = section;
             }
-            chunk.sections[Y] = section;
         }
         System.arraycopy(old.getBiomeColorArray(), 0, chunk.biomeColors, 0, 256);
         System.arraycopy(old.getHeightMapArray(), 0, chunk.heightMap, 0, 256);
