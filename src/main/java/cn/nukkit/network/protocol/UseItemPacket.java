@@ -14,6 +14,8 @@ public class UseItemPacket extends DataPacket {
     public int x;
     public int y;
     public int z;
+    
+    public int interactBlockId;
 
     public int face;
 
@@ -40,6 +42,7 @@ public class UseItemPacket extends DataPacket {
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
+        this.interactBlockId = this.getVarInt();
         this.face = this.getVarInt();
         Vector3f faceVector3 = this.getVector3f();
         this.fx = faceVector3.x;
