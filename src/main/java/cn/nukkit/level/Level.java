@@ -25,6 +25,7 @@ import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
+import cn.nukkit.level.format.anvil.Anvil;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
@@ -52,11 +53,8 @@ import cn.nukkit.timings.TimingsHistory;
 import cn.nukkit.utils.*;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-import java.nio.channels.FileChannel;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -241,11 +239,7 @@ public class Level implements ChunkManager, Metadatable {
 
         try {
             if (provider == McRegion.class) {
-                File oldPath = new File(path);
-                File newPath = new File(path + "../" + name + ".old");
-                oldPath.renameTo(newPath);
-                new File(oldPath, "region").mkdirs();
-                Utils.copyFile(new File(newPath, "level.dat"), new File(oldPath, "level.dat"));
+                new File(path).renameTo(new File(path + "../" + name + ".old"));
                 this.provider = provider.getConstructor(Level.class, String.class).newInstance(this, path + "../" + name + ".old/");
             } else {
                 this.provider = provider.getConstructor(Level.class, String.class).newInstance(this, path);
@@ -261,7 +255,10 @@ public class Level implements ChunkManager, Metadatable {
                     TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE));
             McRegion old = (McRegion) this.provider;
             try {
-                this.provider = old.toAnvil(this, path, path + "../" + name + ".old/");
+                this.provider = new LevelProviderConverter(this, path)
+                        .from(old)
+                        .to(Anvil.class)
+                        .perform();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

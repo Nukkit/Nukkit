@@ -3,9 +3,7 @@ package cn.nukkit.level.format.mcregion;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.level.Level;
-import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.format.anvil.Anvil;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.generator.Generator;
@@ -18,14 +16,12 @@ import cn.nukkit.utils.ChunkException;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -371,37 +367,5 @@ public class McRegion extends BaseLevelProvider {
             this.regions.remove(index);
         }
         this.level = null;
-    }
-
-    public Anvil toAnvil(Level level, String path, String oldPath) throws IOException {
-        Anvil anvil = new Anvil(level, path);
-        for (File file : new File(oldPath + "region/").listFiles()) {
-            Matcher m = Pattern.compile("-?\\d+").matcher(file.getName());
-            int regionX, regionZ;
-            try {
-                if (m.find()) {
-                    regionX = Integer.parseInt(m.group());
-                } else continue;
-                if (m.find()) {
-                    regionZ = Integer.parseInt(m.group());
-                } else continue;
-            } catch (NumberFormatException e) {
-                continue;
-            }
-            RegionLoader region = new RegionLoader(this, regionX, regionZ);
-            for (Integer index : region.getLocationIndexes()) {
-                int chunkX = index & 0x1f;
-                int chunkZ = index >> 5;
-                Chunk old = region.readChunk(chunkX, chunkZ);
-                if (old == null) continue;
-                int x = (regionX << 5) | chunkX;
-                int z = (regionZ << 5) | chunkZ;
-                cn.nukkit.level.format.anvil.Chunk chunk = old.toAnvil(anvil);
-                anvil.saveChunk(x, z, chunk);
-            }
-            region.close();
-        }
-        anvil.doGarbageCollection();
-        return anvil;
     }
 }
