@@ -29,6 +29,7 @@ import cn.nukkit.level.format.anvil.Anvil;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
+import cn.nukkit.level.format.leveldb.LevelDB;
 import cn.nukkit.level.format.mcregion.McRegion;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.generator.task.*;
@@ -237,8 +238,9 @@ public class Level implements ChunkManager, Metadatable {
         this.server = server;
         this.autoSave = server.getAutoSave();
 
+        boolean convert = provider == McRegion.class || provider == LevelDB.class;
         try {
-            if (provider == McRegion.class) {
+            if (convert) {
                 new File(path).renameTo(new File(path + "../" + name + ".old"));
                 this.provider = provider.getConstructor(Level.class, String.class).newInstance(this, path + "../" + name + ".old/");
             } else {
@@ -250,7 +252,7 @@ public class Level implements ChunkManager, Metadatable {
 
         this.timings = new LevelTimings(this);
 
-        if (provider == McRegion.class) {
+        if (convert) {
             this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.updating",
                     TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE));
             McRegion old = (McRegion) this.provider;
