@@ -4,6 +4,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.anvil.Anvil;
 import cn.nukkit.level.format.anvil.Chunk;
+import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.ChunkConverter;
 import cn.nukkit.level.format.leveldb.LevelDB;
 import cn.nukkit.level.format.mcregion.McRegion;
@@ -44,7 +45,6 @@ class LevelProviderConverter {
     }
 
     LevelProvider perform() throws IOException {
-        //TODO: LevelDB
         if (!new File(path, "region").mkdirs()) {
             throw new IOException("Cannot mkdir");
         }
@@ -74,7 +74,7 @@ class LevelProviderConverter {
                     for (Integer index : region.getLocationIndexes()) {
                         int chunkX = index & 0x1f;
                         int chunkZ = index >> 5;
-                        cn.nukkit.level.format.mcregion.Chunk old = region.readChunk(chunkX, chunkZ);
+                        BaseFullChunk old = region.readChunk(chunkX, chunkZ);
                         if (old == null) continue;
                         int x = (regionX << 5) | chunkX;
                         int z = (regionZ << 5) | chunkZ;
@@ -87,8 +87,34 @@ class LevelProviderConverter {
                     region.close();
                 }
             }
+            if (provider instanceof LevelDB) {
+                for (byte[] key : ((LevelDB) provider).getTerrainKeys()) {
+                    int x = getChunkX(key);
+                    int z = getChunkZ(key);
+                    BaseFullChunk old = ((LevelDB) provider).readChunk(x, z);
+                    FullChunk chunk = new ChunkConverter(result)
+                            .from(old)
+                            .to(Chunk.class)
+                            .perform();
+                    result.saveChunk(x, z, chunk);
+                }
+            }
             result.doGarbageCollection();
         }
         return result;
+    }
+
+    private static int getChunkX(byte[] key) {
+        return (key[3] << 24) |
+                (key[2] << 16) |
+                (key[1] << 8) |
+                key[0];
+    }
+
+    private static int getChunkZ(byte[] key) {
+        return (key[7] << 24) |
+                (key[6] << 16) |
+                (key[5] << 8) |
+                key[4];
     }
 }

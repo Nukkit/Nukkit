@@ -7,6 +7,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
+import cn.nukkit.level.format.leveldb.key.BaseKey;
 import cn.nukkit.level.format.leveldb.key.FlagsKey;
 import cn.nukkit.level.format.leveldb.key.TerrainKey;
 import cn.nukkit.level.format.leveldb.key.VersionKey;
@@ -278,7 +279,7 @@ public class LevelDB implements LevelProvider {
         return false;
     }
 
-    private Chunk readChunk(int chunkX, int chunkZ) {
+    public Chunk readChunk(int chunkX, int chunkZ) {
         byte[] data;
         if (!this.chunkExists(chunkX, chunkZ) || (data = this.db.get(TerrainKey.create(chunkX, chunkZ).toArray())) == null) {
             return null;
@@ -375,7 +376,7 @@ public class LevelDB implements LevelProvider {
         this.chunks.put(index, (Chunk) chunk);
     }
 
-    public static ChunkSection createChunkSection(int Y) {
+    public static ChunkSection createChunkSection(int y) {
         return null;
     }
 
@@ -519,5 +520,16 @@ public class LevelDB implements LevelProvider {
         if (!this.getName().equals(name)) {
             this.levelData.putString("LevelName", name);
         }
+    }
+
+    public byte[][] getTerrainKeys() {
+        List<byte[]> result = new ArrayList<>();
+        this.db.forEach((entry) -> {
+            byte[] key = entry.getKey();
+            if (key[8] == BaseKey.DATA_TERRAIN) {
+                result.add(key);
+            }
+        });
+        return result.stream().toArray(byte[][]::new);
     }
 }

@@ -5,9 +5,6 @@ import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.anvil.Chunk;
 import cn.nukkit.level.format.anvil.ChunkSection;
 
-import java.util.ArrayList;
-
-
 public class ChunkConverter {
 
     private BaseFullChunk chunk;
