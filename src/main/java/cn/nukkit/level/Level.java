@@ -241,8 +241,9 @@ public class Level implements ChunkManager, Metadatable {
         boolean convert = provider == McRegion.class || provider == LevelDB.class;
         try {
             if (convert) {
-                new File(path).renameTo(new File(path + "../" + name + ".old"));
-                this.provider = provider.getConstructor(Level.class, String.class).newInstance(this, path + "../" + name + ".old/");
+                String newPath = new File(path).getParent() + "/" + name + ".old/";
+                new File(path).renameTo(new File(newPath));
+                this.provider = provider.getConstructor(Level.class, String.class).newInstance(this, newPath);
             } else {
                 this.provider = provider.getConstructor(Level.class, String.class).newInstance(this, path);
             }
