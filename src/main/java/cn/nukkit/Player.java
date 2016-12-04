@@ -3197,7 +3197,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
                     }
 
-                    switch(recipe.getResult().getId()) {
+                    switch (recipe.getResult().getId()) {
                         case Item.WORKBENCH:
                             this.awardAchievement("buildWorkBench");
                             break;

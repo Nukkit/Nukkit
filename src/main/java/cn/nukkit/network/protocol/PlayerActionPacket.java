@@ -48,7 +48,7 @@ public class PlayerActionPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this. putVarLong(this.entityId);
+        this.putVarLong(this.entityId);
         this.putVarInt(this.action);
         this.putBlockCoords(this.x, this.y, this.z);
         this.putVarInt(this.face);

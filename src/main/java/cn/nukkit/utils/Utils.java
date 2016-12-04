@@ -3,8 +3,8 @@ package cn.nukkit.utils;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
-import java.nio.charset.StandardCharsets;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**

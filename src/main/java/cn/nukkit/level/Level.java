@@ -266,7 +266,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         this.provider.updateLevelName(name);
-        
+
         this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.preparing",
                 TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE));
 
@@ -1604,10 +1604,10 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void dropItem(Vector3 source, Item item, Vector3 motion, boolean dropAround, int delay) {
-        if(motion == null) {
-            if(dropAround){
+        if (motion == null) {
+            if (dropAround) {
                 float f = this.rand.nextFloat() * 0.5f;
-                float f1 = this.rand.nextFloat() * ((float)Math.PI * 2);
+                float f1 = this.rand.nextFloat() * ((float) Math.PI * 2);
 
                 motion = new Vector3(-MathHelper.sin(f1) * f, 0.20000000298023224, MathHelper.cos(f1) * f);
             } else {
