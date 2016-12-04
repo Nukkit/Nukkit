@@ -45,9 +45,7 @@ class LevelProviderConverter {
     }
 
     LevelProvider perform() throws IOException {
-        if (!new File(path, "region").mkdirs()) {
-            throw new IOException("Cannot mkdir");
-        }
+        new File(path).mkdir();
         Utils.copyFile(new File(provider.getPath(), "level.dat"), new File(path, "level.dat"));
         LevelProvider result;
         try {
@@ -57,6 +55,7 @@ class LevelProviderConverter {
         }
         if (toClass == Anvil.class) {
             if (provider instanceof McRegion) {
+                new File(path, "region").mkdir();
                 for (File file : new File(provider.getPath() + "region/").listFiles()) {
                     Matcher m = Pattern.compile("-?\\d+").matcher(file.getName());
                     int regionX, regionZ;
@@ -88,6 +87,7 @@ class LevelProviderConverter {
                 }
             }
             if (provider instanceof LevelDB) {
+                new File(path, "db").mkdir();
                 for (byte[] key : ((LevelDB) provider).getTerrainKeys()) {
                     int x = getChunkX(key);
                     int z = getChunkZ(key);
