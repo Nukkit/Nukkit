@@ -61,10 +61,10 @@ public class ChunkConverter {
                     for (int x = 0; x < 16; x++) {
                         for (int y = 0; y < 16; y++) {
                             for (int z = 0; z < 16; z++) {
-                                section.setBlockId(x, y, z, result.getBlockId(x, (Y << 4) | y, z));
-                                section.setBlockData(x, y, z, result.getBlockData(x, (Y << 4) | y, z));
-                                section.setBlockLight(x, y, z, result.getBlockLight(x, (Y << 4) | y, z));
-                                section.setBlockSkyLight(x, y, z, result.getBlockSkyLight(x, (Y << 4) | y, z));
+                                section.setBlockId(x, y, z, chunk.getBlockId(x, (Y << 4) | y, z));
+                                section.setBlockData(x, y, z, chunk.getBlockData(x, (Y << 4) | y, z));
+                                section.setBlockLight(x, y, z, chunk.getBlockLight(x, (Y << 4) | y, z));
+                                section.setBlockSkyLight(x, y, z, chunk.getBlockSkyLight(x, (Y << 4) | y, z));
                             }
                         }
                     }
@@ -74,10 +74,8 @@ public class ChunkConverter {
         }
         System.arraycopy(chunk.getBiomeColorArray(), 0, result.biomeColors, 0, 256);
         System.arraycopy(chunk.getHeightMapArray(), 0, result.heightMap, 0, 256);
-        result.NBTentities = new ArrayList<>();
-        chunk.NBTentities.forEach((nbt) -> result.NBTentities.add(nbt.copy()));
-        result.NBTtiles = new ArrayList<>();
-        chunk.NBTtiles.forEach((nbt) -> result.NBTtiles.add(nbt.copy()));
+        result.NBTentities = chunk.NBTentities;
+        result.NBTtiles = chunk.NBTtiles;
         result.setGenerated();
         result.setPopulated();
         result.initChunk();
