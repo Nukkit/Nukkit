@@ -123,9 +123,9 @@ public class Anvil extends BaseLevelProvider {
         BinaryStream extraData;
         if (!extra.isEmpty()) {
             extraData = new BinaryStream();
-            extraData.putLInt(extra.size());
+            extraData.putVarInt(extra.size());
             for (Map.Entry<Integer, Integer> entry : extra.entrySet()) {
-                extraData.putLInt(entry.getKey());
+                extraData.putVarInt(entry.getKey());
                 extraData.putLShort(entry.getValue());
             }
         } else {
@@ -152,10 +152,11 @@ public class Anvil extends BaseLevelProvider {
         }
         stream.put(new byte[256]);
         stream.put(chunk.getBiomeIdArray());
+        stream.putByte((byte) 0);
         if (extraData != null) {
             stream.put(extraData.getBuffer());
         } else {
-            stream.putLInt(0);
+            stream.putVarInt(0);
         }
         stream.put(blockEntities);
 
