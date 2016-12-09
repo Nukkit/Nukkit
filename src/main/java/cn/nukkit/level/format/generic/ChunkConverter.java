@@ -79,6 +79,7 @@ public class ChunkConverter {
         chunk.NBTtiles.forEach((nbt) -> result.NBTtiles.add(nbt.copy()));
         result.setGenerated();
         result.setPopulated();
+        result.setLightPopulated();
         result.initChunk();
         return result;
     }
