@@ -2333,6 +2333,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             Block block = target.getSide(((PlayerActionPacket) packet).face);
                             if (block.getId() == Block.FIRE) {
                                 this.level.setBlock(block, new BlockAir(), true);
+                                break;
                             }
                             this.lastBreak = System.currentTimeMillis();
                             break;
