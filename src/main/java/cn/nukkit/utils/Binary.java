@@ -2,7 +2,13 @@ package cn.nukkit.utils;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.*;
+import cn.nukkit.item.Item;
+import cn.nukkit.math.BlockVector3;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -71,9 +77,11 @@ public class Binary {
     public static byte[] writeMetadata(EntityMetadata metadata) {
         BinaryStream stream = new BinaryStream();
         Map<Integer, EntityData> map = metadata.getMap();
+        stream.putUnsignedVarInt(map.size());
         for (int id : map.keySet()) {
             EntityData d = map.get(id);
-            stream.putByte((byte) (((d.getType() << 5) | (id & 0x1F)) & 0xff));
+            stream.putUnsignedVarInt(id);
+            stream.putUnsignedVarInt(d.getType());
             switch (d.getType()) {
                 case Entity.DATA_TYPE_BYTE:
                     stream.putByte(((ByteEntityData) d).getData().byteValue());
@@ -82,14 +90,14 @@ public class Binary {
                     stream.putLShort(((ShortEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_INT:
-                    stream.putLInt(((IntEntityData) d).getData());
+                    stream.putVarInt(((IntEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_FLOAT:
                     stream.putLFloat(((FloatEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_STRING:
                     String s = ((StringEntityData) d).getData();
-                    stream.putLShort(s.getBytes(StandardCharsets.UTF_8).length);
+                    stream.putUnsignedVarInt(s.getBytes(StandardCharsets.UTF_8).length);
                     stream.put(s.getBytes(StandardCharsets.UTF_8));
                     break;
                 case Entity.DATA_TYPE_SLOT:
@@ -99,85 +107,67 @@ public class Binary {
                     stream.putLShort(slot.count);
                     break;
                 case Entity.DATA_TYPE_POS:
-                    PositionEntityData pos = (PositionEntityData) d;
-                    stream.putLInt(pos.x);
-                    stream.putLInt(pos.y);
-                    stream.putLInt(pos.z);
+                    IntPositionEntityData pos = (IntPositionEntityData) d;
+                    stream.putVarInt(pos.x);
+                    stream.putByte((byte) pos.y);
+                    stream.putVarInt(pos.z);
                     break;
                 case Entity.DATA_TYPE_LONG:
-                    stream.putLLong(((LongEntityData) d).getData());
+                    stream.putVarLong(((LongEntityData) d).getData());
+                    break;
+                case Entity.DATA_TYPE_VECTOR3F:
+                    Vector3fEntityData v3data = (Vector3fEntityData) d;
+                    stream.putLFloat(v3data.x);
+                    stream.putLFloat(v3data.y);
+                    stream.putLFloat(v3data.z);
                     break;
             }
         }
-
-        stream.putByte((byte) 0x7f);
         return stream.getBuffer();
     }
 
     public static EntityMetadata readMetadata(byte[] payload) {
-        int offset = 0;
+        BinaryStream stream = new BinaryStream();
+        stream.setBuffer(payload);
+        long count = stream.getUnsignedVarInt();
         EntityMetadata m = new EntityMetadata();
-        int b = payload[offset] & 0xff;
-        ++offset;
-        while (b != 0x7f && offset < payload.length) {
-            int id = b & 0x1f;
-            int type = b >> 5;
-
-            EntityData data;
+        for (int i = 0; i < count; i++) {
+            int key = (int) stream.getUnsignedVarInt();
+            int type = (int) stream.getUnsignedVarInt();
+            EntityData value = null;
             switch (type) {
                 case Entity.DATA_TYPE_BYTE:
-                    data = new ByteEntityData(id, payload[offset] & 0xff);
-                    ++offset;
+                    value = new ByteEntityData(key, stream.getByte());
                     break;
                 case Entity.DATA_TYPE_SHORT:
-                    data = new ShortEntityData(id, readLShort(subBytes(payload, offset, 2)));
-                    offset += 2;
+                    value = new ShortEntityData(key, stream.getLShort());
                     break;
                 case Entity.DATA_TYPE_INT:
-                    data = new IntEntityData(id, readLInt(subBytes(payload, offset, 4)));
-                    offset += 4;
+                    value = new IntEntityData(key, stream.getVarInt());
                     break;
                 case Entity.DATA_TYPE_FLOAT:
-                    data = new FloatEntityData(id, readLFloat(subBytes(payload, offset, 4)));
-                    offset += 4;
+                    value = new FloatEntityData(key, stream.getLFloat());
                     break;
                 case Entity.DATA_TYPE_STRING:
-                    int len = readLShort(subBytes(payload, offset, 2));
-                    offset += 2;
-                    String str = new String(subBytes(payload, offset, len));
-                    offset += len;
-                    data = new StringEntityData(id, str);
+                    value = new StringEntityData(key, stream.getString());
                     break;
                 case Entity.DATA_TYPE_SLOT:
-                    int blockId = readLShort(subBytes(payload, offset, 2));
-                    offset += 2;
-                    byte meta = payload[offset];
-                    ++offset;
-                    int count = readLShort(subBytes(payload, offset, 2));
-                    offset += 2;
-                    data = new SlotEntityData(id, blockId, meta, count);
+                    Item item = stream.getSlot();
+                    value = new SlotEntityData(key, item.getId(), item.getDamage(), item.getCount());
                     break;
                 case Entity.DATA_TYPE_POS:
-                    int[] intArray = new int[3];
-                    for (int i = 0; i < 3; ++i) {
-                        intArray[i] = readLInt(subBytes(payload, offset, 4));
-                        offset += 4;
-                    }
-                    data = new PositionEntityData(id, intArray[0], intArray[1], intArray[2]);
+                    BlockVector3 v3 = stream.getBlockCoords();
+                    value = new IntPositionEntityData(key, v3.x, v3.y, v3.z);
                     break;
                 case Entity.DATA_TYPE_LONG:
-                    data = new LongEntityData(id, readLLong(subBytes(payload, offset, 4)));
-                    offset += 8;
+                    value = new LongEntityData(key, stream.getVarLong());
                     break;
-                default:
-                    return new EntityMetadata();
+                case Entity.DATA_TYPE_VECTOR3F:
+                    value = new Vector3fEntityData(key, stream.getVector3f());
+                    break;
             }
-
-            m.put(data);
-            b = payload[offset] & 0xff;
-            ++offset;
+            if (value != null) m.put(value);
         }
-
         return m;
     }
 
@@ -338,6 +328,18 @@ public class Binary {
                 (byte) (l >>> 48),
                 (byte) (l >>> 56),
         };
+    }
+
+    public static byte[] writeVarInt(int v) {
+        BinaryStream stream = new BinaryStream();
+        stream.putVarInt(v);
+        return stream.getBuffer();
+    }
+
+    public static byte[] writeUnsignedVarInt(long v) {
+        BinaryStream stream = new BinaryStream();
+        stream.putUnsignedVarInt(v);
+        return stream.getBuffer();
     }
 
     public static byte[] reserveBytes(byte[] bytes) {

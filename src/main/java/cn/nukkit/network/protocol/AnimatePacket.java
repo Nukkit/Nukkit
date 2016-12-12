@@ -12,15 +12,15 @@ public class AnimatePacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.action = this.getByte();
-        this.eid = getLong();
+        this.action = (int) this.getUnsignedVarInt();
+        this.eid = getVarLong();
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putByte((byte) action);
-        this.putLong(eid);
+        this.putUnsignedVarInt(this.action);
+        this.putVarLong(this.eid);
     }
 
     @Override

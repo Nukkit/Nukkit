@@ -3,6 +3,7 @@ package cn.nukkit.command.defaults;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
@@ -18,6 +19,10 @@ public class SpawnpointCommand extends VanillaCommand {
     public SpawnpointCommand(String name) {
         super(name, "%nukkit.command.spawnpoint.description", "%commands.spawnpoint.usage");
         this.setPermission("nukkit.command.spawnpoint");
+        this.commandParameters.clear();
+        this.commandParameters.put("default", new CommandParameter[]{
+                new CommandParameter("pos", CommandParameter.ARG_TYPE_BLOCK_POS, true),
+        });
     }
 
     @Override

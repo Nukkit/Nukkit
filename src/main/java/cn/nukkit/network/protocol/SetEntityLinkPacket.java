@@ -22,10 +22,10 @@ public class SetEntityLinkPacket extends DataPacket {
 
     @Override
     public void encode() {
-        reset();
-        putLong(rider);
-        putLong(riding);
-        putByte(type);
+        this.reset();
+        this.putVarLong(this.rider);
+        this.putVarLong(this.riding);
+        this.putByte(this.type);
     }
 
     @Override

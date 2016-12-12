@@ -14,6 +14,7 @@ public class GarbageCollectorCommand extends VanillaCommand {
     public GarbageCollectorCommand(String name) {
         super(name, "%nukkit.command.gc.description", "%nukkit.command.gc.usage");
         this.setPermission("nukkit.command.gc");
+        this.commandParameters.clear();
     }
 
     @Override

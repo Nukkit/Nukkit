@@ -81,8 +81,7 @@ public class JavaPluginLoader implements PluginLoader {
 
     @Override
     public PluginDescription getPluginDescription(File file) {
-        try {
-            JarFile jar = new JarFile(file);
+        try (JarFile jar = new JarFile(file)) {
             JarEntry entry = jar.getJarEntry("nukkit.yml");
             if (entry == null) {
                 entry = jar.getJarEntry("plugin.yml");
@@ -90,8 +89,9 @@ public class JavaPluginLoader implements PluginLoader {
                     return null;
                 }
             }
-            InputStream stream = jar.getInputStream(entry);
-            return new PluginDescription(Utils.readFile(stream));
+            try (InputStream stream = jar.getInputStream(entry)) {
+                return new PluginDescription(Utils.readFile(stream));
+            }
         } catch (IOException e) {
             return null;
         }
@@ -127,6 +127,8 @@ public class JavaPluginLoader implements PluginLoader {
     public void disablePlugin(Plugin plugin) {
         if (plugin instanceof PluginBase && plugin.isEnabled()) {
             this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.plugin.disable", plugin.getDescription().getFullName()));
+
+            this.server.getServiceManager().cancel(plugin);
 
             this.server.getPluginManager().callEvent(new PluginDisableEvent(plugin));
 

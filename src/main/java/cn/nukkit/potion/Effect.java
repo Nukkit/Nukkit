@@ -2,7 +2,6 @@ package cn.nukkit.potion;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityEvent;
 import cn.nukkit.event.entity.EntityRegainHealthEvent;
@@ -264,7 +263,7 @@ public class Effect implements Cloneable {
 
         if (this.id == Effect.INVISIBILITY) {
             entity.setDataFlag(Entity.DATA_FLAGS, Entity.DATA_FLAG_INVISIBLE, true);
-            entity.setDataProperty(new ByteEntityData(Entity.DATA_SHOW_NAMETAG, 0));
+            entity.setNameTagVisible(false);
         }
     }
 
@@ -284,7 +283,7 @@ public class Effect implements Cloneable {
 
         if (this.id == Effect.INVISIBILITY) {
             entity.setDataFlag(Entity.DATA_FLAGS, Entity.DATA_FLAG_INVISIBLE, false);
-            entity.setDataProperty(new ByteEntityData(Entity.DATA_SHOW_NAMETAG, 1));
+            entity.setNameTagVisible(true);
         }
     }
 

@@ -22,6 +22,7 @@ public class VersionCommand extends VanillaCommand {
                 new String[]{"ver", "about"}
         );
         this.setPermission("nukkit.command.version");
+        this.commandParameters.clear();
     }
 
     @Override

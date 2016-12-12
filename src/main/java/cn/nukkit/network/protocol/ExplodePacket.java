@@ -23,7 +23,7 @@ public class ExplodePacket extends DataPacket {
 
     @Override
     public DataPacket clean() {
-        records = new Vector3[0];
+        this.records = new Vector3[0];
         return super.clean();
     }
 
@@ -35,16 +35,12 @@ public class ExplodePacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putFloat(this.x);
-        this.putFloat(this.y);
-        this.putFloat(this.z);
-        this.putFloat(this.radius);
-        this.putInt(this.records.length);
+        this.putVector3f(this.x, this.y, this.z);
+        this.putLFloat(this.radius);
+        this.putUnsignedVarInt(this.records.length);
         if (this.records.length > 0) {
             for (Vector3 record : records) {
-                this.putByte((byte) record.x);
-                this.putByte((byte) record.y);
-                this.putByte((byte) record.z);
+                this.putBlockCoords((int) record.x, (int) record.y, (int) record.z);
             }
         }
     }

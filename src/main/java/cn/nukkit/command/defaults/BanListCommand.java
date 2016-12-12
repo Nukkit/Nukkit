@@ -1,6 +1,7 @@
 package cn.nukkit.command.defaults;
 
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.permission.BanEntry;
 import cn.nukkit.permission.BanList;
@@ -15,6 +16,10 @@ public class BanListCommand extends VanillaCommand {
     public BanListCommand(String name) {
         super(name, "%nukkit.command.banlist.description", "%commands.banlist.usage");
         this.setPermission("nukkit.command.ban.list");
+        this.commandParameters.clear();
+        this.commandParameters.put("default", new CommandParameter[]{
+                new CommandParameter("ips|players", true)
+        });
     }
 
     @Override

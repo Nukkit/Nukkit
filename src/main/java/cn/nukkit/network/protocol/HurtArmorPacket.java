@@ -7,7 +7,7 @@ public class HurtArmorPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.HURT_ARMOR_PACKET;
 
-    public byte health;
+    public int health;
 
     @Override
     public void decode() {
@@ -16,8 +16,8 @@ public class HurtArmorPacket extends DataPacket {
 
     @Override
     public void encode() {
-        reset();
-        putByte(health);
+        this.reset();
+        this.putVarInt(this.health);
     }
 
     @Override

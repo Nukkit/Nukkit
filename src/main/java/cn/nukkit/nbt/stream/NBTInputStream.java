@@ -1,5 +1,7 @@
 package cn.nukkit.nbt.stream;
 
+import cn.nukkit.utils.VarInt;
+
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -14,18 +16,28 @@ import java.nio.charset.StandardCharsets;
 public class NBTInputStream implements DataInput, AutoCloseable {
     private final DataInputStream stream;
     private final ByteOrder endianness;
+    private final boolean network;
 
     public NBTInputStream(InputStream stream) {
         this(stream, ByteOrder.BIG_ENDIAN);
     }
 
     public NBTInputStream(InputStream stream, ByteOrder endianness) {
+        this(stream, endianness, false);
+    }
+
+    public NBTInputStream(InputStream stream, ByteOrder endianness, boolean network) {
         this.stream = stream instanceof DataInputStream ? (DataInputStream) stream : new DataInputStream(stream);
         this.endianness = endianness;
+        this.network = network;
     }
 
     public ByteOrder getEndianness() {
         return endianness;
+    }
+
+    public boolean isNetwork() {
+        return network;
     }
 
     @Override
@@ -87,6 +99,9 @@ public class NBTInputStream implements DataInput, AutoCloseable {
 
     @Override
     public int readInt() throws IOException {
+        if (network) {
+            return VarInt.readVarInt(this.stream);
+        }
         int i = this.stream.readInt();
         if (endianness == ByteOrder.LITTLE_ENDIAN) {
             i = Integer.reverseBytes(i);
@@ -96,6 +111,9 @@ public class NBTInputStream implements DataInput, AutoCloseable {
 
     @Override
     public long readLong() throws IOException {
+        if (network) {
+            return VarInt.readVarLong(this.stream);
+        }
         long l = this.stream.readLong();
         if (endianness == ByteOrder.LITTLE_ENDIAN) {
             l = Long.reverseBytes(l);
@@ -121,7 +139,7 @@ public class NBTInputStream implements DataInput, AutoCloseable {
 
     @Override
     public String readUTF() throws IOException {
-        int length = this.readUnsignedShort();
+        int length = network ? this.readUnsignedByte() : this.readUnsignedShort();
         byte[] bytes = new byte[length];
         this.stream.read(bytes);
         return new String(bytes, StandardCharsets.UTF_8);

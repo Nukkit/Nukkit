@@ -7,7 +7,8 @@ public class AddPaintingPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.ADD_PAINTING_PACKET;
 
-    public long eid;
+    public long entityUniqueId;
+    public long entityRuntimeId;
     public int x;
     public int y;
     public int z;
@@ -22,12 +23,11 @@ public class AddPaintingPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putLong(eid);
-        this.putInt(x);
-        this.putInt(y);
-        this.putInt(z);
-        this.putInt(direction);
-        this.putString(title);
+        this.putVarLong(this.entityUniqueId);
+        this.putVarLong(this.entityRuntimeId);
+        this.putBlockCoords(this.x, this.y, this.z);
+        this.putVarInt(this.direction);
+        this.putString(this.title);
     }
 
     @Override

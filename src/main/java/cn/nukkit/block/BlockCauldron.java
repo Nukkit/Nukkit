@@ -1,7 +1,6 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityCauldron;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
@@ -10,7 +9,6 @@ import cn.nukkit.item.*;
 import cn.nukkit.level.sound.ExplodeSound;
 import cn.nukkit.level.sound.SplashSound;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.Tag;
 
 import java.util.Iterator;
@@ -149,6 +147,7 @@ public class BlockCauldron extends BlockSolid {
                     player.getInventory().setItemInHand(new ItemBlock(new BlockAir()));
                 } else if (item.getCount() > 1) {
                     item.setCount(item.getCount() - 1);
+                    player.getInventory().setItemInHand(item);
 
                     Item bottle = new ItemGlassBottle();
                     if (player.getInventory().canAddItem(bottle)) {
@@ -173,6 +172,7 @@ public class BlockCauldron extends BlockSolid {
                     player.getInventory().setItemInHand(new ItemPotion());
                 } else if (item.getCount() > 1) {
                     item.setCount(item.getCount() - 1);
+                    player.getInventory().setItemInHand(item);
 
                     Item potion = new ItemPotion();
                     if (player.getInventory().canAddItem(potion)) {

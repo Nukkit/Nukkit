@@ -1,5 +1,7 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.math.Vector3f;
+
 /**
  * author: MagicDroidX
  * Nukkit Project
@@ -40,6 +42,7 @@ public class LevelEventPacket extends DataPacket {
 
     public static final int EVENT_SOUND_CAMERA_TAKE_PICTURE = 1050;
     public static final int EVENT_SOUND_EXPERIENCE_ORB = 1051;
+    public static final int EVENT_SOUND_BLOCK_PLACE = 1052;
 
     public static final int EVENT_SOUND_BUTTON_CLICK = 3500;
     public static final int EVENT_SOUND_EXPLODE = 3501;
@@ -70,9 +73,9 @@ public class LevelEventPacket extends DataPacket {
     public static final int EVENT_ADD_PARTICLE_MASK = 0x4000;
 
     public int evid;
-    public float x;
-    public float y;
-    public float z;
+    public float x = 0;
+    public float y = 0;
+    public float z = 0;
     public int data;
 
     @Override
@@ -82,20 +85,19 @@ public class LevelEventPacket extends DataPacket {
 
     @Override
     public void decode() {
-        evid = this.getShort();
-        x = this.getFloat();
-        y = this.getFloat();
-        z = this.getFloat();
-        data = this.getInt();
+        this.evid = this.getVarInt();
+        Vector3f v = this.getVector3f();
+        this.x = v.x;
+        this.y = v.y;
+        this.z = v.z;
+        this.data = this.getVarInt();
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putShort(this.evid);
-        this.putFloat(this.x);
-        this.putFloat(this.y);
-        this.putFloat(this.z);
-        this.putInt(this.data);
+        this.putVarInt(this.evid);
+        this.putVector3f(this.x, this.y, this.z);
+        this.putVarInt(this.data);
     }
 }
