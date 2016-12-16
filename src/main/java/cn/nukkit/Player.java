@@ -3,6 +3,7 @@ package cn.nukkit;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockDoor;
+import cn.nukkit.block.BlockEnderChest;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityItemFrame;
 import cn.nukkit.blockentity.BlockEntitySign;
@@ -203,6 +204,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private String buttonText = "Button";
 
     protected boolean enableClientCommand = true;
+
+    private BlockEnderChest viewingEnderChest = null;
+
+    public BlockEnderChest getViewingEnderChest() {
+        return viewingEnderChest;
+    }
+
+    public void setViewingEnderChest(BlockEnderChest chest) {
+        if (chest == null && this.viewingEnderChest != null) {
+            this.viewingEnderChest.getViewers().remove(this);
+        } else if (chest != null) {
+            chest.getViewers().add(this);
+        }
+        this.viewingEnderChest = chest;
+    }
 
     public TranslationContainer getLeaveMessage() {
         return new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.left", this.getDisplayName());
