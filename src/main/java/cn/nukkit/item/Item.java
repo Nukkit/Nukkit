@@ -208,6 +208,7 @@ public class Item implements Cloneable {
     public static final int COCOA_BLOCK = 127;
     public static final int SANDSTONE_STAIRS = 128;
     public static final int EMERALD_ORE = 129;
+    public static final int ENDER_CHEST = 130;
 
     public static final int TRIPWIRE_HOOK = 131;
 
@@ -956,6 +957,7 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.FLOWER_POT, 0));
         addCreativeItem(Item.get(Item.ENCHANTMENT_TABLE, 0));
         addCreativeItem(Item.get(Item.SLIME_BLOCK, 0));
+        addCreativeItem(Item.get(Item.ENDER_CHEST, 0));
 
         addCreativeItem(Item.get(Item.WOOL, 0));
         addCreativeItem(Item.get(Item.WOOL, 8));
