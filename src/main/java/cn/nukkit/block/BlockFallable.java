@@ -21,16 +21,6 @@ public abstract class BlockFallable extends BlockSolid {
         super(meta);
     }
 
-    @Override
-    public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz) {
-        return this.place(item, block, target, face, fx, fy, fz, null);
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz, Player player) {
-        return this.getLevel().setBlock(this, this, true, true);
-    }
-
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             Block down = this.getSide(Vector3.SIDE_DOWN);
