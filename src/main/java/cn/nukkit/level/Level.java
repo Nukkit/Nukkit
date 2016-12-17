@@ -283,12 +283,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         this.folderName = name;
-        this.updateQueue = new PriorityQueue<>(11, new Comparator<PriorityObject>() {
-            @Override
-            public int compare(PriorityObject o1, PriorityObject o2) {
-                return o1.priority > o2.priority ? 1 : (o1.priority == o2.priority ? 0 : -1);
-            }
-        });
+        this.updateQueue = new PriorityQueue<>(11, (o1, o2) -> o1.priority > o2.priority ? 1 : (o1.priority == o2.priority ? 0 : -1));
         this.time = this.provider.getTime();
 
         this.raining = this.provider.isRaining();
@@ -1382,7 +1377,7 @@ public class Level implements ChunkManager, Metadatable {
     public Block getBlock(Vector3 pos, boolean cached) {
         long chunkIndex = Level.chunkHash((int) pos.x >> 4, (int) pos.z >> 4);
         BlockVector3 index = Level.blockHash((int) pos.x, (int) pos.y, (int) pos.z);
-        int fullState = 0;
+        int fullState;
         if (cached && this.blockCache.containsKey(index)) {
             return this.blockCache.get(index);
         } else if (pos.y >= 0 && pos.y < 256 && this.chunks.containsKey(chunkIndex)) {
@@ -1579,11 +1574,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private void addBlockChange(long index, int x, int y, int z) {
-        SoftReference<Map<Short, Object>> current = changedBlocks.get(index);
-        if (current == null) {
-            current = new SoftReference(new HashMap<>());
-            this.changedBlocks.put(index, current);
-        }
+        SoftReference<Map<Short, Object>> current = changedBlocks.computeIfAbsent(index, k -> new SoftReference(new HashMap<>()));
         Map<Short, Object> currentMap = current.get();
         if (currentMap != changeBlocksFullMap && currentMap != null) {
             if (currentMap.size() > MAX_BLOCK_CACHE) {

@@ -21,7 +21,6 @@ import cn.nukkit.network.protocol.ExplodePacket;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -170,10 +169,8 @@ public class Explosion {
 
         ItemBlock air = new ItemBlock(new BlockAir());
 
-        Iterator iter = this.affectedBlocks.iterator();
         //Iterator iter = this.affectedBlocks.entrySet().iterator();
-        while (iter.hasNext()) {
-            Block block = (Block) iter.next();
+        for (Block block : this.affectedBlocks) {
             //Block block = (Block) ((HashMap.Entry) iter.next()).getValue();
             if (block.getId() == Block.TNT) {
                 double mot = Math.random() * Math.PI * 2;
