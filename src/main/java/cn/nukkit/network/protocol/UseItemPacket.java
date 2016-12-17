@@ -14,7 +14,7 @@ public class UseItemPacket extends DataPacket {
     public int x;
     public int y;
     public int z;
-    
+
     public int interactBlockId;
 
     public int face;

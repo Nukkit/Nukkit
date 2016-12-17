@@ -90,7 +90,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_BOUNDING_BOX_HEIGHT = 54; //float
     public static final int DATA_FUSE_LENGTH = 55; //int
     /* 56 (vector3f)
-	 * 57 (byte)
+     * 57 (byte)
 	 * 58 (float)
 	 * 59 (float) */
 
