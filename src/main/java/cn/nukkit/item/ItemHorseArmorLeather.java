@@ -10,6 +10,6 @@ public class ItemHorseArmorLeather extends Item {
     }
 
     public ItemHorseArmorLeather(Integer meta, int count) {
-        super(LEATHER_HORSE_ARMOR, meta, count, "Leather horse armor");
+        super(LEATHER_HORSE_ARMOR, meta, count, "Leather Horse Armor");
     }
 }
