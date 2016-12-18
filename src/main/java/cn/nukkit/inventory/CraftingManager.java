@@ -732,6 +732,12 @@ public class CraftingManager {
                 " N ",
                 "   "
         )).setIngredient("N", Item.get(Item.PLANKS, BlockPlanks.DARK_OAK, 1)));
+
+        this.registerRecipe(new BigShapedRecipe(Item.get(Item.ENDER_CHEST, 0, 1),
+                "PPP",
+                "PSP",
+                "PPP"
+        ).setIngredient("P", Item.get(Item.OBSIDIAN, 0, 1)).setIngredient("S", Item.get(Item.ENDER_EYE, 0, 1)));
     }
 
     protected void registerFurnace() {
