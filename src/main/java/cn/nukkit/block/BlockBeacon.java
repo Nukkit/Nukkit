@@ -74,7 +74,6 @@ public class BlockBeacon extends BlockSolid {
                     .putInt("x", (int) this.x)
                     .putInt("y", (int) this.y)
                     .putInt("z", (int) this.z);
-            Server.getInstance().getLogger().info("Creating Block Entity Beacon");
             new BlockEntityBeacon(this.level.getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
         }
 
