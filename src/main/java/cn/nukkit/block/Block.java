@@ -190,6 +190,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int COCOA_BLOCK = 127;
     public static final int SANDSTONE_STAIRS = 128;
     public static final int EMERALD_ORE = 129;
+    public static final int ENDER_CHEST = 54;
 
     public static final int EMERALD_BLOCK = 133;
     public static final int SPRUCE_WOOD_STAIRS = 134;
@@ -270,6 +271,14 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int DARK_OAK_DOOR_BLOCK = 197;
     public static final int GRASS_PATH = 198;
     public static final int ITEM_FRAME_BLOCK = 199;
+
+    public static final int CHORUS_PLANT = 999;// fix
+
+    public static final int PURPUR_BLOCK = 201;
+    public static final int PURPUR_PILLAR = 202;
+    public static final int PURPUR_STAIRS = 203;
+    public static final int PURPUR_DOUBLE_SLAB = 204;
+    public static final int PURPUR_SLAB = 205;
 
     public static final int PODZOL = 243;
     public static final int BEETROOT_BLOCK = 244;
@@ -425,6 +434,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[EMERALD_ORE] = BlockOreEmerald.class;
             list[EMERALD_BLOCK] = BlockEmerald.class;
 
+            list[ENDER_CHEST] = BlockEnderChest.class;
+
             list[SPRUCE_WOOD_STAIRS] = BlockStairsSpruce.class;
             list[BIRCH_WOOD_STAIRS] = BlockStairsBirch.class;
             list[JUNGLE_WOOD_STAIRS] = BlockStairsJungle.class;
@@ -505,6 +516,14 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[DOUBLE_RED_SANDSTONE_SLAB] = BlockDoubleSlabRedSandstone.class;
             list[WOODEN_BUTTON] = BlockButtonStone.class;
             list[STONE_BUTTON] = BlockButtonWooden.class;
+
+            //list[CHORUS_PLANT] = BlockChorusPlant.class;
+
+            list[PURPUR_BLOCK] = BlockPurpurBlock.class;
+            list[PURPUR_PILLAR] = BlockPurpurPillar.class;
+            list[PURPUR_STAIRS] = BlockPurpurStairs.class;
+            list[PURPUR_DOUBLE_SLAB] = BlockPurpurDoubleSlab.class;
+            list[PURPUR_SLAB] = BlockPurpurSlab.class;
 
             for (int id = 0; id < 256; id++) {
                 Class c = list[id];

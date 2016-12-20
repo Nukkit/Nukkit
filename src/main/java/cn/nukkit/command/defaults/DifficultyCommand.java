@@ -18,10 +18,9 @@ public class DifficultyCommand extends VanillaCommand {
     public DifficultyCommand(String name) {
         super(name, "%nukkit.command.difficulty.description", "%commands.difficulty.usage");
         this.setPermission("nukkit.command.difficulty");
-        this.commandParameters.clear();
-        this.commandParameters.put("default", new CommandParameter[]{
+        this.commandParameters = new CommandParameter[]{
                 new CommandParameter("difficulty", CommandParameter.ARG_TYPE_INT, false)
-        });
+        };
     }
 
     @Override

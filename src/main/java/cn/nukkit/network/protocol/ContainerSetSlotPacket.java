@@ -18,6 +18,7 @@ public class ContainerSetSlotPacket extends DataPacket {
     public int slot;
     public int hotbarSlot;
     public Item item;
+    public byte unknown;
 
     @Override
     public void decode() {

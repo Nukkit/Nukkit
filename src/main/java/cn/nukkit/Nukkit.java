@@ -14,20 +14,20 @@ import cn.nukkit.utils.ServerKiller;
  */
 
 /**
- * Nukkit启动类，包含{@code main}函数。<br>
+ * Nukkit???，包含{@code main}函数。<br>
  * The launcher class of Nukkit, including the {@code main} function.
  *
  * @author MagicDroidX(code) @ Nukkit Project
- * @author 粉鞋大妈(javadoc) @ Nukkit Project
+ * @author 粉鞋大?(javadoc) @ Nukkit Project
  * @since Nukkit 1.0 | Nukkit API 1.0.0
  */
 public class Nukkit {
 
     public final static String VERSION = "1.0dev";
     public final static String API_VERSION = "1.0.0";
-    public final static String CODENAME = "蘋果(Apple)派(Pie)";
-    public final static String MINECRAFT_VERSION = "v0.16.0 alpha";
-    public final static String MINECRAFT_VERSION_NETWORK = "0.16.0";
+    public final static String CODENAME = "SOTE";
+    public final static String MINECRAFT_VERSION = "v1.0.0 alpha";
+    public final static String MINECRAFT_VERSION_NETWORK = "1.0.0";
 
     public final static String PATH = System.getProperty("user.dir") + "/";
     public final static String DATA_PATH = System.getProperty("user.dir") + "/";
@@ -47,7 +47,7 @@ public class Nukkit {
             }
         }
 
-        //启动参数
+        //??参数
         for (String arg : args) {
             switch (arg) {
                 case "disable-ansi":

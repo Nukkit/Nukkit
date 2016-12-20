@@ -128,7 +128,7 @@ public class JavaPluginLoader implements PluginLoader {
         if (plugin instanceof PluginBase && plugin.isEnabled()) {
             this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.plugin.disable", plugin.getDescription().getFullName()));
 
-            this.server.getServiceManager().cancel(plugin);
+            //this.server.getServiceManager().cancel(plugin);
 
             this.server.getPluginManager().callEvent(new PluginDisableEvent(plugin));
 

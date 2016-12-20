@@ -292,6 +292,14 @@ public class Item implements Cloneable {
     public static final int GRASS_PATH = 198;
     public static final int ITEM_FRAME_BLOCK = 199;
 
+    public static final int CHORUS_PLANT = 999;// fix
+
+    public static final int PURPUR_BLOCK = 201;
+    public static final int PURPUR_PILLAR = 202;
+    public static final int PURPUR_STAIRS = 203;
+    public static final int PURPUR_DOUBLE_SLAB = 204;
+    public static final int PURPUR_SLAB = 205;
+
     public static final int PODZOL = 243;
     public static final int BEETROOT_BLOCK = 244;
     public static final int STONECUTTER = 245;
@@ -806,6 +814,7 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.STONE_BRICK_STAIRS, 0));
         addCreativeItem(Item.get(Item.NETHER_BRICKS_STAIRS, 0));
         addCreativeItem(Item.get(Item.QUARTZ_STAIRS, 0));
+        addCreativeItem(Item.get(Item.PURPUR_STAIRS, 0));
         addCreativeItem(Item.get(Item.SLAB, 0));
         addCreativeItem(Item.get(Item.SLAB, 3));
         addCreativeItem(Item.get(Item.WOODEN_SLAB, 0));
@@ -820,12 +829,15 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.SLAB, 5));
         addCreativeItem(Item.get(Item.SLAB, 6));
         addCreativeItem(Item.get(Item.SLAB, 7));
+        addCreativeItem(Item.get(Item.PURPUR_SLAB, 0));
         addCreativeItem(Item.get(Item.QUARTZ_BLOCK, 0));
         addCreativeItem(Item.get(Item.QUARTZ_BLOCK, 2));
         addCreativeItem(Item.get(Item.QUARTZ_BLOCK, 1));
         addCreativeItem(Item.get(Item.PRISMARINE, 0));
         addCreativeItem(Item.get(Item.PRISMARINE, 1));
         addCreativeItem(Item.get(Item.PRISMARINE, 2));
+        addCreativeItem(Item.get(Item.PURPUR_BLOCK, 0));
+        addCreativeItem(Item.get(Item.PURPUR_PILLAR, 0));
         addCreativeItem(Item.get(Item.COAL_ORE, 0));
         addCreativeItem(Item.get(Item.IRON_ORE, 0));
         addCreativeItem(Item.get(Item.GOLD_ORE, 0));

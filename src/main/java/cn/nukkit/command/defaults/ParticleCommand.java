@@ -22,18 +22,17 @@ public class ParticleCommand extends VanillaCommand {
         super(name, "%nukkit.command.particle.description", "%nukkit.command.particle.usage");
         this.setPermission("nukkit.command.particle");
         //<name> <x> <y> <z> <xd> <yd> <zd> [count] [data]
-        this.commandParameters.clear();
-        this.commandParameters.put("default", new CommandParameter[]{
+        this.commandParameters = new CommandParameter[]{
                 new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
-                new CommandParameter("x", CommandParameter.ARG_TYPE_STRING, false),
-                new CommandParameter("y", CommandParameter.ARG_TYPE_STRING, false),
-                new CommandParameter("z", CommandParameter.ARG_TYPE_STRING, false),
-                new CommandParameter("zd", CommandParameter.ARG_TYPE_STRING, false),
-                new CommandParameter("yd", CommandParameter.ARG_TYPE_STRING, false),
-                new CommandParameter("zd", CommandParameter.ARG_TYPE_STRING, false),
+                new CommandParameter("x"),
+                new CommandParameter("y"),
+                new CommandParameter("z"),
+                new CommandParameter("zd"),
+                new CommandParameter("yd"),
+                new CommandParameter("zd"),
                 new CommandParameter("count", CommandParameter.ARG_TYPE_INT, true),
                 new CommandParameter("data", true)
-        });
+        };
     }
 
     @Override
@@ -120,10 +119,10 @@ public class ParticleCommand extends VanillaCommand {
         switch (name) {
             case "explode":
                 return new ExplodeParticle(pos);
+            case "largeexplode":
+                return new LargeExplodeParticle(pos);
             case "hugeexplosion":
                 return new HugeExplodeParticle(pos);
-            case "hugeexplosionseed":
-                return new HugeExplodeSeedParticle(pos);
             case "bubble":
                 return new BubbleParticle(pos);
             case "splash":
@@ -180,8 +179,7 @@ public class ParticleCommand extends VanillaCommand {
                 return new HappyVillagerParticle(pos);
             case "angryvillager":
                 return new AngryVillagerParticle(pos);
-            case "forcefield":
-                return new BlockForceFieldParticle(pos);
+
         }
 
         if (name.startsWith("iconcrack_")) {

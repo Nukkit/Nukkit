@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
-import cn.nukkit.event.player.PlayerKickEvent;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -13,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -25,11 +25,10 @@ public class BanIpCommand extends VanillaCommand {
         super(name, "%nukkit.command.ban.ip.description", "%commands.banip.usage");
         this.setPermission("nukkit.command.ban.ip");
         this.setAliases(new String[]{"banip"});
-        this.commandParameters.clear();
-        this.commandParameters.put("default", new CommandParameter[]{
+        this.commandParameters = new CommandParameter[]{
                 new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
                 new CommandParameter("reason", true)
-        });
+        };
     }
 
     @Override
@@ -96,7 +95,7 @@ public class BanIpCommand extends VanillaCommand {
 
         for (Player player : new ArrayList<>(sender.getServer().getOnlinePlayers().values())) {
             if (player.getAddress().equals(ip)) {
-                player.kick(PlayerKickEvent.Reason.IP_BANNED, !reason.isEmpty() ? reason : "IP banned");
+                player.kick(!Objects.equals(reason, "") ? reason : "IP banned.");
             }
         }
 

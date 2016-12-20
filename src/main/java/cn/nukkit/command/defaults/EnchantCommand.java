@@ -17,12 +17,11 @@ public class EnchantCommand extends VanillaCommand {
     public EnchantCommand(String name) {
         super(name, "%nukkit.command.enchant.description", "%commands.enchant.usage");
         this.setPermission("nukkit.command.enchant");
-        this.commandParameters.clear();
-        this.commandParameters.put("default", new CommandParameter[]{
+        this.commandParameters = new CommandParameter[]{
                 new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
                 new CommandParameter("enchantment ID", CommandParameter.ARG_TYPE_INT, false),
                 new CommandParameter("level", CommandParameter.ARG_TYPE_INT, true),
-        });
+        };
     }
 
     @Override

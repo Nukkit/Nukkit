@@ -22,6 +22,7 @@ public abstract class Particle extends Vector3 {
     public static final int TYPE_ITEM_BREAK = 12;
     public static final int TYPE_SNOWBALL_POOF = 13;
     public static final int TYPE_HUGE_EXPLODE = 14;
+    public static final int TYPE_LARGE_EXPLODE = 14;
     public static final int TYPE_HUGE_EXPLODE_SEED = 15;
     public static final int TYPE_MOB_FLAME = 16;
     public static final int TYPE_HEART = 17;

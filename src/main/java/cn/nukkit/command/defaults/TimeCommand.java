@@ -20,14 +20,10 @@ public class TimeCommand extends VanillaCommand {
                 "nukkit.command.time.set;" +
                 "nukkit.command.time.start;" +
                 "nukkit.command.time.stop");
-        this.commandParameters.clear();
-        this.commandParameters.put("1arg", new CommandParameter[]{
-                new CommandParameter("start|stop", CommandParameter.ARG_TYPE_STRING, false)
-        });
-        this.commandParameters.put("2args", new CommandParameter[]{
-                new CommandParameter("add|set", CommandParameter.ARG_TYPE_STRING, false),
-                new CommandParameter("value", CommandParameter.ARG_TYPE_INT, false)
-        });
+        this.commandParameters = new CommandParameter[]{
+                new CommandParameter("add|set|start|stop", CommandParameter.ARG_TYPE_STRING, false),
+                new CommandParameter("value", CommandParameter.ARG_TYPE_INT, true)
+        };
     }
 
     @Override

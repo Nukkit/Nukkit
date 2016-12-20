@@ -18,14 +18,13 @@ public class EffectCommand extends Command {
     public EffectCommand(String name) {
         super(name, "%nukkit.command.effect.description", "%commands.effect.usage");
         this.setPermission("nukkit.command.effect");
-        this.commandParameters.clear();
-        this.commandParameters.put("default", new CommandParameter[]{
+        this.commandParameters = new CommandParameter[]{
                 new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
                 new CommandParameter("effect"),
                 new CommandParameter("seconds", CommandParameter.ARG_TYPE_INT, true),
                 new CommandParameter("amplifier", true),
                 new CommandParameter("hideParticle", CommandParameter.ARG_TYPE_BOOL, true)
-        });
+        };
     }
 
     @Override

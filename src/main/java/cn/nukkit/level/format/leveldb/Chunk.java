@@ -54,7 +54,7 @@ public class Chunk extends BaseFullChunk {
     public Chunk(LevelProvider level, int chunkX, int chunkZ, byte[] terrain, List<CompoundTag> entityData, List<CompoundTag> tileData, Map<Integer, Integer> extraData) {
         ByteBuffer buffer = ByteBuffer.wrap(terrain).order(ByteOrder.BIG_ENDIAN);
 
-        byte[] blocks = new byte[32768];
+        byte[] blocks = new byte[16*16*128];
         buffer.get(blocks);
 
         byte[] data = new byte[16384];

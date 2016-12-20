@@ -17,11 +17,10 @@ public class TellCommand extends VanillaCommand {
     public TellCommand(String name) {
         super(name, "%nukkit.command.tell.description", "%commands.message.usage", new String[]{"w", "msg"});
         this.setPermission("nukkit.command.tell");
-        this.commandParameters.clear();
-        this.commandParameters.put("default", new CommandParameter[]{
+        this.commandParameters = new CommandParameter[]{
                 new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
                 new CommandParameter("message")
-        });
+        };
     }
 
     @Override
