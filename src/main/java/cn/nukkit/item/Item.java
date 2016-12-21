@@ -1208,29 +1208,39 @@ public class Item implements Cloneable {
         
         
         //Arrow
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, ItemArrow.NO_EFFECT));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.NIGHT_VISION));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.NIGHT_VISION_LONG));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.INVISIBLE));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.INVISIBLE_LONG));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.LEAPING));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.LEAPING_LONG));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.LEAPING_II));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.FIRE_RESISTANCE));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.FIRE_RESISTANCE_LONG));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.SPEED));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.SPEED_LONG));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.SPEED_II));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.SLOWNESS));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.SLOWNESS_LONG));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.WATER_BREATHING));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.WATER_BREATHING_LONG));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.INSTANT_HEALTH));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.INSTANT_HEALTH_II));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.HARMING));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.HARMING_II));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.POISON));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.POISON_LONG));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.POISON_II));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.REGENERATION));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.REGENERATION_LONG));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.REGENERATION_II));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.STRENGTH));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.STRENGTH_LONG));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.STRENGTH_II));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.WEAKNESS));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.WEAKNESS_LONG));
+		addCreativeItem(Item.get(Item.ARROW, ItemArrow.WITHER_II));
         
         //Potion
         addCreativeItem(Item.get(Item.GLASS_BOTTLE, 0));
