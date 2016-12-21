@@ -9,10 +9,16 @@ import cn.nukkit.level.format.generic.ChunkConverter;
 import cn.nukkit.level.format.leveldb.LevelDB;
 import cn.nukkit.level.format.mcregion.McRegion;
 import cn.nukkit.level.format.mcregion.RegionLoader;
+import cn.nukkit.nbt.NBTIO;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.LevelException;
 import cn.nukkit.utils.Utils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteOrder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,6 +55,19 @@ class LevelProviderConverter {
         Utils.copyFile(new File(provider.getPath(), "level.dat"), new File(path, "level.dat"));
         LevelProvider result;
         try {
+            if (provider instanceof LevelDB) {
+                try (FileInputStream stream = new FileInputStream(path + "level.dat")) {
+                    stream.skip(8);
+                    CompoundTag levelData = NBTIO.read(stream, ByteOrder.LITTLE_ENDIAN);
+                    if (levelData != null) {
+                        NBTIO.writeGZIPCompressed(new CompoundTag().putCompound("Data", levelData), new FileOutputStream(path + "level.dat"));
+                    } else {
+                        throw new IOException("LevelData can not be null");
+                    }
+                } catch (IOException e) {
+                    throw new LevelException("Invalid level.dat");
+                }
+            }
             result = toClass.getConstructor(Level.class, String.class).newInstance(level, path);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -87,7 +106,7 @@ class LevelProviderConverter {
                 }
             }
             if (provider instanceof LevelDB) {
-                new File(path, "db").mkdir();
+                new File(path, "region").mkdir();
                 for (byte[] key : ((LevelDB) provider).getTerrainKeys()) {
                     int x = getChunkX(key);
                     int z = getChunkZ(key);
