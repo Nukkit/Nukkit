@@ -1131,7 +1131,6 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.NETHER_QUARTZ, 0));
         addCreativeItem(Item.get(Item.PAPER, 0));
         addCreativeItem(Item.get(Item.BOOK, 0));
-        addCreativeItem(Item.get(Item.ARROW, 0));
         addCreativeItem(Item.get(Item.BONE, 0));
         addCreativeItem(Item.get(Item.EMPTY_MAP, 0));
         addCreativeItem(Item.get(Item.SUGARCANE, 0));
@@ -1204,7 +1203,35 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.DYE, 10));
         addCreativeItem(Item.get(Item.DYE, 2));
         addCreativeItem(Item.get(Item.DYE, 6));
-
+        
+        
+        
+        
+        //Arrow
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        addCreativeItem(Item.get(Item.ARROW, 0));
+        
         //Potion
         addCreativeItem(Item.get(Item.GLASS_BOTTLE, 0));
         addCreativeItem(Item.get(Item.POTION, ItemPotion.NO_EFFECTS));
