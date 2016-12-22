@@ -30,11 +30,11 @@ public class Vector2f {
     }
 
     public int getFloorX() {
-        return (int) Math.floor(this.x);
+        return NukkitMath.floorFloat(this.x);
     }
 
     public int getFloorY() {
-        return (int) Math.floor(this.y);
+        return NukkitMath.floorFloat(this.y);
     }
 
     public Vector2f add(float x) {
@@ -66,7 +66,7 @@ public class Vector2f {
     }
 
     public Vector2f floor() {
-        return new Vector2f((int) Math.floor(this.x), (int) Math.floor(this.y));
+        return new Vector2f(this.getFloorX(), this.getFloorY());
     }
 
     public Vector2f round() {
