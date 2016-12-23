@@ -301,8 +301,7 @@ public class Item implements Cloneable {
     public static final int PURPUR_BLOCK = 201;
 
     public static final int PURPUR_STAIRS = 203;
-    public static final int DOUBLE_PURPUR_SLAB = 204;
-    public static final int PURPUR_SLAB = 205;
+
     public static final int END_BRICKS = 206;
 
     public static final int END_ROD = 208;
@@ -887,9 +886,9 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.SLAB, 1));
         addCreativeItem(Item.get(Item.RED_SANDSTONE_SLAB));
         addCreativeItem(Item.get(Item.SLAB, 5));
-        addCreativeItem(Item.get(Item.SLAB, 6));
         addCreativeItem(Item.get(Item.SLAB, 7));
-        addCreativeItem(Item.get(Item.PURPUR_SLAB));
+        addCreativeItem(Item.get(Item.SLAB, 6));
+        addCreativeItem(Item.get(Item.RED_SANDSTONE_SLAB, 1));
         addCreativeItem(Item.get(Item.QUARTZ_BLOCK, 0));
         addCreativeItem(Item.get(Item.QUARTZ_BLOCK, 2));
         addCreativeItem(Item.get(Item.QUARTZ_BLOCK, 1));
