@@ -26,6 +26,9 @@ public class PlayerActionPacket extends DataPacket {
 
     public static final byte ACTION_NETHER_UNKNOWN = 14; //todo what's this?
 
+    public static final byte ACTION_START_GLIDE = 15;
+    public static final byte ACTION_STOP_GLIDE = 16;
+
     public long entityId;
     public int action;
     public int x;

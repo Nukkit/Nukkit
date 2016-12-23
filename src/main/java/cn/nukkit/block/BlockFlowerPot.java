@@ -100,7 +100,7 @@ public class BlockFlowerPot extends BlockFlowable {
         int itemMeta;
         if (!canPlaceIntoFlowerPot(item.getId())) {
             if (!canPlaceIntoFlowerPot(item.getBlock().getId())) {
-                return false;
+                return true;
             }
             itemID = item.getBlock().getId();
             itemMeta = item.getDamage();

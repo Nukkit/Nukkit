@@ -46,6 +46,9 @@ public abstract class Particle extends Vector3 {
     public static final int TYPE_NOTE = 36;
     public static final int TYPE_WITCH_SPELL = 37;
     public static final int TYPE_CARROT = 38;
+    //39 unknown
+    public static final int TYPE_END_ROD = 40;
+    public static final int TYPE_DRAGONS_BREATH = 41;
 
     public Particle() {
         super(0, 0, 0);

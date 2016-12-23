@@ -165,7 +165,6 @@ public class Level implements ChunkManager, Metadatable {
     private BlockMetadataStore blockMetadata;
 
     private boolean useSections;
-    private byte blockOrder;
 
     private Position temporalPosition;
     private Vector3 temporalVector;
@@ -276,7 +275,6 @@ public class Level implements ChunkManager, Metadatable {
         this.generator = Generator.getGenerator(this.provider.getGenerator());
 
         try {
-            this.blockOrder = (byte) provider.getMethod("getProviderOrder").invoke(null);
             this.useSections = (boolean) provider.getMethod("usesChunkSection").invoke(null);
         } catch (Exception e) {
             throw new RuntimeException(e);

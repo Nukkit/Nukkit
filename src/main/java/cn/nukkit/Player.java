@@ -2356,6 +2356,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.lastBreak = Long.MAX_VALUE;
                             break;
 
+                        case PlayerActionPacket.ACTION_STOP_BREAK:
+                            break;
+
                         case PlayerActionPacket.ACTION_RELEASE_ITEM:
                             if (this.startAction > -1 && this.getDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION)) {
                                 if (this.inventory.getItemInHand().getId() == Item.BOW) {
@@ -2493,6 +2496,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.spawnToAll();
                             this.scheduleUpdate();
                             break;
+
+                        case PlayerActionPacket.ACTION_JUMP:
+                            break packetswitch;
 
                         case PlayerActionPacket.ACTION_START_SPRINT:
                             PlayerToggleSprintEvent playerToggleSprintEvent = new PlayerToggleSprintEvent(this, true);
