@@ -24,6 +24,7 @@ public class BlockPurpur extends BlockSolid {
                 "Purpur Block",
                 "Purpur Block",
                 "Purpur Pillar",
+                "Purpur Pillar"
         };
 
         return names[this.meta & 0x03];
@@ -51,16 +52,18 @@ public class BlockPurpur extends BlockSolid {
 
     @Override
     public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz, Player player) {
-        short[] faces = new short[]{
-                0,
-                0,
-                0b1000,
-                0b1000,
-                0b0100,
-                0b0100
-        };
+        if (this.meta != PURPUR_NORMAL) {
+            short[] faces = new short[]{
+                    0,
+                    0,
+                    0b1000,
+                    0b1000,
+                    0b0100,
+                    0b0100
+            };
 
-        this.meta = ((this.meta & 0x03) | faces[face]);
+            this.meta = ((this.meta & 0x03) | faces[face]);
+        }
         this.getLevel().setBlock(block, this, true, true);
 
         return true;
