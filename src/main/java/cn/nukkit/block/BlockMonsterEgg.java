@@ -44,7 +44,7 @@ public class BlockMonsterEgg extends BlockSolid {
                 "Chiseled Stone Brick"
         };
 
-        return names[this.meta & 0x07];
+        return names[this.meta & 0x07] + " Monster Egg";
     }
 
     @Override
