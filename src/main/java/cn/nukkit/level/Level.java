@@ -255,7 +255,7 @@ public class Level implements ChunkManager, Metadatable {
         if (convert) {
             this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.updating",
                     TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE));
-            McRegion old = (McRegion) this.provider;
+            LevelProvider old = this.provider;
             try {
                 this.provider = new LevelProviderConverter(this, path)
                         .from(old)

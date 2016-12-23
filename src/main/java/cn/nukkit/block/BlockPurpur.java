@@ -7,22 +7,26 @@ import cn.nukkit.utils.BlockColor;
 
 public class BlockPurpur extends BlockSolid {
 
+    public static final int PURPUR_NORMAL = 0;
+    public static final int PURPUR_PILLAR = 2;
+
     public BlockPurpur() {
         this(0);
     }
 
     public BlockPurpur(int meta) {
-        super(0);
+        super(meta);
     }
 
     @Override
     public String getName() {
         String[] names = new String[]{
                 "Purpur Block",
+                "Purpur Block",
                 "Purpur Pillar",
         };
 
-        return names[this.meta & 0x01];
+        return names[this.meta & 0x03];
     }
 
     @Override
@@ -66,7 +70,7 @@ public class BlockPurpur extends BlockSolid {
     public int[][] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
             return new int[][]{
-                    {Item.PURPUR_BLOCK, this.meta & 0x01, 1}
+                    {Item.PURPUR_BLOCK, this.meta & 0x03, 1}
             };
         } else {
             return new int[0][0];

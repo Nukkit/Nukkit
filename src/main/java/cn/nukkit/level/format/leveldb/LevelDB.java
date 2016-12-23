@@ -526,7 +526,7 @@ public class LevelDB implements LevelProvider {
         List<byte[]> result = new ArrayList<>();
         this.db.forEach((entry) -> {
             byte[] key = entry.getKey();
-            if (key[8] == BaseKey.DATA_TERRAIN) {
+            if (key.length > 8 && key[8] == BaseKey.DATA_TERRAIN) {
                 result.add(key);
             }
         });
