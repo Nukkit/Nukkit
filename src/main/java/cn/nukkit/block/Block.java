@@ -422,7 +422,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             //TODO: list[POWERED_REPEATER] = BlockRepeaterPowered.class; //94
             list[INVISIBLE_BEDROCK] = BlockBedrockInvisible.class; //95
             list[TRAPDOOR] = BlockTrapdoor.class; //96
-            //TODO: list[MONSTER_EGG] = BlockMonsterEgg.class; //97
+            list[MONSTER_EGG] = BlockMonsterEgg.class; //97
             list[STONE_BRICKS] = BlockBricksStone.class; //98
             list[BROWN_MUSHROOM_BLOCK] = BlockHugeMushroomBrown.class; //99
             list[RED_MUSHROOM_BLOCK] = BlockHugeMushroomRed.class; //100
@@ -437,7 +437,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[STONE_BRICK_STAIRS] = BlockStairsStoneBrick.class; //109
             list[MYCELIUM] = BlockMycelium.class; //110
             list[WATER_LILY] = BlockWaterLily.class; //111
-            list[NETHER_BRICKS] = BlockNetherBricks.class; //112
+            list[NETHER_BRICKS] = BlockBricksNether.class; //112
             list[NETHER_BRICK_FENCE] = BlockFenceNetherBrick.class; //113
             list[NETHER_BRICKS_STAIRS] = BlockStairsNetherBrick.class; //114
             //TODO: list[NETHER_WART_BLOCK] = BlockNetherWart.class; //115
@@ -524,10 +524,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             //TODO: list[CHORUS_FLOWER] = BlockChorusFlower.class; //200
             list[PURPUR_BLOCK] = BlockPurpur.class; //201
 
-            //TODO: list[PURPUR_STAIRS] = BlockStairsPurpur.class; //203
-            //TODO: list[DOUBLE_PURPUR_SLAB] = BlockDoubleSlabPurpur.class; //204
-            //TODO: list[PURPUR_SLAB] = BlockSlabPurpur.class; //205
-            //TODO: list[END_BRICKS] = BlockEndBricks.class; //206
+            list[PURPUR_STAIRS] = BlockStairsPurpur.class; //203
+
+            list[END_BRICKS] = BlockBricksEndStone.class; //206
 
             //TODO: list[END_ROD] = BlockEndRod.class; //208
             //TODO: list[END_GATEWAY] = BlockEndGateway.class; //209
