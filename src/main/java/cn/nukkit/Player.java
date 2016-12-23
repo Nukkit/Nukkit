@@ -3,6 +3,7 @@ package cn.nukkit;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockDoor;
+import cn.nukkit.block.BlockEnderChest;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityItemFrame;
 import cn.nukkit.blockentity.BlockEntitySign;
@@ -203,6 +204,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private String buttonText = "Button";
 
     protected boolean enableClientCommand = true;
+
+    private BlockEnderChest viewingEnderChest = null;
+
+    public BlockEnderChest getViewingEnderChest() {
+        return viewingEnderChest;
+    }
+
+    public void setViewingEnderChest(BlockEnderChest chest) {
+        if (chest == null && this.viewingEnderChest != null) {
+            this.viewingEnderChest.getViewers().remove(this);
+        } else if (chest != null) {
+            chest.getViewers().add(this);
+        }
+        this.viewingEnderChest = chest;
+    }
 
     public TranslationContainer getLeaveMessage() {
         return new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.left", this.getDisplayName());
@@ -650,10 +666,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendChunk(int x, int z, byte[] payload) {
-        this.sendChunk(x, z, payload, FullChunkDataPacket.ORDER_COLUMNS);
-    }
-
-    public void sendChunk(int x, int z, byte[] payload, byte ordering) {
         if (!this.connected) {
             return;
         }
@@ -664,7 +676,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         FullChunkDataPacket pk = new FullChunkDataPacket();
         pk.chunkX = x;
         pk.chunkZ = z;
-        pk.order = ordering;
         pk.data = payload;
 
         this.batchDataPacket(pk);
@@ -688,12 +699,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         int count = 0;
 
         List<Map.Entry<Long, Integer>> entryList = new ArrayList<>(this.loadQueue.entrySet());
-        entryList.sort(new Comparator<Map.Entry<Long, Integer>>() {
-            @Override
-            public int compare(Map.Entry<Long, Integer> o1, Map.Entry<Long, Integer> o2) {
-                return o1.getValue() - o2.getValue();
-            }
-        });
+        entryList.sort(Comparator.comparingInt(Map.Entry::getValue));
 
         for (Map.Entry<Long, Integer> entry : entryList) {
             long index = entry.getKey();
@@ -1822,7 +1828,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setNameTagVisible(true);
         this.setNameTagAlwaysVisible(true);
 
-        this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn", new String[]{
+        this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn",
                 TextFormat.AQUA + this.username + TextFormat.WHITE,
                 this.ip,
                 String.valueOf(this.port),
@@ -1830,8 +1836,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.level.getName(),
                 String.valueOf(NukkitMath.round(this.x, 4)),
                 String.valueOf(NukkitMath.round(this.y, 4)),
-                String.valueOf(NukkitMath.round(this.z, 4))
-        }));
+                String.valueOf(NukkitMath.round(this.z, 4))));
 
         if (this.isOp()) {
             this.setRemoveFormat(false);
@@ -1969,6 +1974,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     MovePlayerPacket movePlayerPacket = (MovePlayerPacket) packet;
                     Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
+
+                    if (newPos.distanceSquared(this) < 0.01 && movePlayerPacket.yaw % 360 == this.yaw && movePlayerPacket.pitch % 360 == this.pitch) {
+                        break;
+                    }
 
                     boolean revert = false;
                     if (!this.isAlive() || !this.spawned) {
@@ -2338,12 +2347,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             Block block = target.getSide(((PlayerActionPacket) packet).face);
                             if (block.getId() == Block.FIRE) {
                                 this.level.setBlock(block, new BlockAir(), true);
+                                break;
                             }
                             this.lastBreak = System.currentTimeMillis();
                             break;
 
                         case PlayerActionPacket.ACTION_ABORT_BREAK:
                             this.lastBreak = Long.MAX_VALUE;
+                            break;
+
+                        case PlayerActionPacket.ACTION_STOP_BREAK:
                             break;
 
                         case PlayerActionPacket.ACTION_RELEASE_ITEM:
@@ -2403,7 +2416,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     } else {
                                         entityShootBowEvent.getProjectile().setMotion(entityShootBowEvent.getProjectile().getMotion().multiply(entityShootBowEvent.getForce()));
                                         if (this.isSurvival()) {
-                                            Enchantment infinity = null;
+                                            Enchantment infinity;
 
                                             if (!bow.hasEnchantments() || (infinity = bow.getEnchantment(Enchantment.ID_BOW_INFINITY)) == null || infinity.getLevel() <= 0)
                                                 this.inventory.removeItem(itemArrow);
@@ -2483,6 +2496,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.spawnToAll();
                             this.scheduleUpdate();
                             break;
+
+                        case PlayerActionPacket.ACTION_JUMP:
+                            break packetswitch;
 
                         case PlayerActionPacket.ACTION_START_SPRINT:
                             PlayerToggleSprintEvent playerToggleSprintEvent = new PlayerToggleSprintEvent(this, true);
@@ -3202,7 +3218,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
                     }
 
-                    switch(recipe.getResult().getId()) {
+                    switch (recipe.getResult().getId()) {
                         case Item.WORKBENCH:
                             this.awardAchievement("buildWorkBench");
                             break;
@@ -3383,7 +3399,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET:
                     RequestChunkRadiusPacket requestChunkRadiusPacket = (RequestChunkRadiusPacket) packet;
                     ChunkRadiusUpdatedPacket chunkRadiusUpdatePacket = new ChunkRadiusUpdatedPacket();
-                    this.chunkRadius = Math.max(5, Math.min((int) requestChunkRadiusPacket.radius, this.viewDistance));
+                    this.chunkRadius = Math.max(5, Math.min(requestChunkRadiusPacket.radius, this.viewDistance));
                     chunkRadiusUpdatePacket.radius = this.chunkRadius;
                     this.dataPacket(chunkRadiusUpdatePacket);
                     break;
@@ -3620,12 +3636,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.server.getPluginManager().unsubscribeFromPermission(Server.BROADCAST_CHANNEL_USERS, this);
             this.spawned = false;
-            this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logOut", new String[]{
+            this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logOut",
                     TextFormat.AQUA + (this.getName() == null ? "" : this.getName()) + TextFormat.WHITE,
                     this.ip,
                     String.valueOf(this.port),
-                    this.getServer().getLanguage().translateString(reason)
-            }));
+                    this.getServer().getLanguage().translateString(reason)));
             this.windows = new HashMap<>();
             this.windowIndex = new HashMap<>();
             this.usedChunks = new HashMap<>();
@@ -4288,14 +4303,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
 
     public static BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, byte[] payload) {
-        return getChunkCacheFromData(chunkX, chunkZ, payload, FullChunkDataPacket.ORDER_COLUMNS);
-    }
-
-    public static BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, byte[] payload, byte ordering) {
         FullChunkDataPacket pk = new FullChunkDataPacket();
         pk.chunkX = chunkX;
         pk.chunkZ = chunkZ;
-        pk.order = ordering;
         pk.data = payload;
         pk.encode();
 
