@@ -530,8 +530,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
             list[END_BRICKS] = BlockBricksEndStone.class; //206
 
-            //TODO: list[END_ROD] = BlockEndRod.class; //208
-            //TODO: list[END_GATEWAY] = BlockEndGateway.class; //209
+            list[END_ROD] = BlockEndRod.class; //208
+            list[END_GATEWAY] = BlockEndGateway.class; //209
 
             //TODO: list[CHORUS_PLANT] = BlockChorusPlant.class; //240
             list[PODZOL] = BlockPodzol.class; //243
