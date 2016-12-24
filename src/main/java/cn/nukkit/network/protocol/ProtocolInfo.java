@@ -88,6 +88,7 @@ public interface ProtocolInfo {
     byte CAMERA_PACKET = 0x49;
     byte ADD_ITEM_PACKET = 0x4a;
     byte BOSS_EVENT_PACKET = 0x4b;
+    byte SHOW_CREDITS_PACKET = 0x4c;
     byte AVAILABLE_COMMANDS_PACKET = 0x4d;
     byte COMMAND_STEP_PACKET = 0x4e;
     byte RESOURCE_PACK_DATA_INFO_PACKET = 0x4f;

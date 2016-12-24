@@ -286,5 +286,6 @@ public class Network {
         this.registerPacket(ProtocolInfo.TEXT_PACKET, TextPacket.class);
         this.registerPacket(ProtocolInfo.UPDATE_BLOCK_PACKET, UpdateBlockPacket.class);
         this.registerPacket(ProtocolInfo.USE_ITEM_PACKET, UseItemPacket.class);
+        this.registerPacket(ProtocolInfo.SHOW_CREDITS_PACKET, ShowCreditsPacket.class);
     }
 }
