@@ -696,7 +696,6 @@ public class CraftingManager {
         )).setIngredient("N", Item.get(Item.STONE, 0, 1)));
 
 
-
         //all planks...
         this.registerRecipe((new BigShapedRecipe(Item.get(Item.WOODEN_BUTTON, 0, 1),
                 "   ",
@@ -733,6 +732,12 @@ public class CraftingManager {
                 " N ",
                 "   "
         )).setIngredient("N", Item.get(Item.PLANKS, BlockPlanks.DARK_OAK, 1)));
+
+        this.registerRecipe(new BigShapedRecipe(Item.get(Item.ENDER_CHEST, 0, 1),
+                "PPP",
+                "PSP",
+                "PPP"
+        ).setIngredient("P", Item.get(Item.OBSIDIAN, 0, 1)).setIngredient("S", Item.get(Item.ENDER_EYE, 0, 1)));
     }
 
     protected void registerFurnace() {
@@ -1136,24 +1141,21 @@ public class CraftingManager {
 
     }
 
-    public final Comparator<Item> comparator = new Comparator<Item>() {
-        @Override
-        public int compare(Item i1, Item i2) {
-            if (i1.getId() > i2.getId()) {
-                return 1;
-            } else if (i1.getId() < i2.getId()) {
-                return -1;
-            } else if (i1.getDamage() > i2.getDamage()) {
-                return 1;
-            } else if (i1.getDamage() < i2.getDamage()) {
-                return -1;
-            } else if (i1.getCount() > i2.getCount()) {
-                return 1;
-            } else if (i1.getCount() < i2.getCount()) {
-                return -1;
-            } else {
-                return 0;
-            }
+    public final Comparator<Item> comparator = (i1, i2) -> {
+        if (i1.getId() > i2.getId()) {
+            return 1;
+        } else if (i1.getId() < i2.getId()) {
+            return -1;
+        } else if (i1.getDamage() > i2.getDamage()) {
+            return 1;
+        } else if (i1.getDamage() < i2.getDamage()) {
+            return -1;
+        } else if (i1.getCount() > i2.getCount()) {
+            return 1;
+        } else if (i1.getCount() < i2.getCount()) {
+            return -1;
+        } else {
+            return 0;
         }
     };
 
@@ -1207,7 +1209,7 @@ public class CraftingManager {
         this.recipes.put(recipe.getId(), recipe);
         String hash = "";
         List<Item> ingredients = recipe.getIngredientList();
-        Collections.sort(ingredients, this.comparator);
+        ingredients.sort(this.comparator);
         for (Item item : ingredients) {
             hash += item.getId() + ":" + (!item.hasMeta() ? "?" : item.getDamage()) + "x" + item.getCount() + ",";
         }
@@ -1245,7 +1247,7 @@ public class CraftingManager {
 
         String hash = "";
         List<Item> ingredients = recipe.getIngredientList();
-        Collections.sort(ingredients, this.comparator);
+        ingredients.sort(this.comparator);
         for (Item item : ingredients) {
             hash += item.getId() + ":" + (!item.hasMeta() ? "?" : item.getDamage()) + "x" + item.getCount() + ",";
         }
