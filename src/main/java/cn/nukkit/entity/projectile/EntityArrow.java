@@ -3,7 +3,7 @@ package cn.nukkit.entity.projectile;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.CriticalParticle;
+import cn.nukkit.level.particle.*;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -60,6 +60,10 @@ public class EntityArrow extends EntityProjectile {
 
     protected boolean isCritical;
 
+    public boolean hasColor = false;
+
+    public int[] rgba = new int[4];
+
     public EntityArrow(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);
     }
@@ -85,10 +89,15 @@ public class EntityArrow extends EntityProjectile {
 
         if (!this.hadCollision && this.isCritical) {
             NukkitRandom random = new NukkitRandom();
-            this.level.addParticle(new CriticalParticle(this.add(
+            Vector3 pos = this.add(
                     this.getWidth() / 2 + ((double) NukkitMath.randomRange(random, -100, 100)) / 500,
                     this.getHeight() / 2 + ((double) NukkitMath.randomRange(random, -100, 100)) / 500,
-                    this.getWidth() / 2 + ((double) NukkitMath.randomRange(random, -100, 100)) / 500)));
+                    this.getWidth() / 2 + ((double) NukkitMath.randomRange(random, -100, 100)) / 500);
+            if(this.hasColor){
+                this.level.addParticle(new CriticalParticle(pos));
+            }else{
+                this.level.addParticle(new DustParticle(pos, rgba[0], rgba[1], rgba[2], rgba[3]));
+            }
         } else if (this.onGround) {
             this.isCritical = false;
         }
@@ -101,6 +110,11 @@ public class EntityArrow extends EntityProjectile {
         this.timing.stopTiming();
 
         return hasUpdate;
+    }
+
+    public void setParticleColor(int r, int g, int b, int a){
+        this.hasColor = true;
+        this.rgba = new int[]{r,g,b,a};
     }
 
     @Override
