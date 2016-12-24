@@ -6,6 +6,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.*;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 

@@ -19,7 +19,7 @@ public class BlockPurpurDoubleSlab extends BlockSolid {
 
     @Override
     public int getId() {
-        return PURPUR_DOUBLE_SLAB;
+        return DOUBLE_PURPUR_SLAB;
     }
 
     @Override

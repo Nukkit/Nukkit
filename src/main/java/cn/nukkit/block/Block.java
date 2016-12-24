@@ -278,6 +278,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int ITEM_FRAME_BLOCK = 199;
     public static final int CHORUS_FLOWER = 200;
     public static final int PURPUR_BLOCK = 201;
+    public static final int PURPUR_PILLAR = 202;
 
     public static final int PURPUR_STAIRS = 203;
     public static final int DOUBLE_PURPUR_SLAB = 204;
@@ -523,6 +524,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[ITEM_FRAME_BLOCK] = BlockItemFrame.class; //199
             //TODO: list[CHORUS_FLOWER] = BlockChorusFlower.class; //200
             list[PURPUR_BLOCK] = BlockPurpur.class; //201
+            //list[PURPUR_PILLAR] = BlockPurpurPillar.class; //201
 
             list[PURPUR_STAIRS] = BlockStairsPurpur.class; //203
 

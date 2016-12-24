@@ -14,7 +14,7 @@ public class BlockPurpurSlab extends BlockSlab {
     }
 
     public BlockPurpurSlab(int meta) {
-        super(meta, PURPUR_DOUBLE_SLAB);
+        super(meta, DOUBLE_PURPUR_SLAB);
     }
 
     @Override
