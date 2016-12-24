@@ -19,7 +19,12 @@ public class BlockStairsPurpur extends BlockStairs {
 
     @Override
     public double getHardness() {
-        return 0.8;
+        return 1.5;
+    }
+
+    @Override
+    public double getResistance() {
+        return 30;
     }
 
     @Override

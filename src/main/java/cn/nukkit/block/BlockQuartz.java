@@ -36,6 +36,11 @@ public class BlockQuartz extends BlockSolid {
     }
 
     @Override
+    public double getResistance() {
+        return 4;
+    }
+
+    @Override
     public String getName() {
         String[] names = new String[]{
                 "Quartz Block",
