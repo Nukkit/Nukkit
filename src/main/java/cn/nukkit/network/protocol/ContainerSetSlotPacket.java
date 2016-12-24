@@ -26,6 +26,7 @@ public class ContainerSetSlotPacket extends DataPacket {
         this.slot = this.getVarInt();
         this.hotbarSlot = this.getVarInt();
         this.item = this.getSlot();
+        this.unknown = (byte) this.getByte();
     }
 
     @Override
@@ -35,5 +36,6 @@ public class ContainerSetSlotPacket extends DataPacket {
         this.putVarInt(this.slot);
         this.putVarInt(this.hotbarSlot);
         this.putSlot(this.item);
+        this.putByte(this.unknown);
     }
 }

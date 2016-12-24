@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.event.player.PlayerKickEvent;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.utils.TextFormat;
 
@@ -16,10 +17,11 @@ public class KickCommand extends VanillaCommand {
     public KickCommand(String name) {
         super(name, "%nukkit.command.kick.description", "%commands.kick.usage");
         this.setPermission("nukkit.command.kick");
-        this.commandParameters = new CommandParameter[]{
+        this.commandParameters.clear();
+        this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
                 new CommandParameter("reason", true)
-        };
+        });
     }
 
     @Override
@@ -45,7 +47,7 @@ public class KickCommand extends VanillaCommand {
 
         Player player = sender.getServer().getPlayer(name);
         if (player != null) {
-            player.kick(reason);
+            player.kick(PlayerKickEvent.Reason.KICKED_BY_ADMIN);
             if (reason.length() >= 1) {
                 Command.broadcastCommandMessage(sender,
                         new TranslationContainer("commands.kick.success.reason", new String[]{player.getName(), reason})

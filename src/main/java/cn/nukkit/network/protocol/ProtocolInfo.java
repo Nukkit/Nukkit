@@ -10,6 +10,8 @@ public interface ProtocolInfo {
      * Actual Minecraft: PE protocol version
      */
     byte CURRENT_PROTOCOL = 100;
+    String MINECRAFT_VERSION = "v1.0.0";
+    String MINECRAFT_VERSION_NETWORK = "1.0.0";
 
     byte LOGIN_PACKET = 0x01;
     byte PLAY_STATUS_PACKET = 0x02;
@@ -81,12 +83,11 @@ public interface ProtocolInfo {
     byte REQUEST_CHUNK_RADIUS_PACKET = 0x44;
     byte CHUNK_RADIUS_UPDATED_PACKET = 0x45;
     byte ITEM_FRAME_DROP_ITEM_PACKET = 0x46;
-    byte REPLACE_SELECTED_ITEM_PACKET = 0x47;
+    byte REPLACE_ITEM_IN_SLOT_PACKET = 0x47; //ReplaceSelectedItemPacket
     byte GAME_RULES_CHANGED_PACKET = 0x48;
     byte CAMERA_PACKET = 0x49;
     byte ADD_ITEM_PACKET = 0x4a;
     byte BOSS_EVENT_PACKET = 0x4b;
-    byte SNOW_CREDITS_PACKET = 0x4c;
     byte AVAILABLE_COMMANDS_PACKET = 0x4d;
     byte COMMAND_STEP_PACKET = 0x4e;
     byte RESOURCE_PACK_DATA_INFO_PACKET = 0x4f;

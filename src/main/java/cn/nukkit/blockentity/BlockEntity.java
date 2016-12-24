@@ -19,6 +19,7 @@ import java.util.Map;
 public abstract class BlockEntity extends Position {
     //WARNING: DO NOT CHANGE ANY NAME HERE, OR THE CLIENT WILL CRASH
     public static final String CHEST = "Chest";
+    public static final String ENDER_CHEST = "EnderChest";
     public static final String FURNACE = "Furnace";
     public static final String SIGN = "Sign";
     public static final String MOB_SPAWNER = "MobSpawner";
@@ -30,6 +31,7 @@ public abstract class BlockEntity extends Position {
     public static final String MUSIC = "Music";
     public static final String ITEM_FRAME = "ItemFrame";
     public static final String CAULDRON = "Cauldron";
+    public static final String BEACON = "Beacon";
 
 
     public static long count = 1;

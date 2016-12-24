@@ -43,7 +43,7 @@ public class JavaPluginLoader implements PluginLoader {
             String className = description.getMain();
             PluginClassLoader classLoader = new PluginClassLoader(this, this.getClass().getClassLoader(), file);
             this.classLoaders.put(description.getName(), classLoader);
-            PluginBase plugin = null;
+            PluginBase plugin;
             try {
                 Class javaClass = classLoader.loadClass(className);
 
@@ -55,8 +55,7 @@ public class JavaPluginLoader implements PluginLoader {
 
                     if (plugin != null && description.isSigned()) {
                         PluginCertificateTask task = new PluginCertificateTask(plugin);
-                        boolean result = task.run();
-
+                        task.run();
                     }
 
                     return plugin;
@@ -128,7 +127,7 @@ public class JavaPluginLoader implements PluginLoader {
         if (plugin instanceof PluginBase && plugin.isEnabled()) {
             this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.plugin.disable", plugin.getDescription().getFullName()));
 
-            //this.server.getServiceManager().cancel(plugin);
+            this.server.getServiceManager().cancel(plugin);
 
             this.server.getPluginManager().callEvent(new PluginDisableEvent(plugin));
 

@@ -54,7 +54,7 @@ public class Chunk extends BaseFullChunk {
     public Chunk(LevelProvider level, int chunkX, int chunkZ, byte[] terrain, List<CompoundTag> entityData, List<CompoundTag> tileData, Map<Integer, Integer> extraData) {
         ByteBuffer buffer = ByteBuffer.wrap(terrain).order(ByteOrder.BIG_ENDIAN);
 
-        byte[] blocks = new byte[16*16*128];
+        byte[] blocks = new byte[32768];
         buffer.get(blocks);
 
         byte[] data = new byte[16384];
@@ -115,7 +115,7 @@ public class Chunk extends BaseFullChunk {
 
     @Override
     public void setBlockId(int x, int y, int z, int id) {
-        this.blocks[(x << 11) | (z << 7) | y] = (byte) (id);
+        this.blocks[(x << 11) | (z << 7) | y] = (byte) id;
         this.hasChanged = true;
     }
 
@@ -168,7 +168,7 @@ public class Chunk extends BaseFullChunk {
         int i = (x << 11) | (z << 7) | y;
         boolean changed = false;
         if (blockId != null) {
-            byte id = (byte) (blockId & 0xff);
+            byte id = blockId.byteValue();
             if (this.blocks[i] != id) {
                 this.blocks[i] = id;
                 changed = true;
@@ -185,7 +185,7 @@ public class Chunk extends BaseFullChunk {
                 }
             } else {
                 this.data[i] = (byte) (((meta & 0x0f) << 4) | (old & 0x0f));
-                if (!meta.equals((old & 0xf0) >> 4)) {
+                if (!meta.equals(old >> 4)) {
                     changed = true;
                 }
             }

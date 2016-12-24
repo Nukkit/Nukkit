@@ -3,7 +3,6 @@ package cn.nukkit.command.defaults;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
-import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Level;
 
@@ -16,7 +15,7 @@ public class SaveCommand extends VanillaCommand {
     public SaveCommand(String name) {
         super(name, "%nukkit.command.save.description", "%commands.save.usage");
         this.setPermission("nukkit.command.save.perform");
-        this.commandParameters = new CommandParameter[0];
+        this.commandParameters.clear();
     }
 
     @Override

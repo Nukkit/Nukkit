@@ -12,8 +12,8 @@ public abstract class Particle extends Vector3 {
     public static final int TYPE_CRITICAL = 2;
     public static final int TYPE_BLOCK_FORCE_FIELD = 3;
     public static final int TYPE_SMOKE = 4;
-    public static final int TYPE_EXPLODE = 5; //actually steam
-    public static final int TYPE_WHITE_SMOKE = 6; //also steam, maybe bigger?
+    public static final int TYPE_EXPLODE = 5;
+    public static final int TYPE_EVAPORATION = 6;
     public static final int TYPE_FLAME = 7;
     public static final int TYPE_LAVA = 8;
     public static final int TYPE_LARGE_SMOKE = 9;
@@ -22,7 +22,6 @@ public abstract class Particle extends Vector3 {
     public static final int TYPE_ITEM_BREAK = 12;
     public static final int TYPE_SNOWBALL_POOF = 13;
     public static final int TYPE_HUGE_EXPLODE = 14;
-    public static final int TYPE_LARGE_EXPLODE = 14;
     public static final int TYPE_HUGE_EXPLODE_SEED = 15;
     public static final int TYPE_MOB_FLAME = 16;
     public static final int TYPE_HEART = 17;
@@ -45,8 +44,11 @@ public abstract class Particle extends Vector3 {
     public static final int TYPE_ENCHANTMENT_TABLE = 34;
     public static final int TYPE_TRACKING_EMITTER = 35;
     public static final int TYPE_NOTE = 36;
-    public static final int TYPE_WITCH_MAGIC = 37;
+    public static final int TYPE_WITCH_SPELL = 37;
     public static final int TYPE_CARROT = 38;
+    //39 unknown
+    public static final int TYPE_END_ROD = 40;
+    public static final int TYPE_DRAGONS_BREATH = 41;
 
     public Particle() {
         super(0, 0, 0);

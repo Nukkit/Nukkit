@@ -1,6 +1,5 @@
 package cn.nukkit.command.defaults;
 
-
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
@@ -11,7 +10,6 @@ import cn.nukkit.level.Location;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.utils.TextFormat;
 
-
 /**
  * Created on 2015/11/12 by Pub4Game and milkice.
  * Package cn.nukkit.command.defaults in project Nukkit .
@@ -20,9 +18,21 @@ public class TeleportCommand extends VanillaCommand {
     public TeleportCommand(String name) {
         super(name, "%nukkit.command.tp.description", "%commands.tp.usage");
         this.setPermission("nukkit.command.teleport");
-        this.commandParameters = new CommandParameter[]{
-                new CommandParameter("args ...", false)
-        };
+        this.commandParameters.clear();
+        this.commandParameters.put("->Player", new CommandParameter[]{
+                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
+        });
+        this.commandParameters.put("Player->Player", new CommandParameter[]{
+                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
+                new CommandParameter("target", CommandParameter.ARG_TYPE_TARGET, false),
+        });
+        this.commandParameters.put("Player->Pos", new CommandParameter[]{
+                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
+                new CommandParameter("pos", CommandParameter.ARG_TYPE_BLOCK_POS, false),
+        });
+        this.commandParameters.put("->Pos", new CommandParameter[]{
+                new CommandParameter("pos", CommandParameter.ARG_TYPE_BLOCK_POS, false),
+        });
     }
 
     @Override
@@ -92,7 +102,7 @@ public class TeleportCommand extends VanillaCommand {
                 return true;
             }
             if (y < 0) y = 0;
-            if (y > 128) y = 128;
+            if (y > 256) y = 256;
             if (args.length == 6 || (args.length == 5 && pos == 3)) {
                 yaw = Integer.parseInt(args[pos++]);
                 pitch = Integer.parseInt(args[pos++]);
