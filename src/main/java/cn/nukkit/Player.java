@@ -239,7 +239,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public boolean isBanned() {
-        return this.server.getNameBans().isBanned(this.getName().toLowerCase());
+        return this.server.getNameBans().isBanned(this.getName());
     }
 
     @Override
@@ -1658,7 +1658,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, "Server is white-listed");
 
             return;
-        } else if (this.server.getNameBans().isBanned(this.getName().toLowerCase())) {
+        } else if (this.isBanned()) {
             this.kick(PlayerKickEvent.Reason.NAME_BANNED, "You are banned");
             return;
         } else if (this.server.getIPBans().isBanned(this.getAddress())) {
