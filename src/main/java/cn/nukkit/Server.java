@@ -49,10 +49,7 @@ import cn.nukkit.network.CompressBatchedTask;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
-import cn.nukkit.network.protocol.BatchPacket;
-import cn.nukkit.network.protocol.CraftingDataPacket;
-import cn.nukkit.network.protocol.DataPacket;
-import cn.nukkit.network.protocol.PlayerListPacket;
+import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.query.QueryHandler;
 import cn.nukkit.network.rcon.RCON;
 import cn.nukkit.permission.BanEntry;
@@ -354,7 +351,7 @@ public class Server {
         this.network = new Network(this);
         this.network.setName(this.getMotd());
 
-        this.logger.info(this.getLanguage().translateString("nukkit.server.info", new String[]{this.getName(), TextFormat.YELLOW + this.getNukkitVersion() + TextFormat.WHITE, TextFormat.AQUA + this.getCodename() + TextFormat.WHITE, this.getApiVersion()}));
+        this.logger.info(this.getLanguage().translateString("nukkit.server.info", this.getName(), TextFormat.YELLOW + this.getNukkitVersion() + TextFormat.WHITE, TextFormat.AQUA + this.getCodename() + TextFormat.WHITE, this.getApiVersion()));
         this.logger.info(this.getLanguage().translateString("nukkit.server.license", this.getName()));
 
 
@@ -1114,7 +1111,7 @@ public class Server {
     }
 
     public String getVersion() {
-        return Nukkit.MINECRAFT_VERSION;
+        return ProtocolInfo.MINECRAFT_VERSION;
     }
 
     public String getApiVersion() {
@@ -1605,10 +1602,9 @@ public class Server {
         }
 
         if (provider == null) {
-            String providerName;
             if ((provider = LevelProviderManager.getProviderByName
-                    (providerName = (String) this.getConfig("level-settings.default-format", "mcregion"))) == null) {
-                provider = LevelProviderManager.getProviderByName(providerName = "mcregion");
+                    ((String) this.getConfig("level-settings.default-format", "anvil"))) == null) {
+                provider = LevelProviderManager.getProviderByName("anvil");
             }
         }
 
@@ -1910,6 +1906,7 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.BREWING_STAND, BlockEntityBrewingStand.class);
         BlockEntity.registerBlockEntity(BlockEntity.ITEM_FRAME, BlockEntityItemFrame.class);
         BlockEntity.registerBlockEntity(BlockEntity.CAULDRON, BlockEntityCauldron.class);
+        BlockEntity.registerBlockEntity(BlockEntity.ENDER_CHEST, BlockEntityEnderChest.class);
         BlockEntity.registerBlockEntity(BlockEntity.BEACON, BlockEntityBeacon.class);
     }
 
