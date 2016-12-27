@@ -25,17 +25,12 @@ public class EntityEnderman extends EntityCreature {
 
  @Override
  public float getWidth(){
-     return ?.?f;
+     return 0.72f;
  }
 
  @Override
  public float getLenght(){
-     return ?.?f;
- }
-
- @Override
- public float getHeight(){
-     return ?.?f;
+     return 2.8f;
  }
 
  @Override
