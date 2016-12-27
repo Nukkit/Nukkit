@@ -35,7 +35,7 @@ public class EntityEnderman extends EntityCreature {
 
  @Override
  public String getName(){
-     return this.getName Tag();
+     return this.getNameTag();
  }
 
  @Override
