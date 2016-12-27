@@ -10,12 +10,12 @@ import cn.nukkit.nbt.tag.CompoundTag;
  * Todo: Width,Lenght,Height
  */
         
-public class EntityEnderman extends EntityCreature{
+public class EntityEnderman extends EntityCreature {
     
  public static final int NETWORK_ID = 38;
     
- public EntityEnderman(FullChunk chunk,CompoundTag nbt){
-    super(chunk,nbt)
+ public EntityEnderman(FullChunk chunk, CompoundTag nbt) {
+      super(chunk, nbt);
 }
     
  @Override
