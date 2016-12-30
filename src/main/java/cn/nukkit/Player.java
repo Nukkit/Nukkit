@@ -20,10 +20,7 @@ import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.*;
-import cn.nukkit.entity.projectile.EntityArrow;
-import cn.nukkit.entity.projectile.EntityEgg;
-import cn.nukkit.entity.projectile.EntityProjectile;
-import cn.nukkit.entity.projectile.EntitySnowball;
+import cn.nukkit.entity.projectile.*;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.block.SignChangeEvent;
 import cn.nukkit.event.entity.*;
@@ -206,6 +203,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean enableClientCommand = true;
 
     private BlockEnderChest viewingEnderChest = null;
+    
+    protected int lastEnderPearl = -1;
 
     public BlockEnderChest getViewingEnderChest() {
         return viewingEnderChest;
@@ -2183,9 +2182,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             .add(new DoubleTag("", y + this.getEyeHeight()))
                                             .add(new DoubleTag("", z)))
                                     .putList(new ListTag<DoubleTag>("Motion")
-                                       /* .add(new DoubleTag("", aimPos.x))
-                                        .add(new DoubleTag("", aimPos.y))
-                                        .add(new DoubleTag("", aimPos.z)))*/
                                             .add(new DoubleTag("", -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)))
                                             .add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
                                             .add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
@@ -2220,9 +2216,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             .add(new DoubleTag("", y + this.getEyeHeight()))
                                             .add(new DoubleTag("", z)))
                                     .putList(new ListTag<DoubleTag>("Motion")
-                                       /* .add(new DoubleTag("", aimPos.x))
-                                        .add(new DoubleTag("", aimPos.y))
-                                        .add(new DoubleTag("", aimPos.z)))*/
                                             .add(new DoubleTag("", -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)))
                                             .add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
                                             .add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
@@ -2250,6 +2243,41 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             } else {
                                 egg.spawnToAll();
                             }
+                        } else if (item.getId() == Item.ENDER_PEARL && (this.server.getTick() - this.lastEnderPearl) >= 20) {
+                            CompoundTag nbt = new CompoundTag()
+                                    .putList(new ListTag<DoubleTag>("Pos")
+                                            .add(new DoubleTag("", x))
+                                            .add(new DoubleTag("", y + this.getEyeHeight()))
+                                            .add(new DoubleTag("", z)))
+                                    .putList(new ListTag<DoubleTag>("Motion")
+                                            .add(new DoubleTag("", -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)))
+                                            .add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
+                                            .add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
+                                    .putList(new ListTag<FloatTag>("Rotation")
+                                            .add(new FloatTag("", (float) yaw))
+                                            .add(new FloatTag("", (float) pitch)));
+
+                            float f = 1.5f;
+                            EntityEnderPearl enderPearl = new EntityEnderPearl(this.chunk, nbt, this);
+
+                            enderPearl.setMotion(enderPearl.getMotion().multiply(f));
+                            if (this.isSurvival()) {
+                                item.setCount(item.getCount() - 1);
+                                this.inventory.setItemInHand(item.getCount() > 0 ? item : Item.get(Item.AIR));
+                            }
+                            if (enderPearl instanceof EntityProjectile) {
+                                ProjectileLaunchEvent projectileLaunchEvent = new ProjectileLaunchEvent(enderPearl);
+                                this.server.getPluginManager().callEvent(projectileLaunchEvent);
+                                if (projectileLaunchEvent.isCancelled()) {
+                                    enderPearl.kill();
+                                } else {
+                                    enderPearl.spawnToAll();
+                                    this.level.addSound(new LaunchSound(this), this.getViewers().values());
+                                }
+                            } else {
+                                enderPearl.spawnToAll();
+                            }
+                            this.lastEnderPearl = this.server.getTick();
                         } else if (item.getId() == Item.EXPERIENCE_BOTTLE) {
                             CompoundTag nbt = new CompoundTag()
                                     .putList(new ListTag<DoubleTag>("Pos")
