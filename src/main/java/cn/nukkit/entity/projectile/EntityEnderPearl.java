@@ -57,7 +57,13 @@ public class EntityEnderPearl extends EntityProjectile {
 
         boolean hasUpdate = super.onUpdate(currentTick);
 
-        if (this.age > 1200 || this.isCollided) {
+        if (this.onGround) {
+            shootingEntity.teleport(this);
+            this.kill();
+            hasUpdate = true;
+        }
+
+        if (this.age > 1200) {
             this.kill();
             hasUpdate = true;
         }
