@@ -3,7 +3,6 @@ package cn.nukkit.entity.projectile;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.sound.EndermanTeleportSound;
 import cn.nukkit.nbt.tag.CompoundTag;
