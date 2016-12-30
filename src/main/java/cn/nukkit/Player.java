@@ -203,6 +203,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean enableClientCommand = true;
 
     private BlockEnderChest viewingEnderChest = null;
+    
+    protected int lastEnderPearl = -1;
 
     public BlockEnderChest getViewingEnderChest() {
         return viewingEnderChest;
@@ -2241,7 +2243,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             } else {
                                 egg.spawnToAll();
                             }
-                        } else if (item.getId() == Item.ENDER_PEARL) {
+                        } else if (item.getId() == Item.ENDER_PEARL && (this.server.getTick() - this.lastEnderPearl) >= 20) {
                             CompoundTag nbt = new CompoundTag()
                                     .putList(new ListTag<DoubleTag>("Pos")
                                             .add(new DoubleTag("", x))
@@ -2275,6 +2277,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             } else {
                                 enderPearl.spawnToAll();
                             }
+                            this.lastEnderPearl = this.server.getTick();
                         } else if (item.getId() == Item.EXPERIENCE_BOTTLE) {
                             CompoundTag nbt = new CompoundTag()
                                     .putList(new ListTag<DoubleTag>("Pos")
