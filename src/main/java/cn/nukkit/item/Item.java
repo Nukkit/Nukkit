@@ -1,7 +1,10 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.*;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockAir;
+import cn.nukkit.block.BlockFence;
+import cn.nukkit.block.BlockFlower;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
 import cn.nukkit.item.enchantment.Enchantment;
@@ -584,7 +587,7 @@ public class Item implements Cloneable {
     public boolean canBeActivated() {
         return false;
     }
-    
+
     public static void init() {
         if (list == null) {
             list = new Class[65535];
@@ -773,7 +776,7 @@ public class Item implements Cloneable {
             //TODO: list[SHULKER_SHELL] = ItemShulkerShell.class; //445
 
             list[BEETROOT] = ItemBeetroot.class; //457
-            list[BEETROOT_SEEDS] =ItemSeedsBeetroot.class; //458
+            list[BEETROOT_SEEDS] = ItemSeedsBeetroot.class; //458
             list[BEETROOT_SOUP] = ItemBeetrootSoup.class; //459
             list[RAW_SALMON] = ItemSalmon.class; //460
             list[CLOWNFISH] = ItemClownfish.class; //461

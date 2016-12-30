@@ -759,6 +759,7 @@ public class CraftingManager {
         this.registerRecipe(new FurnaceRecipe(Item.get(Item.STEAK, 0, 1), Item.get(Item.RAW_BEEF, null, 1)));
         this.registerRecipe(new FurnaceRecipe(Item.get(Item.COOKED_CHICKEN, 0, 1), Item.get(Item.RAW_CHICKEN, null, 1)));
         this.registerRecipe(new FurnaceRecipe(Item.get(Item.BAKED_POTATO, 0, 1), Item.get(Item.POTATO, null, 1)));
+        this.registerRecipe(new FurnaceRecipe(Item.get(Item.COOKED_MUTTON, 0, 1), Item.get(Item.RAW_MUTTON, null, 1)));
 
         this.registerRecipe(new FurnaceRecipe(Item.get(Item.HARDENED_CLAY, 0, 1), Item.get(Item.CLAY_BLOCK, null, 1)));
     }
