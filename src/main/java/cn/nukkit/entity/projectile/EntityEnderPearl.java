@@ -3,6 +3,7 @@ package cn.nukkit.entity.projectile;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.sound.EndermanTeleportSound;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
@@ -57,8 +58,10 @@ public class EntityEnderPearl extends EntityProjectile {
 
         boolean hasUpdate = super.onUpdate(currentTick);
 
-        if (this.onGround) {
-            shootingEntity.teleport(this);
+        if (this.onGround && this.shootingEntity instanceof Player) {
+            this.shootingEntity.teleport(this);
+            this.shootingEntity.attack(5);
+            this.level.addSound(new EndermanTeleportSound(this));
             this.kill();
             hasUpdate = true;
         }
