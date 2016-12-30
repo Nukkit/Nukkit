@@ -15,7 +15,6 @@ import cn.nukkit.network.protocol.ContainerSetSlotPacket;
 import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 /**
