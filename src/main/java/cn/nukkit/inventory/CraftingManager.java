@@ -696,7 +696,6 @@ public class CraftingManager {
         )).setIngredient("N", Item.get(Item.STONE, 0, 1)));
 
 
-
         //all planks...
         this.registerRecipe((new BigShapedRecipe(Item.get(Item.WOODEN_BUTTON, 0, 1),
                 "   ",

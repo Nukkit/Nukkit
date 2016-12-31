@@ -650,10 +650,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendChunk(int x, int z, byte[] payload) {
-        this.sendChunk(x, z, payload, FullChunkDataPacket.ORDER_COLUMNS);
-    }
-
-    public void sendChunk(int x, int z, byte[] payload, byte ordering) {
         if (!this.connected) {
             return;
         }
@@ -664,7 +660,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         FullChunkDataPacket pk = new FullChunkDataPacket();
         pk.chunkX = x;
         pk.chunkZ = z;
-        pk.order = ordering;
         pk.data = payload;
 
         this.batchDataPacket(pk);
@@ -1970,6 +1965,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     MovePlayerPacket movePlayerPacket = (MovePlayerPacket) packet;
                     Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
 
+                    if (newPos.distanceSquared(this) < 0.01 && movePlayerPacket.yaw % 360 == this.yaw && movePlayerPacket.pitch % 360 == this.pitch) {
+                        break;
+                    }
+
                     boolean revert = false;
                     if (!this.isAlive() || !this.spawned) {
                         revert = true;
@@ -2338,6 +2337,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             Block block = target.getSide(((PlayerActionPacket) packet).face);
                             if (block.getId() == Block.FIRE) {
                                 this.level.setBlock(block, new BlockAir(), true);
+                                break;
                             }
                             this.lastBreak = System.currentTimeMillis();
                             break;
@@ -3202,7 +3202,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
                     }
 
-                    switch(recipe.getResult().getId()) {
+                    switch (recipe.getResult().getId()) {
                         case Item.WORKBENCH:
                             this.awardAchievement("buildWorkBench");
                             break;
@@ -4288,14 +4288,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
 
     public static BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, byte[] payload) {
-        return getChunkCacheFromData(chunkX, chunkZ, payload, FullChunkDataPacket.ORDER_COLUMNS);
-    }
-
-    public static BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, byte[] payload, byte ordering) {
         FullChunkDataPacket pk = new FullChunkDataPacket();
         pk.chunkX = chunkX;
         pk.chunkZ = chunkZ;
-        pk.order = ordering;
         pk.data = payload;
         pk.encode();
 
