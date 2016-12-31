@@ -168,8 +168,8 @@ public class CraftingManager {
                 " B ",
                 "DOD",
                 "OOO"
-        )).setIngredient("D", Item.get(Item.DIAMOND, 0, 2)).setIngredient("O", Item.get(Item.OBSIDIAN, 0, 4)).setIngredient("B", Item.get(Item.BOOK, 0, 1)));
-
+        )).setIngredient("D", Item.get(Item.DIAMOND, 0, 1)).setIngredient("O", Item.get(Item.OBSIDIAN, 0, 1)).setIngredient("B", Item.get(Item.BOOK, 0, 1)));
+        
         this.registerRecipe((new BigShapedRecipe(Item.get(Item.FENCE, BlockPlanks.OAK, 3),
                 "PSP",
                 "PSP",
@@ -512,7 +512,7 @@ public class CraftingManager {
                 " N "
         )).setIngredient("N", Item.get(Item.SLAB, BlockSlabStone.SANDSTONE, 1)));
 
-        this.registerRecipe((new BigShapedRecipe(Item.get(Item.STONE_BRICK, BlockBricksStone.NORMAL, 1),
+        this.registerRecipe((new BigShapedRecipe(Item.get(Item.STONE_BRICK, BlockBricksStone.NORMAL, 4),
                 "   ",
                 "SS ",
                 "SS "
