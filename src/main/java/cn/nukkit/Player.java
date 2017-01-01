@@ -2718,6 +2718,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 break;
                             }
 
+                            for (Enchantment enchantment : item.getEnchantments()) {
+                                enchantment.doPostAttack(this, targetEntity);
+                            }
+
                             if (item.isTool() && this.isSurvival()) {
                                 if (item.useOn(targetEntity) && item.getDamage() >= item.getMaxDurability()) {
                                     this.inventory.setItemInHand(new ItemBlock(new BlockAir()));

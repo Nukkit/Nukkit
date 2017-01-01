@@ -1866,12 +1866,6 @@ public class Item implements Cloneable {
     }
 
     public boolean useOn(Entity entity) {
-        Enchantment fireAspect = getEnchantment(Enchantment.ID_FIRE_ASPECT);
-        if (fireAspect != null && fireAspect.getLevel() > 0) {
-            entity.setOnFire(4 * fireAspect.getLevel());
-            return true;
-        }
-
         return false;
     }
 
@@ -1944,6 +1938,10 @@ public class Item implements Cloneable {
     }
 
     public int getArmorPoints() {
+        return 0;
+    }
+
+    public int getToughness() {
         return 0;
     }
 

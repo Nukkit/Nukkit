@@ -188,7 +188,7 @@ public abstract class Entity extends Location implements Metadatable {
     public int deadTicks = 0;
     protected int age = 0;
 
-    protected int health = 20;
+    protected float health = 20;
     private int maxHealth = 20;
 
     protected float ySize = 0;
@@ -773,7 +773,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.heal(new EntityRegainHealthEvent(this, amount, EntityRegainHealthEvent.CAUSE_REGEN));
     }
 
-    public int getHealth() {
+    public float getHealth() {
         return health;
     }
 
@@ -782,17 +782,16 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setHealth(float health) {
-        int h = (int) health;
-        if (this.health == h) {
+        if (this.health == health) {
             return;
         }
 
-        if (h <= 0) {
+        if (health <= 0) {
             if (this.isAlive()) {
                 this.kill();
             }
-        } else if (h <= this.getMaxHealth() || h < this.health) {
-            this.health = h;
+        } else if (health <= this.getMaxHealth() || health < this.health) {
+            this.health = health;
         } else {
             this.health = this.getMaxHealth();
         }
