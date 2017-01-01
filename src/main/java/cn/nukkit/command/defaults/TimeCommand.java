@@ -96,9 +96,9 @@ public class TimeCommand extends VanillaCommand {
 
             int value;
             if ("day".equals(args[1])) {
-                value = Level.TIME_DAY;
+                value = 1000;
             } else if ("night".equals(args[1])) {
-                value = Level.TIME_NIGHT;
+                value = 13000;
             } else {
                 try {
                     value = Math.max(0, Integer.parseInt(args[1]));
