@@ -2620,26 +2620,37 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
                     this.craftingType = CRAFTING_SMALL;
-                    Entity targetEntity = this.level.getEntity(((InteractPacket) packet).target);
+
+                    InteractPacket interactPacket = (InteractPacket) packet;
+
+                    Entity targetEntity = this.level.getEntity(interactPacket.target);
+
+                    if (targetEntity == null || !this.isAlive() || !targetEntity.isAlive()) {
+                        break;
+                    }
+
+                    if (targetEntity instanceof EntityItem || targetEntity instanceof EntityArrow || targetEntity instanceof EntityXPOrb) {
+                        this.kick(PlayerKickEvent.Reason.INVALID_PVE, "Attempting to attack an invalid entity");
+                        this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.getName()));
+                        break;
+                    }
+
                     boolean cancelled = false;
                     if (targetEntity instanceof Player && !((boolean) this.server.getConfig("pvp", true))) {
                         cancelled = true;
                     }
 
-                    if (((InteractPacket) packet).action == InteractPacket.ACTION_MOUSEOVER) {
-                        this.getServer().getPluginManager().callEvent(new PlayerMouseOverEntityEvent(this, targetEntity));
-                    } else {
-                        if (targetEntity != null && this.isAlive() && targetEntity.isAlive()) {
+                    item = this.inventory.getItemInHand();
+
+                    switch (interactPacket.action) {
+                        case InteractPacket.ACTION_MOUSEOVER:
+                            this.getServer().getPluginManager().callEvent(new PlayerMouseOverEntityEvent(this, targetEntity));
+                            break;
+                        case InteractPacket.ACTION_LEFT_CLICK:
                             if (this.getGamemode() == Player.VIEW) {
                                 cancelled = true;
                             }
-                            if (targetEntity instanceof EntityItem || targetEntity instanceof EntityArrow) {
-                                this.kick(PlayerKickEvent.Reason.INVALID_PVE, "Attempting to attack an invalid entity");
-                                this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.getName()));
-                                break;
-                            }
 
-                            item = this.inventory.getItemInHand();
                             float itemDamage = item.getAttackDamage();
 
                             for (Enchantment enchantment : item.getEnchantments()) {
@@ -2656,51 +2667,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     break;
                                 } else if (!this.server.getPropertyBoolean("pvp") || this.server.getDifficulty() == 0) {
                                     cancelled = true;
-                                }
-                            } else if (targetEntity instanceof EntityVehicle) {
-                                SetEntityLinkPacket pk;
-                                switch (((InteractPacket) packet).action) {
-                                    case InteractPacket.ACTION_RIGHT_CLICK:
-                                        cancelled = true;
-
-                                        if (((EntityVehicle) targetEntity).linkedEntity != null) {
-                                            break;
-                                        }
-                                        pk = new SetEntityLinkPacket();
-                                        pk.rider = targetEntity.getId();
-                                        pk.riding = this.id;
-                                        pk.type = 2;
-                                        Server.broadcastPacket(this.hasSpawned.values(), pk);
-
-                                        pk = new SetEntityLinkPacket();
-                                        pk.rider = targetEntity.getId();
-                                        pk.riding = 0;
-                                        pk.type = 2;
-                                        dataPacket(pk);
-
-                                        riding = targetEntity;
-                                        ((EntityVehicle) targetEntity).linkedEntity = this;
-
-                                        this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
-                                        break;
-                                    case InteractPacket.ACTION_VEHICLE_EXIT:
-                                        pk = new SetEntityLinkPacket();
-                                        pk.rider = targetEntity.getId();
-                                        pk.riding = this.id;
-                                        pk.type = 3;
-                                        Server.broadcastPacket(this.hasSpawned.values(), pk);
-
-                                        pk = new SetEntityLinkPacket();
-                                        pk.rider = targetEntity.getId();
-                                        pk.riding = 0;
-                                        pk.type = 3;
-                                        dataPacket(pk);
-
-                                        cancelled = true;
-                                        riding = null;
-                                        ((EntityVehicle) targetEntity).linkedEntity = null;
-                                        this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
-                                        break;
                                 }
                             }
 
@@ -2729,9 +2695,42 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     this.inventory.setItemInHand(item);
                                 }
                             }
-                        }
-                    }
 
+                            break;
+                        case InteractPacket.ACTION_RIGHT_CLICK:
+                            PlayerInteractEntityEvent playerInteractEntityEvent = new PlayerInteractEntityEvent(this, targetEntity, item);
+                            getServer().getPluginManager().callEvent(playerInteractEntityEvent);
+
+                            if (playerInteractEntityEvent.isCancelled()) {
+                                break;
+                            }
+
+                            targetEntity.onInteract(this, item);
+                            break;
+                        case InteractPacket.ACTION_VEHICLE_EXIT:
+                            if (!(targetEntity instanceof EntityVehicle)) {
+                                break;
+                            }
+
+                            SetEntityLinkPacket pk;
+
+                            pk = new SetEntityLinkPacket();
+                            pk.rider = targetEntity.getId();
+                            pk.riding = this.id;
+                            pk.type = 3;
+                            Server.broadcastPacket(this.hasSpawned.values(), pk);
+
+                            pk = new SetEntityLinkPacket();
+                            pk.rider = targetEntity.getId();
+                            pk.riding = 0;
+                            pk.type = 3;
+                            dataPacket(pk);
+
+                            riding = null;
+                            ((EntityVehicle) targetEntity).linkedEntity = null;
+                            this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
+                            break;
+                    }
                     break;
                 case ProtocolInfo.ANIMATE_PACKET:
                     if (!this.spawned || !this.isAlive()) {

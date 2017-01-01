@@ -152,7 +152,7 @@ public abstract class Entity extends Location implements Metadatable {
             .putLong(DATA_LEAD_HOLDER_EID, -1)
             .putFloat(DATA_SCALE, 1f);
 
-    public Entity rider = null;
+    public Entity linkedEntity = null;
 
     public Entity riding = null;
 
@@ -457,6 +457,14 @@ public abstract class Entity extends Location implements Metadatable {
 
     public float getScale() {
         return this.scale;
+    }
+
+    public Entity getLinkedEntity() {
+        return linkedEntity;
+    }
+
+    public void setLinkedEntity(Entity entity) {
+        linkedEntity = entity;
     }
 
     public Map<Integer, Effect> getEffects() {
@@ -1164,6 +1172,10 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void onCollideWithPlayer(EntityHuman entityPlayer) {
 
+    }
+
+    public boolean onInteract(Entity entity, Item item) {
+        return false;
     }
 
     protected boolean switchLevel(Level targetLevel) {
