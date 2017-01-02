@@ -31,6 +31,8 @@ public interface LevelProvider {
 
     void saveChunk(int X, int Z);
 
+    void saveChunk(int X, int Z, FullChunk chunk);
+
     void unloadChunks();
 
     boolean loadChunk(int X, int Z);

@@ -330,6 +330,14 @@ public class LevelDB implements LevelProvider {
     }
 
     @Override
+    public void saveChunk(int X, int Z, FullChunk chunk) {
+        if (!(chunk instanceof Chunk)) {
+            throw new ChunkException("Invalid Chunk class");
+        }
+        this.writeChunk((Chunk) chunk);
+    }
+
+    @Override
     public Chunk getChunk(int chunkX, int chunkZ) {
         return this.getChunk(chunkX, chunkZ, false);
     }

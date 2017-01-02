@@ -525,4 +525,8 @@ public class Chunk extends BaseFullChunk {
             throw new RuntimeException(e);
         }
     }
+
+    public cn.nukkit.level.format.anvil.Chunk toAnvil(LevelProvider provider) {
+        return cn.nukkit.level.format.anvil.Chunk.fromMcRegion(this, provider);
+    }
 }

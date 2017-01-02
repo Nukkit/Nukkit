@@ -101,17 +101,17 @@ public class Chunk extends BaseChunk {
             this.nbt.putIntArray("HeightMap", new int[256]);
         }
 
-        cn.nukkit.level.format.ChunkSection[] sections = new cn.nukkit.level.format.ChunkSection[8];
+        cn.nukkit.level.format.ChunkSection[] sections = new cn.nukkit.level.format.ChunkSection[16];
         for (Tag section : this.nbt.getList("Sections").getAll()) {
             if (section instanceof CompoundTag) {
                 int y = ((CompoundTag) section).getByte("Y");
-                if (y < 8) {
+                if (y < 16) {
                     sections[y] = new ChunkSection((CompoundTag) section);
                 }
             }
         }
 
-        for (int y = 0; y < 8; y++) {
+        for (int y = 0; y < 16; y++) {
             if (sections[y] == null) {
                 sections[y] = new EmptyChunkSection(y);
             }
@@ -153,7 +153,7 @@ public class Chunk extends BaseChunk {
         int[] heightMap = this.nbt.getIntArray("HeightMap");
         if (heightMap.length != 256) {
             heightMap = new int[256];
-            Arrays.fill(heightMap, 127);
+            Arrays.fill(heightMap, 255);
         }
         this.heightMap = heightMap;
 
@@ -264,7 +264,7 @@ public class Chunk extends BaseChunk {
                 continue;
             }
             CompoundTag s = new CompoundTag(null);
-            s.putByte("Y", (section.getY() & 0xff));
+            s.putByte("Y", section.getY());
             s.putByteArray("Blocks", section.getIdArray());
             s.putByteArray("Data", section.getDataArray());
             s.putByteArray("BlockLight", section.getLightArray());
@@ -394,8 +394,8 @@ public class Chunk extends BaseChunk {
             chunk.x = chunkX;
             chunk.z = chunkZ;
 
-            chunk.sections = new cn.nukkit.level.format.ChunkSection[8];
-            for (int y = 0; y < 8; ++y) {
+            chunk.sections = new cn.nukkit.level.format.ChunkSection[16];
+            for (int y = 0; y < 16; ++y) {
                 chunk.sections[y] = new EmptyChunkSection(y);
             }
 
@@ -412,5 +412,32 @@ public class Chunk extends BaseChunk {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static Chunk fromMcRegion(cn.nukkit.level.format.mcregion.Chunk old, LevelProvider provider) {
+        Chunk chunk = Chunk.getEmptyChunk(old.getX(), old.getZ(), provider);
+        for (int Y = 0; Y < 8; Y++) {
+            ChunkSection section = new ChunkSection(Y);
+            for (int x = 0; x < 16; x++) {
+                for (int y = 0; y < 16; y++) {
+                    for (int z = 0; z < 16; z++) {
+                        section.setBlockId(x, y, z, old.getBlockId(x, Y << 4 | y, z));
+                        section.setBlockData(x, y, z, old.getBlockData(x, Y << 4 | y, z));
+                        section.setBlockLight(x, y, z, old.getBlockLight(x, Y << 4 | y, z));
+                        section.setBlockSkyLight(x, y, z, old.getBlockSkyLight(x, Y << 4 | y, z));
+                    }
+                }
+            }
+            chunk.sections[Y] = section;
+        }
+        System.arraycopy(old.getBiomeColorArray(), 0, chunk.biomeColors, 0, 256);
+        System.arraycopy(old.getHeightMapArray(), 0, chunk.heightMap, 0, 256);
+        chunk.NBTentities = old.getNBT().getList("Entities", CompoundTag.class).getAll();
+        chunk.NBTtiles = old.getNBT().getList("TileEntities", CompoundTag.class).getAll();
+        chunk.extraData.putAll(old.getBlockExtraDataArray());
+        chunk.setGenerated();
+        chunk.setPopulated();
+        chunk.initChunk();
+        return chunk;
     }
 }

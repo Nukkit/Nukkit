@@ -153,7 +153,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public byte[] getBlockIdColumn(int x, int z) {
-        ByteBuffer buffer = ByteBuffer.allocate(128);
+        ByteBuffer buffer = ByteBuffer.allocate(256);
         for (int y = 0; y < SECTION_COUNT; y++) {
             buffer.put(this.sections[y].getBlockIdColumn(x, z));
         }
