@@ -650,10 +650,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendChunk(int x, int z, byte[] payload) {
-        this.sendChunk(x, z, payload, FullChunkDataPacket.ORDER_COLUMNS);
-    }
-
-    public void sendChunk(int x, int z, byte[] payload, byte ordering) {
         if (!this.connected) {
             return;
         }
@@ -664,7 +660,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         FullChunkDataPacket pk = new FullChunkDataPacket();
         pk.chunkX = x;
         pk.chunkZ = z;
-        pk.order = ordering;
         pk.data = payload;
 
         this.batchDataPacket(pk);
@@ -4288,14 +4283,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
 
     public static BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, byte[] payload) {
-        return getChunkCacheFromData(chunkX, chunkZ, payload, FullChunkDataPacket.ORDER_COLUMNS);
-    }
-
-    public static BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, byte[] payload, byte ordering) {
         FullChunkDataPacket pk = new FullChunkDataPacket();
         pk.chunkX = chunkX;
         pk.chunkZ = chunkZ;
-        pk.order = ordering;
         pk.data = payload;
         pk.encode();
 
