@@ -112,7 +112,7 @@ public class Anvil extends BaseLevelProvider {
 
     @Override
     public AsyncTask requestChunkTask(int x, int z) throws ChunkException {
-        FullChunk chunk = this.getChunk(x, z, false);
+        Chunk chunk = this.getChunk(x, z, false);
         if (chunk == null) {
             throw new ChunkException("Invalid Chunk Set");
         }
@@ -149,16 +149,24 @@ public class Anvil extends BaseLevelProvider {
         }
 
         BinaryStream stream = new BinaryStream();
-        stream.put(chunk.getBlockIdArray());
-        stream.put(chunk.getBlockDataArray());
-        stream.put(chunk.getBlockSkyLightArray());
-        stream.put(chunk.getBlockLightArray());
+        int topEmpty = 0;
+        cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
+        for (int ci = 15; ci > 0; ci--) {
+            if (sections[ci].isAllAir()) {
+                topEmpty = ci + 1;
+            } else {
+                break;
+            }
+        }
+        stream.putByte((byte) topEmpty);
+        for (int ci = 0; ci < topEmpty; ci++) {
+            stream.putByte((byte) 0);
+            stream.put(sections[ci].getBytes());
+        }
         for (int height : chunk.getHeightMapArray()) {
             stream.putByte((byte) (height & 0xff));
         }
-        for (int color : chunk.getBiomeColorArray()) {
-            stream.put(Binary.writeInt(color));
-        }
+        stream.put(chunk.getBiomeIdArray());
         if (extraData != null) {
             stream.put(extraData.getBuffer());
         } else {
@@ -166,7 +174,7 @@ public class Anvil extends BaseLevelProvider {
         }
         stream.put(blockEntities);
 
-        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer(), FullChunkDataPacket.ORDER_LAYERED);
+        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer());
 
         return null;
     }
@@ -329,11 +337,11 @@ public class Anvil extends BaseLevelProvider {
         CompoundTag nbt = new CompoundTag();
         nbt.putByte("Y", Y);
         nbt.putByteArray("Blocks", new byte[4096]);
-        nbt.putByteArray("Data", new byte[2048]);
-        byte[] sl = new byte[2048];
+        nbt.putByteArray("Data", new byte[4096]);
+        byte[] sl = new byte[4096];
         Arrays.fill(sl, (byte) 0xff);
         nbt.putByteArray("SkyLight", sl);
-        nbt.putByteArray("BlockLight", new byte[2048]);
+        nbt.putByteArray("BlockLight", new byte[4096]);
         return new ChunkSection(nbt);
     }
 
