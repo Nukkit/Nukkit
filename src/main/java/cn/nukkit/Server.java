@@ -848,7 +848,10 @@ public class Server {
     }
 
     public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, Collection<Player> players) {
-        this.updatePlayerListData(uuid, entityId, name, skin, players.stream().toArray(Player[]::new));
+        this.updatePlayerListData(uuid, entityId, name, skin,
+                players.stream()
+                .filter(p -> p.getId() != entityId)
+                .toArray(Player[]::new));
     }
 
     public void removePlayerListData(UUID uuid) {
@@ -869,16 +872,16 @@ public class Server {
     public void sendFullPlayerListData(Player player) {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
-        List<PlayerListPacket.Entry> entries = new ArrayList<>();
-        for (Player p : this.playerList.values()) {
-            if (p != player) entries.add(
-                    new PlayerListPacket.Entry(
-                            p.getUniqueId(),
-                            p.getId(),
-                            p.getDisplayName(),
-                            p.getSkin()));
-        }
-        pk.entries = entries.stream().toArray(PlayerListPacket.Entry[]::new);
+        pk.entries = this.playerList.values()
+                .stream()
+                .filter(p -> p.getId() != player.getId())
+                .map(p -> new PlayerListPacket.Entry(
+                        p.getUniqueId(),
+                        p.getId(),
+                        p.getDisplayName(),
+                        p.getSkin()))
+                .toArray(PlayerListPacket.Entry[]::new);
+
         player.dataPacket(pk);
     }
 
