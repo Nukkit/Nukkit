@@ -15,7 +15,10 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.math.*;
+import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.NukkitMath;
+import cn.nukkit.math.Vector2;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -82,11 +85,13 @@ public abstract class Entity extends Location implements Metadatable {
      * 49 (long)
      * 50 (long)
      * 51 (long)
-     * 52 (short) */
-    public static final int DATA_BOUNDING_BOX_WIDTH = 53; //float
-    public static final int DATA_BOUNDING_BOX_HEIGHT = 54; //float
-	/* 56 (vector3f)
-	 * 57 (byte)
+     * 52 (short)
+     * 53 (unknown) */
+    public static final int DATA_BOUNDING_BOX_WIDTH = 54; //float
+    public static final int DATA_BOUNDING_BOX_HEIGHT = 55; //float
+    public static final int DATA_FUSE_LENGTH = 56; //int
+    /* 56 (vector3f)
+     * 57 (byte)
 	 * 58 (float)
 	 * 59 (float) */
 
@@ -117,12 +122,13 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_TAMED = 24;
     public static final int DATA_FLAG_LEASHED = 25;
     public static final int DATA_FLAG_SHEARED = 26; //for sheep
-    public static final int DATA_FLAG_FALL_FLYING = 27; //???
+    public static final int DATA_FLAG_GLIDING = 27, DATA_FLAG_FALL_FLYING = 27;
     public static final int DATA_FLAG_ELDER = 28; //elder guardian
     public static final int DATA_FLAG_MOVING = 29;
     public static final int DATA_FLAG_BREATHING = 30; //hides bubbles if true
     public static final int DATA_FLAG_CHESTED = 31; //for mules?
-    public static final int DATA_FLAG_STACKABLE = 32; //???
+    public static final int DATA_FLAG_STACKABLE = 32;
+    public static final int DATA_FLAG_IDLING = 36;
 
     public static final int DATA_LEAD_HOLDER = 23;
     public static final int DATA_LEAD = 24;
@@ -194,7 +200,7 @@ public abstract class Entity extends Location implements Metadatable {
     public int maxFireTicks;
     public int fireTicks = 0;
     public int inPortalTicks = 0;
-	
+
     public float scale = 1;
 
     public CompoundTag namedTag;
@@ -349,8 +355,8 @@ public abstract class Entity extends Location implements Metadatable {
             this.namedTag.putBoolean("Invulnerable", false);
         }
         this.invulnerable = this.namedTag.getBoolean("Invulnerable");
-	    
-	if (!this.namedTag.contains("Scale")) {
+
+        if (!this.namedTag.contains("Scale")) {
             this.namedTag.putFloat("Scale", 1);
         }
         this.scale = this.namedTag.getFloat("Scale");
@@ -438,7 +444,7 @@ public abstract class Entity extends Location implements Metadatable {
     public void setImmobile(boolean value) {
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_IMMOBILE, value);
     }
-	
+
     public void setScale(float scale) {
         this.scale = scale;
         this.setDataProperty(new FloatEntityData(DATA_SCALE, this.scale));
@@ -637,7 +643,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.namedTag.putShort("Air", this.getDataPropertyShort(DATA_AIR));
         this.namedTag.putBoolean("OnGround", this.onGround);
         this.namedTag.putBoolean("Invulnerable", this.invulnerable);
-	this.namedTag.putFloat("Scale", this.scale);
+        this.namedTag.putFloat("Scale", this.scale);
 
         if (!this.effects.isEmpty()) {
             ListTag<CompoundTag> list = new ListTag<>("ActiveEffects");
