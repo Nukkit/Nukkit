@@ -2696,10 +2696,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         pk.type = 3;
                                         dataPacket(pk);
 
-                                        cancelled = true;
-                                        riding = null;
-                                        ((EntityVehicle) targetEntity).linkedEntity = null;
-                                        this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
+                                        VehicleExitEvent vehicleExit = new VehicleExitEvent(this, (EntityVehicle) targetEntity);
+                                        this.server.getPluginManager().callEvent(vehicleExit);
+                                        
+                                        cancelled = vehicleExit.isCancelled();
+                                        
+                                        if(!cancelled) {
+                                        	riding = null;
+                                        	((EntityVehicle) targetEntity).linkedEntity = null;
+                                        	this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
+                                        }
+                                        
+                                        
                                         break;
                                 }
                             }
