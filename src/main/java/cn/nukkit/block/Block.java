@@ -457,7 +457,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[EMERALD_ORE] = BlockOreEmerald.class; //129
             list[ENDER_CHEST] = BlockEnderChest.class; //130
             //TODO: list[TRIPWIRE_HOOK] = BlockTripwireHook.class; //131
-            //TODO: list[TRIPWIRE] = BlockTripwire.class; //132
+            list[TRIPWIRE] = BlockTripWire.class; //132
             list[EMERALD_BLOCK] = BlockEmerald.class; //133
             list[SPRUCE_WOOD_STAIRS] = BlockStairsSpruce.class; //134
             list[BIRCH_WOOD_STAIRS] = BlockStairsBirch.class; //135
