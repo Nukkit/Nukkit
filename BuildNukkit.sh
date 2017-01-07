@@ -4,4 +4,4 @@ echo
 echo
 echo Nukkit Has been built into a jar file!
 echo
-echo Find it in the targets folder!
+echo Find it in the target folder!
