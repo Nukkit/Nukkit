@@ -56,7 +56,7 @@ Build JAR file
 - `mvn clean`
 - `mvn package`
 
-*Please notice that the source code cloned from this project does not include the language files. Add the [language files](https://github.com/Nukkit/Languages.git) to the project path(/src/main/resources/lang) before the compiling to prevent [crashes](https://github.com/Nukkit/Nukkit/issues/1344). *
+*Please notice that the source code cloned from this project does not include the language files. Add the [language files](https://github.com/Nukkit/Languages.git) to the project path(/src/main/resources/lang) before the compiling to prevent [crashes](https://github.com/Nukkit/Nukkit/issues/1344).*
 
 Running
 -------------
