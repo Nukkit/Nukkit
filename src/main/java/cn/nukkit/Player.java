@@ -2567,6 +2567,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.setSneaking(false);
                             }
                             break packetswitch;
+
+
+                        case PlayerActionPacket.ACTION_START_GLIDE:
+                            this.onStartGlidePlayerActionPacket();
+                            break packetswitch;
+
+                        case PlayerActionPacket.ACTION_STOP_GLIDE:
+                            this.onStopGlidePlayerActionPacket();
+                            break packetswitch;
                     }
 
                     this.startAction = -1;
@@ -3471,6 +3480,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
                     }
                     break;
+
                 default:
                     break;
             }
@@ -4419,5 +4429,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         Player other = (Player) obj;
         return Objects.equals(this.getUniqueId(), other.getUniqueId()) && this.getId() == other.getId();
+    }
+
+    private void onStartGlidePlayerActionPacket() {
+        PlayerToggleGlideEvent event = new PlayerToggleGlideEvent(this, true);
+        this.server.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            this.sendData(this);
+        } else {
+            this.setGliding(true);
+        }
+    }
+
+    private void onStopGlidePlayerActionPacket() {
+        PlayerToggleGlideEvent event = new PlayerToggleGlideEvent(this, false);
+        this.server.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            this.sendData(this);
+        } else {
+            this.setGliding(false);
+        }
     }
 }
