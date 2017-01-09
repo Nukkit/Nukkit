@@ -10,6 +10,7 @@ import cn.nukkit.item.Item;
  */
 public class PlayerInteractEntityEvent extends PlayerEvent implements Cancellable {
 
+    private static final HandlerList handlers = new HandlerList();
     protected final Entity entity;
     protected final Item item;
 
@@ -25,5 +26,9 @@ public class PlayerInteractEntityEvent extends PlayerEvent implements Cancellabl
 
     public Item getItem() {
         return this.item;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 }
