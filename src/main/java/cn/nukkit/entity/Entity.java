@@ -1631,7 +1631,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean setDataProperty(EntityData data) {
-        return setDataProperty(data, true);
+        return this.setDataProperty(data, true);
     }
 
     public boolean setDataProperty(EntityData data, boolean send) {
