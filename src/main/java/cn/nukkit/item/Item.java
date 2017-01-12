@@ -728,10 +728,10 @@ public class Item implements Cloneable {
     private static final ArrayList<Item> creative = new ArrayList<>();
 
     private static void initCreativeItems() {
-        clearCreativeItems();
+        //clearCreativeItems();
 
         //Building
-        addCreativeItem(Item.get(Item.COBBLESTONE, 0));
+        /*addCreativeItem(Item.get(Item.COBBLESTONE, 0));
         addCreativeItem(Item.get(Item.STONE_BRICKS, 0));
         addCreativeItem(Item.get(Item.STONE_BRICKS, 1));
         addCreativeItem(Item.get(Item.STONE_BRICKS, 2));
@@ -1031,8 +1031,8 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.SPAWN_EGG, 16)); //Mooshroom
         addCreativeItem(Item.get(Item.SPAWN_EGG, 19)); //Bat
         */
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 22)); //Ocelot
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 33)); //Creeper
+        //addCreativeItem(Item.get(Item.SPAWN_EGG, 22)); //Ocelot
+        //addCreativeItem(Item.get(Item.SPAWN_EGG, 33)); //Creeper
         /*
         addCreativeItem(Item.get(Item.SPAWN_EGG, 38)); //Enderman
         addCreativeItem(Item.get(Item.SPAWN_EGG, 39)); //Silverfish
@@ -1050,7 +1050,7 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.SPAWN_EGG, 21)); //Snow Golem
         addCreativeItem(Item.get(Item.SPAWN_EGG, 44)); //Zombie Villager
         */
-        addCreativeItem(Item.get(Item.WOODEN_SWORD));
+        /*addCreativeItem(Item.get(Item.WOODEN_SWORD));
         addCreativeItem(Item.get(Item.WOODEN_HOE));
         addCreativeItem(Item.get(Item.WOODEN_SHOVEL));
         addCreativeItem(Item.get(Item.WOODEN_PICKAXE));
@@ -1110,9 +1110,9 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.COMPARATOR));
         addCreativeItem(Item.get(Item.DISPENSER, 3));
         addCreativeItem(Item.get(Item.HOPPER));
-        addCreativeItem(Item.get(Item.SNOWBALL));
+        addCreativeItem(Item.get(Item.SNOWBALL));*/
 
-        //Seeds
+        /*Seeds
         addCreativeItem(Item.get(Item.COAL, 0));
         addCreativeItem(Item.get(Item.COAL, 1));
         addCreativeItem(Item.get(Item.DIAMOND, 0));
@@ -1203,9 +1203,9 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.DYE, 11));
         addCreativeItem(Item.get(Item.DYE, 10));
         addCreativeItem(Item.get(Item.DYE, 2));
-        addCreativeItem(Item.get(Item.DYE, 6));
+        addCreativeItem(Item.get(Item.DYE, 6));*/
 
-        //Potion
+        /*Potion
         addCreativeItem(Item.get(Item.GLASS_BOTTLE, 0));
         addCreativeItem(Item.get(Item.POTION, ItemPotion.NO_EFFECTS));
         addCreativeItem(Item.get(Item.POTION, ItemPotion.MUNDANE));
@@ -1279,7 +1279,7 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.SPLASH_POTION, ItemPotion.STRENGTH_LONG));
         addCreativeItem(Item.get(Item.SPLASH_POTION, ItemPotion.STRENGTH_II));
         addCreativeItem(Item.get(Item.SPLASH_POTION, ItemPotion.WEAKNESS));
-        addCreativeItem(Item.get(Item.SPLASH_POTION, ItemPotion.WEAKNESS_LONG));
+        addCreativeItem(Item.get(Item.SPLASH_POTION, ItemPotion.WEAKNESS_LONG));*/
     }
 
     public static void clearCreativeItems() {
