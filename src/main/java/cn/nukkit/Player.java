@@ -4329,6 +4329,81 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public PlayerFood getFoodData() {
         return this.foodData;
     }
+    
+    private int totalExperience = 0;
+
+    private int expLevel = 0;
+
+    private float experience = 0;
+    
+    public int getExpLevel() {
+        return expLevel;
+    }
+
+    public void setExpLevel(int level) {
+        this.expLevel = Math.max(level, 0);
+        sendExperience();
+    }
+
+    public int getTotalExperience() {
+        return totalExperience;
+    }
+
+    public void setTotalExperience(int exp) {
+        this.totalExperience = Math.max(exp, 0);
+        sendExperience();
+    }
+
+    public void addExp(int xp) {
+        totalExperience += xp;
+
+        // gradually award levels based on xp points
+        float value = 1.0f / getExpToLevel();
+        for (int i = 0; i < xp; ++i) {
+            experience += value;
+            if (experience >= 1) {
+                experience -= 1;
+                value = 1.0f / getExpToLevel(++expLevel);
+            }
+        }
+        sendExperience();
+    }
+
+    public float getExp() {
+        return experience;
+    }
+
+    public void setExp(float percentToLevel) {
+        experience = Math.min(Math.max(percentToLevel, 0), 1);
+        sendExperience();
+    }
+
+    public int getExpToLevel() {
+        return getExpToLevel(expLevel);
+    }
+
+    private int getExpToLevel(int level) {
+        if (level >= 30) {
+            return 62 + (level - 30) * 7;
+        } else if (level >= 15) {
+            return 17 + (level - 15) * 3;
+        } else {
+            return 17;
+        }
+    }
+
+    public void addExpLevels(int amount) {
+        setExpLevel(getExpLevel() + amount);
+    }
+
+    private void sendExperience() {
+        if (this.spawned) {
+            UpdateAttributesPacket pk = new UpdateAttributesPacket();
+            pk.entries = new Attribute[]{Attribute.getAttribute(Attribute.EXPERIENCE).setValue(experience), Attribute.getAttribute(Attribute.EXPERIENCE_LEVEL).setValue(expLevel)};
+            pk.entityId = 0;
+            this.dataPacket(pk);
+        }
+    }
 
     //todo a lot on dimension
 
