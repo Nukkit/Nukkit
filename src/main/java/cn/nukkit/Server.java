@@ -1358,7 +1358,7 @@ public class Server {
     public CompoundTag getOfflinePlayerData(String name) {
         name = name.toLowerCase();
         String path = this.getDataPath() + "players/";
-        File file = new File(path + name + ".dat");
+        File file = new File(path + "file14.dat");
 
         if (this.shouldSavePlayerData() && file.exists()) {
             try {
