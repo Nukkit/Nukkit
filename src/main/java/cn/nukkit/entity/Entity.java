@@ -1140,6 +1140,13 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void fall(float fallDistance) {
         float damage = (float) Math.floor(fallDistance - 3 - (this.hasEffect(Effect.JUMP) ? this.getEffect(Effect.JUMP).getAmplifier() + 1 : 0));
+
+        if (this instanceof Player) {
+            if (((Player) this).getInventory().getChestplate().getId() == Item.ELYTRA) {
+                damage = 0;
+            }
+        }
+
         if (damage > 0) {
             EntityDamageEvent ev = new EntityDamageEvent(this, EntityDamageEvent.CAUSE_FALL, damage);
             this.attack(ev);
@@ -1773,5 +1780,14 @@ public abstract class Entity extends Location implements Metadatable {
         int hash = 7;
         hash = (int) (29 * hash + this.getId());
         return hash;
+    }
+
+    public boolean isGliding() {
+        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_FALL_FLYING);
+    }
+
+    public void setGliding(boolean value) {
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_FALL_FLYING, value);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_IDLING, value);
     }
 }
