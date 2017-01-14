@@ -108,7 +108,7 @@ public abstract class Command {
      * @return CommandData|null
      */
     public CommandDataVersions generateCustomCommandData(Player player) {
-        if (!this.testPermission(player)) {
+        if (!this.testPermissionSilent(player)) {
             return null;
         }
 
