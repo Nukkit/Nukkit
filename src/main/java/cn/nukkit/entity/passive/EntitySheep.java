@@ -91,12 +91,12 @@ public class EntitySheep extends EntityAnimal {
     }
 
     @Override
-    public boolean onInteract(Entity entity, Item item) {
+    public boolean onInteract(Player player, Item item) {
         if (item.getId() == Item.DYE) {
             this.setColor(((ItemDye) item).getDyeColor().getWoolData());
 
-            if (entity instanceof EntityHumanType) {
-                EntityHumanType human = (EntityHumanType) entity;
+            if (player instanceof EntityHumanType) {
+                EntityHumanType human = (EntityHumanType) player;
                 item.setCount(item.getCount() - 1);
 
                 if (item.getCount() <= 0) {
@@ -113,8 +113,8 @@ public class EntitySheep extends EntityAnimal {
         }
 
         if (shear()) {
-            if (entity instanceof EntityHumanType) {
-                EntityHumanType human = (EntityHumanType) entity;
+            if (player instanceof EntityHumanType) {
+                EntityHumanType human = (EntityHumanType) player;
                 item.setDamage(item.getDamage() + 1);
 
                 if (item.getDamage() >= item.getMaxDurability()) {
