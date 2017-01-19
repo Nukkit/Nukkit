@@ -104,7 +104,7 @@ public class TimingsManager {
         historyStart = System.currentTimeMillis();
     }
 
-    static Timing getTiming(String name) {
+    public static Timing getTiming(String name) {
         return getTiming(null, name, null);
     }
 
