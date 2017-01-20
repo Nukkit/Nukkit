@@ -94,7 +94,7 @@ public class EntityArrow extends EntityProjectile {
                     this.getWidth() / 2 + ((double) NukkitMath.randomRange(random, -100, 100)) / 500,
                     this.getHeight() / 2 + ((double) NukkitMath.randomRange(random, -100, 100)) / 500,
                     this.getWidth() / 2 + ((double) NukkitMath.randomRange(random, -100, 100)) / 500);
-            if(this.hasColor){
+            if(!this.hasColor){
                 this.level.addParticle(new CriticalParticle(pos));
             }else{
                 this.level.addParticle(new DustParticle(pos, rgba[0], rgba[1], rgba[2], rgba[3]));

@@ -4124,7 +4124,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 ((Player) damager).getFoodData().updateFoodExpLevel(0.3);
             }
             //暴?
-            boolean add = false;
+            /*boolean add = false;
             if (!damager.onGround) {
                 NukkitRandom random = new NukkitRandom();
                 for (int i = 0; i < 5; i++) {
@@ -4134,7 +4134,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 add = true;
             }
-            if (add) source.setDamage((float) (source.getDamage() * 1.5));
+            if (add) source.setDamage((float) (source.getDamage() * 1.5));*/
         }
 
         super.attack(source);
