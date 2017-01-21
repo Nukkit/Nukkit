@@ -226,9 +226,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected int windowCnt = 2;
 
-    protected Map<Inventory, Integer> windows;
+    public Map<Inventory, Integer> windows;
 
-    protected Map<Integer, Inventory> windowIndex = new HashMap<>();
+    public Map<Integer, Inventory> windowIndex = new HashMap<>();
 
     protected int messageCounter = 2;
 
@@ -351,21 +351,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     @Deprecated
     public Long getClientId() {
         return randomClientId;
-    }
-
-    @Override
-    public boolean isBanned() {
-        return this.server.getNameBans().isBanned(this.getName().toLowerCase());
-    }
-
-    @Override
-    public void setBanned(boolean value) {
-        if (value) {
-            this.server.getNameBans().addBan(this.getName(), null, null, null);
-            this.kick(PlayerKickEvent.Reason.NAME_BANNED, "Banned by admin");
-        } else {
-            this.server.getNameBans().remove(this.getName());
-        }
     }
 
     @Override
@@ -929,9 +914,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             respawnPacket.z = (float) pos.z;
             this.dataPacket(respawnPacket);
         }
-
-        //Weather
-        this.getLevel().sendWeather(this);
 
         //FoodLevel
         this.getFoodData().sendFoodLevel();
@@ -1661,10 +1643,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (this.isOnFire() && this.lastUpdate % 10 == 0) {
                 if (this.isCreative() && !this.isInsideOfFire()) {
                     this.extinguish();
-                } else if (this.getLevel().isRaining()) {
-                    if (this.getLevel().canBlockSeeSky(this)) {
-                        this.extinguish();
-                    }
                 }
             }
 
@@ -1773,12 +1751,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!this.server.isWhitelisted((this.getName()).toLowerCase())) {
             this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, "Server is white-listed");
 
-            return;
-        } else if (this.server.getNameBans().isBanned(this.getName().toLowerCase())) {
-            this.kick(PlayerKickEvent.Reason.NAME_BANNED, "You are banned");
-            return;
-        } else if (this.server.getIPBans().isBanned(this.getAddress())) {
-            this.kick(PlayerKickEvent.Reason.IP_BANNED, "You are banned");
             return;
         }
 
@@ -1902,7 +1874,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         statusPacket.status = PlayStatusPacket.LOGIN_SUCCESS;
         this.dataPacket(statusPacket);
 
-        this.dataPacket(new ResourcePacksInfoPacket());
+        //this.dataPacket(new ResourcePacksInfoPacket());
 
         if (this.spawnPosition == null && this.namedTag.contains("SpawnLevel") && (level = this.server.getLevelByName(this.namedTag.getString("SpawnLevel"))) != null) {
             this.spawnPosition = new Position(this.namedTag.getInt("SpawnX"), this.namedTag.getInt("SpawnY"), this.namedTag.getInt("SpawnZ"), level);
@@ -2572,11 +2544,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         case PlayerActionPacket.ACTION_RESPAWN:
                             if (!this.spawned || this.isAlive() || !this.isOnline()) {
-                                break;
-                            }
-
-                            if (this.server.isHardcore()) {
-                                this.setBanned(true);
                                 break;
                             }
 
@@ -3592,11 +3559,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!ev.isCancelled()) {
             String message;
             if (isAdmin) {
-                if (!this.isBanned()) {
-                    message = "Kicked by admin." + (!"".equals(reasonString) ? " Reason: " + reasonString : "");
-                } else {
-                    message = reasonString;
-                }
+                message = "Kicked by admin." + (!"".equals(reasonString) ? " Reason: " + reasonString : "");
             } else {
                 if ("".equals(reasonString)) {
                     message = "disconnectionScreen.noReason";
@@ -4281,8 +4244,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.nextChunkOrderRun = 0;
             this.newPosition = null;
 
-            //Weather
-            this.getLevel().sendWeather(this);
             //Update time
             this.getLevel().sendTime(this);
             return true;
@@ -4313,8 +4274,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.nextChunkOrderRun = 0;
             this.newPosition = null;
 
-            //Weather
-            this.getLevel().sendWeather(this);
             //Update time
             this.getLevel().sendTime(this);
         }

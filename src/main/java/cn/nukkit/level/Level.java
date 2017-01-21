@@ -221,10 +221,6 @@ public class Level implements ChunkManager, Metadatable {
     private Generator generatorInstance;
 
     public final java.util.Random rand = new java.util.Random();
-    private boolean raining = false;
-    private int rainTime = 0;
-    private boolean thundering = false;
-    private int thunderTime = 0;
 
     private long levelCurrentTick = 0;
 
@@ -283,18 +279,6 @@ public class Level implements ChunkManager, Metadatable {
         this.folderName = name;
         this.updateQueue = new PriorityQueue<>(11, (o1, o2) -> o1.priority > o2.priority ? 1 : (o1.priority == o2.priority ? 0 : -1));
         this.time = this.provider.getTime();
-
-        this.raining = this.provider.isRaining();
-        this.rainTime = this.provider.getRainTime();
-        if (this.rainTime <= 0) {
-            setRainTime(rand.nextInt(168000) + 12000);
-        }
-
-        this.thundering = this.provider.isThundering();
-        this.thunderTime = this.provider.getThunderTime();
-        if (this.thunderTime <= 0) {
-            setThunderTime(rand.nextInt(168000) + 12000);
-        }
 
         this.levelCurrentTick = this.provider.getCurrentTick();
 
@@ -672,66 +656,6 @@ public class Level implements ChunkManager, Metadatable {
         this.timings.doTick.startTiming();
 
         this.checkTime();
-
-        // Tick Weather
-        this.rainTime--;
-        if (this.rainTime <= 0) {
-            if (!this.setRaining(!this.raining)) {
-                if (this.raining) {
-                    setRainTime(rand.nextInt(12000) + 12000);
-                } else {
-                    setRainTime(rand.nextInt(168000) + 12000);
-                }
-            }
-        }
-
-        this.thunderTime--;
-        if (this.thunderTime <= 0) {
-            if (!this.setThundering(!this.thundering)) {
-                if (this.thundering) {
-                    setThunderTime(rand.nextInt(12000) + 3600);
-                } else {
-                    setThunderTime(rand.nextInt(168000) + 12000);
-                }
-            }
-        }
-
-        if (this.isThundering()) {
-            synchronized (this) {
-                for (Map.Entry<Long, BaseFullChunk> entry : this.chunks.entrySet()) {
-                    long index = entry.getKey();
-                    BaseFullChunk chunk = entry.getValue();
-                    if (rand.nextInt(100000) == 0) {
-                        this.updateLCG = this.updateLCG * 3 + 1013904223;
-                        int LCG = this.updateLCG >> 2;
-                        int x = LCG & 0x0f;
-                        int z = LCG >> 8 & 0x0f;
-                        int y = chunk.getHighestBlockAt(x, z);
-                        int bId = chunk.getBlockId(x, y, z);
-                        if (bId != Block.TALL_GRASS && bId != Block.WATER)
-                            y += 1;
-                        CompoundTag nbt = new CompoundTag()
-                                .putList(new ListTag<DoubleTag>("Pos").add(new DoubleTag("", x + 16 * chunk.getX()))
-                                        .add(new DoubleTag("", y)).add(new DoubleTag("", z + 16 * chunk.getZ())))
-                                .putList(new ListTag<DoubleTag>("Motion").add(new DoubleTag("", 0))
-                                        .add(new DoubleTag("", 0)).add(new DoubleTag("", 0)))
-                                .putList(new ListTag<FloatTag>("Rotation").add(new FloatTag("", 0))
-                                        .add(new FloatTag("", 0)));
-
-                        EntityLightning bolt = new EntityLightning(chunk, nbt);
-                        LightningStrikeEvent ev = new LightningStrikeEvent(this, bolt);
-                        if (!ev.isCancelled()) {
-                            bolt.spawnToAll();
-                        } else {
-                            bolt.setEffect(false);
-                        }
-
-                    }
-
-                }
-            }
-
-        }
 
         this.levelCurrentTick++;
 
@@ -1127,10 +1051,6 @@ public class Level implements ChunkManager, Metadatable {
         this.server.getPluginManager().callEvent(new LevelSaveEvent(this));
 
         this.provider.setTime((int) this.time);
-        this.provider.setRaining(this.raining);
-        this.provider.setRainTime(this.rainTime);
-        this.provider.setThundering(this.thundering);
-        this.provider.setThunderTime(this.thunderTime);
         this.provider.setCurrentTick(this.levelCurrentTick);
         this.saveChunks();
         if (this.provider instanceof BaseLevelProvider) {
@@ -2737,6 +2657,8 @@ public class Level implements ChunkManager, Metadatable {
                 continue;
             if (anBlockEntity.isBlockEntityValid())
                 continue;
+            if (anBlockEntity.isUsing())
+                continue;
             toClose.add(anBlockEntity);
         }
         for (BlockEntity be : toClose.toArray(new BlockEntity[toClose.size()])) {
@@ -2863,126 +2785,6 @@ public class Level implements ChunkManager, Metadatable {
         pk.pitch = (float) pitch;
         pk.onGround = onGround;
         this.playerMoveToSend.get(index).put(entityId, pk);
-    }
-
-    public boolean isRaining() {
-        return this.raining;
-    }
-
-    public boolean setRaining(boolean raining) {
-        WeatherChangeEvent ev = new WeatherChangeEvent(this, raining);
-        this.getServer().getPluginManager().callEvent(ev);
-
-        if (ev.isCancelled()) {
-            return false;
-        }
-
-        this.raining = raining;
-
-        LevelEventPacket pk = new LevelEventPacket();
-        // These numbers are from Minecraft
-
-        if (raining) {
-            pk.evid = LevelEventPacket.EVENT_START_RAIN;
-            pk.data = rand.nextInt(50000) + 10000;
-            setRainTime(rand.nextInt(12000) + 12000);
-        } else {
-            pk.evid = LevelEventPacket.EVENT_STOP_RAIN;
-            setRainTime(rand.nextInt(168000) + 12000);
-        }
-
-        Server.broadcastPacket(this.getPlayers().values(), pk);
-
-        return true;
-    }
-
-    public int getRainTime() {
-        return this.rainTime;
-    }
-
-    public void setRainTime(int rainTime) {
-        this.rainTime = rainTime;
-    }
-
-    public boolean isThundering() {
-        return isRaining() && this.thundering;
-    }
-
-    public boolean setThundering(boolean thundering) {
-        ThunderChangeEvent ev = new ThunderChangeEvent(this, thundering);
-        this.getServer().getPluginManager().callEvent(ev);
-
-        if (ev.isCancelled()) {
-            return false;
-        }
-
-        if (thundering && !isRaining()) {
-            setRaining(true);
-        }
-
-        this.thundering = thundering;
-
-        LevelEventPacket pk = new LevelEventPacket();
-        // These numbers are from Minecraft
-        if (thundering) {
-            pk.evid = LevelEventPacket.EVENT_START_THUNDER;
-            pk.data = rand.nextInt(50000) + 10000;
-            setThunderTime(rand.nextInt(12000) + 3600);
-        } else {
-            pk.evid = LevelEventPacket.EVENT_STOP_THUNDER;
-            setThunderTime(rand.nextInt(168000) + 12000);
-        }
-
-        Server.broadcastPacket(this.getPlayers().values(), pk);
-
-        return true;
-    }
-
-    public int getThunderTime() {
-        return this.thunderTime;
-    }
-
-    public void setThunderTime(int thunderTime) {
-        this.thunderTime = thunderTime;
-    }
-
-    public void sendWeather(Player[] players) {
-        if (players == null) {
-            players = this.getPlayers().values().stream().toArray(Player[]::new);
-        }
-
-        LevelEventPacket pk = new LevelEventPacket();
-
-        if (this.isRaining()) {
-            pk.evid = LevelEventPacket.EVENT_START_RAIN;
-            pk.data = rand.nextInt(50000) + 10000;
-        } else {
-            pk.evid = LevelEventPacket.EVENT_STOP_RAIN;
-        }
-
-        Server.broadcastPacket(players, pk);
-
-        if (this.isThundering()) {
-            pk.evid = LevelEventPacket.EVENT_START_THUNDER;
-            pk.data = rand.nextInt(50000) + 10000;
-        } else {
-            pk.evid = LevelEventPacket.EVENT_STOP_THUNDER;
-        }
-
-        Server.broadcastPacket(players, pk);
-    }
-
-    public void sendWeather(Player player) {
-        if (player != null) {
-            this.sendWeather(new Player[]{player});
-        }
-    }
-
-    public void sendWeather(Collection<Player> players) {
-        if (players == null) {
-            players = this.getPlayers().values();
-        }
-        this.sendWeather(players.stream().toArray(Player[]::new));
     }
 
     public int getDimension() {
