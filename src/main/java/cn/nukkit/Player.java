@@ -3927,7 +3927,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void setHealth(float health) {
-        if (health < 1) { //maybe 0.5?
+        if (health < 1) {
             health = 0;
         }
 
