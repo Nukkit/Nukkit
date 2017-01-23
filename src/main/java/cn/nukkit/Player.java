@@ -2472,25 +2472,31 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         flame = flameEnchant != null && flameEnchant.getLevel() > 0;
                                     }
 
+                                    double speedX = -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)*1.8;
+                                    double speedY = -Math.sin(pitch / 180 * Math.PI)*1.8;
+                                    double speedZ = Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)*1.8;
+
+                                    int diff = (this.server.getTick() - this.startAction);
+                                    double p = (double) diff / 20;
+                                    double f = Math.min((p * p + p * 2) / 3, 1) * 2;
+
+                                    double ff = (double) diff / 10;
+                                    double fff = ff - 0.2;
                                     CompoundTag nbt = new CompoundTag()
                                             .putList(new ListTag<DoubleTag>("Pos")
-                                                    .add(new DoubleTag("", x))
-                                                    .add(new DoubleTag("", y + this.getEyeHeight()))
-                                                    .add(new DoubleTag("", z)))
+                                                    .add(new DoubleTag("", x + speedX * fff))
+                                                    .add(new DoubleTag("", y + this.getEyeHeight() + speedY * fff))
+                                                    .add(new DoubleTag("", z + speedZ * fff)))
                                             .putList(new ListTag<DoubleTag>("Motion")
-                                                    .add(new DoubleTag("", -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)))
-                                                    .add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
-                                                    .add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
+                                                    .add(new DoubleTag("", speedX))
+                                                    .add(new DoubleTag("", speedY))
+                                                    .add(new DoubleTag("", speedZ)))
                                             .putList(new ListTag<FloatTag>("Rotation")
                                                     .add(new FloatTag("", (float) yaw))
                                                     .add(new FloatTag("", (float) pitch)))
                                             .putShort("Fire", this.isOnFire() || flame ? 45 * 60 : 0)
                                             .putDouble("damage", damage);
 
-                                    int diff = (this.server.getTick() - this.startAction);
-                                    double p = (double) diff / 20;
-
-                                    double f = Math.min((p * p + p * 2) / 3, 1) * 2;
                                     EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(this, bow, new EntityArrow(this.chunk, nbt, this, f == 2), f);
 
                                     if (f < 0.1 || diff < 5) {
