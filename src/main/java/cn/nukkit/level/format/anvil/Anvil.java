@@ -111,7 +111,6 @@ public class Anvil extends BaseLevelProvider {
                     tagList.add(((BlockEntitySpawnable) blockEntity).getSpawnCompound());
                 }
             }
-
             try {
                 blockEntities = NBTIO.write(tagList, ByteOrder.LITTLE_ENDIAN, true);
             } catch (IOException e) {
@@ -133,17 +132,16 @@ public class Anvil extends BaseLevelProvider {
         }
 
         BinaryStream stream = new BinaryStream();
-        int topEmpty = 0;
+        int highest = 0;
         cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
         for (int i = sections.length - 1; i >= 0; i--) {
-            if (sections[i].isEmpty()) {
-                topEmpty = i + 1;
-            } else {
+            if (!sections[i].isEmpty()) {
+                highest = i + 1;
                 break;
             }
         }
-        stream.putByte((byte) topEmpty);
-        for (int i = 0; i < topEmpty; i++) {
+        stream.putByte((byte) highest);
+        for (int i = 0; i < highest; i++) {
             stream.putByte((byte) 0);
             stream.put(sections[i].getBytes());
         }
