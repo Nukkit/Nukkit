@@ -133,11 +133,10 @@ public class Anvil extends BaseLevelProvider {
         }
 
         BinaryStream stream = new BinaryStream();
-        int count;
         cn.nukkit.level.format.SubChunk[] subChunks = chunk.getSubChunks();
         long index = Level.chunkHash(x, z);
-        if (this.level.needClear.contains(index)) {
-            count = 16;
+        Integer count = this.level.needClear.get(index);
+        if (count != null) {
             this.level.needClear.remove(index);
         } else {
             count = 0;
@@ -148,7 +147,7 @@ public class Anvil extends BaseLevelProvider {
                 }
             }
         }
-        stream.putByte((byte) count);
+        stream.putByte(count.byteValue());
         for (int i = 0; i < count; i++) {
             stream.putByte((byte) 0);
             stream.put(subChunks[i].getBytes());

@@ -42,7 +42,9 @@ import cn.nukkit.level.ChunkLoader;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.format.SubChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.level.sound.ExperienceOrbSound;
@@ -604,9 +606,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             for (long index : this.usedChunks.keySet().stream().toArray(Long[]::new)) {
                 int chunkX = Level.getHashX(index);
                 int chunkZ = Level.getHashZ(index);
+                SubChunk[] subChunks = ((Chunk) this.level.getChunk(chunkX, chunkZ)).getSubChunks();
+                int count = 0;
+                for (int y = subChunks.length - 1; y >= 0; y++) {
+                    if (!subChunks[y].isEmpty()) {
+                        count = y + 1;
+                        break;
+                    }
+                }
                 this.unloadChunk(chunkX, chunkZ, oldLevel);
-
-                this.level.needClear.add(index);
+                if (count != 0) {
+                    this.level.needClear.put(index, count);
+                }
             }
             this.usedChunks = new HashMap<>();
             SetTimePacket pk = new SetTimePacket();
