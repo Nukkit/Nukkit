@@ -135,19 +135,21 @@ public class Anvil extends BaseLevelProvider {
         BinaryStream stream = new BinaryStream();
         cn.nukkit.level.format.SubChunk[] subChunks = chunk.getSubChunks();
         long index = Level.chunkHash(x, z);
-        Integer count = this.level.needClear.get(index);
-        if (count != null) {
+        Integer needClear = this.level.needClear.get(index);
+        if (needClear != null) {
             this.level.needClear.remove(index);
-        } else {
-            count = 0;
-            for (int i = subChunks.length - 1; i >= 0; i--) {
-                if (!subChunks[i].isEmpty()) {
-                    count = i + 1;
-                    break;
-                }
+        }
+        int count = 0;
+        for (int i = subChunks.length - 1; i >= 0; i--) {
+            if (!subChunks[i].isEmpty()) {
+                count = i + 1;
+                break;
             }
         }
-        stream.putByte(count.byteValue());
+        if (needClear != null && count < needClear) {
+            count = needClear;
+        }
+        stream.putByte((byte) count);
         for (int i = 0; i < count; i++) {
             stream.putByte((byte) 0);
             stream.put(subChunks[i].getBytes());
