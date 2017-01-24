@@ -606,7 +606,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             for (long index : this.usedChunks.keySet().stream().toArray(Long[]::new)) {
                 int chunkX = Level.getHashX(index);
                 int chunkZ = Level.getHashZ(index);
-                SubChunk[] subChunks = ((Chunk) this.level.getChunk(chunkX, chunkZ)).getSubChunks();
+                SubChunk[] subChunks = ((Chunk) oldLevel.getChunk(chunkX, chunkZ)).getSubChunks();
                 int count = 0;
                 for (int y = subChunks.length - 1; y >= 0; y--) {
                     if (!subChunks[y].isEmpty()) {
