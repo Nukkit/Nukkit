@@ -42,6 +42,8 @@ import cn.nukkit.level.ChunkLoader;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.format.Chunk;
+import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
@@ -604,7 +606,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             for (long index : new ArrayList<>(this.usedChunks.keySet())) {
                 int chunkX = Level.getHashX(index);
                 int chunkZ = Level.getHashZ(index);
+                ChunkSection[] sections = ((Chunk) oldLevel.getChunk(chunkX, chunkZ)).getSections();
+                int count = 0;
+                for (int i = sections.length - 1; i >= 0; i--) {
+                    if (!sections[i].isEmpty()) {
+                        count = i + 1;
+                        break;
+                    }
+                }
                 this.unloadChunk(chunkX, chunkZ, oldLevel);
+                if (count != 0) {
+                    this.level.needClear.put(index, count);
+                }
             }
 
             this.usedChunks = new HashMap<>();
@@ -629,14 +642,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (entity != this) {
                     entity.despawnFrom(this);
                 }
-            }
-
-            if (level != this.level) {
-                FullChunkDataPacket pk = new FullChunkDataPacket();
-                pk.chunkX = x;
-                pk.chunkZ = z;
-                pk.data = new byte[]{(byte) 16};
-                this.dataPacket(pk);
             }
 
             this.usedChunks.remove(index);
