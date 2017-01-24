@@ -3,8 +3,8 @@ package cn.nukkit.level.format.mcregion;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.level.Level;
-import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.format.SubChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.generator.Generator;
@@ -47,7 +47,7 @@ public class McRegion extends BaseLevelProvider {
         return ORDER_ZXY;
     }
 
-    public static boolean usesChunkSection() {
+    public static boolean usesSubChunk() {
         return false;
     }
 
@@ -336,7 +336,7 @@ public class McRegion extends BaseLevelProvider {
         this.chunks.put(index, (Chunk) chunk);
     }
 
-    public static ChunkSection createChunkSection(int y) {
+    public static SubChunk createSubChunk(int y) {
         return null;
     }
 

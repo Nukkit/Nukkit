@@ -22,13 +22,13 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.format.Chunk;
-import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
+import cn.nukkit.level.format.SubChunk;
 import cn.nukkit.level.format.anvil.Anvil;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
-import cn.nukkit.level.format.generic.EmptyChunkSection;
+import cn.nukkit.level.format.generic.EmptySubChunk;
 import cn.nukkit.level.format.leveldb.LevelDB;
 import cn.nukkit.level.format.mcregion.McRegion;
 import cn.nukkit.level.generator.Generator;
@@ -164,7 +164,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private BlockMetadataStore blockMetadata;
 
-    private boolean useSections;
+    private boolean useSubChunks;
 
     private Position temporalPosition;
     private Vector3 temporalVector;
@@ -277,7 +277,7 @@ public class Level implements ChunkManager, Metadatable {
         this.generator = Generator.getGenerator(this.provider.getGenerator());
 
         try {
-            this.useSections = (boolean) provider.getMethod("usesChunkSection").invoke(null);
+            this.useSubChunks = (boolean) provider.getMethod("usesSubChunk").invoke(null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -1053,10 +1053,10 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             int blockId;
-            if (this.useSections) {
-                for (ChunkSection section : ((Chunk) chunk).getSections()) {
-                    if (!(section instanceof EmptyChunkSection)) {
-                        int Y = section.getY();
+            if (this.useSubChunks) {
+                for (SubChunk subChunk : ((Chunk) chunk).getSubChunks()) {
+                    if (!(subChunk instanceof EmptySubChunk)) {
+                        int Y = subChunk.getY();
                         this.updateLCG = this.updateLCG * 3 + 1013904223;
                         int k = this.updateLCG >> 2;
                         for (int i = 0; i < 3; ++i, k >>= 10) {
@@ -1064,11 +1064,11 @@ public class Level implements ChunkManager, Metadatable {
                             int y = k >> 8 & 0x0f;
                             int z = k >> 16 & 0x0f;
 
-                            blockId = section.getBlockId(x, y, z);
+                            blockId = subChunk.getBlockId(x, y, z);
                             if (this.randomTickBlocks.containsKey(blockId)) {
                                 Class<? extends Block> clazz = this.randomTickBlocks.get(blockId);
                                 try {
-                                    Block block = clazz.getConstructor(int.class).newInstance(section.getBlockData(x, y, z));
+                                    Block block = clazz.getConstructor(int.class).newInstance(subChunk.getBlockData(x, y, z));
                                     block.x = chunkX * 16 + x;
                                     block.y = (Y << 4) + y;
                                     block.z = chunkZ * 16 + z;
