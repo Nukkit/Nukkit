@@ -230,6 +230,8 @@ public class Level implements ChunkManager, Metadatable {
 
     private int dimension;
 
+    public List<Long> needClear = new ArrayList<>();
+
     public Level(Server server, String name, String path, Class<? extends LevelProvider> provider) {
         this.blockStates = Block.fullList;
         this.levelId = levelIdCounter++;

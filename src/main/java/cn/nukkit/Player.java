@@ -601,12 +601,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean switchLevel(Level targetLevel) {
         Level oldLevel = this.level;
         if (super.switchLevel(targetLevel)) {
-            for (long index : new ArrayList<>(this.usedChunks.keySet())) {
+            for (long index : this.usedChunks.keySet().stream().toArray(Long[]::new)) {
                 int chunkX = Level.getHashX(index);
                 int chunkZ = Level.getHashZ(index);
                 this.unloadChunk(chunkX, chunkZ, oldLevel);
-            }
 
+                this.level.needClear.add(index);
+            }
             this.usedChunks = new HashMap<>();
             SetTimePacket pk = new SetTimePacket();
             pk.time = this.level.getTime();
@@ -629,14 +630,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (entity != this) {
                     entity.despawnFrom(this);
                 }
-            }
-
-            if (level != this.level) {
-                FullChunkDataPacket pk = new FullChunkDataPacket();
-                pk.chunkX = x;
-                pk.chunkZ = z;
-                pk.data = new byte[]{(byte) 16};
-                this.dataPacket(pk);
             }
 
             this.usedChunks.remove(index);
