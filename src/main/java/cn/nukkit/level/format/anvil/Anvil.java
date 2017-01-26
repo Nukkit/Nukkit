@@ -41,7 +41,7 @@ public class Anvil extends BaseLevelProvider {
         return ORDER_YZX;
     }
 
-    public static boolean usesChunkSection() {
+    public static boolean usesSubChunk() {
         return true;
     }
 
@@ -133,18 +133,23 @@ public class Anvil extends BaseLevelProvider {
         }
 
         BinaryStream stream = new BinaryStream();
-        int highest = 0;
-        cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
-        for (int i = sections.length - 1; i >= 0; i--) {
-            if (!sections[i].isEmpty()) {
-                highest = i + 1;
+        cn.nukkit.level.format.SubChunk[] subChunks = chunk.getSubChunks();
+        int count = 0;
+        for (int i = subChunks.length - 1; i >= 0; i--) {
+            if (!subChunks[i].isEmpty()) {
+                count = i + 1;
                 break;
             }
         }
-        stream.putByte((byte) highest);
-        for (int i = 0; i < highest; i++) {
+        long index = Level.chunkHash(x, z);
+        Integer needClear = this.level.needClear.remove(index);
+        if (needClear != null && count < needClear) {
+            count = needClear;
+        }
+        stream.putByte((byte) count);
+        for (int i = 0; i < count; i++) {
             stream.putByte((byte) 0);
-            stream.put(sections[i].getBytes());
+            stream.put(subChunks[i].getBytes());
         }
         for (int height : chunk.getHeightMapArray()) {
             stream.putByte((byte) height);
@@ -335,7 +340,7 @@ public class Anvil extends BaseLevelProvider {
         this.chunks.put(index, (Chunk) chunk);
     }
 
-    public static ChunkSection createChunkSection(int y) {
+    public static SubChunk createSubChunk(int y) {
         CompoundTag nbt = new CompoundTag();
         nbt.putByte("Y", y);
         nbt.putByteArray("Blocks", new byte[4096]);
@@ -344,7 +349,7 @@ public class Anvil extends BaseLevelProvider {
         Arrays.fill(sl, (byte) 0xff);
         nbt.putByteArray("SkyLight", sl);
         nbt.putByteArray("BlockLight", new byte[2048]);
-        return new ChunkSection(nbt);
+        return new SubChunk(nbt);
     }
 
     @Override

@@ -4,9 +4,9 @@ import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.level.Level;
-import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
+import cn.nukkit.level.format.SubChunk;
 import cn.nukkit.level.format.leveldb.key.BaseKey;
 import cn.nukkit.level.format.leveldb.key.FlagsKey;
 import cn.nukkit.level.format.leveldb.key.TerrainKey;
@@ -84,7 +84,7 @@ public class LevelDB implements LevelProvider {
         return ORDER_ZXY;
     }
 
-    public static boolean usesChunkSection() {
+    public static boolean usesSubChunk() {
         return false;
     }
 
@@ -376,7 +376,7 @@ public class LevelDB implements LevelProvider {
         this.chunks.put(index, (Chunk) chunk);
     }
 
-    public static ChunkSection createChunkSection(int y) {
+    public static SubChunk createSubChunk(int y) {
         return null;
     }
 

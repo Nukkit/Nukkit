@@ -1,6 +1,6 @@
 package cn.nukkit.level.format.generic;
 
-import cn.nukkit.level.format.ChunkSection;
+import cn.nukkit.level.format.SubChunk;
 import cn.nukkit.utils.ChunkException;
 
 import java.nio.ByteBuffer;
@@ -10,10 +10,10 @@ import java.util.Arrays;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class EmptyChunkSection implements ChunkSection {
+public class EmptySubChunk implements SubChunk {
     private final int y;
 
-    public EmptyChunkSection(int y) {
+    public EmptySubChunk(int y) {
         this.y = y;
     }
 
@@ -141,7 +141,7 @@ public class EmptyChunkSection implements ChunkSection {
     }
 
     @Override
-    public ChunkSection clone() {
+    public SubChunk clone() {
         return this;
     }
 }

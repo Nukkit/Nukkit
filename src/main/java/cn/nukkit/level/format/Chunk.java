@@ -5,15 +5,15 @@ package cn.nukkit.level.format;
  * Nukkit Project
  */
 public interface Chunk extends FullChunk {
-    byte SECTION_COUNT = 16;
+    byte SUB_CHUNK_COUNT = 16;
 
-    boolean isSectionEmpty(float fY);
+    boolean isSubChunkEmpty(float fY);
 
-    ChunkSection getSection(float fY);
+    SubChunk getSubChunk(float fY);
 
-    boolean setSection(float fY, ChunkSection section);
+    boolean setSubChunk(float fY, SubChunk subChunk);
 
-    ChunkSection[] getSections();
+    SubChunk[] getSubChunks();
 
     class Entry {
         public final int chunkX;

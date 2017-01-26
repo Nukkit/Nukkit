@@ -3,7 +3,7 @@ package cn.nukkit.level.format.generic;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.anvil.Chunk;
-import cn.nukkit.level.format.anvil.ChunkSection;
+import cn.nukkit.level.format.anvil.SubChunk;
 
 import java.util.ArrayList;
 
@@ -56,18 +56,18 @@ public class ChunkConverter {
                     if (!empty) break;
                 }
                 if (!empty) {
-                    ChunkSection section = new ChunkSection(Y);
+                    SubChunk subChunk = new SubChunk(Y);
                     for (int x = 0; x < 16; x++) {
                         for (int y = 0; y < 16; y++) {
                             for (int z = 0; z < 16; z++) {
-                                section.setBlockId(x, y, z, chunk.getBlockId(x, (Y << 4) | y, z));
-                                section.setBlockData(x, y, z, chunk.getBlockData(x, (Y << 4) | y, z));
-                                section.setBlockLight(x, y, z, chunk.getBlockLight(x, (Y << 4) | y, z));
-                                section.setBlockSkyLight(x, y, z, chunk.getBlockSkyLight(x, (Y << 4) | y, z));
+                                subChunk.setBlockId(x, y, z, chunk.getBlockId(x, (Y << 4) | y, z));
+                                subChunk.setBlockData(x, y, z, chunk.getBlockData(x, (Y << 4) | y, z));
+                                subChunk.setBlockLight(x, y, z, chunk.getBlockLight(x, (Y << 4) | y, z));
+                                subChunk.setBlockSkyLight(x, y, z, chunk.getBlockSkyLight(x, (Y << 4) | y, z));
                             }
                         }
                     }
-                    ((BaseChunk) result).sections[Y] = section;
+                    ((BaseChunk) result).subChunks[Y] = subChunk;
                 }
             }
         }

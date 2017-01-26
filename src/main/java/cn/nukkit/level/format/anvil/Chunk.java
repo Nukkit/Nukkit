@@ -5,8 +5,9 @@ import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.LevelProvider;
+import cn.nukkit.level.format.SubChunk;
 import cn.nukkit.level.format.generic.BaseChunk;
-import cn.nukkit.level.format.generic.EmptyChunkSection;
+import cn.nukkit.level.format.generic.EmptySubChunk;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.stream.NBTOutputStream;
@@ -101,19 +102,19 @@ public class Chunk extends BaseChunk {
             this.nbt.putIntArray("HeightMap", new int[256]);
         }
 
-        cn.nukkit.level.format.ChunkSection[] sections = new cn.nukkit.level.format.ChunkSection[16];
-        for (Tag section : this.nbt.getList("Sections").getAll()) {
-            if (section instanceof CompoundTag) {
-                int y = ((CompoundTag) section).getByte("Y");
+        SubChunk[] subChunks = new SubChunk[16];
+        for (Tag subChunk : this.nbt.getList("Sections").getAll()) {
+            if (subChunk instanceof CompoundTag) {
+                int y = ((CompoundTag) subChunk).getByte("Y");
                 if (y < 16) {
-                    sections[y] = new ChunkSection((CompoundTag) section);
+                    subChunks[y] = new cn.nukkit.level.format.anvil.SubChunk((CompoundTag) subChunk);
                 }
             }
         }
 
         for (int y = 0; y < 16; y++) {
-            if (sections[y] == null) {
-                sections[y] = new EmptyChunkSection(y);
+            if (subChunks[y] == null) {
+                subChunks[y] = new EmptySubChunk(y);
             }
         }
 
@@ -131,14 +132,14 @@ public class Chunk extends BaseChunk {
 
         this.x = this.nbt.getInt("xPos");
         this.z = this.nbt.getInt("zPos");
-        for (int Y = 0; Y < sections.length; ++Y) {
-            cn.nukkit.level.format.ChunkSection section = sections[Y];
-            if (section != null) {
-                this.sections[Y] = section;
+        for (int Y = 0; Y < subChunks.length; ++Y) {
+            SubChunk subChunk = subChunks[Y];
+            if (subChunk != null) {
+                this.subChunks[Y] = subChunk;
             } else {
-                throw new ChunkException("Received invalid ChunkSection instance");
+                throw new ChunkException("Received invalid SubChunk instance");
             }
-            if (Y >= SECTION_COUNT) {
+            if (Y >= SUB_CHUNK_COUNT) {
                 throw new ChunkException("Invalid amount of chunks");
             }
         }
@@ -259,16 +260,16 @@ public class Chunk extends BaseChunk {
         nbt.putIntArray("BiomeColors", this.getBiomeColorArray());
         nbt.putIntArray("HeightMap", this.getHeightMapArray());
 
-        for (cn.nukkit.level.format.ChunkSection section : this.getSections()) {
-            if (section instanceof EmptyChunkSection) {
+        for (SubChunk subChunk : this.getSubChunks()) {
+            if (subChunk instanceof EmptySubChunk) {
                 continue;
             }
             CompoundTag s = new CompoundTag(null);
-            s.putByte("Y", section.getY());
-            s.putByteArray("Blocks", section.getIdArray());
-            s.putByteArray("Data", section.getDataArray());
-            s.putByteArray("BlockLight", section.getLightArray());
-            s.putByteArray("SkyLight", section.getSkyLightArray());
+            s.putByte("Y", subChunk.getY());
+            s.putByteArray("Blocks", subChunk.getIdArray());
+            s.putByteArray("Data", subChunk.getDataArray());
+            s.putByteArray("BlockLight", subChunk.getLightArray());
+            s.putByteArray("SkyLight", subChunk.getSkyLightArray());
             nbt.getList("Sections", CompoundTag.class).add(s);
         }
 
@@ -320,20 +321,20 @@ public class Chunk extends BaseChunk {
         nbt.putInt("xPos", this.x);
         nbt.putInt("zPos", this.z);
 
-        ListTag<CompoundTag> sectionList = new ListTag<>("Sections");
-        for (cn.nukkit.level.format.ChunkSection section : this.getSections()) {
-            if (section instanceof EmptyChunkSection) {
+        ListTag<CompoundTag> subChunkList = new ListTag<>("Sections");
+        for (SubChunk subChunk : this.getSubChunks()) {
+            if (subChunk instanceof EmptySubChunk) {
                 continue;
             }
             CompoundTag s = new CompoundTag(null);
-            s.putByte("Y", (section.getY()));
-            s.putByteArray("Blocks", section.getIdArray());
-            s.putByteArray("Data", section.getDataArray());
-            s.putByteArray("BlockLight", section.getLightArray());
-            s.putByteArray("SkyLight", section.getSkyLightArray());
-            sectionList.add(s);
+            s.putByte("Y", subChunk.getY());
+            s.putByteArray("Blocks", subChunk.getIdArray());
+            s.putByteArray("Data", subChunk.getDataArray());
+            s.putByteArray("BlockLight", subChunk.getLightArray());
+            s.putByteArray("SkyLight", subChunk.getSkyLightArray());
+            subChunkList.add(s);
         }
-        nbt.putList(sectionList);
+        nbt.putList(subChunkList);
 
         nbt.putIntArray("BiomeColors", this.getBiomeColorArray());
         nbt.putIntArray("HeightMap", this.getHeightMapArray());
@@ -394,9 +395,9 @@ public class Chunk extends BaseChunk {
             chunk.x = chunkX;
             chunk.z = chunkZ;
 
-            chunk.sections = new cn.nukkit.level.format.ChunkSection[16];
+            chunk.subChunks = new SubChunk[16];
             for (int y = 0; y < 16; ++y) {
-                chunk.sections[y] = new EmptyChunkSection(y);
+                chunk.subChunks[y] = new EmptySubChunk(y);
             }
 
             chunk.heightMap = new int[256];

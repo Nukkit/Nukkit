@@ -42,7 +42,9 @@ import cn.nukkit.level.ChunkLoader;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.format.SubChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.level.sound.ExperienceOrbSound;
@@ -601,12 +603,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean switchLevel(Level targetLevel) {
         Level oldLevel = this.level;
         if (super.switchLevel(targetLevel)) {
-            for (long index : new ArrayList<>(this.usedChunks.keySet())) {
+            for (long index : this.usedChunks.keySet().stream().toArray(Long[]::new)) {
                 int chunkX = Level.getHashX(index);
                 int chunkZ = Level.getHashZ(index);
+                SubChunk[] subChunks = ((Chunk) oldLevel.getChunk(chunkX, chunkZ)).getSubChunks();
+                int count = 0;
+                for (int y = subChunks.length - 1; y >= 0; y--) {
+                    if (!subChunks[y].isEmpty()) {
+                        count = y + 1;
+                        break;
+                    }
+                }
                 this.unloadChunk(chunkX, chunkZ, oldLevel);
+                if (count != 0) {
+                    this.level.needClear.put(index, count);
+                }
             }
-
             this.usedChunks = new HashMap<>();
             SetTimePacket pk = new SetTimePacket();
             pk.time = this.level.getTime();
@@ -629,14 +641,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (entity != this) {
                     entity.despawnFrom(this);
                 }
-            }
-
-            if (level != this.level) {
-                FullChunkDataPacket pk = new FullChunkDataPacket();
-                pk.chunkX = x;
-                pk.chunkZ = z;
-                pk.data = new byte[]{(byte) 16};
-                this.dataPacket(pk);
             }
 
             this.usedChunks.remove(index);

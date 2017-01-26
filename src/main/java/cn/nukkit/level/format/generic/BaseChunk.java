@@ -2,8 +2,8 @@ package cn.nukkit.level.format.generic;
 
 import cn.nukkit.Server;
 import cn.nukkit.level.format.Chunk;
-import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.LevelProvider;
+import cn.nukkit.level.format.SubChunk;
 import cn.nukkit.utils.ChunkException;
 
 import java.io.IOException;
@@ -18,17 +18,17 @@ import java.util.Arrays;
 
 public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
-    protected ChunkSection[] sections = new ChunkSection[SECTION_COUNT];
+    protected SubChunk[] subChunks = new SubChunk[SUB_CHUNK_COUNT];
 
     @Override
     public BaseChunk clone() {
         BaseChunk chunk = (BaseChunk) super.clone();
         chunk.biomeColors = this.getBiomeColorArray().clone();
         chunk.heightMap = this.getHeightMapArray().clone();
-        if (sections != null && sections[0] != null) {
-            chunk.sections = new ChunkSection[sections.length];
-            for (int i = 0; i < sections.length; i++) {
-                chunk.sections[i] = sections[i].clone();
+        if (subChunks != null && subChunks[0] != null) {
+            chunk.subChunks = new SubChunk[subChunks.length];
+            for (int i = 0; i < subChunks.length; i++) {
+                chunk.subChunks[i] = subChunks[i].clone();
             }
         }
         return chunk;
@@ -36,7 +36,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public int getFullBlock(int x, int y, int z) {
-        return this.sections[y >> 4].getFullBlock(x, y & 0x0f, z);
+        return this.subChunks[y >> 4].getFullBlock(x, y & 0x0f, z);
     }
 
     @Override
@@ -55,32 +55,32 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
         int damage = meta == null ? 0 : meta;
         try {
             this.hasChanged = true;
-            return this.sections[y >> 4].setBlock(x, y & 0x0f, z, id, damage);
+            return this.subChunks[y >> 4].setBlock(x, y & 0x0f, z, id, damage);
         } catch (ChunkException e) {
             int Y = y >> 4;
             try {
-                this.setInternalSection(Y, (ChunkSection) this.providerClass.getMethod("createChunkSection", int.class).invoke(this.providerClass, Y));
+                this.setInternalSubChunk(Y, (SubChunk) this.providerClass.getMethod("createSubChunk", int.class).invoke(this.providerClass, Y));
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                 Server.getInstance().getLogger().logException(e1);
             }
-            return this.sections[y >> 4].setBlock(x, y & 0x0f, z, id, damage);
+            return this.subChunks[y >> 4].setBlock(x, y & 0x0f, z, id, damage);
         }
     }
 
     @Override
     public int getBlockId(int x, int y, int z) {
-        return this.sections[y >> 4].getBlockId(x, y & 0x0f, z);
+        return this.subChunks[y >> 4].getBlockId(x, y & 0x0f, z);
     }
 
     @Override
     public void setBlockId(int x, int y, int z, int id) {
         try {
-            this.sections[y >> 4].setBlockId(x, y & 0x0f, z, id);
+            this.subChunks[y >> 4].setBlockId(x, y & 0x0f, z, id);
             this.hasChanged = true;
         } catch (ChunkException e) {
             int Y = y >> 4;
             try {
-                this.setInternalSection(Y, (ChunkSection) this.providerClass.getMethod("createChunkSection", int.class).invoke(this.providerClass, Y));
+                this.setInternalSubChunk(Y, (SubChunk) this.providerClass.getMethod("createSubChunk", int.class).invoke(this.providerClass, Y));
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                 Server.getInstance().getLogger().logException(e1);
             }
@@ -90,18 +90,18 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public int getBlockData(int x, int y, int z) {
-        return this.sections[y >> 4].getBlockData(x, y & 0x0f, z);
+        return this.subChunks[y >> 4].getBlockData(x, y & 0x0f, z);
     }
 
     @Override
     public void setBlockData(int x, int y, int z, int data) {
         try {
-            this.sections[y >> 4].setBlockData(x, y & 0x0f, z, data);
+            this.subChunks[y >> 4].setBlockData(x, y & 0x0f, z, data);
             this.hasChanged = true;
         } catch (ChunkException e) {
             int Y = y >> 4;
             try {
-                this.setInternalSection(Y, (ChunkSection) this.providerClass.getMethod("createChunkSection", int.class).invoke(this.providerClass, Y));
+                this.setInternalSubChunk(Y, (SubChunk) this.providerClass.getMethod("createSubChunk", int.class).invoke(this.providerClass, Y));
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                 Server.getInstance().getLogger().logException(e1);
             }
@@ -111,18 +111,18 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public int getBlockSkyLight(int x, int y, int z) {
-        return this.sections[y >> 4].getBlockSkyLight(x, y & 0x0f, z);
+        return this.subChunks[y >> 4].getBlockSkyLight(x, y & 0x0f, z);
     }
 
     @Override
     public void setBlockSkyLight(int x, int y, int z, int level) {
         try {
-            this.sections[y >> 4].setBlockSkyLight(x, y & 0x0f, z, level);
+            this.subChunks[y >> 4].setBlockSkyLight(x, y & 0x0f, z, level);
             this.hasChanged = true;
         } catch (ChunkException e) {
             int Y = y >> 4;
             try {
-                this.setInternalSection(Y, (ChunkSection) this.providerClass.getMethod("createChunkSection", int.class).invoke(this.providerClass, Y));
+                this.setInternalSubChunk(Y, (SubChunk) this.providerClass.getMethod("createSubChunk", int.class).invoke(this.providerClass, Y));
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                 Server.getInstance().getLogger().logException(e1);
             }
@@ -132,18 +132,18 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public int getBlockLight(int x, int y, int z) {
-        return this.sections[y >> 4].getBlockLight(x, y & 0x0f, z);
+        return this.subChunks[y >> 4].getBlockLight(x, y & 0x0f, z);
     }
 
     @Override
     public void setBlockLight(int x, int y, int z, int level) {
         try {
-            this.sections[y >> 4].setBlockLight(x, y & 0x0f, z, level);
+            this.subChunks[y >> 4].setBlockLight(x, y & 0x0f, z, level);
             this.hasChanged = true;
         } catch (ChunkException e) {
             int Y = y >> 4;
             try {
-                this.setInternalSection(Y, (ChunkSection) this.providerClass.getMethod("createChunkSection", int.class).invoke(this.providerClass, Y));
+                this.setInternalSubChunk(Y, (SubChunk) this.providerClass.getMethod("createSubChunk", int.class).invoke(this.providerClass, Y));
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                 Server.getInstance().getLogger().logException(e1);
             }
@@ -154,8 +154,8 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     @Override
     public byte[] getBlockIdColumn(int x, int z) {
         ByteBuffer buffer = ByteBuffer.allocate(256);
-        for (int y = 0; y < SECTION_COUNT; y++) {
-            buffer.put(this.sections[y].getBlockIdColumn(x, z));
+        for (int y = 0; y < SUB_CHUNK_COUNT; y++) {
+            buffer.put(this.subChunks[y].getBlockIdColumn(x, z));
         }
         return buffer.array();
     }
@@ -163,8 +163,8 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     @Override
     public byte[] getBlockDataColumn(int x, int z) {
         ByteBuffer buffer = ByteBuffer.allocate(64);
-        for (int y = 0; y < SECTION_COUNT; y++) {
-            buffer.put(this.sections[y].getBlockDataColumn(x, z));
+        for (int y = 0; y < SUB_CHUNK_COUNT; y++) {
+            buffer.put(this.subChunks[y].getBlockDataColumn(x, z));
         }
         return buffer.array();
     }
@@ -172,8 +172,8 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     @Override
     public byte[] getBlockSkyLightColumn(int x, int z) {
         ByteBuffer buffer = ByteBuffer.allocate(64);
-        for (int y = 0; y < SECTION_COUNT; y++) {
-            buffer.put(this.sections[y].getBlockSkyLightColumn(x, z));
+        for (int y = 0; y < SUB_CHUNK_COUNT; y++) {
+            buffer.put(this.subChunks[y].getBlockSkyLightColumn(x, z));
         }
         return buffer.array();
     }
@@ -181,37 +181,37 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     @Override
     public byte[] getBlockLightColumn(int x, int z) {
         ByteBuffer buffer = ByteBuffer.allocate(64);
-        for (int y = 0; y < SECTION_COUNT; y++) {
-            buffer.put(this.sections[y].getBlockLightColumn(x, z));
+        for (int y = 0; y < SUB_CHUNK_COUNT; y++) {
+            buffer.put(this.subChunks[y].getBlockLightColumn(x, z));
         }
         return buffer.array();
     }
 
     @Override
-    public boolean isSectionEmpty(float fY) {
-        return this.sections[(int) fY] instanceof EmptyChunkSection;
+    public boolean isSubChunkEmpty(float fY) {
+        return this.subChunks[(int) fY] instanceof EmptySubChunk;
     }
 
     @Override
-    public ChunkSection getSection(float fY) {
-        return this.sections[(int) fY];
+    public SubChunk getSubChunk(float fY) {
+        return this.subChunks[(int) fY];
     }
 
     @Override
-    public boolean setSection(float fY, ChunkSection section) {
+    public boolean setSubChunk(float fY, SubChunk subChunk) {
         byte[] emptyIdArray = new byte[4096];
         byte[] emptyDataArray = new byte[2048];
-        if (Arrays.equals(emptyIdArray, section.getIdArray()) && Arrays.equals(emptyDataArray, section.getDataArray())) {
-            this.sections[(int) fY] = new EmptyChunkSection((int) fY);
+        if (Arrays.equals(emptyIdArray, subChunk.getIdArray()) && Arrays.equals(emptyDataArray, subChunk.getDataArray())) {
+            this.subChunks[(int) fY] = new EmptySubChunk((int) fY);
         } else {
-            this.sections[(int) fY] = section;
+            this.subChunks[(int) fY] = subChunk;
         }
         this.hasChanged = true;
         return true;
     }
 
-    private void setInternalSection(float fY, ChunkSection section) {
-        this.sections[(int) fY] = section;
+    private void setInternalSubChunk(float fY, SubChunk subChunk) {
+        this.subChunks[(int) fY] = subChunk;
         this.hasChanged = true;
     }
 
@@ -227,43 +227,43 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public byte[] getBlockIdArray() {
-        ByteBuffer buffer = ByteBuffer.allocate(4096 * SECTION_COUNT);
-        for (int y = 0; y < SECTION_COUNT; y++) {
-            buffer.put(this.sections[y].getIdArray());
+        ByteBuffer buffer = ByteBuffer.allocate(4096 * SUB_CHUNK_COUNT);
+        for (int y = 0; y < SUB_CHUNK_COUNT; y++) {
+            buffer.put(this.subChunks[y].getIdArray());
         }
         return buffer.array();
     }
 
     @Override
     public byte[] getBlockDataArray() {
-        ByteBuffer buffer = ByteBuffer.allocate(2048 * SECTION_COUNT);
-        for (int y = 0; y < SECTION_COUNT; y++) {
-            buffer.put(this.sections[y].getDataArray());
+        ByteBuffer buffer = ByteBuffer.allocate(2048 * SUB_CHUNK_COUNT);
+        for (int y = 0; y < SUB_CHUNK_COUNT; y++) {
+            buffer.put(this.subChunks[y].getDataArray());
         }
         return buffer.array();
     }
 
     @Override
     public byte[] getBlockSkyLightArray() {
-        ByteBuffer buffer = ByteBuffer.allocate(2048 * SECTION_COUNT);
-        for (int y = 0; y < SECTION_COUNT; y++) {
-            buffer.put(this.sections[y].getSkyLightArray());
+        ByteBuffer buffer = ByteBuffer.allocate(2048 * SUB_CHUNK_COUNT);
+        for (int y = 0; y < SUB_CHUNK_COUNT; y++) {
+            buffer.put(this.subChunks[y].getSkyLightArray());
         }
         return buffer.array();
     }
 
     @Override
     public byte[] getBlockLightArray() {
-        ByteBuffer buffer = ByteBuffer.allocate(2048 * SECTION_COUNT);
-        for (int y = 0; y < SECTION_COUNT; y++) {
-            buffer.put(this.sections[y].getLightArray());
+        ByteBuffer buffer = ByteBuffer.allocate(2048 * SUB_CHUNK_COUNT);
+        for (int y = 0; y < SUB_CHUNK_COUNT; y++) {
+            buffer.put(this.subChunks[y].getLightArray());
         }
         return buffer.array();
     }
 
     @Override
-    public ChunkSection[] getSections() {
-        return sections;
+    public SubChunk[] getSubChunks() {
+        return subChunks;
     }
 
     @Override

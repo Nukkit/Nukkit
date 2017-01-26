@@ -9,7 +9,7 @@ import java.util.Arrays;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
+public class SubChunk implements cn.nukkit.level.format.SubChunk {
 
     private final int y;
     private byte[] blocks;
@@ -17,7 +17,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     private byte[] blockLight;
     private byte[] skyLight;
 
-    public ChunkSection(int y) {
+    public SubChunk(int y) {
         this.y = y;
         this.blocks = new byte[4096];
         this.data = new byte[2048];
@@ -25,7 +25,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
         this.skyLight = new byte[2048];
     }
 
-    public ChunkSection(CompoundTag nbt) {
+    public SubChunk(CompoundTag nbt) {
         this.y = nbt.getByte("Y");
         this.blocks = nbt.getByteArray("Blocks");
         this.data = nbt.getByteArray("Data");
@@ -283,18 +283,18 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     }
 
     @Override
-    public ChunkSection clone() {
-        ChunkSection section;
+    public cn.nukkit.level.format.anvil.SubChunk clone() {
+        cn.nukkit.level.format.anvil.SubChunk subChunk;
         try {
-            section = (ChunkSection) super.clone();
+            subChunk = (cn.nukkit.level.format.anvil.SubChunk) super.clone();
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
             return null;
         }
-        section.skyLight = this.skyLight.clone();
-        section.blockLight = this.blockLight.clone();
-        section.blocks = this.blocks.clone();
-        section.data = this.data.clone();
-        return section;
+        subChunk.skyLight = this.skyLight.clone();
+        subChunk.blockLight = this.blockLight.clone();
+        subChunk.blocks = this.blocks.clone();
+        subChunk.data = this.data.clone();
+        return subChunk;
     }
 }
