@@ -133,16 +133,21 @@ public class Anvil extends BaseLevelProvider {
         }
 
         BinaryStream stream = new BinaryStream();
-        int highest = 0;
         cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
+        int count = 0;
         for (int i = sections.length - 1; i >= 0; i--) {
             if (!sections[i].isEmpty()) {
-                highest = i + 1;
+                count = i + 1;
                 break;
             }
         }
-        stream.putByte((byte) highest);
-        for (int i = 0; i < highest; i++) {
+        long index = Level.chunkHash(x, z);
+        Integer needClear = this.level.needClear.remove(index);
+        if (needClear != null && count < needClear) {
+            count = needClear;
+        }
+        stream.putByte((byte) count);
+        for (int i = 0; i < count; i++) {
             stream.putByte((byte) 0);
             stream.put(sections[i].getBytes());
         }
