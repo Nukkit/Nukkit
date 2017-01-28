@@ -25,31 +25,43 @@ public class BiomeSelector {
         this.rainfall = new Simplex(random, 2F, 1F / 8F, 1F / 1024F);
     }
 
-    public int lookup(double temperature, double rainfall) {
-        if (rainfall < 0.25) {
-            return Biome.SWAMP;
-        } else if (rainfall < 0.60) {
-            if (temperature < 0.25) {
-                return Biome.ICE_PLAINS;
-            } else if (temperature < 0.75) {
+    public int lookup(double temperature, double rainfall) { // Ocean is default biome,nt in generation. Mountains and small mountains isn't biomes. Is root of biomes
+        if (temperature <= 0.8) {
+            if (rainfall <= 0.4) {
                 return Biome.PLAINS;
-            } else {
+            }
+        } else if (temperature <= 2.0) {
+            if (rainfall == 0) {
                 return Biome.DESERT;
             }
-        } else if (rainfall < 0.80) {
-            if (temperature < 0.25) {
-                return Biome.TAIGA;
-            } else if (temperature < 0.75) {
+        } else if (temperature <= 0.7) {
+            if (rainfall <= 0.8) {
                 return Biome.FOREST;
-            } else {
+            }
+        } else if (temperature <= 0.5) {
+            if (rainfall <= 0.5) {
                 return Biome.BIRCH_FOREST;
+            } else if (rainfall <= 0.7) {
+                return Biome.RIVER;
             }
-        } else {
-            if (temperature < 0.25) {
-                return Biome.MOUNTAINS;
+        } else if (temperature <= 0.05) {
+            if (rainfall <= 0.8) {
+                return Biome.TAIGA;
             } else {
-                return Biome.SMALL_MOUNTAINS;
+                return Biome.ICE_PLAINS;
             }
+        } else if (temperature <= 0.8) {
+            if (rainfall <= 0.9) {
+                return Biome.SWAMP;
+            }
+        /*} else if (temperature <= 1.2) {
+            if (rainfall == 0) {
+                return Biome.35;
+            }
+        } else if (temperature <= 0.9) {
+            if (rainfall <= 1.2) {
+                return Biome.21;
+            }*/
         }
     }
 
