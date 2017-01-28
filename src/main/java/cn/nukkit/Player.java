@@ -500,17 +500,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             int identifier = this.dataPacket(pk, true); // We *need* ACK so we can be sure that the client received the packet or not
             Thread t = new Thread() {
                 public void run() {
-                    while (true) {
-                        // We are going to wait 3 seconds, if after 3 seconds we didn't receive a reply from the client, resend the packet.
-                        try {
-                            Thread.sleep(3000);
-                            boolean status = needACK.get(identifier);
-                            if (!status && isOnline()) {
-                                sendCommandData();
-                                return;
-                            }
-                        } catch (InterruptedException e) {}
-                    }
+                    // We are going to wait 3 seconds, if after 3 seconds we didn't receive a reply from the client, resend the packet.
+                    try {
+                        Thread.sleep(3000);
+                        boolean status = needACK.get(identifier);
+                        if (!status && isOnline()) {
+                            sendCommandData();
+                            return;
+                        }
+                    } catch (InterruptedException e) {}
                 }
             };
             t.start();
@@ -628,10 +626,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.time = this.level.getTime();
             pk.started = !this.level.stopTime;
             this.dataPacket(pk);
-
-            // TODO: Remove this hack
-            int distance = this.viewDistance * 2 * 16 * 2;
-            this.sendPosition(this.add(distance, 0, distance), this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);
             return true;
         }
         return false;
@@ -649,6 +643,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (entity != this) {
                     entity.despawnFrom(this);
                 }
+            }
+
+            if (level != this.level) {
+                FullChunkDataPacket pk = new FullChunkDataPacket();
+                pk.chunkX = x;
+                pk.chunkZ = z;
+                pk.data = new byte[]{(byte) 16};
+                this.dataPacket(pk);
             }
 
             this.usedChunks.remove(index);
