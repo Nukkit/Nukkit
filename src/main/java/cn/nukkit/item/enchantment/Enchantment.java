@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public abstract class Enchantment implements Cloneable {
 
-    protected static Enchantment[] enchantments;
+    public static Enchantment[] enchantments;
 
     public static final int ID_PROTECTION_ALL = 0;
     public static final int ID_PROTECTION_FIRE = 1;
