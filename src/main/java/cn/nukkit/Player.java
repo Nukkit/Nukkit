@@ -430,12 +430,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public PermissionAttachment addAttachment(Plugin plugin) {
-        return this.addAttachment(plugin, null);
+        return this.addAttachment(plugin, true);
     }
 
     @Override
     public PermissionAttachment addAttachment(Plugin plugin, String name) {
-        return this.addAttachment(plugin, name, null);
+        return this.addAttachment(plugin, name, true);
     }
 
     @Override
