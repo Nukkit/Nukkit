@@ -31,14 +31,19 @@ public class CommandReader extends Thread implements InterruptibleThread {
         if (instance != null) {
             throw new RuntimeException("Command Reader is already exist");
         }
+
+        instance = this;
+        this.createConsoleReader();
+        this.setName("Console");
+    }
+
+    private void createConsoleReader() {
         try {
             this.reader = new ConsoleReader();
-            reader.setPrompt("> ");
-            instance = this;
+            this.reader.setPrompt("> ");
         } catch (IOException e) {
             Server.getInstance().getLogger().error("Unable to start Console Reader", e);
         }
-        this.setName("Console");
     }
 
     public String readLine() {
@@ -47,6 +52,7 @@ public class CommandReader extends Thread implements InterruptibleThread {
             return this.reader.readLine("> ");
         } catch (IOException e) {
             Server.getInstance().getLogger().logException(e);
+            this.createConsoleReader();
             return "";
         }
     }
