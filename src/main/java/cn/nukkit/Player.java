@@ -3595,19 +3595,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void sendMessage(String message) {
-        String[] mes = this.server.getLanguage().translateString(message).split("\\n");
         // TODO: Remove this workaround (broken client MCPE 1.0.0)
-        for (String m : mes) {
-            messageQueue.add(m);
-        }
-        /* for (String m : mes) {
-            if (!"".equals(m)) {
-                TextPacket pk = new TextPacket();
-                pk.type = TextPacket.TYPE_RAW;
-                pk.message = m;
-                this.dataPacket(pk);
-            }
-        } */
+        messageQueue.add(this.server.getLanguage().translateString(message));
+
+        /*
+        TextPacket pk = new TextPacket();
+        pk.type = TextPacket.TYPE_RAW;
+        pk.message = this.server.getLanguage().translateString(message);
+        this.dataPacket(pk);
+        */
     }
 
     @Override
