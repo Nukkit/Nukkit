@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -121,7 +122,6 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
-import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.level.sound.ExperienceOrbSound;
 import cn.nukkit.level.sound.ItemFrameItemRemovedSound;
 import cn.nukkit.level.sound.LaunchSound;
@@ -166,7 +166,6 @@ import cn.nukkit.network.protocol.PlayerActionPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.RemoveBlockPacket;
 import cn.nukkit.network.protocol.RequestChunkRadiusPacket;
-import cn.nukkit.network.protocol.ResourcePacksInfoPacket;
 import cn.nukkit.network.protocol.RespawnPacket;
 import cn.nukkit.network.protocol.SetCommandsEnabledPacket;
 import cn.nukkit.network.protocol.SetEntityLinkPacket;
@@ -322,6 +321,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean enableClientCommand = true;
 
     private BlockEnderChest viewingEnderChest = null;
+
+    public int messageCount = 0;
+    public LinkedHashMap<Integer, String> messageQueue = new LinkedHashMap<Integer, String>();
 
     public BlockEnderChest getViewingEnderChest() {
         return viewingEnderChest;
@@ -1688,6 +1690,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
         }
+ 
+        if(this.messageCount > 0){
+            String message = "";
+            for (Map.Entry<Integer, String> e : this.messageQueue.entrySet()){
+                if(message.equals("")) message += e.getValue();
+                else message += "\n"+e.getValue();
+            }
+            TextPacket pk = new TextPacket();
+            pk.type = TextPacket.TYPE_RAW;
+            pk.message = message;
+            this.dataPacket(pk);
+            this.messageQueue.clear();
+            this.messageCount = 0;
+        }
 
         this.checkTeleportPosition();
 
@@ -2491,9 +2507,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     double fff = ff - 0.2;
                                     CompoundTag nbt = new CompoundTag()
                                             .putList(new ListTag<DoubleTag>("Pos")
-                                                    .add(new DoubleTag("", x + speedX * fff))
-                                                    .add(new DoubleTag("", y + this.getEyeHeight() + speedY * fff))
-                                                    .add(new DoubleTag("", z + speedZ * fff)))
+                                                    .add(new DoubleTag("", x))
+                                                    .add(new DoubleTag("", y + this.getEyeHeight()))
+                                                    .add(new DoubleTag("", z)))
                                             .putList(new ListTag<DoubleTag>("Motion")
                                                     .add(new DoubleTag("", speedX))
                                                     .add(new DoubleTag("", speedY))
@@ -2963,7 +2979,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         textPacket.message = this.removeFormat ? TextFormat.clean(textPacket.message) : textPacket.message;
                         for (String msg : textPacket.message.split("\n")) {
                             if (!"".equals(msg.trim()) && msg.length() <= 255 && this.messageCounter-- > 0) {
-                                if (msg.startsWith("/")) { //Command
+                                if (msg.startsWith("./")) { //Command
                                     PlayerCommandPreprocessEvent commandPreprocessEvent = new PlayerCommandPreprocessEvent(this, msg);
                                     if (commandPreprocessEvent.getMessage().length() > 320) {
                                         commandPreprocessEvent.setCancelled();
@@ -3591,7 +3607,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void sendMessage(String message) {
-        String[] mes = this.server.getLanguage().translateString(message).split("\\n");
+        this.messageQueue.put(this.messageCount, message);
+        this.messageCount++;
+        /*String[] mes = this.server.getLanguage().translateString(message).split("\\n");
         for (String m : mes) {
             if (!"".equals(m)) {
                 TextPacket pk = new TextPacket();
@@ -3599,7 +3617,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 pk.message = m;
                 this.dataPacket(pk);
             }
-        }
+        }*/
     }
 
     @Override
