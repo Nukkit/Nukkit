@@ -1079,8 +1079,10 @@ public class Server {
         return true;
     }
 
+    // TODO: Fix title
+    // It is now printing in the console the title instead of... well, not printing in the console
     public void titleTick() {
-        if (!Nukkit.ANSI) {
+        if (true || !Nukkit.ANSI) {
             return;
         }
 
