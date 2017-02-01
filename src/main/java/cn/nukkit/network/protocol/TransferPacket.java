@@ -10,14 +10,14 @@ public class TransferPacket extends DataPacket {
     @Override
     public void decode() {
         this.address = this.getString();
-        this.port = (short) this.getShort();
+        this.port = (short) this.getLShort();
     }
 
     @Override
     public void encode() {
         this.reset();
         this.putString(address);
-        this.putShort(port);
+        this.putLShort(port);
     }
 
     @Override
