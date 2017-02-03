@@ -66,7 +66,6 @@ import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
@@ -4460,6 +4459,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.movementSpeed += sprintSpeedChange;
         }
         this.setMovementSpeed(this.movementSpeed);
+    }
+
+    public void transfer(String address, int port) {
+        TransferPacket pk = new TransferPacket();
+        pk.address = address;
+        pk.port = port;
+        this.dataPacket(pk);
     }
 
     @Override
