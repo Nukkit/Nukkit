@@ -4461,13 +4461,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setMovementSpeed(this.movementSpeed);
     }
 
-    public void transfer(String address, int port) {
-        TransferPacket pk = new TransferPacket();
-        pk.address = address;
-        pk.port = port;
-        this.dataPacket(pk);
-    }
-
     @Override
     public int hashCode() {
         if ((this.hash == 0) || (this.hash == 485)) {
