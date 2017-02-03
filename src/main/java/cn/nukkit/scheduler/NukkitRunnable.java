@@ -20,37 +20,37 @@ public abstract class NukkitRunnable implements Runnable {
 
     public synchronized Runnable runTask(Plugin plugin) throws IllegalArgumentException, IllegalStateException {
         checkState();
-        this.taskHandler = Server.getInstance().getScheduler().scheduleTask(this);
+        this.taskHandler = Server.getInstance().getScheduler().scheduleTask(plugin, this);
         return taskHandler.getTask();
     }
 
     public synchronized Runnable runTaskAsynchronously(Plugin plugin) throws IllegalArgumentException, IllegalStateException  {
         checkState();
-        this.taskHandler = Server.getInstance().getScheduler().scheduleTask(this, true);
+        this.taskHandler = Server.getInstance().getScheduler().scheduleTask(plugin, this, true);
         return taskHandler.getTask();
     }
 
     public synchronized Runnable runTaskLater(Plugin plugin, int delay) throws IllegalArgumentException, IllegalStateException  {
         checkState();
-        this.taskHandler = Server.getInstance().getScheduler().scheduleDelayedTask(this, delay);
+        this.taskHandler = Server.getInstance().getScheduler().scheduleDelayedTask(plugin, this, delay);
         return taskHandler.getTask();
     }
 
     public synchronized Runnable runTaskLaterAsynchronously(Plugin plugin, int delay) throws IllegalArgumentException, IllegalStateException  {
         checkState();
-        this.taskHandler = Server.getInstance().getScheduler().scheduleDelayedTask(this, delay, true);
+        this.taskHandler = Server.getInstance().getScheduler().scheduleDelayedTask(plugin, this, delay, true);
         return taskHandler.getTask();
     }
 
     public synchronized Runnable runTaskTimer(Plugin plugin, int delay, int period) throws IllegalArgumentException, IllegalStateException  {
         checkState();
-        this.taskHandler = Server.getInstance().getScheduler().scheduleDelayedRepeatingTask(this, delay, period);
+        this.taskHandler = Server.getInstance().getScheduler().scheduleDelayedRepeatingTask(plugin, this, delay, period);
         return taskHandler.getTask();
     }
 
     public synchronized Runnable runTaskTimerAsynchronously(Plugin plugin, int delay, int period) throws IllegalArgumentException, IllegalStateException  {
         checkState();
-        this.taskHandler = Server.getInstance().getScheduler().scheduleDelayedRepeatingTask(this, delay, period, true);
+        this.taskHandler = Server.getInstance().getScheduler().scheduleDelayedRepeatingTask(plugin, this, delay, period, true);
         return taskHandler.getTask();
     }
 
