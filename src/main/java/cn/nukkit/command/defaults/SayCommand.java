@@ -37,7 +37,7 @@ public class SayCommand extends VanillaCommand {
         if (sender instanceof Player) {
             senderString = ((Player) sender).getDisplayName();
         } else if (sender instanceof ConsoleCommandSender) {
-            senderString = "Server";
+            senderString = "CONSOLE";
         } else {
             senderString = sender.getName();
         }
