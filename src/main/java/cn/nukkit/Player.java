@@ -1216,8 +1216,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     protected void checkBlockCollision() {
-        for (Block block : this.getBlocksAround()) {
+        boolean portal = false;
+
+        for (Block block : this.getCollisionBlocks()) {
+            if (block.getId() == Block.NETHER_PORTAL) {
+                portal = true;
+                continue;
+            }
+
             block.onEntityCollide(this);
+        }
+
+        if (portal) {
+            inPortalTicks++;
         }
     }
 
@@ -1413,7 +1424,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.lastPitch = to.pitch;
 
             if (!isFirst) {
+                List<Block> blocksAround = new ArrayList<>(this.blocksAround);
+                List<Block> collidingBlocks = new ArrayList<>(this.collisionBlocks);
+
                 PlayerMoveEvent ev = new PlayerMoveEvent(this, from, to);
+
+                this.blocksAround = null;
+                this.collisionBlocks = null;
 
                 this.server.getPluginManager().callEvent(ev);
 
@@ -1423,6 +1440,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     } else {
                         this.addMovement(this.x, this.y + this.getEyeHeight(), this.z, this.yaw, this.pitch, this.yaw);
                     }
+                } else {
+                    this.blocksAround = blocksAround;
+                    this.collisionBlocks = collidingBlocks;
                 }
             }
 
