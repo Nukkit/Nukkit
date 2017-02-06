@@ -67,8 +67,8 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
-import cn.nukkit.timings.Timings;
 import cn.nukkit.utils.*;
+import co.aikar.timings.Timings;
 
 import java.io.*;
 import java.nio.ByteOrder;
@@ -186,7 +186,10 @@ public class Server {
 
     private Level defaultLevel = null;
 
+    private Thread currentThread;
+    
     public Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
+        currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
         instance = this;
         this.logger = logger;
 
@@ -628,6 +631,12 @@ public class Server {
     }
 
     public boolean dispatchCommand(CommandSender sender, String commandLine) throws ServerException {
+        // First we need to check if this command is on the main thread or not, if not, warn the user
+        if (!this.isPrimaryThread()) {
+            getLogger().warning("Command Dispatched Async: " + commandLine);
+            getLogger().warning("Please notify author of plugin causing this execution to fix this bug!", new Throwable());
+            // TODO: We should sync the command to the main thread too!
+        }
         if (sender == null) {
             throw new ServerException("CommandSender is not valid");
         }
@@ -1070,8 +1079,9 @@ public class Server {
         return true;
     }
 
+    // TODO: Fix title tick
     public void titleTick() {
-        if (!Nukkit.ANSI) {
+        if (true || !Nukkit.ANSI) {
             return;
         }
 
@@ -1547,7 +1557,13 @@ public class Server {
             return false;
         }
 
-        String path = this.getDataPath() + "worlds/" + name + "/";
+        String path;
+
+        if (name.contains("/") || name.contains("\\")) {
+            path = name;
+        } else {
+            path = this.getDataPath() + "worlds/" + name + "/";
+        }
 
         Class<? extends LevelProvider> provider = LevelProviderManager.getProvider(path);
 
@@ -1613,10 +1629,16 @@ public class Server {
             }
         }
 
+        String path;
+
+        if (name.contains("/") || name.contains("\\")) {
+            path = name;
+        } else {
+            path = this.getDataPath() + "worlds/" + name + "/";
+        }
+
         Level level;
         try {
-            String path = this.getDataPath() + "worlds/" + name + "/";
-
             provider.getMethod("generate", String.class, String.class, long.class, Class.class, Map.class).invoke(null, path, name, seed, generator, options);
 
             level = new Level(this, name, path, provider);
@@ -1869,6 +1891,16 @@ public class Server {
         return this.getPropertyBoolean("player.save-player-data", true);
     }
 
+    /**
+     * Checks the current thread against the expected primary thread for the server.
+     * 
+     * <b>Note:</b> this method should not be used to indicate the current synchronized state of the runtime. A current thread matching the main thread indicates that it is synchronized, but a mismatch does not preclude the same assumption.
+     * @return true if the current thread matches the expected primary thread, false otherwise
+     */
+    public boolean isPrimaryThread() {
+        return (Thread.currentThread() == currentThread);
+    }
+    
     private void registerEntities() {
         Entity.registerEntity("Arrow", EntityArrow.class);
         Entity.registerEntity("Item", EntityItem.class);

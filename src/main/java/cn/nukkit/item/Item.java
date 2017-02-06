@@ -612,7 +612,7 @@ public class Item implements Cloneable {
             list[STONE_PICKAXE] = ItemPickaxeStone.class; //274
             list[STONE_AXE] = ItemAxeStone.class; //275
             list[DIAMOND_SWORD] = ItemSwordDiamond.class; //276
-            list[DIAMOND_SHOVEL] = ItemSwordDiamond.class; //277
+            list[DIAMOND_SHOVEL] = ItemShovelDiamond.class; //277
             list[DIAMOND_PICKAXE] = ItemPickaxeDiamond.class; //278
             list[DIAMOND_AXE] = ItemAxeDiamond.class; //279
             list[STICK] = ItemStick.class; //280
@@ -662,7 +662,7 @@ public class Item implements Cloneable {
             list[WOODEN_DOOR] = ItemDoorWood.class; //324
             list[BUCKET] = ItemBucket.class; //325
 
-            list[MINECART] = ItemMinecartChest.class; //328
+            list[MINECART] = ItemMinecart.class; //328
             list[SADDLE] = ItemSaddle.class; //329
             list[IRON_DOOR] = ItemDoorIron.class; //330
             list[REDSTONE] = ItemRedstone.class; //331
@@ -771,7 +771,7 @@ public class Item implements Cloneable {
 
             //TODO: list[LINGERING_POTION] = ItemPotionLingering.class; //441
 
-            //TODO: list[ELYTRA] = ItemElytra.class; //444
+            list[ELYTRA] = ItemElytra.class; //444
 
             //TODO: list[SHULKER_SHELL] = ItemShulkerShell.class; //445
 
