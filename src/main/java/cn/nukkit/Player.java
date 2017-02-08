@@ -961,7 +961,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         return 0;
     }
+    
+	public boolean transferTo(String address, int port) {
+        DataPacketSendEvent ev = new PlayerTransferEvent(this, address, port);
+		this.server.getPluginManager().callEvent(ev);
+		if (ev.isCancelled()) {
+			return false;
+		}
+		pk = new TransferPacket();
+		pk.address = ev.getAddress();
+        pk.port = ev.getPort();
+		this.dataPacket(pk);
+		this.getServer().getLogger().info("Transferring player" + this.getName() + " to " + ev.getAddress() + ":" + ev.getPort());
 
+		return true;
+	}
+    
     public int getPing() {
         return this.interfaz.getNetworkLatency(this);
     }
