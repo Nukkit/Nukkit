@@ -11,7 +11,7 @@ public class TransferServerCommand extends VanillaCommand {
 
     public TransferServerCommand(String name) {
         super(name, "%nukkit.command.transfer.description", "%nukkit.command.transfer.usage");
-        this.setPermission("nukkit.command.transfer;");
+        this.setPermission("nukkit.command.transfer");
         this.commandParameters.clear();
         this.commandParameters.put("1arg", new CommandParameter[]{
                 new CommandParameter("adress", CommandParameter.ARG_TYPE_STRING, false)
@@ -35,17 +35,18 @@ public class TransferServerCommand extends VanillaCommand {
             return true;
         }
         
-        /** @var String $address
-          * @var int $port
+        /** @var String address
+          * @var int port
           */
           
         if (args.length < 2) {
-             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
-             return false;
+            sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
+            
+            return false;
         }
         
-        /** @var Player $sender */
-        int success = sender.transferTo(String address, int port);
+        /** @var Player sender */
+        int success = sender.transferTo(address, port);
         return success;
     }
 }
