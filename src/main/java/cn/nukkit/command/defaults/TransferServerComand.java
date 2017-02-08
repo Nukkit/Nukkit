@@ -34,7 +34,7 @@ public class TransferServerCommand extends VanillaCommand {
             return true;
         }
         
-        /** @var string $address
+        /** @var String $address
           * @var int $port
           */
           
