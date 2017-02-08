@@ -11,39 +11,39 @@ public class PlayerTransferEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
     
-    /** @var string $address */
-    private string address;
+    /** @var String $address */
+    private String address;
     /** @var int $port */
     private int port;
     
-    public PlayerTransferEvent(Player player, string address, int port) {
+    public PlayerTransferEvent(Player player, String address, int port) {
         this.address = address;
         this.port = port;
     }
     
-	  /**
-	    * @return string
+    /**
+      * @return String
       */
     public void getAddress() {
         return this.address;
     }
     
-     /**
-	    * @return string address
+    /**
+      * @return String address
       */
-    public void setAddress(string address) {
+    public void setAddress(String address) {
         this.address = address;
     }
     
     /**
-	    * @return string
+      * @return string
       */
     public void getPort() {
         return this.port;
     }
     
     /**
-	    * @return int port
+      * @return int port
       */
     public void setPort(int port) {
         this.port = port;
