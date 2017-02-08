@@ -2,6 +2,7 @@ package cn.nukkit.command.defaults;
 
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.ConsoleCommandSender;
+import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.Player;
 import cn.nukkit.utils.TextFormat;
@@ -44,7 +45,7 @@ public class TransferServerCommand extends VanillaCommand {
         }
         
         /** @var Player $sender */
-        success = sender.transferTo(address, port);
+        int success = sender.transferTo(String address, int port);
         return success;
     }
 }
