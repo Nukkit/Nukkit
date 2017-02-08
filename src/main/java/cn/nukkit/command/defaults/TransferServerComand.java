@@ -8,7 +8,7 @@ import cn.nukkit.utils.TextFormat;
 
 public class TransferServerCommand extends VanillaCommand {
 
-    public TimeCommand(String name) {
+    public TransferServerCommand(String name) {
         super(name, "%nukkit.command.transfer.description", "%nukkit.command.transfer.usage");
         this.setPermission("nukkit.command.transfer;");
         this.commandParameters.clear();
