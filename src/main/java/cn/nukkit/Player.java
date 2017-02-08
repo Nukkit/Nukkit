@@ -962,9 +962,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return 0;
     }
     
-	public boolean transferTo(String address, int port = 19132) {
+	public boolean transferTo(String address, int port) {
         PlayerTransferEvent ev = new PlayerTransferEvent(this, address, port);
-		this.server.getPluginManager().callEvent(ev);
+	this.server.getPluginManager().callEvent(ev);
 		
 		if (ev.isCancelled()) {
 			return false;
