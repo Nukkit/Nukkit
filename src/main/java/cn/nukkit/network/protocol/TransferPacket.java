@@ -3,7 +3,7 @@ package cn.nukkit.network.protocol;
 public class TransferPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.TRANSFER_PACKET;
     
-    public string address;
+    public String address;
     public short port;
     
     @Override
