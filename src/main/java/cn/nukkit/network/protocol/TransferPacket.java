@@ -3,14 +3,14 @@ package cn.nukkit.network.protocol;
 public class TransferPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.TRANSFER_PACKET;
     
-    public string adress;
+    public string address;
     public short port;
     
     @Override
     public void decode() {
         this.address = this.getString();
         this.port = this.getLShort();
-        System.out.print("Client tries to join from Server" + this.adress + this.port);
+        System.out.print("Client tries to join from Server" + this.address + this.port);
     }
     
     @Override
