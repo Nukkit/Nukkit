@@ -10,7 +10,7 @@ public class TransferPacket extends DataPacket {
     public void decode() {
         this.address = this.getString();
         this.port = this.getLShort();
-        System.out.print("Client tries to join from Server + this.adress + this.port");
+        System.out.print("Client tries to join from Server" + this.adress + this.port);
     }
     
     @Override
