@@ -2979,7 +2979,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         textPacket.message = this.removeFormat ? TextFormat.clean(textPacket.message) : textPacket.message;
                         for (String msg : textPacket.message.split("\n")) {
                             if (!"".equals(msg.trim()) && msg.length() <= 255 && this.messageCounter-- > 0) {
-                                if (msg.startsWith("./")) { //Command
+                                if (msg.startsWith("/")) { //Command
                                     PlayerCommandPreprocessEvent commandPreprocessEvent = new PlayerCommandPreprocessEvent(this, msg);
                                     if (commandPreprocessEvent.getMessage().length() > 320) {
                                         commandPreprocessEvent.setCancelled();
