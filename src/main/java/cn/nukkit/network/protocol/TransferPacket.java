@@ -5,7 +5,7 @@ public class TransferPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.TRANSFER_PACKET;
     
     public String address; // Server address
-    public short port = 19132; // Server port
+    public int port = 19132; // Server port
     
     @Override
     public void decode() {
