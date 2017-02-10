@@ -94,5 +94,5 @@ public interface ProtocolInfo {
     byte RESOURCE_PACK_DATA_INFO_PACKET = 0x4f;//79
     byte RESOURCE_PACK_CHUNK_DATA_PACKET = 0x50;//80
     byte RESOURCE_PACK_CHUNK_REQUEST_PACKET = 0x51;//81
-    byte TRANSFER_PACKET = 0x51;//81
+    byte TRANSFER_PACKET = 0x52;//82
 }
