@@ -35,12 +35,16 @@ public class BiomeSelector {
                 return Biome.ICE_PLAINS;
             } else if (temperature < 0.75) {
                 return Biome.DESERT;
+            } else {
+                return Biome.ROOFED_FOREST_M;
             }
         } else if (rainfall < 0.80) {
             if (temperature < 0.25) {
                 return Biome.TAIGA;
             } else if (temperature < 0.75) {
                 return Biome.FOREST;
+            } else {
+                return Biome.ROOFED_FOREST;
             }
         } else {
             if (rainfall < 1.0) {
