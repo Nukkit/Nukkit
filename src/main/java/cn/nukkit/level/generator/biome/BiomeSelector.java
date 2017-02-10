@@ -43,21 +43,12 @@ public class BiomeSelector {
                 return Biome.FOREST;
             }
         } else {
-            if (temperature < 0.25) {
-                return Biome.MOUNTAINS;
-             } else {
-                return Biome.SMALL_MOUNTAINS;
-            }
             if (rainfall < 1.0) {
                 return Biome.MUSHROOM_ISLAND;
             } else if (temperature < 1.2) {
-                if (rainfall < 0.9) {
-                    return Biome.JUNGLE;
-                } else {
-                    return Biome.SAVANNA;
-                }
+                return Biome.JUNGLE;
             } else {
-                return Biome.PLAINS;
+                return Biome.SAVANNA;
             }
         }
     }
