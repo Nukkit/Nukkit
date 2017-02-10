@@ -42,7 +42,7 @@ class TransferServerCommand extends VanillaCommand {
             return false;
         }
         
-        int success = sender.transfer(address, port);
+        success = sender.transfer(address, port);
         return success;
     }
 }
