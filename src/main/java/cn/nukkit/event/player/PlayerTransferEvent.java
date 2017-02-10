@@ -19,7 +19,7 @@ public class PlayerTransferEvent extends PlayerEvent implements Cancellable {
         this.port = port;
     }
     
-    public void getAddress() {
+    public String getAddress() {
         return this.address;
     }
     
@@ -27,7 +27,7 @@ public class PlayerTransferEvent extends PlayerEvent implements Cancellable {
         this.address = address;
     }
     
-    public void getPort() {
+    public int getPort() {
         return this.port;
     }
     
