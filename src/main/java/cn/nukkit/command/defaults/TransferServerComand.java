@@ -17,7 +17,7 @@ public class TransferServerCommand extends VanillaCommand {
                 new CommandParameter("adress", CommandParameter.ARG_TYPE_STRING, false)
         });
         this.commandParameters.put("2args", new CommandParameter[]{
-                new CommandParameter("port", CommandParameter.ARG_TYPE_SHORT, false),
+                new CommandParameter("port", CommandParameter.ARG_TYPE_INT, false),
         });
     }
     
