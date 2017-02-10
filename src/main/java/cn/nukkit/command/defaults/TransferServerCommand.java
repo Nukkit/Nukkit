@@ -8,7 +8,7 @@ import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.Player;
 import cn.nukkit.utils.TextFormat;
 
-class TransferServerCommand extends VanillaCommand {
+public class TransferServerCommand extends VanillaCommand {
 
     public TransferServerCommand(String name) {
         super(name, "%nukkit.command.transfer.description", "%nukkit.command.transfer.usage");
