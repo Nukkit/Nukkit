@@ -48,8 +48,6 @@ public class BiomeSelector {
             }
         } else {
             if (rainfall < 1.0) {
-                return Biome.MUSHROOM_ISLAND;
-            } else if (temperature < 1.2) {
                 return Biome.JUNGLE;
             } else {
                 return Biome.SAVANNA;
