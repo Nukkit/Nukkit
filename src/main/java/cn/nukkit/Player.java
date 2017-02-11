@@ -1509,10 +1509,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return false;
     }
 
-    @Override
+    /*@Override
     public void addMovement(double x, double y, double z, double yaw, double pitch, double headYaw) {
         this.level.addPlayerMovement(this.chunk.getX(), this.chunk.getZ(), this.id, x, y, z, yaw, pitch, this.isOnGround());
-    }
+    }*/
 
     public void sendAttributes() {
         UpdateAttributesPacket pk = new UpdateAttributesPacket();
