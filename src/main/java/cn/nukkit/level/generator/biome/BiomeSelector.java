@@ -49,6 +49,7 @@ public class BiomeSelector {
                 return Biome.JUNGLE;
             }
         }
+        return Biome.PLAINS;
     }
     public void recalculate() {
         this.map = new int[64 * 64];
