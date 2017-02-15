@@ -1184,31 +1184,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!this.onGround || movX != 0 || movY != 0 || movZ != 0) {
             boolean onGround = false;
 
-            AxisAlignedBB bb = this.boundingBox.clone();
-            bb.maxY = bb.minY + 0.5;
-            bb.minY -= 1;
-
             AxisAlignedBB realBB = this.boundingBox.clone();
             realBB.maxY = realBB.minY + 0.1;
             realBB.minY -= 0.2;
 
-            int minX = NukkitMath.floorDouble(bb.minX);
-            int minY = NukkitMath.floorDouble(bb.minY);
-            int minZ = NukkitMath.floorDouble(bb.minZ);
-            int maxX = NukkitMath.ceilDouble(bb.maxX);
-            int maxY = NukkitMath.ceilDouble(bb.maxY);
-            int maxZ = NukkitMath.ceilDouble(bb.maxZ);
-
-            for (int z = minZ; z <= maxZ; ++z) {
-                for (int x = minX; x <= maxX; ++x) {
-                    for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z));
-
-                        if (!block.canPassThrough() && block.collidesWithBB(realBB)) {
-                            onGround = true;
-                            break;
-                        }
-                    }
+            for (Block block : getBlocksUnder()) {
+                if (!block.canPassThrough() && block.collidesWithBB(realBB)) {
+                    onGround = true;
+                    break;
                 }
             }
 
@@ -1552,6 +1535,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (this.spawned) {
+            if(this.newPosition != null && this.newPosition.equals(this)) {
+                this.blocksAround = null;
+                this.blocksUnder = null;
+                getBlocksAround();
+            }
+
             this.processMovement(tickDiff);
 
             this.entityBaseTick(tickDiff);
