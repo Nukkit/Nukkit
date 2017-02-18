@@ -15,6 +15,8 @@ import cn.nukkit.level.Level;
  */
 public class ItemBucket extends Item {
 
+    private static final int[] SIDES_NSEW = new int[]{ Block.SIDE_NORTH, Block.SIDE_SOUTH, Block.SIDE_EAST, Block.SIDE_WEST };
+
     public ItemBucket() {
         this(0, 1);
     }
@@ -77,22 +79,11 @@ public class ItemBucket extends Item {
 
                     // When water is removed ensure any adjacent still water is
                     // replaced with water that can flow.
-                    Block north = target.getSide(target.SIDE_NORTH);
-                    Block south = target.getSide(target.SIDE_SOUTH);
-                    Block east = target.getSide(target.SIDE_EAST);
-                    Block west = target.getSide(target.SIDE_WEST);
-
-                    if (north.getId() == STILL_WATER) {
-                        level.setBlock(north, new BlockWater());
-                    }
-                    if (south.getId() == STILL_WATER) {
-                        level.setBlock(south, new BlockWater());
-                    }
-                    if (east.getId() == STILL_WATER) {
-                        level.setBlock(east, new BlockWater());
-                    }
-                    if (west.getId() == STILL_WATER) {
-                        level.setBlock(west, new BlockWater());
+                    for (int side : this.SIDES_NSEW) {
+                        Block b = target.getSide(side);
+                        if (b.getId() == STILL_WATER) {
+                            level.setBlock(b, new BlockWater());
+                        }
                     }
 
                     if (player.isSurvival()) {
