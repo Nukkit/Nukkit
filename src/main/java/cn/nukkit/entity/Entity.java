@@ -225,6 +225,8 @@ public abstract class Entity extends Location implements Metadatable {
 
     protected boolean isPlayer = false;
 
+    public long lastCactusDamage = 0;
+
     public float getHeight() {
         return 0;
     }
@@ -746,6 +748,13 @@ public abstract class Entity extends Location implements Metadatable {
                 || source.getCause() == EntityDamageEvent.CAUSE_FIRE_TICK
                 || source.getCause() == EntityDamageEvent.CAUSE_LAVA)) {
             source.setCancelled();
+        }
+        if(source.getCause() == EntityDamageEvent.CAUSE_CONTACT || source.getCause() == EntityDamageEvent.CAUSE_LAVA){
+            if(System.nanoTime() - this.lastCactusDamage >= 1000000000){
+                this.lastCactusDamage = System.nanoTime();
+            }else{
+                return;
+            }
         }
 
         getServer().getPluginManager().callEvent(source);

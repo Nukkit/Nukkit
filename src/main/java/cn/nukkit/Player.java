@@ -1127,26 +1127,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean awardAchievement(String achievementId) {
-        Achievement achievement = Achievement.achievements.get(achievementId);
-
-        if (achievement == null || hasAchievement(achievementId)) {
-            return false;
-        }
-
-        for (String id : achievement.requires) {
-            if (!this.hasAchievement(id)) {
-                return false;
-            }
-        }
-        PlayerAchievementAwardedEvent event = new PlayerAchievementAwardedEvent(this, achievementId);
-        this.server.getPluginManager().callEvent(event);
-
-        if (event.isCancelled()) {
-            return false;
-        }
-
-        this.achievements.add(achievementId);
-        achievement.broadcast(this);
         return true;
     }
 
@@ -3440,7 +3420,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 if (tr.getSlot() == 2) {
                                     switch (((FurnaceInventory) inv).getResult().getId()) {
                                         case Item.IRON_INGOT:
-                                            achievements.add("acquireIron");
+                                            //achievements.add("acquireIron");
                                             break;
                                     }
                                 }

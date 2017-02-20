@@ -47,8 +47,21 @@ public class BlockItemFrame extends BlockTransparent {
     public boolean onActivate(Item item, Player player) {
         BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
         BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntity;
+        /*if(!(itemFrame instanceof BlockEntityItemFram)){
+            CompoundTag nbt = new CompoundTag()
+                    .putString("id", BlockEntity.ITEM_FRAME)
+                    .putInt("x", (int) block.x)
+                    .putInt("y", (int) block.y)
+                    .putInt("z", (int) block.z)
+                    .putByte("ItemRotation", 0)
+                    .putFloat("ItemDropChance", 1.0f);
+            new BlockEntityItemFrame(this.getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
+        }*/
         if (itemFrame.getItem().getId() == Item.AIR) {
-            itemFrame.setItem(Item.get(item.getId(), item.getDamage(), 1));
+            //itemFrame.setItem(Item.get(item.getId(), item.getDamage(), 1));
+            Item itemOnFrame = item.clone();
+            itemOnFrame.setCount(1);
+            itemFrame.setItem(itemOnFrame);
             this.getLevel().addSound(new ItemFrameItemAddedSound(this));
             if (player != null && player.isSurvival()) {
                 int count = item.getCount();
