@@ -65,7 +65,6 @@ import cn.nukkit.event.inventory.CraftItemEvent;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryPickupArrowEvent;
 import cn.nukkit.event.inventory.InventoryPickupItemEvent;
-import cn.nukkit.event.player.PlayerAchievementAwardedEvent;
 import cn.nukkit.event.player.PlayerAnimationEvent;
 import cn.nukkit.event.player.PlayerBedEnterEvent;
 import cn.nukkit.event.player.PlayerBedLeaveEvent;
@@ -324,6 +323,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public int messageCount = 0;
     public LinkedHashMap<Integer, String> messageQueue = new LinkedHashMap<Integer, String>();
+
+    public int UIProfile = LoginPacket.GUI_POCKET;
 
     public BlockEnderChest getViewingEnderChest() {
         return viewingEnderChest;
@@ -735,10 +736,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
 
-            if (level != this.level) { 
+            if (level != this.level) {
                 FullChunkDataPacket pk = new FullChunkDataPacket();
                 pk.chunkX = x;
-                pk.chunkZ = z; 
+                pk.chunkZ = z;
                 pk.data = new byte[]{(byte) 16};
                 this.dataPacket(pk);
             }
@@ -1670,7 +1671,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
         }
- 
+
         if(this.messageCount > 0){
             String message = "";
             for (Map.Entry<Integer, String> e : this.messageQueue.entrySet()){
@@ -2013,6 +2014,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     this.uuid = loginPacket.clientUUID;
                     this.rawUUID = Binary.writeUUID(this.uuid);
+                    this.UIProfile = loginPacket.UIProfile;
 
                     boolean valid = true;
                     int len = loginPacket.username.length();
@@ -3355,7 +3357,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (containerSetSlotPacket.slot < 0) {
                         break;
                     }
-
                     BaseTransaction transaction;
                     if (containerSetSlotPacket.windowid == 0) { //Our inventory
                         if (containerSetSlotPacket.slot >= this.inventory.getSize()) {
