@@ -1,9 +1,14 @@
 package cn.nukkit.entity.monsters;
 
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.entity.monsters.mobutils.Drops;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EntitySpider extends EntityCreature {
 
@@ -45,7 +50,18 @@ public class EntitySpider extends EntityCreature {
 
    @Override
     public Item[] getDrops() {
-        return new Item[]{Item.get(Item.STRING), Item.get(Item.SPIDER_EYE)};   
+        List<Item> drops = new ArrayList<>();
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+            int strings = Drops.rand(0, 3); // drops 0-2 strings
+            int spiderEye = Drops.rand(0, 3) == 0 ? 1 : 0; // with a 1/3 chance it drops a spider eye
+            for (int i = 0; i < strings; i++) {
+                drops.add(Item.get(Item.STRING, 0, 1));
+            }
+            for (int i = 0; i < spiderEye; i++) {
+                drops.add(Item.get(Item.SPIDER_EYE, 0, 1));
+            }
+        }
+        return drops.toArray(new Item[drops.size()]);
     }
 
     public int getKillExperience() {
