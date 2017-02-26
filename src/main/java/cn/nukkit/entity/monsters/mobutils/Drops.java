@@ -1,4 +1,4 @@
-package cn.nukkit.entity.monsters.mobutils.Drops;
+package cn.nukkit.entity.monsters.mobutils;
 
 import java.util.Random;
 
