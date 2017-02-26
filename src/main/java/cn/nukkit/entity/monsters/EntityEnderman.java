@@ -5,7 +5,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.entity.monsters.mobutils.dropsRandomizer;
+import cn.nukkit.entity.monsters.mobutils.Drops;
 
 import java.util.ArrayList;
 import java.util.List;
