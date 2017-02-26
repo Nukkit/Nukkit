@@ -1,9 +1,9 @@
-package cn.nukkit.entity.monsters.MobUtils;
+package cn.nukkit.entity.monsters.dropsRandomizer;
 
 import java.util.Random;
 
 
-public class Utils {
+public class dropsRandomizer {
 
     private static final Random random = new Random(System.currentTimeMillis());
 
