@@ -4566,9 +4566,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setMovementSpeed(this.movementSpeed);
     }
 
-    public void transfer(string address, int port = 19132) {
+    public void transfer(string address, int port) {
 		PlayerTransferEvent event = this.getServer().getPluginManager().callEvent(new PlayerTransferEvent(this, address, port));
-		if(!event.isCancelled()){
+		if(!(event.isCancelled())){
 			TransferPacket pk = new TransferPacket();
 			pk.address = address;
 			pk.port = port;
