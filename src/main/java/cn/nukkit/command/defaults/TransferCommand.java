@@ -5,6 +5,7 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TranslationContainer;
+import cn.nukkit.utils.TextFormat;
 
 /**
  * author: MagicDroidX
@@ -20,7 +21,7 @@ public class TransferCommand extends VanillaCommand {
                 new CommandParameter[]{
                         new CommandParameter("address", CommandParameter.ARG_TYPE_STRING, false)
                 });
-		this.commandParameters("2arg",
+		this.commandParameters.put("2arg",
 				new CommandParameter[]{
 					new CommandParameter("port", CommandParameter.ARG_TYPE_INT, false)
 				});
@@ -43,6 +44,9 @@ public class TransferCommand extends VanillaCommand {
             
             return false;
         }
+		
+		String address = args[0];
+		int port = args[1];
 		
 		sender.transfer(address, port);
 		
