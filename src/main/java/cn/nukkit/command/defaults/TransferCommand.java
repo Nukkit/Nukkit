@@ -16,7 +16,7 @@ public class TransferCommand extends VanillaCommand {
         this.commandParameters.clear();
         this.commandParameters.put("1arg",
                 new CommandParameter[]{
-                        new CommandParameter("address", CommandParameter.ARG_TYPE_STRING, false),
+                        new CommandParameter("address", CommandParameter.ARG_TYPE_STRING, false)
                 });
 		this.commandParameters("2arg",
 				new CommandParameter[]{
