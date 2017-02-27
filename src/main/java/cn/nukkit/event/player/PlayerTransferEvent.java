@@ -11,7 +11,10 @@ public class PlayerTransferEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
-	public PlayerTransferEvent(Player player, string address, int port){
+	public String address;
+	public int port = 19132;
+	
+	public PlayerTransferEvent(Player player, String address, int port){
 		this.player = player;
 		this.address = address;
 		this.port = port;
@@ -21,11 +24,11 @@ public class PlayerTransferEvent extends PlayerEvent implements Cancellable {
 		return this.player;
 	}
 	
-	public string getAddress(){
+	public String getAddress(){
 		return this.address;
 	}
 	
-	public void setAddress(string address){
+	public void setAddress(String address){
 		this.address = address;
 	}
 	
