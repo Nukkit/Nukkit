@@ -20,7 +20,7 @@ public class TransferCommand extends VanillaCommand {
                 });
 		this.commandParameters("2arg",
 				new CommandParameter[]{
-					new CommandParameter("port", CommandParameter.ARG_TYPE_INT, false);
+					new CommandParameter("port", CommandParameter.ARG_TYPE_INT, false)
 				});
     }
 
