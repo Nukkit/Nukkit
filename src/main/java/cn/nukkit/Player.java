@@ -2544,6 +2544,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 }
 
                                 this.server.getPluginManager().callEvent(entityShootBowEvent);
+                                if(entityShootBowEvent.getProjectile() instanceof EntityArrow) {
+                                    EntityArrow arrow = (EntityArrow) entityShootBowEvent.getProjectile();
+                                    arrow.setCritical(entityShootBowEvent.isCritical());
+                                }
                                 if (entityShootBowEvent.isCancelled()) {
                                     entityShootBowEvent.getProjectile().kill();
                                     this.inventory.sendContents(this);

@@ -24,11 +24,14 @@ public class EntityShootBowEvent extends EntityEvent implements Cancellable {
 
     private double force;
 
+    private boolean critical;
+
     public EntityShootBowEvent(EntityLiving shooter, Item bow, EntityProjectile projectile, double force) {
         this.entity = shooter;
         this.bow = bow;
         this.projectile = projectile;
         this.force = force;
+        this.critical = force == 2;
     }
 
     @Override
@@ -62,5 +65,13 @@ public class EntityShootBowEvent extends EntityEvent implements Cancellable {
 
     public void setForce(double force) {
         this.force = force;
+    }
+
+    public boolean isCritical() {
+        return this.critical;
+    }
+
+    public void setCritical(boolean bool) {
+        this.critical = bool;
     }
 }
