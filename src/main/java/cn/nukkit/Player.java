@@ -1,6 +1,7 @@
 package cn.nukkit;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -175,6 +176,7 @@ import cn.nukkit.network.protocol.SetTimePacket;
 import cn.nukkit.network.protocol.StartGamePacket;
 import cn.nukkit.network.protocol.TakeItemEntityPacket;
 import cn.nukkit.network.protocol.TextPacket;
+import cn.nukkit.network.protocol.TransferPacket;
 import cn.nukkit.network.protocol.UpdateAttributesPacket;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
 import cn.nukkit.network.protocol.UseItemPacket;
@@ -323,6 +325,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public int messageCount = 0;
     public LinkedHashMap<Integer, String> messageQueue = new LinkedHashMap<Integer, String>();
+
+    public int ADRole;
+
+    public int CurrentInputMode;
+    public int DefaultInputMode;
+
+    public String DeviceModel;
+    public int DeviceOS;
+
+    public String GameVersion;
+
+    public int GuiScale;
+
+    public String serverAddress;
+
+    public String TenantId;
 
     public int UIProfile = LoginPacket.GUI_POCKET;
 
@@ -885,7 +903,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.joined", new String[]{
                         this.getDisplayName()
                 })
-        );
+                );
 
         this.server.getPluginManager().callEvent(playerJoinEvent);
 
@@ -1347,13 +1365,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
 
                         switch (item.getId()) {
-                            case Item.WOOD:
-                            case Item.WOOD2:
-                                this.awardAchievement("mineWood");
-                                break;
-                            case Item.DIAMOND:
-                                this.awardAchievement("diamond");
-                                break;
+                        case Item.WOOD:
+                        case Item.WOOD2:
+                            this.awardAchievement("mineWood");
+                            break;
+                        case Item.DIAMOND:
+                            this.awardAchievement("diamond");
+                            break;
                         }
                         /*switch (item.getId()) {
                             case Item.WOOD:
@@ -1818,9 +1836,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.setLevel(this.server.getDefaultLevel());
             nbt.putString("Level", this.level.getName());
             nbt.getList("Pos", DoubleTag.class)
-                    .add(new DoubleTag("0", this.level.getSpawnLocation().x))
-                    .add(new DoubleTag("1", this.level.getSpawnLocation().y))
-                    .add(new DoubleTag("2", this.level.getSpawnLocation().z));
+            .add(new DoubleTag("0", this.level.getSpawnLocation().x))
+            .add(new DoubleTag("1", this.level.getSpawnLocation().y))
+            .add(new DoubleTag("2", this.level.getSpawnLocation().z));
         } else {
             this.setLevel(level);
         }
@@ -1974,7 +1992,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             packetswitch:
-            switch (packet.pid()) {
+                switch (packet.pid()) {
                 case ProtocolInfo.LOGIN_PACKET:
                     if (this.loggedIn) {
                         break;
@@ -2014,6 +2032,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     this.uuid = loginPacket.clientUUID;
                     this.rawUUID = Binary.writeUUID(this.uuid);
+
+                    this.ADRole = loginPacket.ADRole;
+
+                    this.CurrentInputMode = loginPacket.CurrentInputMode;
+                    this.DefaultInputMode = loginPacket.DefaultInputMode;
+
+                    this.DeviceModel = loginPacket.DeviceModel;
+                    this.DeviceOS = loginPacket.DeviceOS;
+
+                    this.GameVersion = loginPacket.GameVersion;
+
+                    this.GuiScale = loginPacket.GuiScale;
+
+                    this.serverAddress = loginPacket.serverAddress;
+
+                    this.TenantId = loginPacket.TenantId;
+
                     this.UIProfile = loginPacket.UIProfile;
 
                     boolean valid = true;
@@ -2249,7 +2284,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 -Math.sin(this.yaw / 180d * Math.PI) * Math.cos(this.pitch / 180d * Math.PI),
                                 -Math.sin(this.pitch / 180d * Math.PI),
                                 Math.cos(this.yaw / 180d * Math.PI) * Math.cos(this.pitch / 180d * Math.PI)
-                        );
+                                );
 
                         if (this.isCreative()) {
                             item = this.inventory.getItemInHand();
@@ -2276,7 +2311,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             .add(new DoubleTag("", y + this.getEyeHeight()))
                                             .add(new DoubleTag("", z)))
                                     .putList(new ListTag<DoubleTag>("Motion")
-                                       /* .add(new DoubleTag("", aimPos.x))
+                                            /* .add(new DoubleTag("", aimPos.x))
                                         .add(new DoubleTag("", aimPos.y))
                                         .add(new DoubleTag("", aimPos.z)))*/
                                             .add(new DoubleTag("", -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)))
@@ -2313,7 +2348,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             .add(new DoubleTag("", y + this.getEyeHeight()))
                                             .add(new DoubleTag("", z)))
                                     .putList(new ListTag<DoubleTag>("Motion")
-                                       /* .add(new DoubleTag("", aimPos.x))
+                                            /* .add(new DoubleTag("", aimPos.x))
                                         .add(new DoubleTag("", aimPos.y))
                                         .add(new DoubleTag("", aimPos.z)))*/
                                             .add(new DoubleTag("", -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)))
@@ -2426,213 +2461,213 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     Vector3 pos = new Vector3(((PlayerActionPacket) packet).x, ((PlayerActionPacket) packet).y, ((PlayerActionPacket) packet).z);
 
                     switch (((PlayerActionPacket) packet).action) {
-                        case PlayerActionPacket.ACTION_START_BREAK:
-                            if (this.lastBreak != Long.MAX_VALUE || pos.distanceSquared(this) > 10000) {
-                                break;
-                            }
-                            Block target = this.level.getBlock(pos);
-                            PlayerInteractEvent playerInteractEvent = new PlayerInteractEvent(this, this.inventory.getItemInHand(), target, ((PlayerActionPacket) packet).face, target.getId() == 0 ? PlayerInteractEvent.LEFT_CLICK_AIR : PlayerInteractEvent.LEFT_CLICK_BLOCK);
-                            this.getServer().getPluginManager().callEvent(playerInteractEvent);
-                            if (playerInteractEvent.isCancelled()) {
-                                this.inventory.sendHeldItem(this);
-                                break;
-                            }
-                            Block block = target.getSide(((PlayerActionPacket) packet).face);
-                            if (block.getId() == Block.FIRE) {
-                                this.level.setBlock(block, new BlockAir(), true);
-                                break;
-                            }
-                            this.lastBreak = System.currentTimeMillis();
+                    case PlayerActionPacket.ACTION_START_BREAK:
+                        if (this.lastBreak != Long.MAX_VALUE || pos.distanceSquared(this) > 10000) {
                             break;
-
-                        case PlayerActionPacket.ACTION_ABORT_BREAK:
-                            this.lastBreak = Long.MAX_VALUE;
+                        }
+                        Block target = this.level.getBlock(pos);
+                        PlayerInteractEvent playerInteractEvent = new PlayerInteractEvent(this, this.inventory.getItemInHand(), target, ((PlayerActionPacket) packet).face, target.getId() == 0 ? PlayerInteractEvent.LEFT_CLICK_AIR : PlayerInteractEvent.LEFT_CLICK_BLOCK);
+                        this.getServer().getPluginManager().callEvent(playerInteractEvent);
+                        if (playerInteractEvent.isCancelled()) {
+                            this.inventory.sendHeldItem(this);
                             break;
-
-                        case PlayerActionPacket.ACTION_STOP_BREAK:
+                        }
+                        Block block = target.getSide(((PlayerActionPacket) packet).face);
+                        if (block.getId() == Block.FIRE) {
+                            this.level.setBlock(block, new BlockAir(), true);
                             break;
+                        }
+                        this.lastBreak = System.currentTimeMillis();
+                        break;
 
-                        case PlayerActionPacket.ACTION_RELEASE_ITEM:
-                            if (this.startAction > -1 && this.getDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION)) {
-                                if (this.inventory.getItemInHand().getId() == Item.BOW) {
+                    case PlayerActionPacket.ACTION_ABORT_BREAK:
+                        this.lastBreak = Long.MAX_VALUE;
+                        break;
 
-                                    Item bow = this.inventory.getItemInHand();
-                                    ItemArrow itemArrow = new ItemArrow();
-                                    if (this.isSurvival() && !this.inventory.contains(itemArrow)) {
-                                        this.inventory.sendContents(this);
-                                        break;
+                    case PlayerActionPacket.ACTION_STOP_BREAK:
+                        break;
+
+                    case PlayerActionPacket.ACTION_RELEASE_ITEM:
+                        if (this.startAction > -1 && this.getDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION)) {
+                            if (this.inventory.getItemInHand().getId() == Item.BOW) {
+
+                                Item bow = this.inventory.getItemInHand();
+                                ItemArrow itemArrow = new ItemArrow();
+                                if (this.isSurvival() && !this.inventory.contains(itemArrow)) {
+                                    this.inventory.sendContents(this);
+                                    break;
+                                }
+
+                                double damage = 2;
+                                boolean flame = false;
+
+                                if (bow.hasEnchantments()) {
+                                    Enchantment bowDamage = bow.getEnchantment(Enchantment.ID_BOW_POWER);
+
+                                    if (bowDamage != null && bowDamage.getLevel() > 0) {
+                                        damage += 0.25 * (bowDamage.getLevel() + 1);
                                     }
 
-                                    double damage = 2;
-                                    boolean flame = false;
+                                    Enchantment flameEnchant = bow.getEnchantment(Enchantment.ID_BOW_FLAME);
+                                    flame = flameEnchant != null && flameEnchant.getLevel() > 0;
+                                }
 
-                                    if (bow.hasEnchantments()) {
-                                        Enchantment bowDamage = bow.getEnchantment(Enchantment.ID_BOW_POWER);
+                                double speedX = -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)*1.8;
+                                double speedY = -Math.sin(pitch / 180 * Math.PI)*1.8;
+                                double speedZ = Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)*1.8;
 
-                                        if (bowDamage != null && bowDamage.getLevel() > 0) {
-                                            damage += 0.25 * (bowDamage.getLevel() + 1);
-                                        }
+                                int diff = (this.server.getTick() - this.startAction);
+                                double p = (double) diff / 20;
+                                double f = Math.min((p * p + p * 2) / 3, 1) * 2;
 
-                                        Enchantment flameEnchant = bow.getEnchantment(Enchantment.ID_BOW_FLAME);
-                                        flame = flameEnchant != null && flameEnchant.getLevel() > 0;
-                                    }
+                                double ff = (double) diff / 10;
+                                double fff = ff - 0.2;
+                                CompoundTag nbt = new CompoundTag()
+                                        .putList(new ListTag<DoubleTag>("Pos")
+                                                .add(new DoubleTag("", x))
+                                                .add(new DoubleTag("", y + this.getEyeHeight()))
+                                                .add(new DoubleTag("", z)))
+                                        .putList(new ListTag<DoubleTag>("Motion")
+                                                .add(new DoubleTag("", speedX))
+                                                .add(new DoubleTag("", speedY))
+                                                .add(new DoubleTag("", speedZ)))
+                                        .putList(new ListTag<FloatTag>("Rotation")
+                                                .add(new FloatTag("", (float) yaw))
+                                                .add(new FloatTag("", (float) pitch)))
+                                        .putShort("Fire", this.isOnFire() || flame ? 45 * 60 : 0)
+                                        .putDouble("damage", damage);
 
-                                    double speedX = -Math.sin(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)*1.8;
-                                    double speedY = -Math.sin(pitch / 180 * Math.PI)*1.8;
-                                    double speedZ = Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI)*1.8;
+                                EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(this, bow, new EntityArrow(this.chunk, nbt, this, f == 2), f);
 
-                                    int diff = (this.server.getTick() - this.startAction);
-                                    double p = (double) diff / 20;
-                                    double f = Math.min((p * p + p * 2) / 3, 1) * 2;
+                                if (f < 0.1 || diff < 5) {
+                                    entityShootBowEvent.setCancelled();
+                                }
 
-                                    double ff = (double) diff / 10;
-                                    double fff = ff - 0.2;
-                                    CompoundTag nbt = new CompoundTag()
-                                            .putList(new ListTag<DoubleTag>("Pos")
-                                                    .add(new DoubleTag("", x))
-                                                    .add(new DoubleTag("", y + this.getEyeHeight()))
-                                                    .add(new DoubleTag("", z)))
-                                            .putList(new ListTag<DoubleTag>("Motion")
-                                                    .add(new DoubleTag("", speedX))
-                                                    .add(new DoubleTag("", speedY))
-                                                    .add(new DoubleTag("", speedZ)))
-                                            .putList(new ListTag<FloatTag>("Rotation")
-                                                    .add(new FloatTag("", (float) yaw))
-                                                    .add(new FloatTag("", (float) pitch)))
-                                            .putShort("Fire", this.isOnFire() || flame ? 45 * 60 : 0)
-                                            .putDouble("damage", damage);
+                                this.server.getPluginManager().callEvent(entityShootBowEvent);
+                                if (entityShootBowEvent.isCancelled()) {
+                                    entityShootBowEvent.getProjectile().kill();
+                                    this.inventory.sendContents(this);
+                                } else {
+                                    entityShootBowEvent.getProjectile().setMotion(entityShootBowEvent.getProjectile().getMotion().multiply(entityShootBowEvent.getForce()));
+                                    if (this.isSurvival()) {
+                                        Enchantment infinity;
 
-                                    EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(this, bow, new EntityArrow(this.chunk, nbt, this, f == 2), f);
+                                        if (!bow.hasEnchantments() || (infinity = bow.getEnchantment(Enchantment.ID_BOW_INFINITY)) == null || infinity.getLevel() <= 0)
+                                            this.inventory.removeItem(itemArrow);
 
-                                    if (f < 0.1 || diff < 5) {
-                                        entityShootBowEvent.setCancelled();
-                                    }
-
-                                    this.server.getPluginManager().callEvent(entityShootBowEvent);
-                                    if (entityShootBowEvent.isCancelled()) {
-                                        entityShootBowEvent.getProjectile().kill();
-                                        this.inventory.sendContents(this);
-                                    } else {
-                                        entityShootBowEvent.getProjectile().setMotion(entityShootBowEvent.getProjectile().getMotion().multiply(entityShootBowEvent.getForce()));
-                                        if (this.isSurvival()) {
-                                            Enchantment infinity;
-
-                                            if (!bow.hasEnchantments() || (infinity = bow.getEnchantment(Enchantment.ID_BOW_INFINITY)) == null || infinity.getLevel() <= 0)
-                                                this.inventory.removeItem(itemArrow);
-
-                                            if (!bow.isUnbreakable()) {
-                                                Enchantment durability = bow.getEnchantment(Enchantment.ID_DURABILITY);
-                                                if (!(durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= new Random().nextInt(100))) {
-                                                    bow.setDamage(bow.getDamage() + 1);
-                                                    if (bow.getDamage() >= 385) {
-                                                        this.inventory.setItemInHand(new ItemBlock(new BlockAir(), 0, 0));
-                                                    } else {
-                                                        this.inventory.setItemInHand(bow);
-                                                    }
+                                        if (!bow.isUnbreakable()) {
+                                            Enchantment durability = bow.getEnchantment(Enchantment.ID_DURABILITY);
+                                            if (!(durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= new Random().nextInt(100))) {
+                                                bow.setDamage(bow.getDamage() + 1);
+                                                if (bow.getDamage() >= 385) {
+                                                    this.inventory.setItemInHand(new ItemBlock(new BlockAir(), 0, 0));
+                                                } else {
+                                                    this.inventory.setItemInHand(bow);
                                                 }
                                             }
                                         }
-                                        if (entityShootBowEvent.getProjectile() instanceof EntityProjectile) {
-                                            ProjectileLaunchEvent projectev = new ProjectileLaunchEvent(entityShootBowEvent.getProjectile());
-                                            this.server.getPluginManager().callEvent(projectev);
-                                            if (projectev.isCancelled()) {
-                                                entityShootBowEvent.getProjectile().kill();
-                                            } else {
-                                                entityShootBowEvent.getProjectile().spawnToAll();
-                                                this.level.addSound(new LaunchSound(this), this.getViewers().values());
-                                            }
+                                    }
+                                    if (entityShootBowEvent.getProjectile() instanceof EntityProjectile) {
+                                        ProjectileLaunchEvent projectev = new ProjectileLaunchEvent(entityShootBowEvent.getProjectile());
+                                        this.server.getPluginManager().callEvent(projectev);
+                                        if (projectev.isCancelled()) {
+                                            entityShootBowEvent.getProjectile().kill();
                                         } else {
                                             entityShootBowEvent.getProjectile().spawnToAll();
+                                            this.level.addSound(new LaunchSound(this), this.getViewers().values());
                                         }
+                                    } else {
+                                        entityShootBowEvent.getProjectile().spawnToAll();
                                     }
                                 }
                             }
-                            //milk removed here, see the section of food
+                        }
+                        //milk removed here, see the section of food
 
-                        case PlayerActionPacket.ACTION_STOP_SLEEPING:
-                            this.stopSleep();
+                    case PlayerActionPacket.ACTION_STOP_SLEEPING:
+                        this.stopSleep();
+                        break;
+
+                    case PlayerActionPacket.ACTION_RESPAWN:
+                        if (!this.spawned || this.isAlive() || !this.isOnline()) {
                             break;
+                        }
 
-                        case PlayerActionPacket.ACTION_RESPAWN:
-                            if (!this.spawned || this.isAlive() || !this.isOnline()) {
-                                break;
-                            }
+                        this.craftingType = CRAFTING_SMALL;
 
-                            this.craftingType = CRAFTING_SMALL;
+                        PlayerRespawnEvent playerRespawnEvent = new PlayerRespawnEvent(this, this.getSpawn());
+                        this.server.getPluginManager().callEvent(playerRespawnEvent);
 
-                            PlayerRespawnEvent playerRespawnEvent = new PlayerRespawnEvent(this, this.getSpawn());
-                            this.server.getPluginManager().callEvent(playerRespawnEvent);
+                        this.teleport(playerRespawnEvent.getRespawnPosition(), null);
 
-                            this.teleport(playerRespawnEvent.getRespawnPosition(), null);
+                        this.setSprinting(false, true);
+                        this.setSneaking(false);
 
-                            this.setSprinting(false, true);
-                            this.setSneaking(false);
+                        this.extinguish();
+                        this.setDataProperty(new ShortEntityData(Player.DATA_AIR, 400), false);
+                        this.deadTicks = 0;
+                        this.noDamageTicks = 60;
 
-                            this.extinguish();
-                            this.setDataProperty(new ShortEntityData(Player.DATA_AIR, 400), false);
-                            this.deadTicks = 0;
-                            this.noDamageTicks = 60;
+                        this.setHealth(this.getMaxHealth());
+                        this.getFoodData().setLevel(20, 20);
 
-                            this.setHealth(this.getMaxHealth());
-                            this.getFoodData().setLevel(20, 20);
+                        this.removeAllEffects();
+                        this.sendData(this);
 
-                            this.removeAllEffects();
+                        this.setMovementSpeed(DEFAULT_SPEED);
+
+                        this.getAdventureSettings().update();
+                        this.inventory.sendContents(this);
+                        this.inventory.sendArmorContents(this);
+
+                        this.blocked = false;
+
+                        this.spawnToAll();
+                        this.scheduleUpdate();
+                        break;
+
+                    case PlayerActionPacket.ACTION_JUMP:
+                        break packetswitch;
+
+                    case PlayerActionPacket.ACTION_START_SPRINT:
+                        PlayerToggleSprintEvent playerToggleSprintEvent = new PlayerToggleSprintEvent(this, true);
+                        this.server.getPluginManager().callEvent(playerToggleSprintEvent);
+                        if (playerToggleSprintEvent.isCancelled()) {
                             this.sendData(this);
+                        } else {
+                            this.setSprinting(true);
+                        }
+                        break packetswitch;
 
-                            this.setMovementSpeed(DEFAULT_SPEED);
+                    case PlayerActionPacket.ACTION_STOP_SPRINT:
+                        playerToggleSprintEvent = new PlayerToggleSprintEvent(this, false);
+                        this.server.getPluginManager().callEvent(playerToggleSprintEvent);
+                        if (playerToggleSprintEvent.isCancelled()) {
+                            this.sendData(this);
+                        } else {
+                            this.setSprinting(false);
+                        }
+                        break packetswitch;
 
-                            this.getAdventureSettings().update();
-                            this.inventory.sendContents(this);
-                            this.inventory.sendArmorContents(this);
+                    case PlayerActionPacket.ACTION_START_SNEAK:
+                        PlayerToggleSneakEvent playerToggleSneakEvent = new PlayerToggleSneakEvent(this, true);
+                        this.server.getPluginManager().callEvent(playerToggleSneakEvent);
+                        if (playerToggleSneakEvent.isCancelled()) {
+                            this.sendData(this);
+                        } else {
+                            this.setSneaking(true);
+                        }
+                        break packetswitch;
 
-                            this.blocked = false;
-
-                            this.spawnToAll();
-                            this.scheduleUpdate();
-                            break;
-
-                        case PlayerActionPacket.ACTION_JUMP:
-                            break packetswitch;
-
-                        case PlayerActionPacket.ACTION_START_SPRINT:
-                            PlayerToggleSprintEvent playerToggleSprintEvent = new PlayerToggleSprintEvent(this, true);
-                            this.server.getPluginManager().callEvent(playerToggleSprintEvent);
-                            if (playerToggleSprintEvent.isCancelled()) {
-                                this.sendData(this);
-                            } else {
-                                this.setSprinting(true);
-                            }
-                            break packetswitch;
-
-                        case PlayerActionPacket.ACTION_STOP_SPRINT:
-                            playerToggleSprintEvent = new PlayerToggleSprintEvent(this, false);
-                            this.server.getPluginManager().callEvent(playerToggleSprintEvent);
-                            if (playerToggleSprintEvent.isCancelled()) {
-                                this.sendData(this);
-                            } else {
-                                this.setSprinting(false);
-                            }
-                            break packetswitch;
-
-                        case PlayerActionPacket.ACTION_START_SNEAK:
-                            PlayerToggleSneakEvent playerToggleSneakEvent = new PlayerToggleSneakEvent(this, true);
-                            this.server.getPluginManager().callEvent(playerToggleSneakEvent);
-                            if (playerToggleSneakEvent.isCancelled()) {
-                                this.sendData(this);
-                            } else {
-                                this.setSneaking(true);
-                            }
-                            break packetswitch;
-
-                        case PlayerActionPacket.ACTION_STOP_SNEAK:
-                            playerToggleSneakEvent = new PlayerToggleSneakEvent(this, false);
-                            this.server.getPluginManager().callEvent(playerToggleSneakEvent);
-                            if (playerToggleSneakEvent.isCancelled()) {
-                                this.sendData(this);
-                            } else {
-                                this.setSneaking(false);
-                            }
-                            break packetswitch;
+                    case PlayerActionPacket.ACTION_STOP_SNEAK:
+                        playerToggleSneakEvent = new PlayerToggleSneakEvent(this, false);
+                        this.server.getPluginManager().callEvent(playerToggleSneakEvent);
+                        if (playerToggleSneakEvent.isCancelled()) {
+                            this.sendData(this);
+                        } else {
+                            this.setSneaking(false);
+                        }
+                        break packetswitch;
                     }
 
                     this.startAction = -1;
@@ -2726,47 +2761,47 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             } else if (targetEntity instanceof EntityVehicle) {
                                 SetEntityLinkPacket pk;
                                 switch (((InteractPacket) packet).action) {
-                                    case InteractPacket.ACTION_RIGHT_CLICK:
-                                        cancelled = true;
+                                case InteractPacket.ACTION_RIGHT_CLICK:
+                                    cancelled = true;
 
-                                        if (((EntityVehicle) targetEntity).linkedEntity != null) {
-                                            break;
-                                        }
-                                        pk = new SetEntityLinkPacket();
-                                        pk.rider = targetEntity.getId();
-                                        pk.riding = this.id;
-                                        pk.type = 2;
-                                        Server.broadcastPacket(this.hasSpawned.values(), pk);
-
-                                        pk = new SetEntityLinkPacket();
-                                        pk.rider = targetEntity.getId();
-                                        pk.riding = 0;
-                                        pk.type = 2;
-                                        dataPacket(pk);
-
-                                        riding = targetEntity;
-                                        ((EntityVehicle) targetEntity).linkedEntity = this;
-
-                                        this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
+                                    if (((EntityVehicle) targetEntity).linkedEntity != null) {
                                         break;
-                                    case InteractPacket.ACTION_VEHICLE_EXIT:
-                                        pk = new SetEntityLinkPacket();
-                                        pk.rider = targetEntity.getId();
-                                        pk.riding = this.id;
-                                        pk.type = 3;
-                                        Server.broadcastPacket(this.hasSpawned.values(), pk);
+                                    }
+                                    pk = new SetEntityLinkPacket();
+                                    pk.rider = targetEntity.getId();
+                                    pk.riding = this.id;
+                                    pk.type = 2;
+                                    Server.broadcastPacket(this.hasSpawned.values(), pk);
 
-                                        pk = new SetEntityLinkPacket();
-                                        pk.rider = targetEntity.getId();
-                                        pk.riding = 0;
-                                        pk.type = 3;
-                                        dataPacket(pk);
+                                    pk = new SetEntityLinkPacket();
+                                    pk.rider = targetEntity.getId();
+                                    pk.riding = 0;
+                                    pk.type = 2;
+                                    dataPacket(pk);
 
-                                        cancelled = true;
-                                        riding = null;
-                                        ((EntityVehicle) targetEntity).linkedEntity = null;
-                                        this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
-                                        break;
+                                    riding = targetEntity;
+                                    ((EntityVehicle) targetEntity).linkedEntity = this;
+
+                                    this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
+                                    break;
+                                case InteractPacket.ACTION_VEHICLE_EXIT:
+                                    pk = new SetEntityLinkPacket();
+                                    pk.rider = targetEntity.getId();
+                                    pk.riding = this.id;
+                                    pk.type = 3;
+                                    Server.broadcastPacket(this.hasSpawned.values(), pk);
+
+                                    pk = new SetEntityLinkPacket();
+                                    pk.rider = targetEntity.getId();
+                                    pk.riding = 0;
+                                    pk.type = 3;
+                                    dataPacket(pk);
+
+                                    cancelled = true;
+                                    riding = null;
+                                    ((EntityVehicle) targetEntity).linkedEntity = null;
+                                    this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
+                                    break;
                                 }
                             }
 
@@ -2825,50 +2860,50 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     EntityEventPacket entityEventPacket = (EntityEventPacket) packet;
 
                     switch (entityEventPacket.event) {
-                        case EntityEventPacket.USE_ITEM: //Eating
-                            Item itemInHand = this.inventory.getItemInHand();
-                            PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
-                            this.server.getPluginManager().callEvent(consumeEvent);
-                            if (consumeEvent.isCancelled()) {
-                                this.inventory.sendContents(this);
-                                break;
-                            }
-
-                            if (itemInHand.getId() == Item.POTION) {
-                                Potion potion = Potion.getPotion(itemInHand.getDamage()).setSplash(false);
-
-                                if (this.getGamemode() == SURVIVAL) {
-                                    if (itemInHand.getCount() > 1) {
-                                        ItemGlassBottle bottle = new ItemGlassBottle();
-                                        if (this.inventory.canAddItem(bottle)) {
-                                            this.inventory.addItem(bottle);
-                                        }
-                                        --itemInHand.count;
-                                    } else {
-                                        itemInHand = new ItemGlassBottle();
-                                    }
-                                }
-
-                                if (potion != null) {
-                                    potion.applyPotion(this);
-                                }
-
-                            } else {
-                                EntityEventPacket pk = new EntityEventPacket();
-                                pk.eid = this.getId();
-                                pk.event = EntityEventPacket.USE_ITEM;
-                                this.dataPacket(pk);
-                                Server.broadcastPacket(this.getViewers().values(), pk);
-
-                                Food food = Food.getByRelative(itemInHand);
-                                if (food != null) if (food.eatenBy(this)) --itemInHand.count;
-
-                            }
-
-                            this.inventory.setItemInHand(itemInHand);
-                            this.inventory.sendHeldItem(this);
-
+                    case EntityEventPacket.USE_ITEM: //Eating
+                        Item itemInHand = this.inventory.getItemInHand();
+                        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
+                        this.server.getPluginManager().callEvent(consumeEvent);
+                        if (consumeEvent.isCancelled()) {
+                            this.inventory.sendContents(this);
                             break;
+                        }
+
+                        if (itemInHand.getId() == Item.POTION) {
+                            Potion potion = Potion.getPotion(itemInHand.getDamage()).setSplash(false);
+
+                            if (this.getGamemode() == SURVIVAL) {
+                                if (itemInHand.getCount() > 1) {
+                                    ItemGlassBottle bottle = new ItemGlassBottle();
+                                    if (this.inventory.canAddItem(bottle)) {
+                                        this.inventory.addItem(bottle);
+                                    }
+                                    --itemInHand.count;
+                                } else {
+                                    itemInHand = new ItemGlassBottle();
+                                }
+                            }
+
+                            if (potion != null) {
+                                potion.applyPotion(this);
+                            }
+
+                        } else {
+                            EntityEventPacket pk = new EntityEventPacket();
+                            pk.eid = this.getId();
+                            pk.event = EntityEventPacket.USE_ITEM;
+                            this.dataPacket(pk);
+                            Server.broadcastPacket(this.getViewers().values(), pk);
+
+                            Food food = Food.getByRelative(itemInHand);
+                            if (food != null) if (food.eatenBy(this)) --itemInHand.count;
+
+                        }
+
+                        this.inventory.setItemInHand(itemInHand);
+                        this.inventory.sendHeldItem(this);
+
+                        break;
                     }
                     break;
                 case ProtocolInfo.DROP_ITEM_PACKET:
@@ -2914,23 +2949,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     JsonElement arg = commandStepPacket.args.get(par.name);
                                     if (arg != null) {
                                         switch (par.type) {
-                                            case CommandParameter.ARG_TYPE_TARGET:
-                                                CommandArg rules = new Gson().fromJson(arg, CommandArg.class);
-                                                commandText += " " + rules.getRules()[0].getValue();
-                                                break;
-                                            case CommandParameter.ARG_TYPE_BLOCK_POS:
-                                                CommandArgBlockVector bv = new Gson().fromJson(arg, CommandArgBlockVector.class);
-                                                commandText += " " + bv.getX() + " " + bv.getY() + " " + bv.getZ();
-                                                break;
-                                            case CommandParameter.ARG_TYPE_STRING:
-                                            case CommandParameter.ARG_TYPE_STRING_ENUM:
-                                            case CommandParameter.ARG_TYPE_RAW_TEXT:
-                                                String string = new Gson().fromJson(arg, String.class);
-                                                commandText += " " + string;
-                                                break;
-                                            default:
-                                                commandText += " " + arg.toString();
-                                                break;
+                                        case CommandParameter.ARG_TYPE_TARGET:
+                                            CommandArg rules = new Gson().fromJson(arg, CommandArg.class);
+                                            commandText += " " + rules.getRules()[0].getValue();
+                                            break;
+                                        case CommandParameter.ARG_TYPE_BLOCK_POS:
+                                            CommandArgBlockVector bv = new Gson().fromJson(arg, CommandArgBlockVector.class);
+                                            commandText += " " + bv.getX() + " " + bv.getY() + " " + bv.getZ();
+                                            break;
+                                        case CommandParameter.ARG_TYPE_STRING:
+                                        case CommandParameter.ARG_TYPE_STRING_ENUM:
+                                        case CommandParameter.ARG_TYPE_RAW_TEXT:
+                                            String string = new Gson().fromJson(arg, String.class);
+                                            commandText += " " + string;
+                                            break;
+                                        default:
+                                            commandText += " " + arg.toString();
+                                            break;
                                         }
                                     }
                                 }
@@ -3313,38 +3348,38 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     switch (recipe.getResult().getId()) {
-                        case Item.WORKBENCH:
-                            this.awardAchievement("buildWorkBench");
-                            break;
-                        case Item.WOODEN_PICKAXE:
-                            this.awardAchievement("buildPickaxe");
-                            break;
-                        case Item.FURNACE:
-                            this.awardAchievement("buildFurnace");
-                            break;
-                        case Item.WOODEN_HOE:
-                            this.awardAchievement("buildHoe");
-                            break;
-                        case Item.BREAD:
-                            this.awardAchievement("makeBread");
-                            break;
-                        case Item.CAKE:
-                            //TODO: detect complex recipes like cake that leave remains
-                            this.awardAchievement("bakeCake");
-                            this.inventory.addItem(new ItemBucket(0, 3));
-                            break;
-                        case Item.STONE_PICKAXE:
-                        case Item.GOLD_PICKAXE:
-                        case Item.IRON_PICKAXE:
-                        case Item.DIAMOND_PICKAXE:
-                            this.awardAchievement("buildBetterPickaxe");
-                            break;
-                        case Item.WOODEN_SWORD:
-                            this.awardAchievement("buildSword");
-                            break;
-                        case Item.DIAMOND:
-                            this.awardAchievement("diamond");
-                            break;
+                    case Item.WORKBENCH:
+                        this.awardAchievement("buildWorkBench");
+                        break;
+                    case Item.WOODEN_PICKAXE:
+                        this.awardAchievement("buildPickaxe");
+                        break;
+                    case Item.FURNACE:
+                        this.awardAchievement("buildFurnace");
+                        break;
+                    case Item.WOODEN_HOE:
+                        this.awardAchievement("buildHoe");
+                        break;
+                    case Item.BREAD:
+                        this.awardAchievement("makeBread");
+                        break;
+                    case Item.CAKE:
+                        //TODO: detect complex recipes like cake that leave remains
+                        this.awardAchievement("bakeCake");
+                        this.inventory.addItem(new ItemBucket(0, 3));
+                        break;
+                    case Item.STONE_PICKAXE:
+                    case Item.GOLD_PICKAXE:
+                    case Item.IRON_PICKAXE:
+                    case Item.DIAMOND_PICKAXE:
+                        this.awardAchievement("buildBetterPickaxe");
+                        break;
+                    case Item.WOODEN_SWORD:
+                        this.awardAchievement("buildSword");
+                        break;
+                    case Item.DIAMOND:
+                        this.awardAchievement("diamond");
+                        break;
                     }
 
                     break;
@@ -3420,9 +3455,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             if (inv instanceof FurnaceInventory) {
                                 if (tr.getSlot() == 2) {
                                     switch (((FurnaceInventory) inv).getResult().getId()) {
-                                        case Item.IRON_INGOT:
-                                            //achievements.add("acquireIron");
-                                            break;
+                                    case Item.IRON_INGOT:
+                                        //achievements.add("acquireIron");
+                                        break;
                                     }
                                 }
                             }
@@ -3469,9 +3504,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         } else {
                             SignChangeEvent signChangeEvent = new SignChangeEvent(t.getBlock(), this, new String[]{
                                     this.removeFormat ? TextFormat.clean(nbt.getString("Text1")) : nbt.getString("Text1"),
-                                    this.removeFormat ? TextFormat.clean(nbt.getString("Text2")) : nbt.getString("Text2"),
-                                    this.removeFormat ? TextFormat.clean(nbt.getString("Text3")) : nbt.getString("Text3"),
-                                    this.removeFormat ? TextFormat.clean(nbt.getString("Text4")) : nbt.getString("Text4")
+                                            this.removeFormat ? TextFormat.clean(nbt.getString("Text2")) : nbt.getString("Text2"),
+                                                    this.removeFormat ? TextFormat.clean(nbt.getString("Text3")) : nbt.getString("Text3"),
+                                                            this.removeFormat ? TextFormat.clean(nbt.getString("Text4")) : nbt.getString("Text4")
                             });
 
                             if (!t.namedTag.contains("Creator") || !Objects.equals(this.getUniqueId().toString(), t.namedTag.getString("Creator"))) {
@@ -3535,7 +3570,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
                 default:
                     break;
-            }
+                }
         }
     }
 
@@ -3823,109 +3858,109 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         EntityDamageEvent cause = this.getLastDamageCause();
 
         switch (cause == null ? EntityDamageEvent.CAUSE_CUSTOM : cause.getCause()) {
-            case EntityDamageEvent.CAUSE_ENTITY_ATTACK:
-                if (cause instanceof EntityDamageByEntityEvent) {
-                    Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
-                    killer = e;
-                    if (e instanceof Player) {
-                        message = "death.attack.player";
-                        params.add(((Player) e).getDisplayName());
-                        break;
-                    } else if (e instanceof EntityLiving) {
-                        message = "death.attack.mob";
-                        params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
-                        break;
-                    } else {
-                        params.add("Unknown");
-                    }
-                }
-                break;
-            case EntityDamageEvent.CAUSE_PROJECTILE:
-                if (cause instanceof EntityDamageByEntityEvent) {
-                    Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
-                    killer = e;
-                    if (e instanceof Player) {
-                        message = "death.attack.arrow";
-                        params.add(((Player) e).getDisplayName());
-                    } else if (e instanceof EntityLiving) {
-                        message = "death.attack.arrow";
-                        params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
-                        break;
-                    } else {
-                        params.add("Unknown");
-                    }
-                }
-                break;
-            case EntityDamageEvent.CAUSE_SUICIDE:
-                message = "death.attack.generic";
-                break;
-            case EntityDamageEvent.CAUSE_VOID:
-                message = "death.attack.outOfWorld";
-                break;
-            case EntityDamageEvent.CAUSE_FALL:
-                if (cause != null) {
-                    if (cause.getFinalDamage() > 2) {
-                        message = "death.fell.accident.generic";
-                        break;
-                    }
-                }
-                message = "death.attack.fall";
-                break;
-
-            case EntityDamageEvent.CAUSE_SUFFOCATION:
-                message = "death.attack.inWall";
-                break;
-
-            case EntityDamageEvent.CAUSE_LAVA:
-                message = "death.attack.lava";
-                break;
-
-            case EntityDamageEvent.CAUSE_FIRE:
-                message = "death.attack.onFire";
-                break;
-
-            case EntityDamageEvent.CAUSE_FIRE_TICK:
-                message = "death.attack.inFire";
-                break;
-
-            case EntityDamageEvent.CAUSE_DROWNING:
-                message = "death.attack.drown";
-                break;
-
-            case EntityDamageEvent.CAUSE_CONTACT:
-                if (cause instanceof EntityDamageByBlockEvent) {
-                    if (((EntityDamageByBlockEvent) cause).getDamager().getId() == Block.CACTUS) {
-                        message = "death.attack.cactus";
-                    }
-                }
-                break;
-
-            case EntityDamageEvent.CAUSE_BLOCK_EXPLOSION:
-            case EntityDamageEvent.CAUSE_ENTITY_EXPLOSION:
-                if (cause instanceof EntityDamageByEntityEvent) {
-                    Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
-                    killer = e;
-                    if (e instanceof Player) {
-                        message = "death.attack.explosion.player";
-                        params.add(((Player) e).getDisplayName());
-                    } else if (e instanceof EntityLiving) {
-                        message = "death.attack.explosion.player";
-                        params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
-                        break;
-                    }
+        case EntityDamageEvent.CAUSE_ENTITY_ATTACK:
+            if (cause instanceof EntityDamageByEntityEvent) {
+                Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
+                killer = e;
+                if (e instanceof Player) {
+                    message = "death.attack.player";
+                    params.add(((Player) e).getDisplayName());
+                    break;
+                } else if (e instanceof EntityLiving) {
+                    message = "death.attack.mob";
+                    params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
+                    break;
                 } else {
-                    message = "death.attack.explosion";
+                    params.add("Unknown");
                 }
-                break;
+            }
+            break;
+        case EntityDamageEvent.CAUSE_PROJECTILE:
+            if (cause instanceof EntityDamageByEntityEvent) {
+                Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
+                killer = e;
+                if (e instanceof Player) {
+                    message = "death.attack.arrow";
+                    params.add(((Player) e).getDisplayName());
+                } else if (e instanceof EntityLiving) {
+                    message = "death.attack.arrow";
+                    params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
+                    break;
+                } else {
+                    params.add("Unknown");
+                }
+            }
+            break;
+        case EntityDamageEvent.CAUSE_SUICIDE:
+            message = "death.attack.generic";
+            break;
+        case EntityDamageEvent.CAUSE_VOID:
+            message = "death.attack.outOfWorld";
+            break;
+        case EntityDamageEvent.CAUSE_FALL:
+            if (cause != null) {
+                if (cause.getFinalDamage() > 2) {
+                    message = "death.fell.accident.generic";
+                    break;
+                }
+            }
+            message = "death.attack.fall";
+            break;
 
-            case EntityDamageEvent.CAUSE_MAGIC:
-                message = "death.attack.magic";
-                break;
+        case EntityDamageEvent.CAUSE_SUFFOCATION:
+            message = "death.attack.inWall";
+            break;
 
-            case EntityDamageEvent.CAUSE_CUSTOM:
-                break;
+        case EntityDamageEvent.CAUSE_LAVA:
+            message = "death.attack.lava";
+            break;
 
-            default:
+        case EntityDamageEvent.CAUSE_FIRE:
+            message = "death.attack.onFire";
+            break;
+
+        case EntityDamageEvent.CAUSE_FIRE_TICK:
+            message = "death.attack.inFire";
+            break;
+
+        case EntityDamageEvent.CAUSE_DROWNING:
+            message = "death.attack.drown";
+            break;
+
+        case EntityDamageEvent.CAUSE_CONTACT:
+            if (cause instanceof EntityDamageByBlockEvent) {
+                if (((EntityDamageByBlockEvent) cause).getDamager().getId() == Block.CACTUS) {
+                    message = "death.attack.cactus";
+                }
+            }
+            break;
+
+        case EntityDamageEvent.CAUSE_BLOCK_EXPLOSION:
+        case EntityDamageEvent.CAUSE_ENTITY_EXPLOSION:
+            if (cause instanceof EntityDamageByEntityEvent) {
+                Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
+                killer = e;
+                if (e instanceof Player) {
+                    message = "death.attack.explosion.player";
+                    params.add(((Player) e).getDisplayName());
+                } else if (e instanceof EntityLiving) {
+                    message = "death.attack.explosion.player";
+                    params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
+                    break;
+                }
+            } else {
+                message = "death.attack.explosion";
+            }
+            break;
+
+        case EntityDamageEvent.CAUSE_MAGIC:
+            message = "death.attack.magic";
+            break;
+
+        case EntityDamageEvent.CAUSE_CUSTOM:
+            break;
+
+        default:
 
         }
 
@@ -4099,7 +4134,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 ((Player) damager).getFoodData().updateFoodExpLevel(0.3);
             }
             //暴?
-            /*boolean add = false;
+                    /*boolean add = false;
             if (!damager.onGround) {
                 NukkitRandom random = new NukkitRandom();
                 for (int i = 0; i < 5; i++) {
@@ -4457,6 +4492,57 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.movementSpeed += sprintSpeedChange;
         }
         this.setMovementSpeed(this.movementSpeed);
+    }
+
+    public void transfer(InetSocketAddress address) {
+        String hostName = address.getHostName();
+        int port = address.getPort();
+        TransferPacket pk = new TransferPacket();
+        pk.address = hostName;
+        pk.port = (short) port;
+        this.dataPacket(pk);
+        String message = "tranferred to " + address + ":" + port;
+        this.close(message, message, false);
+    }
+
+    public int getADRole() {
+        return this.ADRole;
+    }
+
+    public int getCurrentInputMode() {
+        return this.CurrentInputMode;
+    }
+
+    public int getDefaultInputMode() {
+        return this.DefaultInputMode;
+    }
+
+    public String getDeviceModel() {
+        return this.DeviceModel;
+    }
+
+    public int getDeviceOS() {
+        return this.DeviceOS;
+    }
+
+    public String getGameVersion() {
+        return this.GameVersion;
+    }
+
+    public int getGuiScale() {
+        return this.GuiScale;
+    }
+
+    public String getserverAddress() {
+        return this.serverAddress;
+    }
+
+    public String getTenantId() {
+        return this.TenantId;
+    }
+
+    public int getUIProfile() {
+        return this.UIProfile;
     }
 
     @Override

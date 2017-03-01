@@ -33,7 +33,7 @@ public class LoginPacket extends DataPacket {
     public long clientId;
     public int CurrentInputMode;
     public int DefaultInputMode;
-    public String DeviceModele;
+    public String DeviceModel;
     public int DeviceOS;
     public String GameVersion;
     public int GuiScale;
@@ -105,7 +105,7 @@ public class LoginPacket extends DataPacket {
         if (skinToken.has("ClientRandomId")) this.clientId = skinToken.get("ClientRandomId").getAsLong();
         if (skinToken.has("CurrentInputMode")) this.CurrentInputMode = skinToken.get("CurrentInputMode").getAsInt();
         if (skinToken.has("DefaultInputMode")) this.DefaultInputMode = skinToken.get("DefaultInputMode").getAsInt();
-        if (skinToken.has("DeviceModele")) this.DeviceModele = skinToken.get("DeviceModele").getAsString();
+        if (skinToken.has("DeviceModel")) this.DeviceModel = skinToken.get("DeviceModel").getAsString();
         if (skinToken.has("DeviceOS")) this.DeviceOS = skinToken.get("DeviceOS").getAsInt();
         if (skinToken.has("GameVersion")) this.GameVersion = skinToken.get("GameVersion").getAsString();
         if (skinToken.has("GuiScale")) this.GuiScale = skinToken.get("GuiScale").getAsInt();
