@@ -4571,7 +4571,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 		String hostName = address.getHostName();
 		int port = address.getPort();
 		PlayerTransferEvent event = new PlayerTransferEvent(this, hostName, port);
-		if()
+		if(!(event.isCancelled())){
 			TransferPacket pk = new TransferPacket();
 			pk.address = hostName;
 			pk.port = port;
