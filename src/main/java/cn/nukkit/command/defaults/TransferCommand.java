@@ -49,7 +49,7 @@ public class TransferCommand extends VanillaCommand {
 		String address = args[0];
 		int port = Integer.parseInt(args[1]);
 		
-		((Player) sender).transfer(address, port);
+		((Player) sender).transfer(address);
 		
 		return true;
     }
