@@ -3,7 +3,8 @@ package cn.nukkit.entity.projectile;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.*;
+import cn.nukkit.level.particle.CriticalParticle;
+import cn.nukkit.level.particle.DustParticle;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
@@ -116,6 +117,10 @@ public class EntityArrow extends EntityProjectile {
     public void setParticleColor(int r, int g, int b, int a){
         this.hasColor = true;
         this.rgba = new int[]{r,g,b,a};
+    }
+
+    public void setCritical(boolean bool) {
+        this.isCritical = bool;
     }
 
     @Override
