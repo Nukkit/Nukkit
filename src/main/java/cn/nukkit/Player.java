@@ -71,6 +71,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -4566,19 +4567,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setMovementSpeed(this.movementSpeed);
     }
 
-    public boolean transfer(String address, int port) {
-		PlayerTransferEvent event = new PlayerTransferEvent(this, address, port);
-		this.getServer().getPluginManager().callEvent(event);
-		if(!(event.isCancelled())){
+    public void transfer(InetSocketAddress address) {
+		String hostName = address.getHostName();
+		int port = address.getPort();
+		PlayerTransferEvent event = new PlayerTransferEvent(this, hostName, port);
+		if()
 			TransferPacket pk = new TransferPacket();
-			pk.address = address;
+			pk.address = hostName;
 			pk.port = port;
 			this.dataPacket(pk);
 			String message = "Transferred to " + address + ":" + port;
 			this.close(message, message, false);
-			return true;
 		}
-		return false;
     }
 
     public String getDeviceModel() {
