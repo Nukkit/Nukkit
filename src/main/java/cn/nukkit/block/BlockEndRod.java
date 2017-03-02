@@ -4,8 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
-import cn.nukkit.math.Vector3;
-import cn.nukkit.utils.BlockColor;
 
 /**
  * Created on 2015/12/7 by xtypr.
@@ -33,6 +31,11 @@ public class BlockEndRod extends BlockTransparent {
 
     @Override
     public double getResistance() {
+        return 15;
+    }
+
+    @Override
+    public int getLightLevel() {
         return 15;
     }
 

@@ -1,16 +1,21 @@
 package cn.nukkit.entity.projectile;
 
+import java.util.Random;
+
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.data.LongEntityData;
-import cn.nukkit.event.entity.*;
+import cn.nukkit.entity.item.EntityPotion;
+import cn.nukkit.event.entity.EntityCombustByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageByChildEntityEvent;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.ProjectileHitEvent;
 import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-
-import java.util.Random;
 
 /**
  * author: MagicDroidX
@@ -137,6 +142,11 @@ public abstract class EntityProjectile extends Entity {
 
                         if (this instanceof EntityArrow && ((EntityArrow) this).isCritical) {
                             damage += new Random().nextInt((int) (damage / 2) + 1);
+                        }
+
+                        if (this instanceof EntityPotion) {
+                            EntityPotion potion = (EntityPotion) this;
+                            potion.onSplash();
                         }
 
                         EntityDamageEvent ev;
