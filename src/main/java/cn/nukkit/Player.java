@@ -166,6 +166,7 @@ import cn.nukkit.network.protocol.PlayerActionPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.RemoveBlockPacket;
 import cn.nukkit.network.protocol.RequestChunkRadiusPacket;
+import cn.nukkit.network.protocol.ResourcePacksInfoPacket;
 import cn.nukkit.network.protocol.RespawnPacket;
 import cn.nukkit.network.protocol.SetCommandsEnabledPacket;
 import cn.nukkit.network.protocol.SetEntityLinkPacket;
@@ -1896,7 +1897,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         statusPacket.status = PlayStatusPacket.LOGIN_SUCCESS;
         this.dataPacket(statusPacket);
 
-        //this.dataPacket(new ResourcePacksInfoPacket());
+        this.dataPacket(new ResourcePacksInfoPacket());
 
         if (this.spawnPosition == null && this.namedTag.contains("SpawnLevel") && (level = this.server.getLevelByName(this.namedTag.getString("SpawnLevel"))) != null) {
             this.spawnPosition = new Position(this.namedTag.getInt("SpawnX"), this.namedTag.getInt("SpawnY"), this.namedTag.getInt("SpawnZ"), level);
