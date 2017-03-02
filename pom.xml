@@ -44,8 +44,6 @@
             <groupId>com.tinfoiled.mcpe.leveldb</groupId>
             <artifactId>leveldb</artifactId>
             <version>0.8</version>
-            <scope>system</scope>
-  <systemPath>${basedir}/lib/leveldb.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
