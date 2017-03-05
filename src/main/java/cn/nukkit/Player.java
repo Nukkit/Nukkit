@@ -4594,7 +4594,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.address = hostName;
         pk.port = port;
         this.dataPacket(pk);
-        String message = "tranferred to " + address + ":" + port;
+        String message = "Transferred to " + address + ":" + port;
         this.close(message, message, false);
     }
 
