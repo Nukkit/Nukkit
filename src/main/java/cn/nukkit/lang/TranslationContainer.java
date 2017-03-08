@@ -8,16 +8,7 @@ public class TranslationContainer extends TextContainer implements Cloneable {
 
     protected String[] params;
 
-    public TranslationContainer(String text) {
-        this(text, new String[]{});
-    }
-
-    public TranslationContainer(String text, String params) {
-        super(text);
-        this.setParameters(new String[]{params});
-    }
-
-    public TranslationContainer(String text, String[] params) {
+    public TranslationContainer(String text, String... params) {
         super(text);
         this.setParameters(params);
     }

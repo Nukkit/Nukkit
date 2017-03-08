@@ -122,10 +122,6 @@ public class BaseLang {
         }
     }
 
-    public String translateString(String str) {
-        return this.translateString(str, new String[]{}, null);
-    }
-
     public String translateString(String str, String... params) {
         return this.translateString(str, params, null);
     }
