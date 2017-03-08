@@ -4592,14 +4592,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void transfer(InetSocketAddress address) {
-        String hostName = address.getHostName();
-        int port = address.getPort();
-        TransferPacket pk = new TransferPacket();
-        pk.address = hostName;
-        pk.port = port;
-        this.dataPacket(pk);
-        String message = "Transferred to " + address + ":" + port;
-        this.close(message, message, false);
+		String hostName = address.getHostName();
+		int port = address.getPort();
+		PlayerTransferEvent event = new PlayerTransferEvent(this, hostName, port);
+		if(!(event.isCancelled())){
+			TransferPacket pk = new TransferPacket();
+			pk.address = hostName;
+			pk.port = port;
+			this.dataPacket(pk);
+			String message = "Transferred to " + address + ":" + port;
+			this.close(message, message, false);
+		}
     }
 
     public String getDeviceModel() {
