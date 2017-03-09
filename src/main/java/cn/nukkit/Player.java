@@ -476,6 +476,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this == player) {
             return;
         }
+        StackTraceElement e = new Exception().getStackTrace()[1];
+        System.out.println(e.getClassName()+","+e.getMethodName());
         this.hiddenPlayers.put(player.getUniqueId(), player);
         player.despawnFrom(this);
     }
@@ -1737,12 +1739,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean canInteract(Vector3 pos, double maxDistance, double maxDiff) {
+        Vector3 eyePos = this.getPosition().add(0, this.getEyeHeight(), 0);
         if (this.distanceSquared(pos) > maxDistance * maxDistance) {
             return false;
         }
 
         Vector2 dV = this.getDirectionPlane();
-        double dot = dV.dot(new Vector2(this.x, this.z));
+        double dot = dV.dot(new Vector2(eyePos.x, eyePos.z));
         double dot1 = dV.dot(new Vector2(pos.x, pos.z));
         return (dot1 - dot) >= -maxDiff;
     }
