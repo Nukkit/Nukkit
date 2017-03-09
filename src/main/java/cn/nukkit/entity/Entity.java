@@ -92,7 +92,12 @@ public abstract class Entity extends Location implements Metadatable {
      * 57 (byte)
 	 * 58 (float)
 	 * 59 (float) */
-
+    public static final int DATA_AREA_EFFECT_CLOUD_RADIUS = 61; //float
+    public static final int DATA_AREA_EFFECT_CLOUD_WAITING = 62; //int
+    public static final int DATA_AREA_EFFECT_CLOUD_PARTICLE = 63; //int
+    public static final int DATA_TRADE_PLAYER = 68;//long
+    
+    
     public static final int DATA_FLAG_ONFIRE = 0;
     public static final int DATA_FLAG_SNEAKING = 1;
     public static final int DATA_FLAG_RIDING = 2;
