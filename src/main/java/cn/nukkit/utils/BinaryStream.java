@@ -284,7 +284,7 @@ public class BinaryStream {
     }
 
     public void putVarLong(long v) {
-        VarInt.writeVarInt(this, (int) v);
+        VarInt.writeVarLong(this, v);
     }
 
     public BigInteger getUnsignedVarLong() {
