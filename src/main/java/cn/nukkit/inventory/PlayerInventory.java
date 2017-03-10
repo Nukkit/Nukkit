@@ -1,5 +1,7 @@
 package cn.nukkit.inventory;
 
+import java.util.Collection;
+
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.BlockAir;
@@ -14,9 +16,6 @@ import cn.nukkit.network.protocol.ContainerSetContentPacket;
 import cn.nukkit.network.protocol.ContainerSetSlotPacket;
 import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 /**
  * author: MagicDroidX
@@ -109,7 +108,7 @@ public class PlayerInventory extends BaseInventory {
         Item item = this.getItemInHand();
 
         MobEquipmentPacket pk = new MobEquipmentPacket();
-        pk.eid = player.equals(this.getHolder()) ? 0 : this.getHolder().getId();
+        pk.eid = this.getHolder().getId();
         pk.item = item;
         pk.slot = (byte) this.getHeldItemSlot();
         pk.selectedSlot = (byte) this.getHeldItemIndex();

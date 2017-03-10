@@ -31,7 +31,6 @@ import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
-import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.command.data.args.CommandArg;
 import cn.nukkit.command.data.args.CommandArgBlockVector;
@@ -141,7 +140,6 @@ import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.network.SourceInterface;
 import cn.nukkit.network.protocol.AdventureSettingsPacket;
 import cn.nukkit.network.protocol.AnimatePacket;
-import cn.nukkit.network.protocol.AvailableCommandsPacket;
 import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.BlockEntityDataPacket;
 import cn.nukkit.network.protocol.ChangeDimensionPacket;
@@ -757,13 +755,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
 
-            if (level != this.level) {
+            /*if (level != this.level) {
                 FullChunkDataPacket pk = new FullChunkDataPacket();
                 pk.chunkX = x;
                 pk.chunkZ = z;
                 pk.data = new byte[]{(byte) 16};
                 this.dataPacket(pk);
-            }
+            }*/
             this.usedChunks.remove(index);
         }
         level.unregisterChunkLoader(this, x, z);
@@ -1142,7 +1140,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.level.sleepTicks = 0;
 
             AnimatePacket pk = new AnimatePacket();
-            pk.eid = 0;
+            pk.eid = this.id;
             pk.action = 3; //Wake up
             this.dataPacket(pk);
         }
@@ -1341,14 +1339,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
 
                 TakeItemEntityPacket pk = new TakeItemEntityPacket();
-                pk.entityId = this.getId();
+                pk.entityId = this.id;
                 pk.target = entity.getId();
                 Server.broadcastPacket(entity.getViewers().values(), pk);
-
-                pk = new TakeItemEntityPacket();
-                pk.entityId = 0;
-                pk.target = entity.getId();
-                this.dataPacket(pk);
 
                 this.inventory.addItem(item.clone());
                 entity.kill();
@@ -1386,14 +1379,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }*/
 
                         TakeItemEntityPacket pk = new TakeItemEntityPacket();
-                        pk.entityId = this.getId();
+                        pk.entityId = this.id;
                         pk.target = entity.getId();
                         Server.broadcastPacket(entity.getViewers().values(), pk);
-
-                        pk = new TakeItemEntityPacket();
-                        pk.entityId = 0;
-                        pk.target = entity.getId();
-                        this.dataPacket(pk);
 
                         this.inventory.addItem(item.clone());
                         entity.kill();
@@ -1586,7 +1574,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (this.chunk != null) {
                 this.getLevel().addEntityMotion(this.chunk.getX(), this.chunk.getZ(), this.getId(), this.motionX, this.motionY, this.motionZ);  //Send to others
                 SetEntityMotionPacket pk = new SetEntityMotionPacket();
-                pk.eid = 0;
+                pk.eid = this.id;
                 pk.motionX = (float) motion.x;
                 pk.motionY = (float) motion.y;
                 pk.motionZ = (float) motion.z;
@@ -1909,8 +1897,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         Position spawnPosition = this.getSpawn();
 
         StartGamePacket startGamePacket = new StartGamePacket();
-        startGamePacket.entityUniqueId = 0;
-        startGamePacket.entityRuntimeId = 0;
+        startGamePacket.entityUniqueId = this.id;
+        startGamePacket.entityRuntimeId = this.id;
         startGamePacket.x = (float) this.x;
         startGamePacket.y = (float) this.y;
         startGamePacket.z = (float) this.z;
@@ -2944,7 +2932,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.craftingType = 0;
                     CommandStepPacket commandStepPacket = (CommandStepPacket) packet;
                     String commandText = commandStepPacket.command;
-                    Command command = this.getServer().getCommandMap().getCommand(commandText);
+                    Command command = this.getServer().getCommandMap().getCommand(commandText.split(" ")[0]);
                     if (command != null) {
                         if (commandStepPacket.args != null && commandStepPacket.args.size() > 0) {
                             CommandParameter[] pars = command.getCommandParameters(commandStepPacket.overload);
@@ -4092,7 +4080,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setAttribute(Attribute attribute) {
         UpdateAttributesPacket pk = new UpdateAttributesPacket();
         pk.entries = new Attribute[]{attribute};
-        pk.entityId = 0;
+        pk.entityId = this.id;
         this.dataPacket(pk);
     }
 
@@ -4156,7 +4144,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!source.isCancelled() && this.getLastDamageCause() == source && this.spawned) {
             this.getFoodData().updateFoodExpLevel(0.3);
             EntityEventPacket pk = new EntityEventPacket();
-            pk.eid = 0;
+            pk.eid = this.id;
             pk.event = EntityEventPacket.HURT_ANIMATION;
             this.dataPacket(pk);
         }
@@ -4192,7 +4180,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (targets != null) {
             Server.broadcastPacket(targets, pk);
         } else {
-            pk.eid = 0;
             this.dataPacket(pk);
         }
     }

@@ -1,13 +1,35 @@
 package cn.nukkit.entity;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockDirt;
 import cn.nukkit.block.BlockFire;
 import cn.nukkit.block.BlockWater;
-import cn.nukkit.entity.data.*;
-import cn.nukkit.event.entity.*;
+import cn.nukkit.entity.data.ByteEntityData;
+import cn.nukkit.entity.data.EntityData;
+import cn.nukkit.entity.data.EntityMetadata;
+import cn.nukkit.entity.data.FloatEntityData;
+import cn.nukkit.entity.data.IntEntityData;
+import cn.nukkit.entity.data.LongEntityData;
+import cn.nukkit.entity.data.ShortEntityData;
+import cn.nukkit.entity.data.StringEntityData;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityDespawnEvent;
+import cn.nukkit.event.entity.EntityLevelChangeEvent;
+import cn.nukkit.event.entity.EntityMotionEvent;
+import cn.nukkit.event.entity.EntityRegainHealthEvent;
+import cn.nukkit.event.entity.EntitySpawnEvent;
+import cn.nukkit.event.entity.EntityTeleportEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.item.Item;
@@ -35,10 +57,6 @@ import cn.nukkit.timings.Timing;
 import cn.nukkit.timings.Timings;
 import cn.nukkit.timings.TimingsHistory;
 import cn.nukkit.utils.ChunkException;
-
-import java.lang.reflect.Constructor;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author MagicDroidX
@@ -689,7 +707,7 @@ public abstract class Entity extends Location implements Metadatable {
     public void sendPotionEffects(Player player) {
         for (Effect effect : this.effects.values()) {
             MobEffectPacket pk = new MobEffectPacket();
-            pk.eid = 0;
+            pk.eid = this.getId();
             pk.effectId = effect.getId();
             pk.amplifier = effect.getAmplifier();
             pk.particles = effect.isVisible();
@@ -706,7 +724,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void sendData(Player player, EntityMetadata data) {
         SetEntityDataPacket pk = new SetEntityDataPacket();
-        pk.eid = player == this ? 0 : this.getId();
+        pk.eid = this.getId();
         pk.metadata = data == null ? this.dataProperties : data;
 
         player.dataPacket(pk);
