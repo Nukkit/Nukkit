@@ -476,8 +476,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this == player) {
             return;
         }
-        StackTraceElement e = new Exception().getStackTrace()[1];
-        System.out.println(e.getClassName()+","+e.getMethodName());
         this.hiddenPlayers.put(player.getUniqueId(), player);
         player.despawnFrom(this);
     }
@@ -1672,10 +1670,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (!this.hasEffect(Effect.JUMP) && diff > 0.6 && expectedVelocity < this.speed.y) {
                             if (this.inAirTicks < 100) {
                                 //this.sendSettings();
-                                this.setMotion(new Vector3(0, expectedVelocity, 0));
-                            } else if (this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server")) {
-                                return false;
-                            }
+                                //this.setMotion(new Vector3(0, expectedVelocity, 0));
+                            }// else if (this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server")) {
+                            //    return false;
+                            //}
                         }
                     }
 
