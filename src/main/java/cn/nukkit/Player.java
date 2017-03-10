@@ -2449,7 +2449,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    ((PlayerActionPacket) packet).entityId = this.id;
+                    //((PlayerActionPacket) packet).entityId = this.id;
                     Vector3 pos = new Vector3(((PlayerActionPacket) packet).x, ((PlayerActionPacket) packet).y, ((PlayerActionPacket) packet).z);
 
                     switch (((PlayerActionPacket) packet).action) {
@@ -2886,7 +2886,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         } else {
                             EntityEventPacket pk = new EntityEventPacket();
-                            pk.eid = this.getId();
+                            pk.eid = this.id;
                             pk.event = EntityEventPacket.USE_ITEM;
                             this.dataPacket(pk);
                             Server.broadcastPacket(this.getViewers().values(), pk);
