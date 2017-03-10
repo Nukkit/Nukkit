@@ -2812,7 +2812,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         MovePlayerPacket pk = new MovePlayerPacket();
-        pk.eid = entityId;
+        pk.eid = 0;
         pk.x = (float) x;
         pk.y = (float) y;
         pk.z = (float) z;

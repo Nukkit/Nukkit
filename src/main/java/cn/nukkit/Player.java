@@ -1599,7 +1599,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void sendAttributes() {
         UpdateAttributesPacket pk = new UpdateAttributesPacket();
-        pk.entityId = 0;
+        pk.entityId = this.id;
         pk.entries = new Attribute[]{
                 Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getMaxHealth()).setValue(health > 0 ? (health < getMaxHealth() ? health : getMaxHealth()) : 0),
                 Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(this.getFoodData().getLevel()),
@@ -4005,7 +4005,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.spawned) {
             UpdateAttributesPacket pk = new UpdateAttributesPacket();
             pk.entries = new Attribute[]{attr};
-            pk.entityId = 0;
+            pk.entityId = this.id;
             this.dataPacket(pk);
         }
     }
