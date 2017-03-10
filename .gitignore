@@ -1,48 +1,47 @@
-# Compile outputs
-*.class
-target
-target/*
-build
-build/*
-nukkit-core/build
-nukkit-core/build/*
-nukkit-loader/build
-nukkit-loader/build/*
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# Folder config file
+Desktop.ini
 
-# Package Files #
-#*.jar
-*.war
-*.ear
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-*.MF
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
 
-# Intellij Platforms
-*.iml
-.idea
-.idea/*
+# Windows shortcuts
+*.lnk
 
-# Eclipse Platforms
-.classpath
-.project
-.settings
-.settings/*
+# =========================
+# Operating System Files
+# =========================
 
-# Generated files
-banned-ips.json
-banned-players.json
-nukkit.yml
-ops.txt
-server.log
-server.properties
-white-list.txt
-worlds
-worlds/*
-plugins
-plugins/*
-players
-players/*
+# OSX
+# =========================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
