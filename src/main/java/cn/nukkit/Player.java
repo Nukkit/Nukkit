@@ -607,6 +607,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendCommandData() {
+        /*
         AvailableCommandsPacket pk = new AvailableCommandsPacket();
         Map<String, CommandDataVersions> data = new HashMap<>();
         int count = 0;
@@ -623,6 +624,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.commands = new Gson().toJson(data);
             this.dataPacket(pk);
         }
+        */
     }
 
     @Override
