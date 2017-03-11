@@ -840,7 +840,19 @@ public class Level implements ChunkManager, Metadatable {
             int chunkX = getHashX(index);
             int chunkZ = getHashZ(index);
             for (MovePlayerPacket packet : this.playerMoveToSend.get(index).values()) {
-                this.addChunkPacket(chunkX, chunkZ, packet);
+                //this.addChunkPacket(chunkX, chunkZ, packet);
+
+                //temp fix
+                //todo: find a proper solution
+                List<Player> players = new ArrayList<>();
+                for (Player player : getChunkPlayers(chunkX, chunkZ).values()) {
+                    if (player.getId() == packet.eid) {
+                        continue;
+                    }
+
+                    players.add(player);
+                }
+                Server.broadcastPacket(players, packet);
             }
         }
         this.playerMoveToSend.clear();
@@ -2868,7 +2880,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         MovePlayerPacket pk = new MovePlayerPacket();
-        pk.eid = 0;
+        pk.eid = entityId;
         pk.x = (float) x;
         pk.y = (float) y;
         pk.z = (float) z;
