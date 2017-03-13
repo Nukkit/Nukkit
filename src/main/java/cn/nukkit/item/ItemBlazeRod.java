@@ -15,6 +15,6 @@ public class ItemBlazeRod extends Item {
     }
 
     public ItemBlazeRod(Integer meta, int count) {
-        super(EGG, meta, count, "BlazeRod");
+        super(BLAZE_ROD, meta, count, "BlazeRod");
     }
 }
