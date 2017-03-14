@@ -6,7 +6,7 @@ package cn.nukkit.item;
 
 public class ItemMap extends Item{
 
-	public ItemMap() {
+    public ItemMap() {
         this(0, 1);
     }
 
