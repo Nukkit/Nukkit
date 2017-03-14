@@ -6,7 +6,7 @@ package cn.nukkit.item;
 
 public class ItemBlazeRod extends Item{
 
-	public ItemBlazeRod() {
+    public ItemBlazeRod() {
         this(0, 1);
     }
 
