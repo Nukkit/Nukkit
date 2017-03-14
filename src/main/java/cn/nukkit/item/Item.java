@@ -703,7 +703,7 @@ public class Item implements Cloneable {
             list[COOKED_CHICKEN] = ItemChickenCooked.class; //366
             list[ROTTEN_FLESH] = ItemRottenFlesh.class; //367
             list[ENDER_PEARL] = ItemEnderPearl.class; //368
-            //TODO: list[BLAZE_ROD] = ItemBlazeRod.class; //369
+            list[BLAZE_ROD] = ItemBlazeRod.class; //369
             //TODO: list[GHAST_TEAR] = ItemGhastTear.class; //370
             list[GOLD_NUGGET] = ItemNuggetGold.class; //371
             //TODO: list[NETHER_WART] = ItemNetherWart.class; //372
