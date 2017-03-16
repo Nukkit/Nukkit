@@ -4,13 +4,12 @@ package cn.nukkit.command.data;
 public class CommandParameterEnum extends CommandParameter {
 
     public String name;
-    public String type = "stringenum";
+    public String type;
     public boolean optional;
     public String[] enum_values = new String[0];
 
     public CommandParameterEnum(String name, boolean optional, String[] enumValues) {
-        this.name = name;
-        this.optional = optional;
+        super(name, "stringenum", optional);
         this.enum_values = enumValues;
     }
 
