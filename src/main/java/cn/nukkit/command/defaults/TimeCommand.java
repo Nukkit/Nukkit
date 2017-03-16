@@ -28,6 +28,10 @@ public class TimeCommand extends VanillaCommand {
                 new CommandParameter("add|set", CommandParameter.ARG_TYPE_STRING, false),
                 new CommandParameter("value", CommandParameter.ARG_TYPE_INT, false)
         });
+        this.commandParameters.put("2argsEnum", new CommandParameter[]{
+                new CommandParameter("set", CommandParameter.ARG_TYPE_STRING, false),
+                new CommandParameterEnum("value", new String[]{"day", "night"})
+        });
     }
 
     @Override
