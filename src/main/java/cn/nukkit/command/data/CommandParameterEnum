@@ -1,0 +1,23 @@
+//Created by kvetinac97
+
+package cn.nukkit.command.data;
+
+public class CommandParameterEnum extends CommandParameter {
+
+    public String[] enum_values = new String[0];
+
+    public CommandParameterEnum(String name, boolean optional, String[] enumValues) {
+        super(name, "stringenum", optional);
+
+        this.enum_values = enumValues;
+    }
+
+    public CommandParameterEnum(String name, boolean optional) {
+        this(name, optional, new String[0]);
+    }
+
+    public CommandParameterEnum(String name) {
+        this(name, false);
+    }
+    
+}
