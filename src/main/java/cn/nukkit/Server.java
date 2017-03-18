@@ -5,6 +5,7 @@ import cn.nukkit.blockentity.*;
 import cn.nukkit.command.*;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityEnderCrystal;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.entity.item.*;
@@ -1953,6 +1954,8 @@ public class Server {
         Entity.registerEntity("Boat", EntityBoat.class);
 
         Entity.registerEntity("Lightning", EntityLightning.class);
+        
+        Entity.registerEntity("EnderCrystal", EntityEnderCrystal.class);
     }
 
     private void registerBlockEntities() {
