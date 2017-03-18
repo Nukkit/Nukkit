@@ -1,8 +1,13 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.entity.mobutils.Drops;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author: BeYkeRYkt
@@ -41,10 +46,21 @@ public class EntityCow extends EntityAnimal {
     public String getName() {
         return this.getNameTag();
     }
-
+    
     @Override
     public Item[] getDrops() {
-        return new Item[]{Item.get(Item.LEATHER), Item.get(Item.RAW_BEEF)};
+        List<Item> drops = new ArrayList<>();
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+            int leather = Drops.rand(1, 4); // drops 1-3 leather
+            int rawbeef = Drops.rand(1, 3); // drops 1-2 rawbeef
+            for (int i=0; i < leather; i++) {
+                drops.add(Item.get(Item.LEATHER, 0, 1));
+            }
+            for (int i=0; i < rawbeef; i++) {
+                drops.add(Item.get(Item.RAW_BEEF, 0, 1));
+            }
+        }
+        return drops.toArray(new Item[drops.size()]);
     }
 
     @Override
