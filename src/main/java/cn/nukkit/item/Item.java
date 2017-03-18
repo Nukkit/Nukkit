@@ -1124,29 +1124,31 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.SPAWN_EGG, 14)); //Wolf
         addCreativeItem(Item.get(Item.SPAWN_EGG, 18)); //Rabbit
         addCreativeItem(Item.get(Item.SPAWN_EGG, 15)); //Villager
-        /*
+        
         addCreativeItem(Item.get(Item.SPAWN_EGG, 16)); //Mooshroom
         addCreativeItem(Item.get(Item.SPAWN_EGG, 19)); //Bat
-        */
+        
         addCreativeItem(Item.get(Item.SPAWN_EGG, 22)); //Ocelot
         addCreativeItem(Item.get(Item.SPAWN_EGG, 33)); //Creeper
-        /*
+        
         addCreativeItem(Item.get(Item.SPAWN_EGG, 38)); //Enderman
         addCreativeItem(Item.get(Item.SPAWN_EGG, 39)); //Silverfish
         addCreativeItem(Item.get(Item.SPAWN_EGG, 34)); //Skeleton
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 37)); //Slime
+        //addCreativeItem(Item.get(Item.SPAWN_EGG, 37)); //Slime
         addCreativeItem(Item.get(Item.SPAWN_EGG, 35)); //Spider
         addCreativeItem(Item.get(Item.SPAWN_EGG, 32)); //Zombie
         addCreativeItem(Item.get(Item.SPAWN_EGG, 36)); //Zombie Pigman
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 17)); //Squid
+        //addCreativeItem(Item.get(Item.SPAWN_EGG, 17)); //Squid
         addCreativeItem(Item.get(Item.SPAWN_EGG, 40)); //Cave spider
+        /*
         addCreativeItem(Item.get(Item.SPAWN_EGG, 42)); //Magma Cube
         addCreativeItem(Item.get(Item.SPAWN_EGG, 41)); //Ghast
         addCreativeItem(Item.get(Item.SPAWN_EGG, 43)); //Blaze
         addCreativeItem(Item.get(Item.SPAWN_EGG, 20)); //Iron Golem
         addCreativeItem(Item.get(Item.SPAWN_EGG, 21)); //Snow Golem
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 44)); //Zombie Villager
         */
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 44)); //Zombie Villager
+        
         addCreativeItem(Item.get(Item.FIRE_CHARGE, 0));
         addCreativeItem(Item.get(Item.WOODEN_SWORD));
         addCreativeItem(Item.get(Item.WOODEN_HOE));
