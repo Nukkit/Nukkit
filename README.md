@@ -1,4 +1,4 @@
-Nukkit
+Forked Nukkit by kazuemon
 ===================
 ![nukkit](https://github.com/Nukkit/Nukkit/blob/master/images/banner.png)
 
@@ -31,7 +31,7 @@ It has a few key advantages over other server software:
 * Written in Java, Nukkit is faster and more stable.
 * Having a friendly structure, it's easy to contribute to Nukkit's development and rewrite plugins from other platforms into Nukkit plugins.
 
-Nukkit is **under improvement** yet, we welcome contributions. 
+Nukkit is **under improvement** yet, we welcome contributions.
 
 Get Nukkit & Plugins
 --------------------

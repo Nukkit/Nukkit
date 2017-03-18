@@ -1,5 +1,12 @@
 package cn.nukkit.item;
 
+import java.io.IOException;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
@@ -15,13 +22,6 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.utils.Binary;
-
-import java.io.IOException;
-import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * author: MagicDroidX
@@ -692,7 +692,7 @@ public class Item implements Cloneable {
             list[BED] = ItemBed.class; //355
             //TODO: list[REPEATER] = ItemRepeater.class; //356
             list[COOKIE] = ItemCookie.class; //357
-            //TODO: list[MAP] = ItemMap.class; //358
+            list[MAP] = ItemMap.class; //358
             list[SHEARS] = ItemShears.class; //359
             list[MELON] = ItemMelon.class; //360
             list[PUMPKIN_SEEDS] = ItemSeedsPumpkin.class; //361
@@ -703,7 +703,7 @@ public class Item implements Cloneable {
             list[COOKED_CHICKEN] = ItemChickenCooked.class; //366
             list[ROTTEN_FLESH] = ItemRottenFlesh.class; //367
             list[ENDER_PEARL] = ItemEnderPearl.class; //368
-            //TODO: list[BLAZE_ROD] = ItemBlazeRod.class; //369
+            list[BLAZE_ROD] = ItemBlazeRod.class; //369
             //TODO: list[GHAST_TEAR] = ItemGhastTear.class; //370
             list[GOLD_NUGGET] = ItemNuggetGold.class; //371
             //TODO: list[NETHER_WART] = ItemNetherWart.class; //372
