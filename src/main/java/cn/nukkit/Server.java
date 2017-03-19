@@ -1949,9 +1949,7 @@ public class Server {
         Entity.registerEntity("Villager", EntityVillager.class);
         Entity.registerEntity("ZombieHorse", EntityZombieHorse.class);
         //TODO: more monsters
-        Entity.registerEntity("Blaze", EntityBlaze.class);
-        Entity.registerEntity("Endreman", EntityEnderman.class);
-        Entity.registerEntity("Ghast", EntityGhast.class);
+        Entity.registerEntity("Enderman", EntityEnderman.class);
         Entity.registerEntity("Husk", EntityHusk.class);
         Entity.registerEntity("Skeleton", EntitySkeleton.class);
         Entity.registerEntity("Spider", EntitySpider.class);
