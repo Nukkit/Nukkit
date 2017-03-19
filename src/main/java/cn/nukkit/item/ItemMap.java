@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -37,6 +38,10 @@ public class ItemMap extends Item {
             tag.putString("map_uuid", "" + mapCount++);
             this.setNamedTag(tag);
         }
+    }
+
+    public void setImage(File file) throws IOException {
+        setImage(ImageIO.read(file));
     }
 
     public void setImage(BufferedImage img) {
@@ -76,10 +81,6 @@ public class ItemMap extends Item {
 
     public void sendImage(Player p) {
         BufferedImage image = loadImageFromNBT();
-
-        if (image == null) {
-            return;
-        }
 
         ClientboundMapItemDataPacket pk = new ClientboundMapItemDataPacket();
         pk.mapId = getMapId();
