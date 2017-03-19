@@ -27,14 +27,14 @@ public class ShapedRecipe implements Recipe {
         }
 
         if (shape.length > 3) {
-            throw new IllegalStateException("Crafting recipes should be 1, 2, 3 rows, not " + shape.length);
+            throw new IllegalStateException("Crafting recipes should be 1, 2, 3 height, not " + shape.length);
         }
 
 
         for (int y = 0; y < shape.length; y++) {
             String row = shape[y];
             if (row.length() == 0 || row.length() > 3) {
-                throw new IllegalStateException("Crafting rows should be 1, 2, 3 characters, not " + row.length());
+                throw new IllegalStateException("Crafting height should be 1, 2, 3 characters, not " + row.length());
             }
 
             this.ingredients.put(y, new HashMap<Integer, Item>() {
