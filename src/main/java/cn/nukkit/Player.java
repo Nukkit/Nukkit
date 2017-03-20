@@ -4053,22 +4053,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.dataPacket(pk);
     }
 
-    @Override
-    public void setHealth(float health) {
-        if (health < 1) {
-            health = 0;
-        }
-
-        super.setHealth(health);
-        Attribute attr = Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getMaxHealth()).setValue(health > 0 ? (health < getMaxHealth() ? health : getMaxHealth()) : 0);
-        if (this.spawned) {
-            UpdateAttributesPacket pk = new UpdateAttributesPacket();
-            pk.entries = new Attribute[]{attr};
-            pk.entityId = this.id;
-            this.dataPacket(pk);
-        }
-    }
-
     public int getExperience() {
         return this.exp;
     }
