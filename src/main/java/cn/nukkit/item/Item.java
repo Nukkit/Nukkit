@@ -692,7 +692,7 @@ public class Item implements Cloneable {
             list[BED] = ItemBed.class; //355
             //TODO: list[REPEATER] = ItemRepeater.class; //356
             list[COOKIE] = ItemCookie.class; //357
-            //TODO: list[MAP] = ItemMap.class; //358
+            list[MAP] = ItemMap.class; //358
             list[SHEARS] = ItemShears.class; //359
             list[MELON] = ItemMelon.class; //360
             list[PUMPKIN_SEEDS] = ItemSeedsPumpkin.class; //361
@@ -1489,13 +1489,21 @@ public class Item implements Cloneable {
     public static Item get(int id, Integer meta, int count, byte[] tags) {
         try {
             Class c = list[id];
+            Item item;
+
             if (c == null) {
-                return new Item(id, meta, count).setCompoundTag(tags);
+                item = new Item(id, meta, count);
             } else if (id < 256) {
-                return new ItemBlock((Block) c.getConstructor(int.class).newInstance(meta), meta, count).setCompoundTag(tags);
+                item = new ItemBlock((Block) c.getConstructor(int.class).newInstance(meta), meta, count);
             } else {
-                return ((Item) c.getConstructor(Integer.class, int.class).newInstance(meta, count)).setCompoundTag(tags);
+                item = ((Item) c.getConstructor(Integer.class, int.class).newInstance(meta, count));
             }
+
+            if (tags.length != 0) {
+                item.setCompoundTag(tags);
+            }
+
+            return item;
         } catch (Exception e) {
             return new Item(id, meta, count).setCompoundTag(tags);
         }
@@ -1638,8 +1646,10 @@ public class Item implements Cloneable {
         for (CompoundTag entry : this.getNamedTag().getList("ench", CompoundTag.class).getAll()) {
             if (entry.getShort("id") == id) {
                 Enchantment e = Enchantment.getEnchantment(entry.getShort("id"));
-                e.setLevel(entry.getShort("lvl"));
-                return e;
+                if (e != null){
+                    e.setLevel(entry.getShort("lvl"));
+                    return e;
+                }
             }
         }
 
@@ -1698,8 +1708,10 @@ public class Item implements Cloneable {
         ListTag<CompoundTag> ench = this.getNamedTag().getList("ench", CompoundTag.class);
         for (CompoundTag entry : ench.getAll()) {
             Enchantment e = Enchantment.getEnchantment(entry.getShort("id"));
-            e.setLevel(entry.getShort("lvl"));
-            enchantments.add(e);
+            if (e != null){
+                e.setLevel(entry.getShort("lvl"));
+                enchantments.add(e);
+            } 
         }
 
         return enchantments.stream().toArray(Enchantment[]::new);
