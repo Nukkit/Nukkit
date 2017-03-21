@@ -730,7 +730,7 @@ public class Item implements Cloneable {
             //TODO: list[EMPTY_MAP] = ItemEmptyMap.class; //395
             //TODO: list[GOLDEN_CARROT] = ItemCarrotGolden.class; //396
             list[SKULL] = ItemSkull.class; //397
-            //TODO: list[CARROT_ON_A_STICK] = ItemCarrotOnAStick.class; //398
+            list[CARROT_ON_A_STICK] = ItemCarrotOnAStick.class; //398
             list[NETHER_STAR] = ItemNetherStar.class; //399
             list[PUMPKIN_PIE] = ItemPumpkinPie.class; //400
 
