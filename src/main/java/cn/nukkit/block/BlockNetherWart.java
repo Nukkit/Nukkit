@@ -47,7 +47,7 @@ public class BlockNetherWart extends BlockFlowable {
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
             if (new Random().nextInt(10) == 1) {
-                if (this.meta < 0x02) {
+                if (this.meta < 0x03) {
                     BlockNetherWart block = (BlockNetherWart) this.clone();
                     ++block.meta;
                     BlockGrowEvent ev = new BlockGrowEvent(this, block);
@@ -84,7 +84,7 @@ public class BlockNetherWart extends BlockFlowable {
 
     @Override
     public int[][] getDrops(Item item) {
-        if (this.meta >= 0x02) {
+        if (this.meta >= 0x03) {
             return new int[][]{
                     {Item.NETHER_WART, 0, 2+(int)(Math.random()*((4-2)+1))}
             };
