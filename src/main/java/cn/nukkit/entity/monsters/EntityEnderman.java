@@ -47,7 +47,7 @@ public class EntityEnderman extends EntityCreature {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            int EnderPearl = Drops.rand(0, 3); // drops 0-2 Pearls
+            int enderPearl = Drops.rand(0, 2); // drops 0-1 Pearls
             for (int i = 0; i < EnderPearl; i++) {
                 drops.add(Item.get(Item.ENDER_PEARL, 0, 1));
             }
