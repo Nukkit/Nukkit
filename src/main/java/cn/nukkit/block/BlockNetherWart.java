@@ -84,7 +84,7 @@ public class BlockNetherWart extends BlockFlowable {
 
     @Override
     public int[][] getDrops(Item item) {
-        if (this.meta >= 0x03) {
+        if (this.meta == 0x03) {
             return new int[][]{
                     {Item.NETHER_WART, 0, 2+(int)(Math.random()*((4-2)+1))}
             };
