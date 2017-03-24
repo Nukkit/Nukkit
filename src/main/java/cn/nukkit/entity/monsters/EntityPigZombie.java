@@ -70,7 +70,7 @@ public class EntityPigZombie extends EntityCreature {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
             int rottenFlesh = Drops.rand(0, 2); // drops 0-1 rotten flesh
-            int goldNuggets = Drops.rand(0, 101) <= 3 ? 1 : 0; // with a 2,5% chance a gold nugget is dropped
+            int goldNuggets = Drops.rand(0, 2); // drops 0-1 gold nugget 
             int goldSword = Drops.rand(0, 101) <= 9 ? 1 : 0; // with a 8,5% chance it's gold sword is dropped
             for (int i=0; i < rottenFlesh; i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
