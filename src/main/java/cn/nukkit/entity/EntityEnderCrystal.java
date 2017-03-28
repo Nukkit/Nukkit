@@ -8,7 +8,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
-public class EntityEnderCrystal extends EntityLiving implements EntityExplosive {
+public class EntityEnderCrystal extends Entity implements EntityExplosive {
     
     public static final int NETWORK_ID = 71;
     
