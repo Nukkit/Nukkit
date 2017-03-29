@@ -111,7 +111,7 @@ public class EntitySheep extends EntityAnimal {
     @Override
     public Item[] getDrops() {
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            return new Item[]{Item.get(Item.WOOL, getColor(), 1)};
+            return new Item[]{Item.get(Item.WOOL, getColor(), 1), Item.get(Item.RAW_MUTTON, 0, 1)};
         }
         return new Item[0];
     }
