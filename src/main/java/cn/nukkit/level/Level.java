@@ -211,6 +211,7 @@ public class Level implements ChunkManager, Metadatable {
             put(Block.SUGARCANE_BLOCK, BlockSugarcane.class);
             put(Block.RED_MUSHROOM, BlockMushroomRed.class);
             put(Block.BROWN_MUSHROOM, BlockMushroomBrown.class);
+            put(Block.NETHER_WART_BLOCK, BlockNetherWart.class);
 
             put(Block.FIRE, BlockFire.class);
             put(Block.GLOWING_REDSTONE_ORE, BlockOreRedstoneGlowing.class);
@@ -1958,7 +1959,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (player != null) {
-            BlockPlaceSound sound = new BlockPlaceSound(block.add(0.5, 0.5, 0.5));
+            BlockPlaceSound sound = new BlockPlaceSound(block.add(0.5, 0.5, 0.5), item.getId());
             Map<Integer, Player> players = getChunkPlayers((int) block.x >> 4, (int) block.z >> 4);
             addSound(sound, players.values());
 

@@ -1,9 +1,6 @@
 package cn.nukkit;
 
-import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockAir;
-import cn.nukkit.block.BlockDoor;
-import cn.nukkit.block.BlockEnderChest;
+import cn.nukkit.block.*;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityItemFrame;
 import cn.nukkit.blockentity.BlockEntitySign;
@@ -2447,6 +2444,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.inventory.sendHeldItem(this);
                                 break;
                             }
+                            if (target.getId() == Block.NOTEBLOCK) {
+                                ((BlockNoteblock)target).emitSound();
+                                break;
+                            }
                             Block block = target.getSide(((PlayerActionPacket) packet).face);
                             if (block.getId() == Block.FIRE) {
                                 this.level.setBlock(block, new BlockAir(), true);
@@ -3578,6 +3579,38 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
                     }
                     break;
+                case ProtocolInfo.MAP_INFO_REQUEST_PACKET:
+                    MapInfoRequestPacket pk = (MapInfoRequestPacket) packet;
+                    Item mapItem = null;
+
+                    for (Item item1 : this.inventory.getContents().values()) {
+                        if (item1 instanceof ItemMap && ((ItemMap) item1).getMapId() == pk.mapId) {
+                            mapItem = item1;
+                        }
+                    }
+
+                    if (mapItem == null) {
+                        for (BlockEntity be : this.level.getBlockEntities().values()) {
+                            if (be instanceof BlockEntityItemFrame) {
+                                BlockEntityItemFrame itemFrame1 = (BlockEntityItemFrame) be;
+
+                                if (itemFrame1.getItem() instanceof ItemMap && ((ItemMap) itemFrame1.getItem()).getMapId() == pk.mapId) {
+                                    ((ItemMap) itemFrame1.getItem()).sendImage(this);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (mapItem != null) {
+                        PlayerMapInfoRequestEvent event;
+                        getServer().getPluginManager().callEvent(event = new PlayerMapInfoRequestEvent(this, mapItem));
+
+                        if (!event.isCancelled()) {
+                            ((ItemMap) mapItem).sendImage(this);
+                        }
+                    }
+                    break;
                 default:
                     break;
             }
@@ -3694,6 +3727,61 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_TIP;
         pk.message = message;
+        this.dataPacket(pk);
+    }
+
+    public void clearTitle() {
+        SetTitlePacket pk = new SetTitlePacket();
+        pk.type = SetTitlePacket.TYPE_CLEAR;
+        this.dataPacket(pk);
+    }
+
+    /**
+     * Resets both title animation times and subtitle for the next shown title
+     */
+    public void resetTitleSettings() {
+        SetTitlePacket pk = new SetTitlePacket();
+        pk.type = SetTitlePacket.TYPE_RESET;
+        this.dataPacket(pk);
+    }
+
+    public void sendTitle(String text) {
+        SetTitlePacket pk = new SetTitlePacket();
+        pk.type = SetTitlePacket.TYPE_TITLE;
+        pk.text = text;
+        this.dataPacket(pk);
+    }
+
+    /**
+     * Sets a subtitle for the next shown title
+     * @param text Subtitle text
+     */
+    public void setSubtitle(String text) {
+        SetTitlePacket pk = new SetTitlePacket();
+        pk.type = SetTitlePacket.TYPE_SUBTITLE;
+        pk.text = text;
+        this.dataPacket(pk);
+    }
+
+    public void sendActionBarTitle(String text) {
+        SetTitlePacket pk = new SetTitlePacket();
+        pk.type = SetTitlePacket.TYPE_ACTION_BAR;
+        pk.text = text;
+        this.dataPacket(pk);
+    }
+
+    /**
+     * Sets times for title animations
+     * @param fadeInTime For how long title fades in
+     * @param stayTime For how long title is shown
+     * @param fadeOutTime For how long title fades out
+     */
+    public void setTitleAnimationTimes(int fadeInTime, int stayTime, int fadeOutTime) {
+        SetTitlePacket pk = new SetTitlePacket();
+        pk.type = SetTitlePacket.TYPE_ANIMATION_TIMES;
+        pk.fadeInTime = fadeInTime;
+        pk.stayTime = stayTime;
+        pk.fadeOutTime = fadeOutTime;
         this.dataPacket(pk);
     }
 
