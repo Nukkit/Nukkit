@@ -112,7 +112,8 @@ public class EntitySheep extends EntityAnimal {
     public Item[] getDrops() {
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
             Random r = new Random();
-            return new Item[]{Item.get(Item.WOOL, 0, 1), Item.get(Item.RAW_MUTTON, 0, r.nextInt(2))};
+            Item[] item = new Item[]{Item.get(Item.WOOL, 0, 1), Item.get(Item.RAW_MUTTON, 0, r.nextInt(2))};
+            return item;
         }
         return new Item[0];
     }
