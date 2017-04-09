@@ -1,9 +1,5 @@
-package cn.nukkit.utils;
+package cn.nukkit.math;
 
-import cn.nukkit.math.MathHelper;
-import cn.nukkit.math.NukkitMath;
-import cn.nukkit.math.NukkitRandom;
-import cn.nukkit.math.Vector3;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 
@@ -12,13 +8,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
-public enum EnumFacing {
-    DOWN(0, 1, -1, "down", EnumFacing.AxisDirection.NEGATIVE, EnumFacing.Axis.Y, new Vector3(0, -1, 0)),
-    UP(1, 0, -1, "up", EnumFacing.AxisDirection.POSITIVE, EnumFacing.Axis.Y, new Vector3(0, 1, 0)),
-    NORTH(2, 3, 2, "north", EnumFacing.AxisDirection.NEGATIVE, EnumFacing.Axis.Z, new Vector3(0, 0, -1)),
-    SOUTH(3, 2, 0, "south", EnumFacing.AxisDirection.POSITIVE, EnumFacing.Axis.Z, new Vector3(0, 0, 1)),
-    WEST(4, 5, 1, "west", EnumFacing.AxisDirection.NEGATIVE, EnumFacing.Axis.X, new Vector3(-1, 0, 0)),
-    EAST(5, 4, 3, "east", EnumFacing.AxisDirection.POSITIVE, EnumFacing.Axis.X, new Vector3(1, 0, 0));
+public enum BlockFace {
+    DOWN(0, 1, -1, "down", AxisDirection.NEGATIVE, Axis.Y, new Vector3(0, -1, 0)),
+    UP(1, 0, -1, "up", AxisDirection.POSITIVE, Axis.Y, new Vector3(0, 1, 0)),
+    NORTH(2, 3, 2, "north", AxisDirection.NEGATIVE, Axis.Z, new Vector3(0, 0, -1)),
+    SOUTH(3, 2, 0, "south", AxisDirection.POSITIVE, Axis.Z, new Vector3(0, 0, 1)),
+    WEST(4, 5, 1, "west", AxisDirection.NEGATIVE, Axis.X, new Vector3(-1, 0, 0)),
+    EAST(5, 4, 3, "east", AxisDirection.POSITIVE, Axis.X, new Vector3(1, 0, 0));
 
     /**
      * Ordering index for D-U-N-S-W-E
@@ -35,8 +31,8 @@ public enum EnumFacing {
      */
     private final int horizontalIndex;
     private final String name;
-    private final EnumFacing.Axis axis;
-    private final EnumFacing.AxisDirection axisDirection;
+    private final Axis axis;
+    private final AxisDirection axisDirection;
 
     /**
      * Normalized Vector that points in the direction of this Facing
@@ -46,22 +42,22 @@ public enum EnumFacing {
     /**
      * All facings in D-U-N-S-W-E order
      */
-    private static final EnumFacing[] VALUES = new EnumFacing[6];
+    private static final BlockFace[] VALUES = new BlockFace[6];
 
     /**
      * All Facings with horizontal axis in order S-W-N-E
      */
-    private static final EnumFacing[] HORIZONTALS = new EnumFacing[4];
-    private static final Map<String, EnumFacing> NAME_LOOKUP = new HashMap<>();
+    private static final BlockFace[] HORIZONTALS = new BlockFace[4];
+    private static final Map<String, BlockFace> NAME_LOOKUP = new HashMap<>();
 
-    private EnumFacing(int indexIn, int oppositeIn, int horizontalIndexIn, String nameIn, EnumFacing.AxisDirection axisDirectionIn, EnumFacing.Axis axisIn, Vector3 directionVecIn) {
-        this.index = indexIn;
-        this.horizontalIndex = horizontalIndexIn;
-        this.opposite = oppositeIn;
-        this.name = nameIn;
-        this.axis = axisIn;
-        this.axisDirection = axisDirectionIn;
-        this.directionVec = directionVecIn;
+    BlockFace(int index, int opposite, int horizontalIndex, String name, AxisDirection axisDirection, Axis axis, Vector3 directionVec) {
+        this.index = index;
+        this.horizontalIndex = horizontalIndex;
+        this.opposite = opposite;
+        this.name = name;
+        this.axis = axis;
+        this.axisDirection = axisDirection;
+        this.directionVec = directionVec;
     }
 
     /**
@@ -81,21 +77,21 @@ public enum EnumFacing {
     /**
      * Get the AxisDirection of this Facing.
      */
-    public EnumFacing.AxisDirection getAxisDirection() {
+    public AxisDirection getAxisDirection() {
         return this.axisDirection;
     }
 
     /**
      * Get the opposite Facing (e.g. DOWN => UP)
      */
-    public EnumFacing getOpposite() {
+    public BlockFace getOpposite() {
         return getFront(this.opposite);
     }
 
     /**
      * Rotate this Facing around the Y axis clockwise (NORTH => EAST => SOUTH => WEST => NORTH)
      */
-    public EnumFacing rotateY() {
+    public BlockFace rotateY() {
         switch (this) {
             case NORTH:
                 return EAST;
@@ -117,7 +113,7 @@ public enum EnumFacing {
     /**
      * Rotate this Facing around the Y axis counter-clockwise (NORTH => WEST => SOUTH => EAST => NORTH)
      */
-    public EnumFacing rotateYCCW() {
+    public BlockFace rotateYCCW() {
         switch (this) {
             case NORTH:
                 return WEST;
@@ -140,18 +136,18 @@ public enum EnumFacing {
      * Returns a offset that addresses the block in front of this facing.
      */
     public int getFrontOffsetX() {
-        return this.axis == EnumFacing.Axis.X ? this.axisDirection.getOffset() : 0;
+        return this.axis == Axis.X ? this.axisDirection.getOffset() : 0;
     }
 
     public int getFrontOffsetY() {
-        return this.axis == EnumFacing.Axis.Y ? this.axisDirection.getOffset() : 0;
+        return this.axis == Axis.Y ? this.axisDirection.getOffset() : 0;
     }
 
     /**
      * Returns a offset that addresses the block in front of this facing.
      */
     public int getFrontOffsetZ() {
-        return this.axis == EnumFacing.Axis.Z ? this.axisDirection.getOffset() : 0;
+        return this.axis == Axis.Z ? this.axisDirection.getOffset() : 0;
     }
 
     /**
@@ -161,28 +157,28 @@ public enum EnumFacing {
         return this.name;
     }
 
-    public EnumFacing.Axis getAxis() {
+    public Axis getAxis() {
         return this.axis;
     }
 
     /**
      * Get a Facing by it's index (0-5). The order is D-U-N-S-W-E. Named getFront for legacy reasons.
      */
-    public static EnumFacing getFront(int index) {
+    public static BlockFace getFront(int index) {
         return VALUES[MathHelper.abs(index % VALUES.length)];
     }
 
     /**
      * Get a Facing by it's horizontal index (0-3). The order is S-W-N-E.
      */
-    public static EnumFacing getHorizontal(int p_176731_0_) {
-        return HORIZONTALS[MathHelper.abs(p_176731_0_ % HORIZONTALS.length)];
+    public static BlockFace getHorizontal(int index) {
+        return HORIZONTALS[MathHelper.abs(index % HORIZONTALS.length)];
     }
 
     /**
      * Get the Facing corresponding to the given angle (0-360). An angle of 0 is SOUTH, an angle of 90 would be WEST.
      */
-    public static EnumFacing fromAngle(double angle) {
+    public static BlockFace fromAngle(double angle) {
         return getHorizontal(NukkitMath.floorDouble(angle / 90.0D + 0.5D) & 3);
     }
 
@@ -193,7 +189,7 @@ public enum EnumFacing {
     /**
      * Choose a random Facing using the given Random
      */
-    public static EnumFacing random(Random rand) {
+    public static BlockFace random(Random rand) {
         return values()[rand.nextInt(values().length)];
     }
 
@@ -205,18 +201,18 @@ public enum EnumFacing {
         return this.name;
     }
 
-    public static EnumFacing getFacingFromAxis(EnumFacing.AxisDirection axisDirectionIn, EnumFacing.Axis axisIn) {
-        for (EnumFacing enumfacing : values()) {
-            if (enumfacing.getAxisDirection() == axisDirectionIn && enumfacing.getAxis() == axisIn) {
-                return enumfacing;
+    public static BlockFace getFacingFromAxis(AxisDirection axisDirection, Axis axis) {
+        for (BlockFace face : values()) {
+            if (face.getAxisDirection() == axisDirection && face.getAxis() == axis) {
+                return face;
             }
         }
 
-        throw new IllegalArgumentException("No such direction: " + axisDirectionIn + " " + axisIn);
+        throw new IllegalArgumentException("No such direction: " + axisDirection + " " + axis);
     }
 
     static {
-        for (EnumFacing enumfacing : values()) {
+        for (BlockFace enumfacing : values()) {
             VALUES[enumfacing.index] = enumfacing;
 
             if (enumfacing.getAxis().isHorizontal()) {
@@ -227,16 +223,16 @@ public enum EnumFacing {
         }
     }
 
-    public static enum Axis implements Predicate<EnumFacing> {
-        X("x", EnumFacing.Plane.HORIZONTAL),
-        Y("y", EnumFacing.Plane.VERTICAL),
-        Z("z", EnumFacing.Plane.HORIZONTAL);
+    public enum Axis implements Predicate<BlockFace> {
+        X("x", Plane.HORIZONTAL),
+        Y("y", Plane.VERTICAL),
+        Z("z", Plane.HORIZONTAL);
 
-        private static final Map<String, EnumFacing.Axis> NAME_LOOKUP = new HashMap<>();
+        private static final Map<String, Axis> NAME_LOOKUP = new HashMap<>();
         private final String name;
-        private final EnumFacing.Plane plane;
+        private final Plane plane;
 
-        private Axis(String name, EnumFacing.Plane plane) {
+        Axis(String name, Plane plane) {
             this.name = name;
             this.plane = plane;
         }
@@ -246,22 +242,22 @@ public enum EnumFacing {
         }
 
         public boolean isVertical() {
-            return this.plane == EnumFacing.Plane.VERTICAL;
+            return this.plane == Plane.VERTICAL;
         }
 
         public boolean isHorizontal() {
-            return this.plane == EnumFacing.Plane.HORIZONTAL;
+            return this.plane == Plane.HORIZONTAL;
         }
 
         public String toString() {
             return this.name;
         }
 
-        public boolean apply(EnumFacing p_apply_1_) {
+        public boolean apply(BlockFace p_apply_1_) {
             return p_apply_1_ != null && p_apply_1_.getAxis() == this;
         }
 
-        public EnumFacing.Plane getPlane() {
+        public Plane getPlane() {
             return this.plane;
         }
 
@@ -270,20 +266,20 @@ public enum EnumFacing {
         }
 
         static {
-            for (EnumFacing.Axis enumfacing$axis : values()) {
+            for (Axis enumfacing$axis : values()) {
                 NAME_LOOKUP.put(enumfacing$axis.getName2().toLowerCase(), enumfacing$axis);
             }
         }
     }
 
-    public static enum AxisDirection {
+    public enum AxisDirection {
         POSITIVE(1, "Towards positive"),
         NEGATIVE(-1, "Towards negative");
 
         private final int offset;
         private final String description;
 
-        private AxisDirection(int offset, String description) {
+        AxisDirection(int offset, String description) {
             this.offset = offset;
             this.description = description;
         }
@@ -297,32 +293,32 @@ public enum EnumFacing {
         }
     }
 
-    public static enum Plane implements Predicate<EnumFacing>, Iterable<EnumFacing> {
+    public enum Plane implements Predicate<BlockFace>, Iterable<BlockFace> {
         HORIZONTAL,
         VERTICAL;
 
-        public EnumFacing[] facings() {
+        public BlockFace[] facings() {
             switch (this) {
                 case HORIZONTAL:
-                    return new EnumFacing[]{EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.SOUTH, EnumFacing.WEST};
+                    return new BlockFace[]{NORTH, EAST, SOUTH, WEST};
                 case VERTICAL:
-                    return new EnumFacing[]{EnumFacing.UP, EnumFacing.DOWN};
+                    return new BlockFace[]{UP, DOWN};
                 default:
                     throw new Error("Someone\'s been tampering with the universe!");
             }
         }
 
-        public EnumFacing random(NukkitRandom rand) {
-            EnumFacing[] aenumfacing = this.facings();
-            return aenumfacing[rand.nextBoundedInt(aenumfacing.length)];
+        public BlockFace random(NukkitRandom rand) {
+            BlockFace[] faces = this.facings();
+            return faces[rand.nextBoundedInt(faces.length)];
         }
 
-        public boolean apply(EnumFacing p_apply_1_) {
-            return p_apply_1_ != null && p_apply_1_.getAxis().getPlane() == this;
+        public boolean apply(BlockFace face) {
+            return face != null && face.getAxis().getPlane() == this;
         }
 
-        public Iterator<EnumFacing> iterator() {
-            return Iterators.<EnumFacing>forArray(this.facings());
+        public Iterator<BlockFace> iterator() {
+            return Iterators.forArray(this.facings());
         }
     }
 }

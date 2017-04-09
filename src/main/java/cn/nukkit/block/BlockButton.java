@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.ButtonClickSound;
+import cn.nukkit.math.BlockFace;
 
 /**
  * Created by CreeperFace on 27. 11. 2016.
@@ -29,12 +30,12 @@ public abstract class BlockButton extends BlockTransparent {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz, Player player) {
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (target.isTransparent()) {
             return false;
         }
 
-        this.meta = face;
+        this.meta = face.getIndex();
         this.level.setBlock(this, this, true, false);
         return true;
     }
@@ -64,9 +65,7 @@ public abstract class BlockButton extends BlockTransparent {
             int side = this.meta;
             if (this.isActivated()) side ^= 0x08;
 
-            int[] faces = new int[]{1, 0, 3, 2, 5, 4};
-
-            if (this.getSide(faces[side]).isTransparent()) {
+            if (this.getSide(BlockFace.getFront(side).getOpposite()).isTransparent()) {
                 this.level.useBreakOn(this);
                 return Level.BLOCK_UPDATE_NORMAL;
             }

@@ -15,7 +15,6 @@ import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.block.BlockUpdateEvent;
 import cn.nukkit.event.level.*;
 import cn.nukkit.event.player.PlayerInteractEvent;
-import cn.nukkit.event.redstone.RedstoneUpdateEvent;
 import cn.nukkit.event.weather.LightningStrikeEvent;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
@@ -46,7 +45,6 @@ import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
-import cn.nukkit.redstone.Redstone;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.timings.LevelTimings;
 import cn.nukkit.utils.*;
@@ -1157,69 +1155,12 @@ public class Level implements ChunkManager, Metadatable {
 
     public void updateAround(Vector3 pos) {
         BlockUpdateEvent ev;
-        this.server.getPluginManager().callEvent(
-                ev = new BlockUpdateEvent(this.getBlock(this.temporalVector.setComponents(pos.x, pos.y - 1, pos.z))));
-        if (!ev.isCancelled()) {
-            ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
-        }
 
-        this.server.getPluginManager().callEvent(
-                ev = new BlockUpdateEvent(this.getBlock(this.temporalVector.setComponents(pos.x, pos.y + 1, pos.z))));
-        if (!ev.isCancelled()) {
-            ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
-        }
-
-        this.server.getPluginManager().callEvent(
-                ev = new BlockUpdateEvent(this.getBlock(this.temporalVector.setComponents(pos.x - 1, pos.y, pos.z))));
-        if (!ev.isCancelled()) {
-            ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
-        }
-
-        this.server.getPluginManager().callEvent(
-                ev = new BlockUpdateEvent(this.getBlock(this.temporalVector.setComponents(pos.x + 1, pos.y, pos.z))));
-        if (!ev.isCancelled()) {
-            ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
-        }
-
-        this.server.getPluginManager().callEvent(
-                ev = new BlockUpdateEvent(this.getBlock(this.temporalVector.setComponents(pos.x, pos.y, pos.z - 1))));
-        if (!ev.isCancelled()) {
-            ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
-        }
-
-        this.server.getPluginManager().callEvent(
-                ev = new BlockUpdateEvent(this.getBlock(this.temporalVector.setComponents(pos.x, pos.y, pos.z + 1))));
-        if (!ev.isCancelled()) {
-            ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
-        }
-    }
-
-    public void updateAroundRedstone(Block block) {
-        BlockUpdateEvent ev = new BlockUpdateEvent(block);
-        this.server.getPluginManager().callEvent(ev);
-        if (!ev.isCancelled()) {
-            for (Entity entity : this.getNearbyEntities(
-                    new AxisAlignedBB(block.x - 1, block.y - 1, block.z - 1, block.x + 1, block.y + 1, block.z + 1))) {
-                entity.scheduleUpdate();
-            }
-            ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
-
-            RedstoneUpdateEvent rsEv = new RedstoneUpdateEvent(ev.getBlock());
-            this.server.getPluginManager().callEvent(rsEv);
-            if (!rsEv.isCancelled()) {
-                Block redstoneWire = rsEv.getBlock().getSide(Vector3.SIDE_DOWN);
-                if (redstoneWire instanceof BlockRedstoneWire) {
-                    if (rsEv.getBlock() instanceof BlockSolid) {
-                        int level = redstoneWire.getPowerLevel();
-                        redstoneWire.setPowerLevel(redstoneWire.getNeighborPowerLevel() - 1);
-                        redstoneWire.getLevel().setBlock(redstoneWire, redstoneWire, true, true);
-                        Redstone.deactive(redstoneWire, level);
-                    } else {
-                        redstoneWire.setPowerLevel(redstoneWire.getNeighborPowerLevel() - 1);
-                        redstoneWire.getLevel().setBlock(redstoneWire, redstoneWire, true, true);
-                        Redstone.active(redstoneWire);
-                    }
-                }
+        for (BlockFace face : BlockFace.values()) {
+            this.server.getPluginManager().callEvent(
+                    ev = new BlockUpdateEvent(this.getBlock(pos.getSide(face))));
+            if (!ev.isCancelled()) {
+                ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
             }
         }
     }
@@ -1560,7 +1501,7 @@ public class Level implements ChunkManager, Metadatable {
                     }
                     ev.getBlock().onUpdate(BLOCK_UPDATE_NORMAL);
                 }
-                this.updateAroundRedstone(block);
+
                 this.updateAround(position);
             }
 
@@ -1824,11 +1765,11 @@ public class Level implements ChunkManager, Metadatable {
 
     }
 
-    public Item useItemOn(Vector3 vector, Item item, int face, float fx, float fy, float fz) {
+    public Item useItemOn(Vector3 vector, Item item, BlockFace face, float fx, float fy, float fz) {
         return this.useItemOn(vector, item, face, fx, fy, fz, null);
     }
 
-    public Item useItemOn(Vector3 vector, Item item, int face, float fx, float fy, float fz, Player player) {
+    public Item useItemOn(Vector3 vector, Item item, BlockFace face, float fx, float fy, float fz, Player player) {
         Block target = this.getBlock(vector);
         Block block = target.getSide(face);
 
@@ -2979,4 +2920,78 @@ public class Level implements ChunkManager, Metadatable {
         return this.getHighestBlockAt(pos.getFloorX(), pos.getFloorZ()) < pos.getY();
     }
 
+    public int getStrongPower(Vector3 pos, BlockFace direction) {
+        return this.getBlock(pos).getStrongPower(direction);
+    }
+
+    public int getStrongPower(Vector3 pos) {
+        int i = 0;
+        i = Math.max(i, this.getStrongPower(pos.down(), BlockFace.DOWN));
+
+        if (i >= 15) {
+            return i;
+        } else {
+            i = Math.max(i, this.getStrongPower(pos.up(), BlockFace.UP));
+
+            if (i >= 15) {
+                return i;
+            } else {
+                i = Math.max(i, this.getStrongPower(pos.north(), BlockFace.NORTH));
+
+                if (i >= 15) {
+                    return i;
+                } else {
+                    i = Math.max(i, this.getStrongPower(pos.south(), BlockFace.SOUTH));
+
+                    if (i >= 15) {
+                        return i;
+                    } else {
+                        i = Math.max(i, this.getStrongPower(pos.west(), BlockFace.WEST));
+
+                        if (i >= 15) {
+                            return i;
+                        } else {
+                            i = Math.max(i, this.getStrongPower(pos.east(), BlockFace.EAST));
+                            return i >= 15 ? i : i;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean isSidePowered(Vector3 pos, BlockFace face) {
+        return this.getRedstonePower(pos, face) > 0;
+    }
+
+    public int getRedstonePower(Vector3 pos, BlockFace face) {
+        Block block = this.getBlock(pos);
+        return block.isSolid() ? this.getStrongPower(pos) : block.getWeakPower(face);
+    }
+
+    public boolean isBlockPowered(Vector3 pos) {
+        return this.getRedstonePower(pos.down(), BlockFace.DOWN) > 0 || this.getRedstonePower(pos.up(), BlockFace.UP) > 0 || this.getRedstonePower(pos.north(), BlockFace.NORTH) > 0 || this.getRedstonePower(pos.south(), BlockFace.SOUTH) > 0 || this.getRedstonePower(pos.west(), BlockFace.WEST) > 0 || this.getRedstonePower(pos.east(), BlockFace.EAST) > 0;
+    }
+
+    /**
+     * Checks if the specified block or its neighbors are powered by a neighboring block. Used by blocks like TNT and
+     * Doors.
+     */
+    public int isBlockIndirectlyGettingPowered(Vector3 pos) {
+        int power = 0;
+
+        for (BlockFace face : BlockFace.values()) {
+            int blockPower = this.getRedstonePower(pos.getSide(face), face);
+
+            if (blockPower >= 15) {
+                return 15;
+            }
+
+            if (blockPower > power) {
+                power = blockPower;
+            }
+        }
+
+        return power;
+    }
 }

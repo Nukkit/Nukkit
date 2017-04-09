@@ -1,9 +1,7 @@
 package cn.nukkit.block;
 
-import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
-import cn.nukkit.redstone.Redstone;
 import cn.nukkit.utils.BlockColor;
 
 /*
@@ -18,8 +16,6 @@ public class BlockRedstone extends BlockSolid {
 
     public BlockRedstone(int meta) {
         super(0);
-        this.setPowerSource(true);
-        this.setPowerLevel(Redstone.POWER_STRONGEST);
     }
 
     @Override
@@ -47,23 +43,7 @@ public class BlockRedstone extends BlockSolid {
         return "Redstone Block";
     }
 
-    @Override
-    public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz, Player player) {
-        this.getLevel().setBlock(block, this, true, false);
-        Redstone.active(this);
-        this.getLevel().updateAllLight(this);
-        this.getLevel().updateAroundRedstone(this);
-        this.getLevel().updateAround(block);
-        return true;
-    }
-
-    @Override
-    public boolean onBreak(Item item) {
-        int level = this.getPowerLevel();
-        this.getLevel().setBlock(this, new BlockAir(), true, true);
-        Redstone.deactive(this, level);
-        return true;
-    }
+    //TODO: redstone
 
     @Override
     public int[][] getDrops(Item item) {

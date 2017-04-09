@@ -9,7 +9,7 @@ import cn.nukkit.level.sound.ItemFrameItemAddedSound;
 import cn.nukkit.level.sound.ItemFrameItemRotated;
 import cn.nukkit.level.sound.ItemFramePlacedSound;
 import cn.nukkit.level.sound.ItemFrameRemovedSound;
-import cn.nukkit.math.Vector3;
+import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
 
@@ -78,19 +78,19 @@ public class BlockItemFrame extends BlockTransparent {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz, Player player) {
-        if (!target.isTransparent() && face > 1 && !block.isSolid()) {
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (!target.isTransparent() && face.getIndex() > 1 && !block.isSolid()) {
             switch (face) {
-                case Vector3.SIDE_NORTH:
+                case NORTH:
                     this.meta = 3;
                     break;
-                case Vector3.SIDE_SOUTH:
+                case SOUTH:
                     this.meta = 2;
                     break;
-                case Vector3.SIDE_WEST:
+                case WEST:
                     this.meta = 1;
                     break;
-                case Vector3.SIDE_EAST:
+                case EAST:
                     this.meta = 0;
                     break;
                 default:

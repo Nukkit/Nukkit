@@ -6,6 +6,7 @@ import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
@@ -71,7 +72,7 @@ public class BlockChest extends BlockTransparent {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz, Player player) {
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         int[] faces = {4, 2, 5, 3};
 
         BlockEntityChest chest = null;
@@ -83,7 +84,7 @@ public class BlockChest extends BlockTransparent {
             } else if ((this.meta == 3 || this.meta == 2) && (side == 2 || side == 3)) {
                 continue;
             }
-            Block c = this.getSide(side);
+            Block c = this.getSide(BlockFace.getFront(side));
             if (c instanceof BlockChest && c.getDamage() == this.meta) {
                 BlockEntity blockEntity = this.getLevel().getBlockEntity(c);
                 if (blockEntity instanceof BlockEntityChest && !((BlockEntityChest) blockEntity).isPaired()) {
@@ -136,7 +137,7 @@ public class BlockChest extends BlockTransparent {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (player != null) {
-            Block top = this.getSide(1);
+            Block top = up();
             if (!top.isTransparent()) {
                 return true;
             }

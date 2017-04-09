@@ -6,7 +6,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.sound.DoorSound;
 import cn.nukkit.math.AxisAlignedBB;
-import cn.nukkit.math.Vector3;
+import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -121,22 +121,22 @@ public class BlockTrapdoor extends BlockTransparent {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz, Player player) {
-        if ((!target.isTransparent() || target.getId() == SLAB) && face != 0 && face != 1) {
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if ((!target.isTransparent() || target.getId() == SLAB) && face != BlockFace.DOWN && face != BlockFace.UP) {
             int faceBit = 0b00;
             int upDownBit = 0b000;
             if (fy > 0.5) upDownBit = 0b100;
             switch (face) {
-                case Vector3.SIDE_NORTH:
+                case NORTH:
                     faceBit = 0b11;
                     break;
-                case Vector3.SIDE_SOUTH:
+                case SOUTH:
                     faceBit = 0b10;
                     break;
-                case Vector3.SIDE_WEST:
+                case WEST:
                     faceBit = 0b01;
                     break;
-                case Vector3.SIDE_EAST:
+                case EAST:
                     faceBit = 0b00;
                     break;
             }

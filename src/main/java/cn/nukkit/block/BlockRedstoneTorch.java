@@ -2,7 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
-import cn.nukkit.redstone.Redstone;
+import cn.nukkit.math.BlockFace;
 
 /**
  * author: Angelic47
@@ -16,8 +16,7 @@ public class BlockRedstoneTorch extends BlockTorch {
 
     public BlockRedstoneTorch(int meta) {
         super(meta);
-        this.setPowerSource(true);
-        this.setPowerLevel(Redstone.POWER_STRONGEST);
+        //TODO: redstone
     }
 
     @Override
@@ -36,10 +35,10 @@ public class BlockRedstoneTorch extends BlockTorch {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, int face, double fx, double fy, double fz, Player player) {
-        Block below = this.getSide(0);
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        Block below = this.down();
 
-        if (!target.isTransparent() && face != 0) {
+        if (!target.isTransparent() && face != BlockFace.DOWN) {
             int[] faces = new int[]{
                     0, //0, nerver used
                     5, //1
@@ -48,15 +47,15 @@ public class BlockRedstoneTorch extends BlockTorch {
                     2, //4
                     1, //5
             };
-            this.meta = faces[face];
+            this.meta = faces[face.getIndex()];
             this.getLevel().setBlock(block, this, true, true);
-            Redstone.active(this);
+            //Redstone.active(this);
 
             return true;
         } else if (!below.isTransparent() || below instanceof BlockFence || below.getId() == COBBLE_WALL) {
             this.meta = 0;
             this.getLevel().setBlock(block, this, true, true);
-            Redstone.active(this);
+            //Redstone.active(this);
 
             return true;
         }
@@ -66,9 +65,8 @@ public class BlockRedstoneTorch extends BlockTorch {
 
     @Override
     public boolean onBreak(Item item) {
-        int level = this.getPowerLevel();
         this.getLevel().setBlock(this, new BlockAir(), true, true);
-        Redstone.deactive(this, level);
+        //TODO: redstone
         return true;
     }
 
