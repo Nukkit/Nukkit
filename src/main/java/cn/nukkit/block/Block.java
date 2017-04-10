@@ -400,7 +400,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[WOODEN_PRESSURE_PLATE] = BlockPressurePlateWood.class; //72
             list[REDSTONE_ORE] = BlockOreRedstone.class; //73
             list[GLOWING_REDSTONE_ORE] = BlockOreRedstoneGlowing.class; //74
-            //TODO: list[UNLIT_REDSTONE_TORCH] = BlockRedstoneTorchUnlit.class; //75
+            list[UNLIT_REDSTONE_TORCH] = BlockRedstoneTorchUnlit.class;
             list[REDSTONE_TORCH] = BlockRedstoneTorch.class; //76
             list[STONE_BUTTON] = BlockButtonStone.class; //77
             list[SNOW_LAYER] = BlockSnowLayer.class; //78

@@ -74,6 +74,7 @@ public class Level implements ChunkManager, Metadatable {
     public static final int BLOCK_UPDATE_SCHEDULED = 3;
     public static final int BLOCK_UPDATE_WEAK = 4;
     public static final int BLOCK_UPDATE_TOUCH = 5;
+    public static final int BLOCK_UPDATE_REDSTONE = 6;
 
     public static final int TIME_DAY = 0;
     public static final int TIME_SUNSET = 12000;
@@ -1150,6 +1151,17 @@ public class Level implements ChunkManager, Metadatable {
                     throw new RuntimeException(e);
                 }
             }
+        }
+    }
+
+    public void updateAroundRedstone(Vector3 pos, BlockFace face) {
+        //TODO: event
+        for (BlockFace side : BlockFace.values()) {
+            /*if(face != null && side == face) {
+                continue;
+            }*/
+
+            this.getBlock(pos.getSide(side)).onUpdate(BLOCK_UPDATE_REDSTONE);
         }
     }
 
@@ -2970,7 +2982,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isBlockPowered(Vector3 pos) {
-        return this.getRedstonePower(pos.down(), BlockFace.DOWN) > 0 || this.getRedstonePower(pos.up(), BlockFace.UP) > 0 || this.getRedstonePower(pos.north(), BlockFace.NORTH) > 0 || this.getRedstonePower(pos.south(), BlockFace.SOUTH) > 0 || this.getRedstonePower(pos.west(), BlockFace.WEST) > 0 || this.getRedstonePower(pos.east(), BlockFace.EAST) > 0;
+        return this.getRedstonePower(pos.north(), BlockFace.NORTH) > 0 || this.getRedstonePower(pos.south(), BlockFace.SOUTH) > 0 || this.getRedstonePower(pos.west(), BlockFace.WEST) > 0 || this.getRedstonePower(pos.east(), BlockFace.EAST) > 0 || this.getRedstonePower(pos.down(), BlockFace.DOWN) > 0 || this.getRedstonePower(pos.up(), BlockFace.UP) > 0;
     }
 
     /**

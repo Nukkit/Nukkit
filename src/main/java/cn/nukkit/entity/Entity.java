@@ -1071,6 +1071,10 @@ public abstract class Entity extends Location implements Metadatable {
         return (new Vector2((float) (-Math.cos(Math.toRadians(this.yaw) - Math.PI / 2)), (float) (-Math.sin(Math.toRadians(this.yaw) - Math.PI / 2)))).normalize();
     }
 
+    public BlockFace getHorizontalFacing() {
+        return BlockFace.getHorizontal(NukkitMath.floorDouble((this.yaw * 4.0F / 360.0F) + 0.5D) & 3);
+    }
+
     public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;

@@ -253,8 +253,8 @@ public enum BlockFace {
             return this.name;
         }
 
-        public boolean apply(BlockFace p_apply_1_) {
-            return p_apply_1_ != null && p_apply_1_.getAxis() == this;
+        public boolean apply(BlockFace face) {
+            return face != null && face.getAxis() == this;
         }
 
         public Plane getPlane() {
@@ -266,8 +266,8 @@ public enum BlockFace {
         }
 
         static {
-            for (Axis enumfacing$axis : values()) {
-                NAME_LOOKUP.put(enumfacing$axis.getName2().toLowerCase(), enumfacing$axis);
+            for (Axis axis : values()) {
+                NAME_LOOKUP.put(axis.getName2().toLowerCase(), axis);
             }
         }
     }
