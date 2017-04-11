@@ -35,7 +35,7 @@ public class BlockSugarcane extends BlockFlowable {
     @Override
     public int[][] getDrops(Item item) {
         return new int[][]{
-            {Item.SUGARCANE, 0, 1}
+                {Item.SUGARCANE, 0, 1}
         };
     }
 

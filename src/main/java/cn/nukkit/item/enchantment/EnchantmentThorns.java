@@ -2,7 +2,6 @@ package cn.nukkit.item.enchantment;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHumanType;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 

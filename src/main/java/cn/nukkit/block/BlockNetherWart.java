@@ -15,7 +15,7 @@ import java.util.Random;
  */
 public class BlockNetherWart extends BlockFlowable {
 
-    public BlockNetherWart(){
+    public BlockNetherWart() {
         this(0);
     }
 
@@ -86,7 +86,7 @@ public class BlockNetherWart extends BlockFlowable {
     public int[][] getDrops(Item item) {
         if (this.meta == 0x03) {
             return new int[][]{
-                    {Item.NETHER_WART, 0, 2+(int)(Math.random()*((4-2)+1))}
+                    {Item.NETHER_WART, 0, 2 + (int) (Math.random() * ((4 - 2) + 1))}
             };
         } else {
             return new int[][]{
