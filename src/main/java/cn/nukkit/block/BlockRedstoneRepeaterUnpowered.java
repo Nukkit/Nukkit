@@ -29,11 +29,6 @@ public class BlockRedstoneRepeaterUnpowered extends BlockRedstoneDiode {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
     public boolean onActivate(Item item, Player player) {
         this.meta += 4;
         if (this.meta > 15) this.meta = this.meta % 4;

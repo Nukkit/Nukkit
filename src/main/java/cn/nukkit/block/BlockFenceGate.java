@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.event.block.DoorToggleEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.DoorSound;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
@@ -126,35 +127,44 @@ public class BlockFenceGate extends BlockTransparent {
 
         player = event.getPlayer();
 
-        if (player == null) {
-            return false;
-        }
-
-        double yaw = player.yaw;
-        double rotation = (yaw - 90) % 360;
-
-        if (rotation < 0) {
-            rotation += 360.0;
-        }
-
-        int originDirection = this.getDamage() & 0x01;
         int direction;
 
-        if (originDirection == 0) {
-            if (rotation >= 0 && rotation < 180) {
-                direction = 2;
+        if (player != null) {
+            double yaw = player.yaw;
+            double rotation = (yaw - 90) % 360;
+
+            if (rotation < 0) {
+                rotation += 360.0;
+            }
+
+            int originDirection = this.getDamage() & 0x01;
+
+            if (originDirection == 0) {
+                if (rotation >= 0 && rotation < 180) {
+                    direction = 2;
+                } else {
+                    direction = 0;
+                }
             } else {
-                direction = 0;
+                if (rotation >= 90 && rotation < 270) {
+                    direction = 3;
+                } else {
+                    direction = 1;
+                }
             }
         } else {
-            if (rotation >= 90 && rotation < 270) {
-                direction = 3;
+            int originDirection = this.getDamage() & 0x01;
+
+            if (originDirection == 0) {
+                direction = 0;
             } else {
                 direction = 1;
             }
         }
 
         this.setDamage(direction | ((~this.getDamage()) & 0x04));
+        this.level.addSound(new DoorSound(this));
+        this.level.setBlock(this, this, false, false);
         return true;
     }
 
@@ -162,4 +172,15 @@ public class BlockFenceGate extends BlockTransparent {
         return (this.meta & 0x04) > 0;
     }
 
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_REDSTONE) {
+            if ((!isOpen() && this.level.isBlockPowered(this)) || (isOpen() && !this.level.isBlockPowered(this))) {
+                this.toggle(null);
+                return type;
+            }
+        }
+
+        return 0;
+    }
 }

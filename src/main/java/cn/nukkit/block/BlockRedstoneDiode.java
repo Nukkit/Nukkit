@@ -167,5 +167,8 @@ public abstract class BlockRedstoneDiode extends BlockFlowable {
         return !this.isPowered ? 0 : (getFacing() == side ? this.getRedstoneSignal() : 0);
     }
 
-
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
 }

@@ -1518,6 +1518,13 @@ public abstract class Entity extends Location implements Metadatable {
         this.scheduleUpdate();
     }
 
+    /**
+     * used for bat only
+     */
+    public boolean doesTriggerPressurePlate() {
+        return true;
+    }
+
     protected void checkChunks() {
         if (this.chunk == null || (this.chunk.getX() != ((int) this.x >> 4)) || this.chunk.getZ() != ((int) this.z >> 4)) {
             if (this.chunk != null) {

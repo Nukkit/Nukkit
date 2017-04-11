@@ -215,6 +215,12 @@ public abstract class BlockDoor extends BlockTransparent {
             }
         }
 
+        if (type == Level.BLOCK_UPDATE_REDSTONE) {
+            if ((!isOpen() && this.level.isBlockPowered(this)) || (isOpen() && !this.level.isBlockPowered(this))) {
+                this.toggle(null);
+            }
+        }
+
         return 0;
     }
 
@@ -291,22 +297,35 @@ public abstract class BlockDoor extends BlockTransparent {
             return false;
         }
 
-        if ((this.meta & 0x08) == 0x08) { //Top
+        if (isTop(this.meta)) { //Top
             Block down = this.down();
             if (down.getId() != this.getId()) {
                 return false;
             }
 
             this.getLevel().setBlock(down, Block.get(this.getId(), down.getDamage() ^ 0x04), true);
+
+            this.meta ^= 0x04;
+            this.getLevel().setBlock(this, this, true);
         } else { //Down
+            Block up = this.up();
+            if (up.getId() != this.getId()) {
+                return false;
+            }
+
             this.meta ^= 0x04;
             this.getLevel().setBlock(this, this, true);
         }
 
+        this.level.addSound(new DoorSound(this));
         return true;
     }
 
     public boolean isOpen() {
         return (this.meta & 0x04) > 0;
+    }
+
+    public boolean isTop(int meta) {
+        return (meta & 8) != 0;
     }
 }
