@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 
 /*
@@ -59,5 +60,15 @@ public class BlockRedstone extends BlockSolid {
     @Override
     public BlockColor getColor() {
         return BlockColor.REDSTONE_BLOCK_COLOR;
+    }
+
+    @Override
+    public boolean isPowerSource() {
+        return true;
+    }
+
+    @Override
+    public int getWeakPower(BlockFace face) {
+        return 15;
     }
 }
