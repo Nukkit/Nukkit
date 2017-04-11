@@ -691,7 +691,7 @@ public class Item implements Cloneable {
             list[SUGAR] = ItemSugar.class; //353
             list[CAKE] = ItemCake.class; //354
             list[BED] = ItemBed.class; //355
-            //TODO: list[REPEATER] = ItemRepeater.class; //356
+            list[REPEATER] = ItemRedstoneRepeater.class; //356
             list[COOKIE] = ItemCookie.class; //357
             list[MAP] = ItemMap.class; //358
             list[SHEARS] = ItemShears.class; //359

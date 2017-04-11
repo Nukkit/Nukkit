@@ -40,7 +40,7 @@ public class BlockRedstoneTorch extends BlockTorch {
         Vector3 pos = getLocation();
 
         if (!target.isTransparent() && face != BlockFace.DOWN) {
-            this.meta = face.getOpposite().getIndex();
+            this.meta = getFacing(face.getIndex()).getIndex();
             this.getLevel().setBlock(block, this, true, true);
 
             for (BlockFace side : BlockFace.values()) {
@@ -78,6 +78,11 @@ public class BlockRedstoneTorch extends BlockTorch {
         for (BlockFace side : BlockFace.values()) {
             this.level.updateAroundRedstone(pos.getSide(side), null);
         }
+        return true;
+    }
+
+    @Override
+    public boolean isPowerSource() {
         return true;
     }
 }

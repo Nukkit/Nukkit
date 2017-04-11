@@ -418,8 +418,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[NETHER_PORTAL] = BlockNetherPortal.class; //90
             list[LIT_PUMPKIN] = BlockPumpkinLit.class; //91
             list[CAKE_BLOCK] = BlockCake.class; //92
-            //TODO: list[UNPOWERED_REPEATER] = BlockRepeaterUnpowered.class; //93
-            //TODO: list[POWERED_REPEATER] = BlockRepeaterPowered.class; //94
+            list[UNPOWERED_REPEATER] = BlockRedstoneRepeaterUnpowered.class; //93
+            list[POWERED_REPEATER] = BlockRedstoneRepeaterPowered.class; //94
             list[INVISIBLE_BEDROCK] = BlockBedrockInvisible.class; //95
             list[TRAPDOOR] = BlockTrapdoor.class; //96
             list[MONSTER_EGG] = BlockMonsterEgg.class; //97
@@ -1037,4 +1037,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return 0;
     }
 
+    public boolean isNormalBlock() {
+        return !isTransparent() && isSolid() && !isPowerSource();
+    }
 }

@@ -1178,13 +1178,35 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void scheduleUpdate(Vector3 pos, int delay) {
+        delay += getServer().getTick();
+
         BlockVector3 index = Level.blockHash((int) pos.x, (int) pos.y, (int) pos.z);
         if (this.updateQueueIndex.containsKey(index) && this.updateQueueIndex.get(index) <= delay) {
             return;
         }
         this.updateQueueIndex.put(index, delay);
         this.updateQueue.add(
-                new PriorityObject(new Vector3((int) pos.x, (int) pos.y, (int) pos.z), delay + this.server.getTick()));
+                new PriorityObject(new Vector3((int) pos.x, (int) pos.y, (int) pos.z), delay));
+    }
+
+    public boolean cancelSheduledUpdate(Vector3 pos) {
+        BlockVector3 index = Level.blockHash((int) pos.x, (int) pos.y, (int) pos.z);
+
+        Integer delay = this.updateQueueIndex.remove(index);
+
+        if (delay == null) {
+            return false;
+        }
+
+
+        this.updateQueue.remove(new PriorityObject(pos, delay));
+        return true;
+    }
+
+    public boolean isUpdateScheduled(Vector3 pos) {
+        BlockVector3 index = Level.blockHash((int) pos.x, (int) pos.y, (int) pos.z);
+
+        return this.updateQueueIndex.containsKey(index);
     }
 
     public Block[] getCollisionBlocks(AxisAlignedBB bb) {
@@ -2978,7 +3000,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public int getRedstonePower(Vector3 pos, BlockFace face) {
         Block block = this.getBlock(pos);
-        return block.isSolid() ? this.getStrongPower(pos) : block.getWeakPower(face);
+        return block.isNormalBlock() ? this.getStrongPower(pos) : block.getWeakPower(face);
     }
 
     public boolean isBlockPowered(Vector3 pos) {

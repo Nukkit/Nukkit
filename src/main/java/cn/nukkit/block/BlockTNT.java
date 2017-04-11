@@ -88,7 +88,7 @@ public class BlockTNT extends BlockSolid {
 
     @Override
     public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL && this.level.isBlockPowered(this)) {
+        if ((type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE) && this.level.isBlockPowered(this)) {
             this.prime();
         }
         return 0;

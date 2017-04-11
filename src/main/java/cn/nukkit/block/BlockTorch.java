@@ -97,4 +97,24 @@ public class BlockTorch extends BlockFlowable {
     public BlockColor getColor() {
         return BlockColor.AIR_BLOCK_COLOR;
     }
+
+    public BlockFace getFacing() {
+        return getFacing(this.meta);
+    }
+
+    public BlockFace getFacing(int meta) {
+        switch (meta) {
+            case 1:
+                return BlockFace.EAST;
+            case 2:
+                return BlockFace.WEST;
+            case 3:
+                return BlockFace.SOUTH;
+            case 4:
+                return BlockFace.NORTH;
+            case 5:
+            default:
+                return BlockFace.UP;
+        }
+    }
 }
