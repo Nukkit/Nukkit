@@ -115,6 +115,8 @@ public abstract class BlockPressurePlateBase extends BlockFlowable {
 
     @Override
     public boolean onBreak(Item item) {
+        this.level.setBlock(this, new BlockAir(), true, true);
+
         if (this.getRedstonePower() > 0) {
             this.level.updateAroundRedstone(this, null);
             this.level.updateAroundRedstone(this.getLocation().down(), null);

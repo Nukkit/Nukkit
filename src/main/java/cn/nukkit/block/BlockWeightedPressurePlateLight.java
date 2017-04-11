@@ -63,10 +63,10 @@ public class BlockWeightedPressurePlateLight extends BlockPressurePlateBase {
 
     @Override
     protected int computeRedstoneStrength() {
-        int i = Math.min(this.level.getCollidingEntities(getCollisionBoundingBox()).length, this.getMaxWeight());
+        int count = Math.min(this.level.getCollidingEntities(getCollisionBoundingBox()).length, this.getMaxWeight());
 
-        if (i > 0) {
-            float f = (float) Math.min(this.getMaxWeight(), i) / (float) this.getMaxWeight();
+        if (count > 0) {
+            float f = (float) Math.min(this.getMaxWeight(), count) / (float) this.getMaxWeight();
             return NukkitMath.ceilFloat(f * 15.0F);
         } else {
             return 0;
