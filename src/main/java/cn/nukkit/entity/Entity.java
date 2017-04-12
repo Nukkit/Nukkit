@@ -96,8 +96,8 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_AREA_EFFECT_CLOUD_WAITING = 62; //int
     public static final int DATA_AREA_EFFECT_CLOUD_PARTICLE = 63; //int
     public static final int DATA_TRADE_PLAYER = 68;//long
-    
-    
+
+
     public static final int DATA_FLAG_ONFIRE = 0;
     public static final int DATA_FLAG_SNEAKING = 1;
     public static final int DATA_FLAG_RIDING = 2;
@@ -1071,6 +1071,10 @@ public abstract class Entity extends Location implements Metadatable {
         return (new Vector2((float) (-Math.cos(Math.toRadians(this.yaw) - Math.PI / 2)), (float) (-Math.sin(Math.toRadians(this.yaw) - Math.PI / 2)))).normalize();
     }
 
+    public BlockFace getHorizontalFacing() {
+        return BlockFace.getHorizontal(NukkitMath.floorDouble((this.yaw * 4.0F / 360.0F) + 0.5D) & 3);
+    }
+
     public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;
@@ -1179,7 +1183,7 @@ public abstract class Entity extends Location implements Metadatable {
             if (down == Item.FARMLAND) {
                 if (this instanceof Player) {
                     Player p = (Player) this;
-                    PlayerInteractEvent ev = new PlayerInteractEvent(p, p.getInventory().getItemInHand(), this.temporalVector.setComponents(v.x, v.y, v.z), PlayerInteractEvent.PHYSICAL);
+                    PlayerInteractEvent ev = new PlayerInteractEvent(p, p.getInventory().getItemInHand(), this.temporalVector.setComponents(v.x, v.y, v.z), null, PlayerInteractEvent.PHYSICAL);
                     this.server.getPluginManager().callEvent(ev);
                     if (ev.isCancelled()) {
                         return;
@@ -1512,6 +1516,13 @@ public abstract class Entity extends Location implements Metadatable {
         this.yaw = yaw;
         this.pitch = pitch;
         this.scheduleUpdate();
+    }
+
+    /**
+     * used for bat only
+     */
+    public boolean doesTriggerPressurePlate() {
+        return true;
     }
 
     protected void checkChunks() {

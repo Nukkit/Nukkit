@@ -33,8 +33,13 @@ public class BlockRedstoneLampLit extends BlockRedstoneLamp {
 
     @Override
     public int onUpdate(int type) {
-        if ((type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_SCHEDULED) && this.getNeighborPowerLevel() <= 0) {
-            this.getLevel().setBlock(this, new BlockRedstoneLamp());
+        if ((type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE) && !this.level.isBlockPowered(this)) {
+            this.level.scheduleUpdate(this, 4);
+            return 1;
+        }
+
+        if (type == Level.BLOCK_UPDATE_SCHEDULED && !this.level.isBlockPowered(this)) {
+            this.level.setBlock(this, new BlockRedstoneLamp(), false, false);
         }
         return 0;
     }

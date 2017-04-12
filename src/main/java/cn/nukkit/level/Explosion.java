@@ -13,10 +13,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.particle.HugeExplodeSeedParticle;
 import cn.nukkit.level.sound.ExplodeSound;
-import cn.nukkit.math.AxisAlignedBB;
-import cn.nukkit.math.BlockVector3;
-import cn.nukkit.math.NukkitMath;
-import cn.nukkit.math.Vector3;
+import cn.nukkit.math.*;
 import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.ExplodePacket;
 
@@ -201,7 +198,7 @@ public class Explosion {
 
             Vector3 pos = new Vector3(block.x, block.y, block.z);
 
-            for (int side = 0; side < 5; side++) {
+            for (BlockFace side : BlockFace.values()) {
                 Vector3 sideBlock = pos.getSide(side);
                 BlockVector3 index = Level.blockHash((int) sideBlock.x, (int) sideBlock.y, (int) sideBlock.z);
                 if (!this.affectedBlocks.contains(sideBlock) && !updateBlocks.containsKey(index)) {

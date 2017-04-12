@@ -4,9 +4,9 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockLeaves2;
 import cn.nukkit.block.BlockWood2;
 import cn.nukkit.level.ChunkManager;
+import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.utils.EnumFacing;
 
 public class NewSavannaTree extends TreeGenerator {
     private static final Block TRUNK = new BlockWood2(BlockWood2.ACACIA);
@@ -48,12 +48,12 @@ public class NewSavannaTree extends TreeGenerator {
             if (!flag) {
                 return false;
             } else {
-                Vector3 down = position.getSide(Vector3.SIDE_DOWN);
+                Vector3 down = position.down();
                 int block = level.getBlockIdAt(down.getFloorX(), down.getFloorY(), down.getFloorZ());
 
                 if ((block == Block.GRASS || block == Block.DIRT) && position.getY() < 256 - i - 1) {
-                    this.setDirtAt(level, position.getSide(Vector3.SIDE_DOWN));
-                    EnumFacing enumfacing = EnumFacing.Plane.HORIZONTAL.random(rand);
+                    this.setDirtAt(level, position.down());
+                    BlockFace enumfacing = BlockFace.Plane.HORIZONTAL.random(rand);
                     int k2 = i - rand.nextBoundedInt(4) - 1;
                     int l2 = 3 - rand.nextBoundedInt(3);
                     int i3 = position.getFloorX();
@@ -88,7 +88,7 @@ public class NewSavannaTree extends TreeGenerator {
                         }
                     }
 
-                    blockpos2 = blockpos2.getSide(Vector3.SIDE_UP);
+                    blockpos2 = blockpos2.up();
 
                     for (int k3 = -1; k3 <= 1; ++k3) {
                         for (int j4 = -1; j4 <= 1; ++j4) {
@@ -96,13 +96,13 @@ public class NewSavannaTree extends TreeGenerator {
                         }
                     }
 
-                    this.placeLeafAt(level, blockpos2.getSide(Vector3.SIDE_EAST, 2));
-                    this.placeLeafAt(level, blockpos2.getSide(Vector3.SIDE_WEST, 2));
-                    this.placeLeafAt(level, blockpos2.getSide(Vector3.SIDE_SOUTH, 2));
-                    this.placeLeafAt(level, blockpos2.getSide(Vector3.SIDE_NORTH, 2));
+                    this.placeLeafAt(level, blockpos2.east(2));
+                    this.placeLeafAt(level, blockpos2.west(2));
+                    this.placeLeafAt(level, blockpos2.south(2));
+                    this.placeLeafAt(level, blockpos2.north(2));
                     i3 = position.getFloorX();
                     j1 = position.getFloorZ();
-                    EnumFacing enumfacing1 = EnumFacing.Plane.HORIZONTAL.random(rand);
+                    BlockFace enumfacing1 = BlockFace.Plane.HORIZONTAL.random(rand);
 
                     if (enumfacing1 != enumfacing) {
                         int l3 = k2 - rand.nextBoundedInt(2) - 1;
@@ -137,7 +137,7 @@ public class NewSavannaTree extends TreeGenerator {
                                 }
                             }
 
-                            blockpos3 = blockpos3.getSide(Vector3.SIDE_UP);
+                            blockpos3 = blockpos3.up();
 
                             for (int j5 = -1; j5 <= 1; ++j5) {
                                 for (int l5 = -1; l5 <= 1; ++l5) {
