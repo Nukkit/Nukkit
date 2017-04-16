@@ -77,7 +77,6 @@ public abstract class BlockRedstoneDiode extends BlockFlowable {
                 this.level.useBreakOn(this);
                 return Level.BLOCK_UPDATE_NORMAL;
             } else {
-                System.out.println("updatestate: " + getFacing());
                 this.updateState();
                 return Level.BLOCK_UPDATE_NORMAL;
             }
@@ -92,7 +91,6 @@ public abstract class BlockRedstoneDiode extends BlockFlowable {
             if ((this.isPowered && !shouldPowered || !this.isPowered && shouldPowered) && !this.level.isUpdateScheduled(this)) {
 
                 this.level.scheduleUpdate(this, this.getDelay());
-                System.out.println("schedule");
             }
         }
     }

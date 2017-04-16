@@ -32,7 +32,6 @@ public class BlockEntityComparator extends BlockEntity {
 
     public void setOutputSignal(int outputSignal) {
         this.outputSignal = outputSignal;
-        System.out.println("set output: " + outputSignal);
     }
 
     @Override

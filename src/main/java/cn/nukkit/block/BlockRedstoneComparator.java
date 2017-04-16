@@ -30,7 +30,7 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
 
     @Override
     public BlockFace getFacing() {
-        return BlockFace.getHorizontal(meta);
+        return BlockFace.getHorizontal(this.meta);
     }
 
     public Mode getMode() {
@@ -63,8 +63,6 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
 
             if (output != power || this.isPowered() != this.shouldBePowered()) {
                 this.level.scheduleUpdate(this, 2);
-            } else {
-                System.out.println("else: " + output + "   " + power);
             }
         }
     }
@@ -111,8 +109,10 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
         } else {
             this.meta += 4;
         }
+
         this.level.addSound(new ClickSound(this, getMode() == Mode.SUBTRACT ? 0.55F : 0.5F));
         this.level.setBlock(this, this, true, false);
+        //bug?
 
         this.onChange();
         return true;
@@ -126,10 +126,8 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
                 if (block.meta < 8) {
                     block.meta += 8;
                 }
-                System.out.println("scheduled update: " + block.getFacing());
                 this.level.setBlock(this, block, true, false);
                 block.onChange();
-                System.out.println("scheduled update after: " + block.getFacing());
                 return type;
             }
 
@@ -157,10 +155,8 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
 
             if (isPowered && !shouldBePowered) {
                 this.level.setBlock(this, getUnpowered(), true, false);
-                System.out.println("unpowered: " + getFacing());
             } else if (!isPowered && shouldBePowered) {
                 this.level.setBlock(this, getPowered(), true, false);
-                System.out.println("powered: " + getFacing());
             }
 
             this.level.updateAroundRedstone(this, null);
