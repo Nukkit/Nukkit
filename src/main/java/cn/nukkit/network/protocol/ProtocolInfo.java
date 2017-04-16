@@ -9,7 +9,7 @@ public interface ProtocolInfo {
     /**
      * Actual Minecraft: PE protocol version
      */
-    byte CURRENT_PROTOCOL = 105;
+    byte CURRENT_PROTOCOL = 106;
     String MINECRAFT_VERSION = "v1.0.5";
     String MINECRAFT_VERSION_NETWORK = "1.0.5";
 

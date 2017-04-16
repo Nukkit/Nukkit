@@ -84,4 +84,9 @@ public class BlockBeacon extends BlockTransparent {
 
         return blockSuccess;
     }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
 }

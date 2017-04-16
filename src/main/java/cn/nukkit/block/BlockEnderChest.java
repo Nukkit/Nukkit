@@ -155,4 +155,9 @@ public class BlockEnderChest extends BlockTransparent {
     public Set<Player> getViewers() {
         return viewers;
     }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
 }

@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.NoteBoxSound;
 import cn.nukkit.network.protocol.BlockEventPacket;
 
@@ -115,5 +116,14 @@ public class BlockNoteblock extends BlockSolid {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE) {
+            //TODO: redstone
+        }
+
+        return 0;
     }
 }

@@ -4,6 +4,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBrewingStand;
+import cn.nukkit.inventory.ContainerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
@@ -133,5 +134,20 @@ public class BlockBrewingStand extends BlockSolid {
     @Override
     public BlockColor getColor() {
         return BlockColor.IRON_BLOCK_COLOR;
+    }
+
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (blockEntity instanceof BlockEntityBrewingStand) {
+            return ContainerInventory.calculateRedstone(((BlockEntityBrewingStand) blockEntity).getInventory());
+        }
+
+        return super.getComparatorInputOverride();
     }
 }

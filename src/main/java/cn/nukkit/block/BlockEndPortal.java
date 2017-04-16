@@ -58,4 +58,8 @@ public class BlockEndPortal extends BlockFlowable {
         return BlockColor.AIR_BLOCK_COLOR;
     }
 
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
 }

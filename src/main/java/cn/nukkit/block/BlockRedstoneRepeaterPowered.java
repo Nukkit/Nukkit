@@ -34,6 +34,11 @@ public class BlockRedstoneRepeaterPowered extends BlockRedstoneDiode {
     }
 
     @Override
+    protected boolean isAlternateInput(Block block) {
+        return isDiode(block);
+    }
+
+    @Override
     public int[][] getDrops(Item item) {
         return new int[][]{{Item.REPEATER, 0, 1}};
     }
@@ -65,5 +70,10 @@ public class BlockRedstoneRepeaterPowered extends BlockRedstoneDiode {
 
         this.level.setBlock(this, this, true, false);
         return true;
+    }
+
+    @Override
+    public boolean isLocked() {
+        return this.getPowerOnSides() > 0;
     }
 }

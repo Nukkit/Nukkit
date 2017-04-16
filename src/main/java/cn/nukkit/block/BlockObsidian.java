@@ -74,4 +74,9 @@ public class BlockObsidian extends BlockSolid {
     public BlockColor getColor() {
         return BlockColor.OBSIDIAN_BLOCK_COLOR;
     }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
 }

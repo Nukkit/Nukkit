@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityChest;
+import cn.nukkit.inventory.ContainerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
@@ -178,5 +179,19 @@ public class BlockChest extends BlockTransparent {
     @Override
     public BlockColor getColor() {
         return BlockColor.WOOD_BLOCK_COLOR;
+    }
+
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+
+    public int getComparatorInputOverride() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (blockEntity instanceof BlockEntityChest) {
+            return ContainerInventory.calculateRedstone(((BlockEntityChest) blockEntity).getInventory());
+        }
+
+        return super.getComparatorInputOverride();
     }
 }
