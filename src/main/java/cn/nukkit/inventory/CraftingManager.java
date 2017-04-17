@@ -779,6 +779,18 @@ public class CraftingManager {
                 "RGR",
                 " R "
         ).setIngredient("R", Item.get(Item.REDSTONE_DUST, 0, 4)).setIngredient("G", Item.get(Item.GLOWSTONE_BLOCK, 0, 1)));
+
+        this.registerRecipe(new BigShapedRecipe(Item.get(Item.REPEATER, 0, 1),
+                "   ",
+                "TRT",
+                "SSS"
+        ).setIngredient("R", Item.get(Item.REDSTONE_DUST, 0, 1)).setIngredient("T", Item.get(Item.REDSTONE_TORCH, 0, 2)).setIngredient("S", Item.get(Item.STONE, 0, 3)));
+
+        this.registerRecipe(new BigShapedRecipe(Item.get(Item.COMPARATOR, 0, 1),
+                " T ",
+                "TQT",
+                "SSS"
+        ).setIngredient("Q", Item.get(Item.QUARTZ, 0, 1)).setIngredient("T", Item.get(Item.REDSTONE_TORCH, 0, 3)).setIngredient("S", Item.get(Item.STONE, 0, 3)));
     }
 
     protected void registerFurnace() {
