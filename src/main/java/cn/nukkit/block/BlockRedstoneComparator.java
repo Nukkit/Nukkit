@@ -121,16 +121,6 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_SCHEDULED) {
-            if (this.isPowered) {
-                BlockRedstoneComparator block = getUnpowered();
-                if (block.meta < 8) {
-                    block.meta += 8;
-                }
-                this.level.setBlock(this, block, true, false);
-                block.onChange();
-                return type;
-            }
-
             this.onChange();
             return type;
         }
@@ -192,21 +182,7 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
     }
 
     public enum Mode {
-        COMPARE("compare"),
-        SUBTRACT("subtract");
-
-        private final String name;
-
-        Mode(String name) {
-            this.name = name;
-        }
-
-        public String toString() {
-            return this.name;
-        }
-
-        public String getName() {
-            return this.name;
-        }
+        COMPARE,
+        SUBTRACT
     }
 }
