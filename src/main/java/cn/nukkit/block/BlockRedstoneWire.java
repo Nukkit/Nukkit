@@ -46,7 +46,7 @@ public class BlockRedstoneWire extends BlockFlowable {
         }
 
         this.getLevel().setBlock(block, this, true, false);
-        this.updateSurroundingRedstone();
+        this.updateSurroundingRedstone(true);
         Vector3 pos = getLocation();
 
         for (BlockFace blockFace : Plane.VERTICAL) {
@@ -79,11 +79,11 @@ public class BlockRedstoneWire extends BlockFlowable {
         }
     }
 
-    private void updateSurroundingRedstone() {
-        this.calculateCurrentChanges();
+    private void updateSurroundingRedstone(boolean force) {
+        this.calculateCurrentChanges(force);
     }
 
-    private void calculateCurrentChanges() {
+    private void calculateCurrentChanges(boolean force) {
         Vector3 pos = this.getLocation();
 
         int meta = this.meta;
@@ -136,6 +136,10 @@ public class BlockRedstoneWire extends BlockFlowable {
             for (BlockFace face : BlockFace.values()) {
                 this.level.updateAroundRedstone(pos.getSide(face), face.getOpposite());
             }
+        } else if (force) {
+            for (BlockFace face : BlockFace.values()) {
+                this.level.updateAroundRedstone(pos.getSide(face), face.getOpposite());
+            }
         }
     }
 
@@ -154,10 +158,10 @@ public class BlockRedstoneWire extends BlockFlowable {
 
         Vector3 pos = getLocation();
 
-        this.updateSurroundingRedstone();
+        this.updateSurroundingRedstone(false);
 
         for (BlockFace blockFace : BlockFace.values()) {
-            this.level.updateAround(pos.getSide(blockFace));
+            this.level.updateAroundRedstone(pos.getSide(blockFace), null);
         }
 
         for (BlockFace blockFace : Plane.HORIZONTAL) {
@@ -195,7 +199,7 @@ public class BlockRedstoneWire extends BlockFlowable {
             return Level.BLOCK_UPDATE_NORMAL;
         }
 
-        this.updateSurroundingRedstone();
+        this.updateSurroundingRedstone(false);
 
         return Level.BLOCK_UPDATE_NORMAL;
     }

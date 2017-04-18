@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityFurnace;
+import cn.nukkit.inventory.ContainerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
@@ -134,5 +135,20 @@ public class BlockFurnaceBurning extends BlockSolid {
         } else {
             return new int[0][0];
         }
+    }
+
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (blockEntity instanceof BlockEntityFurnace) {
+            return ContainerInventory.calculateRedstone(((BlockEntityFurnace) blockEntity).getInventory());
+        }
+
+        return super.getComparatorInputOverride();
     }
 }

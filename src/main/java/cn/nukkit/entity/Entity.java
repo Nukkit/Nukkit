@@ -136,6 +136,8 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_LEAD_HOLDER = 23;
     public static final int DATA_LEAD = 24;
 
+    public static final int DATA_CREEPER_FUSE = 56; //byte
+
     public static long entityCount = 1;
 
     private static final Map<String, Class<? extends Entity>> knownEntities = new HashMap<>();

@@ -66,4 +66,9 @@ public class BlockRedstoneRepeaterUnpowered extends BlockRedstoneDiode {
     protected Block getUnpowered() {
         return this;
     }
+
+    @Override
+    public boolean isLocked() {
+        return this.getPowerOnSides() > 0;
+    }
 }

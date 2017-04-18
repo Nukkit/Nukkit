@@ -4,7 +4,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 
 /**
- * Created by Pub4Game on 30.03.2016.
+ * @author Pub4Game
  */
 public class BlockRedstoneLampLit extends BlockRedstoneLamp {
 

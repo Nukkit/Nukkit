@@ -355,12 +355,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[BED_BLOCK] = BlockBed.class; //26
             list[POWERED_RAIL] = BlockRailPowered.class; //27
             list[DETECTOR_RAIL] = BlockRailDetector.class; //28
-            //TODO: list[STICKY_PISTON] = BlockPistonSticky.class; //29
+            list[STICKY_PISTON] = BlockPistonSticky.class; //29
             list[COBWEB] = BlockCobweb.class; //30
             list[TALL_GRASS] = BlockTallGrass.class; //31
             list[DEAD_BUSH] = BlockDeadBush.class; //32
-            //TODO: list[PISTON] = BlockPiston.class; //33
-            //TODO: list[PISTON_HEAD] = BlockPistonHead.class; //34
+            list[PISTON] = BlockPiston.class; //33
+            list[PISTON_HEAD] = BlockPistonHead.class; //34
             list[WOOL] = BlockWool.class; //35
             list[DANDELION] = BlockDandelion.class; //37
             list[FLOWER] = BlockFlower.class; //38
@@ -474,8 +474,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[TRAPPED_CHEST] = BlockTrappedChest.class; //146
             list[LIGHT_WEIGHTED_PRESSURE_PLATE] = BlockWeightedPressurePlateLight.class; //147
             list[HEAVY_WEIGHTED_PRESSURE_PLATE] = BlockWeightedPressurePlateHeavy.class; //148
-            //TODO: list[UNPOWERED_COMPARATOR] = BlockComparatorUnpowered.class; //149
-            //TODO: list[POWERED_COMPARATOR] = BlockComparatorPowered.class; //149
+            list[UNPOWERED_COMPARATOR] = BlockRedstoneComparatorUnpowered.class; //149
+            list[POWERED_COMPARATOR] = BlockRedstoneComparatorPowered.class; //149
             list[DAYLIGHT_DETECTOR] = BlockDaylightDetector.class; //151
             list[REDSTONE_BLOCK] = BlockRedstone.class; //152
             list[QUARTZ_ORE] = BlockOreQuartz.class; //153
@@ -712,6 +712,18 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
     public boolean canPassThrough() {
         return false;
+    }
+
+    public boolean canBePushed() {
+        return true;
+    }
+
+    public boolean hasComparatorInputOverride() {
+        return false;
+    }
+
+    public int getComparatorInputOverride() {
+        return 0;
     }
 
     public BlockColor getColor() {

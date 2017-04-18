@@ -105,4 +105,12 @@ public class BlockCake extends BlockTransparent {
     public BlockColor getColor() {
         return BlockColor.AIR_BLOCK_COLOR;
     }
+
+    public int getComparatorInputOverride() {
+        return (7 - this.meta) * 2;
+    }
+
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
 }

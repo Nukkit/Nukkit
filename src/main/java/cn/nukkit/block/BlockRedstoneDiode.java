@@ -60,9 +60,12 @@ public abstract class BlockRedstoneDiode extends BlockFlowable {
                 boolean shouldBePowered = this.shouldBePowered();
 
                 if (this.isPowered && !shouldBePowered) {
-                    this.level.setBlock(pos, this.getUnpowered(), false, true);
+                    this.level.setBlock(pos, this.getUnpowered(), true, true);
+
+                    this.level.updateAroundRedstone(this.getLocation().getSide(getFacing().getOpposite()), null);
                 } else if (!this.isPowered) {
-                    this.level.setBlock(pos, this.getPowered(), false, true);
+                    this.level.setBlock(pos, this.getPowered(), true, true);
+                    this.level.updateAroundRedstone(this.getLocation().getSide(getFacing().getOpposite()), null);
 
                     if (!shouldBePowered) {
                         level.scheduleUpdate(pos, this.getDelay());
@@ -74,19 +77,22 @@ public abstract class BlockRedstoneDiode extends BlockFlowable {
                 this.level.useBreakOn(this);
                 return Level.BLOCK_UPDATE_NORMAL;
             } else {
-                if (!this.isLocked()) {
-                    boolean shouldPowered = this.shouldBePowered();
-
-                    if ((this.isPowered && !shouldPowered || !this.isPowered && shouldPowered) && !this.level.isUpdateScheduled(this)) {
-
-                        this.level.scheduleUpdate(this, this.getDelay());
-                    }
-                }
-
+                this.updateState();
                 return Level.BLOCK_UPDATE_NORMAL;
             }
         }
         return 0;
+    }
+
+    public void updateState() {
+        if (!this.isLocked()) {
+            boolean shouldPowered = this.shouldBePowered();
+
+            if ((this.isPowered && !shouldPowered || !this.isPowered && shouldPowered) && !this.level.isUpdateScheduled(this)) {
+
+                this.level.scheduleUpdate(this, this.getDelay());
+            }
+        }
     }
 
     public boolean isLocked() {
@@ -164,11 +170,15 @@ public abstract class BlockRedstoneDiode extends BlockFlowable {
     }
 
     public int getWeakPower(BlockFace side) {
-        return !this.isPowered ? 0 : (getFacing() == side ? this.getRedstoneSignal() : 0);
+        return !this.isPowered() ? 0 : (getFacing() == side ? this.getRedstoneSignal() : 0);
     }
 
     @Override
     public boolean canBeActivated() {
         return true;
+    }
+
+    public boolean isPowered() {
+        return isPowered;
     }
 }

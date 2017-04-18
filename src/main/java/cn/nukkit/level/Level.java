@@ -37,6 +37,7 @@ import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.sound.BlockPlaceSound;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.math.*;
+import cn.nukkit.math.BlockFace.Plane;
 import cn.nukkit.metadata.BlockMetadataStore;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
@@ -1165,6 +1166,27 @@ public class Level implements ChunkManager, Metadatable {
         }
     }
 
+    public void updateComparatorOutputLevel(Vector3 v) {
+        for (BlockFace face : Plane.HORIZONTAL) {
+            Vector3 pos = v.getSide(face);
+
+            if (this.isChunkLoaded((int) pos.x >> 4, (int) pos.z >> 4)) {
+                Block block1 = this.getBlock(pos);
+
+                if (BlockRedstoneDiode.isDiode(block1)) {
+                    block1.onUpdate(BLOCK_UPDATE_REDSTONE);
+                } else if (block1.isNormalBlock()) {
+                    pos = pos.getSide(face);
+                    block1 = this.getBlock(pos);
+
+                    if (BlockRedstoneDiode.isDiode(block1)) {
+                        block1.onUpdate(BLOCK_UPDATE_REDSTONE);
+                    }
+                }
+            }
+        }
+    }
+
     public void updateAround(Vector3 pos) {
         BlockUpdateEvent ev;
 
@@ -1744,6 +1766,8 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             blockEntity.close();
+
+            this.updateComparatorOutputLevel(target);
         }
 
         item.useOn(target);

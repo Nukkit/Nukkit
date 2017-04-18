@@ -184,7 +184,11 @@ public class BlockCauldron extends BlockSolid {
 
                 this.level.addSound(new SplashSound(this.add(0.5, 0.5, 0.5)));
                 break;
+            default:
+                return true;
         }
+
+        this.level.updateComparatorOutputLevel(this);
         return true;
     }
 
@@ -217,5 +221,13 @@ public class BlockCauldron extends BlockSolid {
         }
 
         return new int[0][0];
+    }
+
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+
+    public int getComparatorInputOverride() {
+        return this.meta;
     }
 }

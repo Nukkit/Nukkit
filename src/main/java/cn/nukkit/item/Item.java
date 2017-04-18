@@ -736,7 +736,7 @@ public class Item implements Cloneable {
             list[PUMPKIN_PIE] = ItemPumpkinPie.class; //400
 
             list[ENCHANTED_BOOK] = ItemBookEnchanted.class; //403
-            //TODO: list[COMPARATOR] = ItemComparator.class; //404
+            list[COMPARATOR] = ItemRedstoneComparator.class; //404
             list[NETHER_BRICK] = ItemNetherBrick.class; //405
             list[QUARTZ] = ItemQuartz.class; //406
             list[MINECART_WITH_TNT] = ItemMinecartTNT.class; //407
@@ -1209,6 +1209,9 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.REPEATER));
         addCreativeItem(Item.get(Item.COMPARATOR));
         addCreativeItem(Item.get(Item.DISPENSER, 3));
+        addCreativeItem(Item.get(Item.DROPPER));
+        addCreativeItem(Item.get(Item.PISTON));
+        addCreativeItem(Item.get(Item.STICKY_PISTON));
         addCreativeItem(Item.get(Item.OBSERVER));
         addCreativeItem(Item.get(Item.HOPPER));
         addCreativeItem(Item.get(Item.SNOWBALL));
