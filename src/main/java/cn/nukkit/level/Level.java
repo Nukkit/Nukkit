@@ -1184,6 +1184,8 @@ public class Level implements ChunkManager, Metadatable {
                     }
                 }
             }
+
+            this.getBlock(pos.getSide(side)).onUpdate(BLOCK_UPDATE_REDSTONE);
         }
     }
 
