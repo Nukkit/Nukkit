@@ -22,6 +22,8 @@ import cn.nukkit.entity.projectile.*;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.block.SignChangeEvent;
 import cn.nukkit.event.entity.*;
+import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
+import cn.nukkit.event.entity.EntityDamageEvent.DamageModifier;
 import cn.nukkit.event.inventory.CraftItemEvent;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryPickupArrowEvent;
@@ -2732,11 +2734,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    boolean cancelled = false;
-                    if (targetEntity instanceof Player && !((boolean) this.server.getConfig("pvp", true))) {
-                        cancelled = true;
-                    }
-
                     item = this.inventory.getItemInHand();
 
                     switch (interactPacket.action) {
@@ -2745,7 +2742,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case InteractPacket.ACTION_LEFT_CLICK:
                             if (this.getGamemode() == Player.VIEW) {
-                                cancelled = true;
+                                break;
                             }
 
                             float itemDamage = item.getAttackDamage();
@@ -2754,27 +2751,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 itemDamage += enchantment.getDamageBonus(targetEntity);
                             }
 
-                            HashMap<Integer, Float> damage = new HashMap<>();
-                            damage.put(EntityDamageEvent.MODIFIER_BASE, itemDamage);
+                            Map<DamageModifier, Float> damage = new EnumMap<>(DamageModifier.class);
+                            damage.put(DamageModifier.BASE, itemDamage);
 
                             if (!this.canInteract(targetEntity, isCreative() ? 8 : 5)) {
-                                cancelled = true;
+                                break;
                             } else if (targetEntity instanceof Player) {
                                 if ((((Player) targetEntity).getGamemode() & 0x01) > 0) {
                                     break;
                                 } else if (!this.server.getPropertyBoolean("pvp") || this.server.getDifficulty() == 0) {
-                                    cancelled = true;
+                                    break;
                                 }
                             }
 
-                            EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(this, targetEntity, EntityDamageEvent.CAUSE_ENTITY_ATTACK, damage);
-                            if (cancelled) {
-                                entityDamageByEntityEvent.setCancelled();
-                            }
-
-                            targetEntity.attack(entityDamageByEntityEvent);
-
-                            if (entityDamageByEntityEvent.isCancelled()) {
+                            if (!targetEntity.attack(new EntityDamageByEntityEvent(this, targetEntity, DamageCause.ENTITY_ATTACK, damage))) {
                                 if (item.isTool() && this.isSurvival()) {
                                     this.inventory.sendContents(this);
                                 }
@@ -3946,8 +3936,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         EntityDamageEvent cause = this.getLastDamageCause();
 
-        switch (cause == null ? EntityDamageEvent.CAUSE_CUSTOM : cause.getCause()) {
-            case EntityDamageEvent.CAUSE_ENTITY_ATTACK:
+        switch (cause == null ? DamageCause.CUSTOM : cause.getCause()) {
+            case ENTITY_ATTACK:
                 if (cause instanceof EntityDamageByEntityEvent) {
                     Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
                     killer = e;
@@ -3964,7 +3954,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                 }
                 break;
-            case EntityDamageEvent.CAUSE_PROJECTILE:
+            case PROJECTILE:
                 if (cause instanceof EntityDamageByEntityEvent) {
                     Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
                     killer = e;
@@ -3980,13 +3970,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                 }
                 break;
-            case EntityDamageEvent.CAUSE_SUICIDE:
+            case SUICIDE:
                 message = "death.attack.generic";
                 break;
-            case EntityDamageEvent.CAUSE_VOID:
+            case VOID:
                 message = "death.attack.outOfWorld";
                 break;
-            case EntityDamageEvent.CAUSE_FALL:
+            case FALL:
                 if (cause != null) {
                     if (cause.getFinalDamage() > 2) {
                         message = "death.fell.accident.generic";
@@ -3996,27 +3986,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 message = "death.attack.fall";
                 break;
 
-            case EntityDamageEvent.CAUSE_SUFFOCATION:
+            case SUFFOCATION:
                 message = "death.attack.inWall";
                 break;
 
-            case EntityDamageEvent.CAUSE_LAVA:
+            case LAVA:
                 message = "death.attack.lava";
                 break;
 
-            case EntityDamageEvent.CAUSE_FIRE:
+            case FIRE:
                 message = "death.attack.onFire";
                 break;
 
-            case EntityDamageEvent.CAUSE_FIRE_TICK:
+            case FIRE_TICK:
                 message = "death.attack.inFire";
                 break;
 
-            case EntityDamageEvent.CAUSE_DROWNING:
+            case DROWNING:
                 message = "death.attack.drown";
                 break;
 
-            case EntityDamageEvent.CAUSE_CONTACT:
+            case CONTACT:
                 if (cause instanceof EntityDamageByBlockEvent) {
                     if (((EntityDamageByBlockEvent) cause).getDamager().getId() == Block.CACTUS) {
                         message = "death.attack.cactus";
@@ -4024,8 +4014,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
                 break;
 
-            case EntityDamageEvent.CAUSE_BLOCK_EXPLOSION:
-            case EntityDamageEvent.CAUSE_ENTITY_EXPLOSION:
+            case BLOCK_EXPLOSION:
+            case ENTITY_EXPLOSION:
                 if (cause instanceof EntityDamageByEntityEvent) {
                     Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
                     killer = e;
@@ -4042,11 +4032,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
                 break;
 
-            case EntityDamageEvent.CAUSE_MAGIC:
+            case MAGIC:
                 message = "death.attack.magic";
                 break;
 
-            case EntityDamageEvent.CAUSE_CUSTOM:
+            case CUSTOM:
                 break;
 
             default:
@@ -4199,24 +4189,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
-    public void attack(EntityDamageEvent source) {
+    public boolean attack(EntityDamageEvent source) {
         if (!this.isAlive()) {
-            return;
+            return false;
         }
 
         if (this.isCreative()
-                && source.getCause() != EntityDamageEvent.CAUSE_MAGIC
-                && source.getCause() != EntityDamageEvent.CAUSE_SUICIDE
-                && source.getCause() != EntityDamageEvent.CAUSE_VOID
+                && source.getCause() != DamageCause.MAGIC
+                && source.getCause() != DamageCause.SUICIDE
+                && source.getCause() != DamageCause.VOID
                 ) {
-            source.setCancelled();
-        } else if (this.getAdventureSettings().canFly() && source.getCause() == EntityDamageEvent.CAUSE_FALL) {
-            source.setCancelled();
-        } else if (source.getCause() == EntityDamageEvent.CAUSE_FALL) {
+            //source.setCancelled();
+            return false;
+        } else if (this.getAdventureSettings().canFly() && source.getCause() == DamageCause.FALL) {
+            //source.setCancelled();
+            return false;
+        } else if (source.getCause() == DamageCause.FALL) {
             if (this.getLevel().getBlock(this.getPosition().floor().add(0.5, -1, 0.5)).getId() == Block.SLIME_BLOCK) {
                 if (!this.isSneaking()) {
-                    source.setCancelled();
+                    //source.setCancelled();
                     this.resetFallDistance();
+                    return false;
                 }
             }
         }
@@ -4226,7 +4219,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (damager instanceof Player) {
                 ((Player) damager).getFoodData().updateFoodExpLevel(0.3);
             }
-            //暴击
+            //Critical hit
             boolean add = false;
             if (!damager.onGround) {
                 NukkitRandom random = new NukkitRandom();
@@ -4240,14 +4233,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (add) source.setDamage((float) (source.getDamage() * 1.5));
         }
 
-        super.attack(source);
-
-        if (!source.isCancelled() && this.getLastDamageCause() == source && this.spawned) {
-            this.getFoodData().updateFoodExpLevel(0.3);
-            EntityEventPacket pk = new EntityEventPacket();
-            pk.eid = this.id;
-            pk.event = EntityEventPacket.HURT_ANIMATION;
-            this.dataPacket(pk);
+        if (super.attack(source)) { //!source.isCancelled()
+            if (this.getLastDamageCause() == source && this.spawned) {
+                this.getFoodData().updateFoodExpLevel(0.3);
+                EntityEventPacket pk = new EntityEventPacket();
+                pk.eid = this.id;
+                pk.event = EntityEventPacket.HURT_ANIMATION;
+                this.dataPacket(pk);
+            }
+            return true;
+        } else {
+            return false;
         }
     }
 

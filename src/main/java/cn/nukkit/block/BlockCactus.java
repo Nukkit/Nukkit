@@ -5,7 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
-import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
@@ -65,7 +65,7 @@ public class BlockCactus extends BlockTransparent {
 
     @Override
     public void onEntityCollide(Entity entity) {
-        entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.CAUSE_CONTACT, 1));
+        entity.attack(new EntityDamageByBlockEvent(this, entity, DamageCause.CONTACT, 1));
     }
 
     @Override
