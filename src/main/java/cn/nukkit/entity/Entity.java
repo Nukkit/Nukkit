@@ -777,7 +777,13 @@ public abstract class Entity extends Location implements Metadatable {
             return;
         }
         setLastDamageCause(source);
-        setHealth(getHealth() - source.getFinalDamage());
+        float health = getHealth() - source.getFinalDamage();
+
+        if(health < 1) {
+            health = 0;
+        }
+
+        setHealth(health);
     }
 
     public void attack(float damage) {
