@@ -142,6 +142,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected String username;
     protected String iusername;
     protected String displayName;
+    protected String xuid;
 
     protected int startAction = -1;
 
@@ -1927,6 +1928,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.username = TextFormat.clean(loginPacket.username);
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();
+                    this.xuid = loginPacket.xuid;
                     this.setDataProperty(new StringEntityData(DATA_NAMETAG, this.username), false);
 
                     if (this.server.getOnlinePlayers().size() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull", false)) {
@@ -2577,8 +2579,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             PlayerRespawnEvent playerRespawnEvent = new PlayerRespawnEvent(this, this.getSpawn());
                             this.server.getPluginManager().callEvent(playerRespawnEvent);
+                            
+                            Position respawnPos = playerRespawnEvent.getRespawnPosition();
 
-                            this.teleport(playerRespawnEvent.getRespawnPosition(), null);
+                            this.teleport(respawnPos, null);
+                            
+                            RespawnPacket respawnPacket = new RespawnPacket();
+                            respawnPacket.x = (float) respawnPos.x;
+                            respawnPacket.y = (float) respawnPos.y;
+                            respawnPacket.z = (float) respawnPos.z;
+                            this.dataPacket(respawnPacket);
 
                             this.setSprinting(false, true);
                             this.setSneaking(false);
