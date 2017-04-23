@@ -18,177 +18,182 @@ import java.util.Random;
  */
 public abstract class EntityProjectile extends Entity {
 
-    public static final int DATA_SHOOTER_ID = 17;
+	public static final int DATA_SHOOTER_ID = 17;
 
-    public Entity shootingEntity = null;
+	private Entity shootingEntity = null;
 
-    protected double getDamage() {
-        return 0;
-    }
+	protected double getDamage() {
+		return 0;
+	}
 
-    public boolean hadCollision = false;
+	public boolean hadCollision = false;
 
-    public EntityProjectile(FullChunk chunk, CompoundTag nbt) {
-        this(chunk, nbt, null);
-    }
+	public EntityProjectile(FullChunk chunk, CompoundTag nbt) {
+		this(chunk, nbt, null);
+	}
 
-    public EntityProjectile(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
-        super(chunk, nbt);
-        this.shootingEntity = shootingEntity;
-        if (shootingEntity != null) {
-            this.setDataProperty(new LongEntityData(DATA_SHOOTER_ID, shootingEntity.getId()));
-        }
-    }
+	public EntityProjectile(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
+		super(chunk, nbt);
+		this.shootingEntity = shootingEntity;
+		if (shootingEntity != null) {
+			this.setDataProperty(new LongEntityData(DATA_SHOOTER_ID, shootingEntity.getId()));
+		}
+	}
 
-    public void attack(EntityDamageEvent source) {
-        if (source.getCause() == EntityDamageEvent.CAUSE_VOID) {
-            super.attack(source);
-        }
-    }
+	public Entity getShootingEntity() {
+		return shootingEntity;
+	}
 
-    @Override
-    protected void initEntity() {
-        super.initEntity();
+	public void attack(EntityDamageEvent source) {
+		if (source.getCause() == EntityDamageEvent.CAUSE_VOID) {
+			super.attack(source);
+		}
+	}
 
-        this.setMaxHealth(1);
-        this.setHealth(1);
-        if (this.namedTag.contains("Age")) {
-            this.age = this.namedTag.getShort("Age");
-        }
-    }
+	@Override
+	protected void initEntity() {
+		super.initEntity();
 
-    @Override
-    public boolean canCollideWith(Entity entity) {
-        return entity instanceof EntityLiving && !this.onGround;
-    }
+		this.setMaxHealth(1);
+		this.setHealth(1);
+		if (this.namedTag.contains("Age")) {
+			this.age = this.namedTag.getShort("Age");
+		}
+	}
 
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-        this.namedTag.putShort("Age", this.age);
-    }
+	@Override
+	public boolean canCollideWith(Entity entity) {
+		return entity instanceof EntityLiving && !this.onGround;
+	}
 
-    @Override
-    public boolean onUpdate(int currentTick) {
-        if (this.closed) {
-            return false;
-        }
+	@Override
+	public void saveNBT() {
+		super.saveNBT();
+		this.namedTag.putShort("Age", this.age);
+	}
 
+	@Override
+	public boolean onUpdate(int currentTick) {
+		if (this.closed) {
+			return false;
+		}
 
-        int tickDiff = currentTick - this.lastUpdate;
-        if (tickDiff <= 0 && !this.justCreated) {
-            return true;
-        }
-        this.lastUpdate = currentTick;
+		int tickDiff = currentTick - this.lastUpdate;
+		if (tickDiff <= 0 && !this.justCreated) {
+			return true;
+		}
+		this.lastUpdate = currentTick;
 
-        boolean hasUpdate = this.entityBaseTick(tickDiff);
+		boolean hasUpdate = this.entityBaseTick(tickDiff);
 
-        if (this.isAlive()) {
+		if (this.isAlive()) {
 
-            MovingObjectPosition movingObjectPosition = null;
+			MovingObjectPosition movingObjectPosition = null;
 
-            if (!this.isCollided) {
-                this.motionY -= this.getGravity();
-            }
+			if (!this.isCollided) {
+				this.motionY -= this.getGravity();
+			}
 
-            Vector3 moveVector = new Vector3(this.x + this.motionX, this.y + this.motionY, this.z + this.motionZ);
+			Vector3 moveVector = new Vector3(this.x + this.motionX, this.y + this.motionY, this.z + this.motionZ);
 
-            Entity[] list = this.getLevel().getCollidingEntities(this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1, 1, 1), this);
+			Entity[] list = this.getLevel().getCollidingEntities(this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1, 1, 1), this);
 
-            double nearDistance = Integer.MAX_VALUE;
-            Entity nearEntity = null;
+			double nearDistance = Integer.MAX_VALUE;
+			Entity nearEntity = null;
 
-            for (Entity entity : list) {
-                if (/*!entity.canCollideWith(this) or */
-                        (entity == this.shootingEntity && this.ticksLived < 5)
-                        ) {
-                    continue;
-                }
+			for (Entity entity : list) {
+				if (/*!entity.canCollideWith(this) or */
+						(entity == this.shootingEntity && this.ticksLived < 5)
+						) {
+					continue;
+				}
 
-                AxisAlignedBB axisalignedbb = entity.boundingBox.grow(0.3, 0.3, 0.3);
-                MovingObjectPosition ob = axisalignedbb.calculateIntercept(this, moveVector);
+				AxisAlignedBB axisalignedbb = entity.boundingBox.grow(0.3, 0.3, 0.3);
+				MovingObjectPosition ob = axisalignedbb.calculateIntercept(this, moveVector);
 
-                if (ob == null) {
-                    continue;
-                }
+				if (ob == null) {
+					continue;
+				}
 
-                double distance = this.distanceSquared(ob.hitVector);
+				double distance = this.distanceSquared(ob.hitVector);
 
-                if (distance < nearDistance) {
-                    nearDistance = distance;
-                    nearEntity = entity;
-                }
-            }
+				if (distance < nearDistance) {
+					nearDistance = distance;
+					nearEntity = entity;
+				}
+			}
 
-            if (nearEntity != null) {
-                movingObjectPosition = MovingObjectPosition.fromEntity(nearEntity);
-            }
+			if (nearEntity != null) {
+				movingObjectPosition = MovingObjectPosition.fromEntity(nearEntity);
+			}
 
-            if (movingObjectPosition != null) {
-                if (movingObjectPosition.entityHit != null) {
+			if (movingObjectPosition != null) {
+				if (movingObjectPosition.entityHit != null) {
 
-                    ProjectileHitEvent hitEvent;
-                    this.server.getPluginManager().callEvent(hitEvent = new ProjectileHitEvent(this, movingObjectPosition));
+					ProjectileHitEvent hitEvent;
+					this.server.getPluginManager().callEvent(hitEvent = new ProjectileHitEvent(this, movingObjectPosition));
 
-                    if (!hitEvent.isCancelled()) {
-                        movingObjectPosition = hitEvent.getMovingObjectPosition();
-                        double motion = Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
-                        double damage = Math.ceil(motion * this.getDamage());
+					if (!hitEvent.isCancelled()) {
+						movingObjectPosition = hitEvent.getMovingObjectPosition();
+						double motion = Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+						double damage = Math.ceil(motion * this.getDamage());
 
-                        if (this instanceof EntityArrow && ((EntityArrow) this).isCritical) {
-                            damage += new Random().nextInt((int) (damage / 2) + 1);
-                        }
+						if (this instanceof EntityArrow && ((EntityArrow) this).isCritical) {
+							damage += new Random().nextInt((int) (damage / 2) + 1);
+						}
 
-                        EntityDamageEvent ev;
-                        if (this.shootingEntity == null) {
-                            ev = new EntityDamageByEntityEvent(this, movingObjectPosition.entityHit, EntityDamageEvent.CAUSE_PROJECTILE, (float) damage);
-                        } else {
-                            ev = new EntityDamageByChildEntityEvent(this.shootingEntity, this, movingObjectPosition.entityHit, EntityDamageEvent.CAUSE_PROJECTILE, (float) damage);
-                        }
+						EntityDamageEvent ev;
+						if (this.shootingEntity == null) {
+							ev = new EntityDamageByEntityEvent(this, movingObjectPosition.entityHit, EntityDamageEvent.CAUSE_PROJECTILE, (float) damage);
+						}
+						else {
+							ev = new EntityDamageByChildEntityEvent(this.shootingEntity, this, movingObjectPosition.entityHit, EntityDamageEvent.CAUSE_PROJECTILE, (float) damage);
+						}
 
-                        movingObjectPosition.entityHit.attack(ev);
+						movingObjectPosition.entityHit.attack(ev);
 
-                        this.hadCollision = true;
+						this.hadCollision = true;
 
-                        if (this.fireTicks > 0) {
-                            EntityCombustByEntityEvent ev2 = new EntityCombustByEntityEvent(this, movingObjectPosition.entityHit, 5);
-                            this.server.getPluginManager().callEvent(ev2);
-                            if (!ev2.isCancelled()) {
-                                movingObjectPosition.entityHit.setOnFire(ev2.getDuration());
-                            }
-                        }
+						if (this.fireTicks > 0) {
+							EntityCombustByEntityEvent ev2 = new EntityCombustByEntityEvent(this, movingObjectPosition.entityHit, 5);
+							this.server.getPluginManager().callEvent(ev2);
+							if (!ev2.isCancelled()) {
+								movingObjectPosition.entityHit.setOnFire(ev2.getDuration());
+							}
+						}
 
-                        this.kill();
-                        return true;
-                    }
-                }
-            }
+						this.kill();
+						return true;
+					}
+				}
+			}
 
-            this.move(this.motionX, this.motionY, this.motionZ);
+			this.move(this.motionX, this.motionY, this.motionZ);
 
-            if (this.isCollided && !this.hadCollision) {
-                this.hadCollision = true;
+			if (this.isCollided && !this.hadCollision) {
+				this.hadCollision = true;
 
-                this.motionX = 0;
-                this.motionY = 0;
-                this.motionZ = 0;
+				this.motionX = 0;
+				this.motionY = 0;
+				this.motionZ = 0;
 
-                this.server.getPluginManager().callEvent(new ProjectileHitEvent(this, MovingObjectPosition.fromBlock(this.getFloorX(), this.getFloorY(), this.getFloorZ(), -1, this)));
-            } else if (!this.isCollided && this.hadCollision) {
-                this.hadCollision = false;
-            }
+				this.server.getPluginManager().callEvent(new ProjectileHitEvent(this, MovingObjectPosition.fromBlock(this.getFloorX(), this.getFloorY(), this.getFloorZ(), -1, this)));
+			}
+			else if (!this.isCollided && this.hadCollision) {
+				this.hadCollision = false;
+			}
 
-            if (!this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001) {
-                double f = Math.sqrt((this.motionX * this.motionX) + (this.motionZ * this.motionZ));
-                this.yaw = Math.atan2(this.motionX, this.motionZ) * 180 / Math.PI;
-                this.pitch = Math.atan2(this.motionY, f) * 180 / Math.PI;
-                hasUpdate = true;
-            }
+			if (!this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001) {
+				double f = Math.sqrt((this.motionX * this.motionX) + (this.motionZ * this.motionZ));
+				this.yaw = Math.atan2(this.motionX, this.motionZ) * 180 / Math.PI;
+				this.pitch = Math.atan2(this.motionY, f) * 180 / Math.PI;
+				hasUpdate = true;
+			}
 
-            this.updateMovement();
+			this.updateMovement();
 
-        }
+		}
 
-        return hasUpdate;
-    }
+		return hasUpdate;
+	}
 }
