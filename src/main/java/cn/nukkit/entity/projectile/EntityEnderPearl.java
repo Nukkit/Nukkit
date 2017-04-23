@@ -61,9 +61,9 @@ public class EntityEnderPearl extends EntityProjectile {
 
         boolean hasUpdate = super.onUpdate(currentTick);
 
-        if (this.isCollided && this.shootingEntity instanceof Player) {
-            this.shootingEntity.teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
-            if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) this.shootingEntity.attack(5);
+        if (this.isCollided && this.getShootingEntity() instanceof Player) {
+            this.getShootingEntity().teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
+            if ((((Player) this.getShootingEntity()).getGamemode() & 0x01) == 0) this.getShootingEntity().attack(5);
             this.level.addSound(new EndermanTeleportSound(this));
         }
 
