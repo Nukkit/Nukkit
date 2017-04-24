@@ -1812,7 +1812,7 @@ public class Item implements Cloneable {
         return lines.stream().toArray(String[]::new);
     }
 
-    public void setLore(String[] lines) {
+    public void setLore(String... lines) {
         CompoundTag tag;
         if (!this.hasCompoundTag()) {
             tag = new CompoundTag();
