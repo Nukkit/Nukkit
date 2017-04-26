@@ -1,7 +1,6 @@
 package cn.nukkit.math;
 
 public class BlockVector3 implements Cloneable {
-
     public int x;
     public int y;
     public int z;
@@ -115,7 +114,7 @@ public class BlockVector3 implements Cloneable {
     }
 
     public BlockVector3 getSide(BlockFace face, int step) {
-        return step <= 0 ? this : new BlockVector3(this.getX() + face.getXOffset() * step, this.getY() + face.getYOffset() * step, this.getZ() + face.getZOffset() * step);
+        return new BlockVector3(this.getX() + face.getXOffset() * step, this.getY() + face.getYOffset() * step, this.getZ() + face.getZOffset() * step);
     }
 
     public BlockVector3 up() {
