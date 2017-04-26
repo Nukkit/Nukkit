@@ -53,7 +53,7 @@ public class NewSavannaTree extends TreeGenerator {
 
                 if ((block == Block.GRASS || block == Block.DIRT) && position.getY() < 256 - i - 1) {
                     this.setDirtAt(level, position.down());
-                    BlockFace enumfacing = BlockFace.Plane.HORIZONTAL.random(rand);
+                    BlockFace face = BlockFace.Plane.HORIZONTAL.random(rand);
                     int k2 = i - rand.nextBoundedInt(4) - 1;
                     int l2 = 3 - rand.nextBoundedInt(3);
                     int i3 = position.getFloorX();
@@ -64,8 +64,8 @@ public class NewSavannaTree extends TreeGenerator {
                         int i2 = position.getFloorY() + l1;
 
                         if (l1 >= k2 && l2 > 0) {
-                            i3 += enumfacing.getFrontOffsetX();
-                            j1 += enumfacing.getFrontOffsetZ();
+                            i3 += face.getXOffset();
+                            j1 += face.getZOffset();
                             --l2;
                         }
 
@@ -102,9 +102,9 @@ public class NewSavannaTree extends TreeGenerator {
                     this.placeLeafAt(level, blockpos2.north(2));
                     i3 = position.getFloorX();
                     j1 = position.getFloorZ();
-                    BlockFace enumfacing1 = BlockFace.Plane.HORIZONTAL.random(rand);
+                    BlockFace face1 = BlockFace.Plane.HORIZONTAL.random(rand);
 
-                    if (enumfacing1 != enumfacing) {
+                    if (face1 != face) {
                         int l3 = k2 - rand.nextBoundedInt(2) - 1;
                         int k4 = 1 + rand.nextBoundedInt(3);
                         k1 = 0;
@@ -112,8 +112,8 @@ public class NewSavannaTree extends TreeGenerator {
                         for (int l4 = l3; l4 < i && k4 > 0; --k4) {
                             if (l4 >= 1) {
                                 int j2 = position.getFloorY() + l4;
-                                i3 += enumfacing1.getFrontOffsetX();
-                                j1 += enumfacing1.getFrontOffsetZ();
+                                i3 += face1.getXOffset();
+                                j1 += face1.getZOffset();
                                 Vector3 blockpos1 = new Vector3(i3, j2, j1);
                                 int material1 = level.getBlockIdAt(blockpos1.getFloorX(), blockpos1.getFloorY(), blockpos1.getFloorZ());
 

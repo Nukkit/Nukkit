@@ -76,7 +76,7 @@ public class BlockCactus extends BlockTransparent {
                 this.getLevel().useBreakOn(this);
             } else {
                 for (int side = 2; side <= 5; ++side) {
-                    Block block = getSide(BlockFace.getFront(side));
+                    Block block = getSide(BlockFace.fromIndex(side));
                     if (!block.canBeFlowedInto()) {
                         this.getLevel().useBreakOn(this);
                     }

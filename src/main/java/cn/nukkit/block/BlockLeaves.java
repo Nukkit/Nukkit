@@ -138,7 +138,7 @@ public class BlockLeaves extends BlockTransparent {
             if (fromSide == null) {
                 //North, East, South, West
                 for (Integer side = 2; side <= 5; ++side) {
-                    if (this.findLog(pos.getSide(BlockFace.getFront(side)), visited, distance + 1, check, BlockFace.getFront(side)))
+                    if (this.findLog(pos.getSide(BlockFace.fromIndex(side)), visited, distance + 1, check, BlockFace.fromIndex(side)))
                         return true;
                 }
             } else { //No more loops

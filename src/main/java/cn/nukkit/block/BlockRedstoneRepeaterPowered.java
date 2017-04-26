@@ -30,7 +30,7 @@ public class BlockRedstoneRepeaterPowered extends BlockRedstoneDiode {
 
     @Override
     public BlockFace getFacing() {
-        return BlockFace.getHorizontal(meta);
+        return BlockFace.fromHorizontalIndex(meta);
     }
 
     @Override

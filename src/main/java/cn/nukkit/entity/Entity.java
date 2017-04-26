@@ -1074,7 +1074,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public BlockFace getHorizontalFacing() {
-        return BlockFace.getHorizontal(NukkitMath.floorDouble((this.yaw * 4.0F / 360.0F) + 0.5D) & 3);
+        return BlockFace.fromHorizontalIndex(NukkitMath.floorDouble((this.yaw * 4.0F / 360.0F) + 0.5D) & 3);
     }
 
     public boolean onUpdate(int currentTick) {

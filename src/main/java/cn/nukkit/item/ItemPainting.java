@@ -55,9 +55,9 @@ public class ItemPainting extends Item {
                 boolean valid = true;
                 for (int x = 0; x < motive.width && valid; x++) {
                     for (int z = 0; z < motive.height && valid; z++) {
-                        if (target.getSide(BlockFace.getFront(right[face.getIndex() - 2]), x).isTransparent() ||
+                        if (target.getSide(BlockFace.fromIndex(right[face.getIndex() - 2]), x).isTransparent() ||
                                 target.up(z).isTransparent() ||
-                                block.getSide(BlockFace.getFront(right[face.getIndex() - 2]), x).isSolid() ||
+                                block.getSide(BlockFace.fromIndex(right[face.getIndex() - 2]), x).isSolid() ||
                                 block.up(z).isSolid()) {
                             valid = false;
                         }

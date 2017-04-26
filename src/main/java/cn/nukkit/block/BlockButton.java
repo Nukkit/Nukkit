@@ -106,6 +106,6 @@ public abstract class BlockButton extends BlockFlowable {
 
     public BlockFace getFacing() {
         int side = isActivated() ? meta ^ 0x08 : meta;
-        return BlockFace.getFront(side);
+        return BlockFace.fromIndex(side);
     }
 }

@@ -111,7 +111,7 @@ public abstract class BlockPistonBase extends BlockSolid {
             //this.level.setBlock() TODO: set piston extension?
 
             if (this.sticky) {
-                Vector3 pos = this.add(facing.getFrontOffsetX() * 2, facing.getFrontOffsetY() * 2, facing.getFrontOffsetZ() * 2);
+                Vector3 pos = this.add(facing.getXOffset() * 2, facing.getYOffset() * 2, facing.getZOffset() * 2);
                 Block block = this.level.getBlock(pos);
 
                 if (block.getId() == AIR) {
@@ -129,7 +129,7 @@ public abstract class BlockPistonBase extends BlockSolid {
     }
 
     public BlockFace getFacing() {
-        return BlockFace.getFront(this.meta).getOpposite();
+        return BlockFace.fromIndex(this.meta).getOpposite();
     }
 
     private boolean isPowered() {

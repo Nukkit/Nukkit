@@ -85,7 +85,7 @@ public class BlockChest extends BlockTransparent {
             } else if ((this.meta == 3 || this.meta == 2) && (side == 2 || side == 3)) {
                 continue;
             }
-            Block c = this.getSide(BlockFace.getFront(side));
+            Block c = this.getSide(BlockFace.fromIndex(side));
             if (c instanceof BlockChest && c.getDamage() == this.meta) {
                 BlockEntity blockEntity = this.getLevel().getBlockEntity(c);
                 if (blockEntity instanceof BlockEntityChest && !((BlockEntityChest) blockEntity).isPaired()) {

@@ -50,7 +50,7 @@ public class BlockTorch extends BlockFlowable {
                     0  //6
             };
 
-            if (this.getSide(BlockFace.getFront(faces[side])).isTransparent() && !(side == 0 && (below instanceof BlockFence || below.getId() == COBBLE_WALL))) {
+            if (this.getSide(BlockFace.fromIndex(faces[side])).isTransparent() && !(side == 0 && (below instanceof BlockFence || below.getId() == COBBLE_WALL))) {
                 this.getLevel().useBreakOn(this);
 
                 return Level.BLOCK_UPDATE_NORMAL;

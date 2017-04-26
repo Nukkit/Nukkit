@@ -240,8 +240,8 @@ public abstract class BlockDoor extends BlockTransparent {
             int direction = player != null ? player.getDirection() : 0;
             int[] faces = {3, 4, 2, 5};
 
-            Block next = this.getSide(BlockFace.getFront(faces[((direction + 2) % 4)]));
-            Block next2 = this.getSide(BlockFace.getFront(faces[direction]));
+            Block next = this.getSide(BlockFace.fromIndex(faces[((direction + 2) % 4)]));
+            Block next2 = this.getSide(BlockFace.fromIndex(faces[direction]));
             int metaUp = 0x08;
             if (next.getId() == this.getId() || (!next2.isTransparent() && next.isTransparent())) { //Door hinge
                 metaUp |= 0x01;

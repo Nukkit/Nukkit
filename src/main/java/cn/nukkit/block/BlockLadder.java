@@ -127,7 +127,7 @@ public class BlockLadder extends BlockTransparent {
                     5,
                     4
             };
-            if (!this.getSide(BlockFace.getFront(faces[this.meta])).isSolid()) {
+            if (!this.getSide(BlockFace.fromIndex(faces[this.meta])).isSolid()) {
                 this.getLevel().useBreakOn(this);
                 return Level.BLOCK_UPDATE_NORMAL;
             }

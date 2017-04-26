@@ -53,7 +53,7 @@ public class BlockPistonHead extends BlockTransparent {
     }
 
     public BlockFace getFacing() {
-        return BlockFace.getFront(this.meta).getOpposite();
+        return BlockFace.fromIndex(this.meta).getOpposite();
     }
 
     @Override

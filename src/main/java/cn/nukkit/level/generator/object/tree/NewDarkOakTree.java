@@ -44,8 +44,8 @@ public class NewDarkOakTree extends TreeGenerator {
 
                 for (int j2 = 0; j2 < i; ++j2) {
                     if (j2 >= i1 && j1 > 0) {
-                        k1 += enumfacing.getFrontOffsetX();
-                        l1 += enumfacing.getFrontOffsetZ();
+                        k1 += enumfacing.getXOffset();
+                        l1 += enumfacing.getZOffset();
                         --j1;
                     }
 

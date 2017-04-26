@@ -2178,7 +2178,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.craftingType = CRAFTING_SMALL;
 
                     if (useItemPacket.face >= 0 && useItemPacket.face <= 5) {
-                        BlockFace face = BlockFace.getFront(useItemPacket.face);
+                        BlockFace face = BlockFace.fromIndex(useItemPacket.face);
                         this.setDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION, false);
 
                         if (!this.canInteract(blockVector.add(0.5, 0.5, 0.5), this.isCreative() ? 13 : 7)) {
@@ -2443,7 +2443,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             if (this.lastBreak != Long.MAX_VALUE || pos.distanceSquared(this) > 10000) {
                                 break;
                             }
-                            BlockFace face = BlockFace.getFront(playerActionPacket.face);
+                            BlockFace face = BlockFace.fromIndex(playerActionPacket.face);
                             Block target = this.level.getBlock(pos);
                             PlayerInteractEvent playerInteractEvent = new PlayerInteractEvent(this, this.inventory.getItemInHand(), target, face, target.getId() == 0 ? PlayerInteractEvent.LEFT_CLICK_AIR : PlayerInteractEvent.LEFT_CLICK_BLOCK);
                             this.getServer().getPluginManager().callEvent(playerInteractEvent);

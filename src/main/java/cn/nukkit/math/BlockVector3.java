@@ -115,7 +115,7 @@ public class BlockVector3 implements Cloneable {
     }
 
     public BlockVector3 getSide(BlockFace face, int step) {
-        return step <= 0 ? this : new BlockVector3(this.getX() + face.getFrontOffsetX() * step, this.getY() + face.getFrontOffsetY() * step, this.getZ() + face.getFrontOffsetZ() * step);
+        return step <= 0 ? this : new BlockVector3(this.getX() + face.getXOffset() * step, this.getY() + face.getYOffset() * step, this.getZ() + face.getZOffset() * step);
     }
 
     public BlockVector3 up() {

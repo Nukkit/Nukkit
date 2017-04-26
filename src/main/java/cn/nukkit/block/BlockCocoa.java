@@ -118,7 +118,7 @@ public class BlockCocoa extends BlockTransparent {
                     3, 4, 2, 5, 3, 4, 2, 5, 3, 4, 2, 5
             };
 
-            Block side = this.getSide(BlockFace.getFront(faces[this.meta]));
+            Block side = this.getSide(BlockFace.fromIndex(faces[this.meta]));
 
             if (side.getId() != Block.WOOD && side.getDamage() != BlockWood.JUNGLE) {
                 this.getLevel().useBreakOn(this);

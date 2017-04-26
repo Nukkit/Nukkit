@@ -30,7 +30,7 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
 
     @Override
     public BlockFace getFacing() {
-        return BlockFace.getHorizontal(this.meta);
+        return BlockFace.fromHorizontalIndex(this.meta);
     }
 
     public Mode getMode() {
