@@ -118,8 +118,8 @@ public class EntitySheep extends EntityAnimal {
 
     public void setColor(int color) {
         this.color = color;
-		this.namedTag.putByte("Color", this.color);
 		this.setDataProperty(new ByteEntityData(DATA_COLOUR, color));
+        this.namedTag.putByte("Color", this.color);
     }
 
     public int getColor() {
