@@ -9,6 +9,7 @@ import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.EntityCreeper;
+import cn.nukkit.entity.monsters.*;
 import cn.nukkit.entity.passive.*;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityEnderPearl;
@@ -1933,14 +1934,30 @@ public class Server {
         //todo mobs
         Entity.registerEntity("Creeper", EntityCreeper.class);
         //TODO: more mobs
+        Entity.registerEntity("Bat", EntityBat.class);
         Entity.registerEntity("Chicken", EntityChicken.class);
         Entity.registerEntity("Cow", EntityCow.class);
+        Entity.registerEntity("Donkey", EntityDonkey.class);
+        Entity.registerEntity("Horse", EntityHorse.class);
+        Entity.registerEntity("Mooshroom", EntityMooshroom.class);
         Entity.registerEntity("Pig", EntityPig.class);
         Entity.registerEntity("Rabbit", EntityRabbit.class);
         Entity.registerEntity("Sheep", EntitySheep.class);
         Entity.registerEntity("Wolf", EntityWolf.class);
         Entity.registerEntity("Ocelot", EntityOcelot.class);
+        Entity.registerEntity("SkeletonHorse", EntitySkeletonHorse.class);
         Entity.registerEntity("Villager", EntityVillager.class);
+        Entity.registerEntity("ZombieHorse", EntityZombieHorse.class);
+        //TODO: more monsters
+        Entity.registerEntity("Enderman", EntityEnderman.class);
+        Entity.registerEntity("Husk", EntityHusk.class);
+        Entity.registerEntity("Skeleton", EntitySkeleton.class);
+        Entity.registerEntity("Spider", EntitySpider.class);
+        Entity.registerEntity("Stray", EntityStray.class);
+        Entity.registerEntity("Witch", EntityWitch.class);
+        Entity.registerEntity("Zombie", EntityZombie.class);
+        Entity.registerEntity("ZombieVillager", EntityZombieVillager.class);
+        Entity.registerEntity("PigZombie", EntityPigZombie.class);
 
         Entity.registerEntity("ThrownExpBottle", EntityExpBottle.class);
         Entity.registerEntity("XpOrb", EntityXPOrb.class);
