@@ -4,13 +4,16 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockWood;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.NukkitRandom;
+import java.util.Random;
 
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
 public class ObjectSpruceTree extends ObjectTree {
-    private int treeHeight = 15;
+    
+    Random random = new Random();
+    private int treeHeight = random.nextInt(11-7+1)+11;
 
     @Override
     public int getTrunkBlock() {
