@@ -53,7 +53,7 @@ public class Potion implements Cloneable {
     public static final int WEAKNESS = 34;
     public static final int WEAKNESS_LONG = 35;
 
-    protected static Potion[] potions;
+    public static Potion[] potions;
 
     public static void init() {
         potions = new Potion[256];

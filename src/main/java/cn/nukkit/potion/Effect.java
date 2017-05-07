@@ -42,7 +42,7 @@ public class Effect implements Cloneable {
     public static final int ABSORPTION = 22;
     public static final int SATURATION = 23;
 
-    protected static Effect[] effects;
+    public static Effect[] effects;
 
     public static void init() {
         effects = new Effect[256];
