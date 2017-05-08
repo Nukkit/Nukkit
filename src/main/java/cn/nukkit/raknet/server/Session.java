@@ -35,7 +35,7 @@ public class Session {
     private final int port;
     private int state = STATE_UNCONNECTED;
     //private List<EncapsulatedPacket> preJoinQueue = new ArrayList<>();
-    private int mtuSize = 548; //Min size
+    private int mtuSize = 508; // (Max IP Header Size) - (UDP Header Size) = 576 - 60 - 8 = 508
     private long id = 0;
     private int splitID = 0;
 
@@ -530,7 +530,7 @@ public class Session {
             } else if (this.state == STATE_CONNECTING_1 && packet instanceof OPEN_CONNECTION_REQUEST_2) {
                 this.id = ((OPEN_CONNECTION_REQUEST_2) packet).clientID;
                 if (((OPEN_CONNECTION_REQUEST_2) packet).serverPort == this.sessionManager.getPort() || !this.sessionManager.portChecking) {
-                    this.mtuSize = Math.min(Math.abs(((OPEN_CONNECTION_REQUEST_2) packet).mtuSize), 1464); //Max size, do not allow creating large buffers to fill server memory
+                    this.mtuSize = Math.min(Math.abs(((OPEN_CONNECTION_REQUEST_2) packet).mtuSize), 1432); // MTU - (Max IP Header Size) - (UDP Header Size) = 1500 - 60 - 8 = 1432
                     OPEN_CONNECTION_REPLY_2 pk = new OPEN_CONNECTION_REPLY_2();
                     pk.mtuSize = (short) this.mtuSize;
                     pk.serverID = this.sessionManager.getID();
