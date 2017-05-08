@@ -69,6 +69,10 @@ public abstract class BaseLevelProvider implements LevelProvider {
         return this.levelData.getString("LevelName");
     }
 
+    public void setName(String name) {
+        this.levelData.putString("LevelName", name);
+    }
+
     @Override
     public boolean isRaining() {
         return this.levelData.getBoolean("raining");
