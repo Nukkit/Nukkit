@@ -45,6 +45,63 @@ public abstract class ObjectTree {
         growTree(level, x, y, z, random, 0);
     }
 
+    /*public boolean growTree(Location loc, TreeType type) {
+         net.minecraft.server.WorldGenerator gen;
+        switch (type) {
+        case BIG_TREE:
+            gen = new BigTree(true);
+            break;
+        case BIRCH:
+            gen = new Forest(true, false);
+            break;
+        case REDWOOD:
+            gen = new Taiga2(true);
+            break;
+        case TALL_REDWOOD:
+            gen = new Taiga1();
+            break;
+        case JUNGLE:
+            gen = new JungleTree(true, 10, 20, 3, 3); // Magic values as in BlockSapling
+            break;
+        case SMALL_JUNGLE:
+            gen = new Trees(true, 4 + rand.nextInt(7), 3, 3, false);
+            break;
+        case COCOA_TREE:
+            gen = new Trees(true, 4 + rand.nextInt(7), 3, 3, true);
+            break;
+        case JUNGLE_BUSH:
+            gen = new GroundBush(3, 0);
+            break;
+        case RED_MUSHROOM:
+            gen = new HugeMushroom(1);
+            break;
+        case BROWN_MUSHROOM:
+            gen = new HugeMushroom(0);
+            break;
+        case SWAMP:
+            gen = new SwampTree();
+            break;
+        case ACACIA:
+            gen = new AcaciaTree(true);
+            break;
+        case DARK_OAK:
+            gen = new ForestTree(true);
+            break;
+        case MEGA_REDWOOD:
+            gen = new MegaTree(false, rand.nextBoolean());
+            break;
+        case TALL_BIRCH:
+            gen = new Forest(true, true);
+            break;
+        case TREE:
+        default:
+            gen = new Trees(true);
+            break;
+        }
+
+        return gen.generate(world, rand, new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+    }*/
+    
     public static void growTree(ChunkManager level, int x, int y, int z, NukkitRandom random, int type) {
         ObjectTree tree;
         switch (type) {
@@ -76,7 +133,6 @@ public abstract class ObjectTree {
             tree.placeObject(level, x, y, z, random);
         }
     }
-
 
     public boolean canPlaceObject(ChunkManager level, int x, int y, int z, NukkitRandom random) {
         int radiusToCheck = 0;
