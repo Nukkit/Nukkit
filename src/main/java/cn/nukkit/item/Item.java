@@ -1512,6 +1512,33 @@ public class Item implements Cloneable {
             return new Item(id, meta, count).setCompoundTag(tags);
         }
     }
+    
+    public static Item send(int id) {
+        return send(id, 0);
+    }
+
+    public static Item send(int id, Integer meta) {
+        return send(id, meta, 1);
+    }
+
+    public static Item send(int id, Integer meta, int count) {
+        return send(id, meta, count, new byte[0]);
+    }
+
+    public static Item send(int id, Integer meta, int count, byte[] tags) {
+        try {
+            Class c = list[id];
+            if (c == null) {
+                return new Item(id, meta, count).setCompoundTag(tags);
+            } else if (id < 256) {
+                return new ItemBlock((Block) c.getConstructor(int.class).newInstance(meta), meta, count).setCompoundTag(tags);
+            } else {
+                return ((Item) c.getConstructor(Integer.class, int.class).newInstance(meta, count)).setCompoundTag(tags);
+            }
+        } catch (Exception e) {
+            return new Item(id, meta, count).setCompoundTag(tags);
+        }
+    }
 
     public static Item fromString(String str) {
         String[] b = str.trim().replace(' ', '_').replace("minecraft:", "").split(":");
@@ -1834,6 +1861,14 @@ public class Item implements Cloneable {
     public void setCount(int count) {
         this.count = count;
     }
+    
+    public int sendCount() {
+        return count;
+    }
+
+    public void sendCount(int count) {
+        this.count = count;
+    }
 
     final public String getName() {
         return this.hasCustomName() ? this.getCustomName() : this.name;
@@ -1859,6 +1894,14 @@ public class Item implements Cloneable {
         return meta;
     }
 
+    public int sendId() { //send id of item to other inventory
+        return id;
+    }
+
+    public int sendDamage() { //send damage of item to other inventory
+        return meta;
+    }
+    
     public void setDamage(Integer meta) {
         if (meta != null) {
             this.meta = meta & 0xffff;

@@ -44,9 +44,9 @@ public class AnvilInventory extends ContainerInventory {
         }
 
         if (local.getId() != 0 && second.getId() == 0) { //only rename
+            player.getInventory().addItem(local);
             local.setCustomName(resultItem.getCustomName());
             setItem(RESULT, local);
-            player.getInventory().addItem(local);
             clearAll();
             player.getInventory().sendContents(player);
             sendContents(player);
