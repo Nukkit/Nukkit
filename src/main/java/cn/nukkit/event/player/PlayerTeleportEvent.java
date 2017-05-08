@@ -44,6 +44,10 @@ public class PlayerTeleportEvent extends PlayerEvent implements Cancellable {
     public Location getTo() {
         return to;
     }
+    
+    public TeleportCause getCause(){
+        return cause;
+    }
 
     public TeleportCause getCause() {
         return cause;
