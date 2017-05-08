@@ -142,7 +142,7 @@ public class EntityItem extends Entity {
                 hasUpdate = true;
             }
 
-            this.move(this.motionX, this.motionY, this.motionZ);
+            this.fastmove(this.motionX, this.motionY, this.motionZ);
 
             double friction = 1 - this.getDrag();
 
