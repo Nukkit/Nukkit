@@ -50,6 +50,12 @@ Get Nukkit & Plugins
 
 * __[Jenkins by MengCraft](http://ci.mengcraft.com:8080/job/Nukkit/lastSuccessfulBuild/)__ (**UNOFFICIAL**)
 
+Nukkit Servers
+--------------
+The test server we have that is powered by us is
+fcmcpe.com 23191 or 11111
+Server is open for everyone and it is mostly on everyday!
+
 Build JAR file
 -------------
 - `git submodule update --init`
