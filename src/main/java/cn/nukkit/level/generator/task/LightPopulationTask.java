@@ -3,6 +3,7 @@ package cn.nukkit.level.generator.task;
 import cn.nukkit.Server;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.generic.BaseFullChunk;
+import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.scheduler.AsyncTask;
 
 /**
@@ -29,6 +30,16 @@ public class LightPopulationTask extends AsyncTask {
         chunk.recalculateHeightMap();
         chunk.populateSkyLight();
         chunk.setLightPopulated();
+
+        for(int x = 0; x < 16; ++ x){
+		for(int z = 0; z < 16; ++ z){
+		        int[] blockColor = chunk.getBiomeColor(x, z);
+		        if(blockColor[0] == 0 && blockColor[1] == 0){
+		        	int biomeColor = Biome.getBiome(chunk.getBiomeId(x, z)).getColor();
+		        	chunk.setBiomeColor(x, z, (biomeColor >> 16), (biomeColor >> 8) & 0xff, (biomeColor & 0xff));
+		        }		        	
+		}
+        }
 
         this.chunk = chunk.clone();
     }
