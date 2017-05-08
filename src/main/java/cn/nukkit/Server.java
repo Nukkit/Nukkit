@@ -9,6 +9,7 @@ import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.EntityCreeper;
+import cn.nukkit.entity.mob.EntityZombie;
 import cn.nukkit.entity.passive.*;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityEnderPearl;
@@ -17,7 +18,6 @@ import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.level.LevelInitEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
-import cn.nukkit.event.player.PlayerKickEvent;
 import cn.nukkit.event.server.QueryRegenerateEvent;
 import cn.nukkit.inventory.*;
 import cn.nukkit.item.Item;
@@ -1933,6 +1933,7 @@ public class Server {
         Entity.registerEntity("Painting", EntityPainting.class);
         //todo mobs
         Entity.registerEntity("Creeper", EntityCreeper.class);
+        Entity.registerEntity("Zombie", EntityZombie.class);
         //TODO: more mobs
         Entity.registerEntity("Chicken", EntityChicken.class);
         Entity.registerEntity("Cow", EntityCow.class);
@@ -1968,6 +1969,8 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.CAULDRON, BlockEntityCauldron.class);
         BlockEntity.registerBlockEntity(BlockEntity.ENDER_CHEST, BlockEntityEnderChest.class);
         BlockEntity.registerBlockEntity(BlockEntity.BEACON, BlockEntityBeacon.class);
+        BlockEntity.registerBlockEntity(BlockEntity.PISTON_ARM, BlockEntityPistonArm.class);
+        BlockEntity.registerBlockEntity(BlockEntity.COMPARATOR, BlockEntityComparator.class);
     }
 
     public static Server getInstance() {
