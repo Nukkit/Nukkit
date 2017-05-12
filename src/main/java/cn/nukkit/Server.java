@@ -2,6 +2,7 @@ package cn.nukkit;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.*;
+import cn.nukkit.bukkit.BukkitServer;
 import cn.nukkit.command.*;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
@@ -86,6 +87,7 @@ public class Server {
     public static final String BROADCAST_CHANNEL_USERS = "nukkit.broadcast.user";
 
     private static Server instance = null;
+    private org.bukkit.Server bukkitServer = new BukkitServer(this);
 
     private BanList banByName = null;
 
@@ -765,6 +767,10 @@ public class Server {
             this.logger.emergency("Exception happened while shutting down, exit the process");
             System.exit(1);
         }
+    }
+
+    public org.bukkit.Server getBukkitServer() {
+        return this.bukkitServer;
     }
 
     public void start() {
