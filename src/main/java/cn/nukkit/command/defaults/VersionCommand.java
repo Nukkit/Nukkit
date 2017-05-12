@@ -1,5 +1,6 @@
 package cn.nukkit.command.defaults;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.network.protocol.ProtocolInfo;
@@ -37,7 +38,8 @@ public class VersionCommand extends VanillaCommand {
                     sender.getServer().getCodename(),
                     sender.getServer().getApiVersion(),
                     sender.getServer().getVersion(),
-                    String.valueOf(ProtocolInfo.CURRENT_PROTOCOL)
+                    String.valueOf(ProtocolInfo.CURRENT_PROTOCOL),
+                    Nukkit.getBuildNumber()
             }));
         } else {
             String pluginName = "";

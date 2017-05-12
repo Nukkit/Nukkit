@@ -1,5 +1,10 @@
 package cn.nukkit;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 import cn.nukkit.command.CommandReader;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.MainLogger;
@@ -98,5 +103,37 @@ public class Nukkit {
         System.exit(0);
     }
 
-
+    /**
+     * Returns this build number, only valid if compiled thru CircleCI
+     * 
+     * @return build number
+     */
+    public static String getBuildNumber() {
+        Properties prop = new Properties();
+        InputStream input = Nukkit.class.getClass().getResourceAsStream("/nukkit.properties");
+        try {
+            prop.load(input);
+            return prop.getProperty("build.number");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Unknown Build";
+    }
+    
+    /**
+     * Returns this build commit, only valid if compiled thru CircleCI
+     * 
+     * @return build number
+     */
+    public static String getBuildCommit() {
+        Properties prop = new Properties();
+        InputStream input = Nukkit.class.getClass().getResourceAsStream("/nukkit.properties");
+        try {
+            prop.load(input);
+            return prop.getProperty("build.commit");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Unknown Commit";
+    }
 }
