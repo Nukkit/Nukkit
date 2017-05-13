@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.command.data.CommandParameterEnum;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Level;
 import cn.nukkit.utils.TextFormat;
@@ -27,6 +28,10 @@ public class TimeCommand extends VanillaCommand {
         this.commandParameters.put("2args", new CommandParameter[]{
                 new CommandParameter("add|set", CommandParameter.ARG_TYPE_STRING, false),
                 new CommandParameter("value", CommandParameter.ARG_TYPE_INT, false)
+        });
+        this.commandParameters.put("2argsEnum", new CommandParameter[]{
+                new CommandParameter("set", CommandParameter.ARG_TYPE_STRING, false),
+                new CommandParameterEnum("value", new String[]{"day", "night"})
         });
     }
 
