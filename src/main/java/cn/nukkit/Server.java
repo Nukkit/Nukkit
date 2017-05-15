@@ -14,7 +14,6 @@ import cn.nukkit.entity.passive.*;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityEnderPearl;
 import cn.nukkit.entity.projectile.EntitySnowball;
-import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.level.LevelInitEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
@@ -1399,10 +1398,10 @@ public class Server {
                 return NBTIO.readCompressed(new FileInputStream(file));
             } catch (Exception e) {
                 file.renameTo(new File(path + name + ".dat.bak"));
-                this.logger.notice(this.getLanguage().translateString("nukkit.data.playerCorrupted", name));
+                this.logger.notice(this.getLanguage().translateString("nukkit.pos.playerCorrupted", name));
             }
         } else {
-            this.logger.notice(this.getLanguage().translateString("nukkit.data.playerNotFound", name));
+            this.logger.notice(this.getLanguage().translateString("nukkit.pos.playerNotFound", name));
         }
 
         Position spawn = this.getDefaultLevel().getSafeSpawn();
@@ -1448,7 +1447,7 @@ public class Server {
                     Utils.writeFile(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", new ByteArrayInputStream(NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
                 }
             } catch (Exception e) {
-                this.logger.critical(this.getLanguage().translateString("nukkit.data.saveError", new String[]{name, e.getMessage()}));
+                this.logger.critical(this.getLanguage().translateString("nukkit.pos.saveError", new String[]{name, e.getMessage()}));
                 if (Nukkit.DEBUG > 1) {
                     this.logger.logException(e);
                 }
@@ -1910,7 +1909,7 @@ public class Server {
     }
 
     public boolean shouldSavePlayerData() {
-        return (Boolean) this.getConfig("player.save-player-data", true);
+        return (Boolean) this.getConfig("player.save-player-pos", true);
     }
 
     /**
@@ -1954,7 +1953,7 @@ public class Server {
         // TODO: 2016/1/30 all finds of minecart
         Entity.registerEntity("Boat", EntityBoat.class);
 
-        Entity.registerEntity("Lightning", EntityLightning.class);
+        //Entity.registerEntity("Lightning", EntityLightning.class); lightning shouldn't be saved as entity
     }
 
     private void registerBlockEntities() {
@@ -1971,6 +1970,7 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.BEACON, BlockEntityBeacon.class);
         BlockEntity.registerBlockEntity(BlockEntity.PISTON_ARM, BlockEntityPistonArm.class);
         BlockEntity.registerBlockEntity(BlockEntity.COMPARATOR, BlockEntityComparator.class);
+        BlockEntity.registerBlockEntity(BlockEntity.HOPPER, BlockEntityHopper.class);
     }
 
     public static Server getInstance() {

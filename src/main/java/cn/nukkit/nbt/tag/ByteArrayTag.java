@@ -43,7 +43,7 @@ public class ByteArrayTag extends Tag {
 
     @Override
     public String toString() {
-        return "ByteArrayTag " + this.getName() + " (data: 0x" + Binary.bytesToHexString(data, true) + " [" + data.length + " bytes])";
+        return "ByteArrayTag " + this.getName() + " (pos: 0x" + Binary.bytesToHexString(data, true) + " [" + data.length + " bytes])";
     }
 
     @Override

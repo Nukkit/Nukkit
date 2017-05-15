@@ -119,7 +119,7 @@ abstract public class PluginBase implements Plugin {
      * @param description 描述这个插件的{@code PluginDescription}对象。<br>
      *                    A {@code PluginDescription} object that describes this plugin.
      * @param dataFolder  这个插件的数据的文件夹。<br>
-     *                    The data folder of this plugin.
+     *                    The pos folder of this plugin.
      * @param file        这个插件的文件{@code File}对象。对于jar格式的插件，就是jar文件本身。<br>
      *                    The {@code File} object of this plugin itself. For jar-packed plugins, it is the jar file itself.
      * @since Nukkit 1.0 | Nukkit API 1.0.0

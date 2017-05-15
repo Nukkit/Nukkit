@@ -1712,7 +1712,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         CompoundTag nbt = this.server.getOfflinePlayerData(this.username);
         if (nbt == null) {
-            this.close(this.getLeaveMessage(), "Invalid data");
+            this.close(this.getLeaveMessage(), "Invalid pos");
 
             return;
         }

@@ -48,7 +48,7 @@ public class ByteTag extends NumberTag<Integer> {
         if (hex.length() < 2) {
             hex = "0" + hex;
         }
-        return "ByteTag " + this.getName() + " (data: 0x" + hex + ")";
+        return "ByteTag " + this.getName() + " (pos: 0x" + hex + ")";
     }
 
     @Override

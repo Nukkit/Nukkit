@@ -35,7 +35,7 @@ public class StringTag extends Tag {
 
     @Override
     public String toString() {
-        return "StringTag " + this.getName() + " (data: " + data + ")";
+        return "StringTag " + this.getName() + " (pos: " + data + ")";
     }
 
     @Override

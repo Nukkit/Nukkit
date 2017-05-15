@@ -34,8 +34,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
-import static co.aikar.timings.TimingsManager.HISTORY;
-
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
@@ -45,6 +43,8 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.zip.GZIPOutputStream;
+
+import static co.aikar.timings.TimingsManager.HISTORY;
 
 public class TimingsExport extends Thread {
     private final CommandSender sender;
@@ -75,7 +75,7 @@ public class TimingsExport extends Thread {
             out.addProperty("server", Server.getInstance().getName());
             out.addProperty("motd", Server.getInstance().getMotd());
             out.addProperty("online-mode", false); //In MCPE we have permanent offline mode.
-            out.addProperty("icon", ""); //"data:image/png;base64,"
+            out.addProperty("icon", ""); //"pos:image/png;base64,"
         }
 
         final Runtime runtime = Runtime.getRuntime();
@@ -195,7 +195,7 @@ public class TimingsExport extends Thread {
     @Override
     public void run() {
         this.sender.sendMessage(new TranslationContainer("nukkit.command.timings.uploadStart"));
-        this.out.add("data", JsonUtil.mapToArray(this.history, TimingsHistory::export));
+        this.out.add("pos", JsonUtil.mapToArray(this.history, TimingsHistory::export));
 
         String response = null;
         try {

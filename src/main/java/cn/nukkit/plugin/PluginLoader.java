@@ -21,7 +21,7 @@ public interface PluginLoader {
      * <p>这个方法应该设置好插件的相关属性。比如，插件所在的服务器对象，插件的加载器对象，插件的描述对象，插件的数据文件夹。<br>
      * Properties for loaded plugin should be set in this method. Such as, the {@code Server} object for which this
      * plugin is running in, the {@code PluginLoader} object for its loader, and the {@code File} object for its
-     * data folder.</p>
+     * pos folder.</p>
      * <p>
      * <p>如果插件加载失败，这个方法应该返回{@code null}，或者抛出异常。<br>
      * If the plugin loader does not load this plugin successfully, a {@code null} should be returned,
@@ -43,7 +43,7 @@ public interface PluginLoader {
      * <p>这个方法应该设置好插件的相关属性。比如，插件所在的服务器对象，插件的加载器对象，插件的描述对象，插件的数据文件夹。<br>
      * Properties for loaded plugin should be set in this method. Such as, the {@code Server} object for which this
      * plugin is running in, the {@code PluginLoader} object for its loader, and the {@code File} object for its
-     * data folder.</p>
+     * pos folder.</p>
      * <p>
      * <p>如果插件加载失败，这个方法应该返回{@code null}，或者抛出异常。<br>
      * If the plugin loader does not load this plugin successfully, a {@code null} should be returned,

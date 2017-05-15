@@ -70,7 +70,7 @@ public class BlockFlowerPot extends BlockFlowable {
                 .putInt("y", (int) this.y)
                 .putInt("z", (int) this.z)
                 .putShort("item", 0)
-                .putInt("data", 0);
+                .putInt("pos", 0);
         if (item.hasCustomBlockData()) {
             for (Tag aTag : item.getCustomBlockData().getAllTags()) {
                 nbt.put(aTag.getName(), aTag);
@@ -110,7 +110,7 @@ public class BlockFlowerPot extends BlockFlowable {
             itemMeta = item.getDamage();
         }
         blockEntity.namedTag.putShort("item", itemID);
-        blockEntity.namedTag.putInt("data", itemMeta);
+        blockEntity.namedTag.putInt("pos", itemMeta);
 
         this.meta = 1;
         this.getLevel().setBlock(this, this, true);
@@ -132,7 +132,7 @@ public class BlockFlowerPot extends BlockFlowable {
         if (blockEntity instanceof BlockEntityFlowerPot) {
             dropInside = true;
             insideID = blockEntity.namedTag.getShort("item");
-            insideMeta = blockEntity.namedTag.getInt("data");
+            insideMeta = blockEntity.namedTag.getInt("pos");
         }
 
         if (dropInside) {

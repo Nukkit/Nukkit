@@ -21,7 +21,7 @@ public class ParticleCommand extends VanillaCommand {
     public ParticleCommand(String name) {
         super(name, "%nukkit.command.particle.description", "%nukkit.command.particle.usage");
         this.setPermission("nukkit.command.particle");
-        //<name> <x> <y> <z> <xd> <yd> <zd> [count] [data]
+        //<name> <x> <y> <z> <xd> <yd> <zd> [count] [pos]
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
@@ -32,7 +32,7 @@ public class ParticleCommand extends VanillaCommand {
                 new CommandParameter("yd", CommandParameter.ARG_TYPE_STRING, false),
                 new CommandParameter("zd", CommandParameter.ARG_TYPE_STRING, false),
                 new CommandParameter("count", CommandParameter.ARG_TYPE_INT, true),
-                new CommandParameter("data", true)
+                new CommandParameter("pos", true)
         });
     }
 
