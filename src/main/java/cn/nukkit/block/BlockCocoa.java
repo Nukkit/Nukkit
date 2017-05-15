@@ -126,7 +126,7 @@ public class BlockCocoa extends BlockTransparent {
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
             if (new Random().nextInt(2) == 1) {
-                if (this.meta <= 7) {
+                if (this.meta / 4 < 3) {
                     BlockCocoa block = (BlockCocoa) this.clone();
                     block.meta += 4;
                     BlockGrowEvent ev = new BlockGrowEvent(this, block);
