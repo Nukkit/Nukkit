@@ -216,6 +216,7 @@ public class Level implements ChunkManager, Metadatable {
 
             put(Block.FIRE, BlockFire.class);
             put(Block.GLOWING_REDSTONE_ORE, BlockOreRedstoneGlowing.class);
+            put(Block.COCOA_BLOCK, BlockCocoa.class);
         }
     };
 
