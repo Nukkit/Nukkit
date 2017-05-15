@@ -143,10 +143,10 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
 
     @Override
     public boolean onUpdate() {
-        if (!isBlockEntityValid()) {
-            this.close();
+        if (this.closed) {
             return false;
         }
+        
         this.transferCooldown--;
 
         if (!this.isOnTransferCooldown()) {
