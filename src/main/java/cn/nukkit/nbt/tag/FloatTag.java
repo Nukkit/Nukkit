@@ -44,7 +44,7 @@ public class FloatTag extends NumberTag<Float> {
 
     @Override
     public String toString() {
-        return "FloatTag " + this.getName() + " (pos: " + data + ")";
+        return "FloatTag " + this.getName() + " (data: " + data + ")";
     }
 
     @Override

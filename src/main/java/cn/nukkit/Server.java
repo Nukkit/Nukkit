@@ -1398,10 +1398,10 @@ public class Server {
                 return NBTIO.readCompressed(new FileInputStream(file));
             } catch (Exception e) {
                 file.renameTo(new File(path + name + ".dat.bak"));
-                this.logger.notice(this.getLanguage().translateString("nukkit.pos.playerCorrupted", name));
+                this.logger.notice(this.getLanguage().translateString("nukkit.data.playerCorrupted", name));
             }
         } else {
-            this.logger.notice(this.getLanguage().translateString("nukkit.pos.playerNotFound", name));
+            this.logger.notice(this.getLanguage().translateString("nukkit.data.playerNotFound", name));
         }
 
         Position spawn = this.getDefaultLevel().getSafeSpawn();
@@ -1447,7 +1447,7 @@ public class Server {
                     Utils.writeFile(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", new ByteArrayInputStream(NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
                 }
             } catch (Exception e) {
-                this.logger.critical(this.getLanguage().translateString("nukkit.pos.saveError", new String[]{name, e.getMessage()}));
+                this.logger.critical(this.getLanguage().translateString("nukkit.data.saveError", new String[]{name, e.getMessage()}));
                 if (Nukkit.DEBUG > 1) {
                     this.logger.logException(e);
                 }
@@ -1909,7 +1909,7 @@ public class Server {
     }
 
     public boolean shouldSavePlayerData() {
-        return (Boolean) this.getConfig("player.save-player-pos", true);
+        return (Boolean) this.getConfig("player.save-player-data", true);
     }
 
     /**

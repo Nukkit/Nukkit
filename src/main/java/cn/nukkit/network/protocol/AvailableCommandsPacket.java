@@ -7,7 +7,7 @@ package cn.nukkit.network.protocol;
 public class AvailableCommandsPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.AVAILABLE_COMMANDS_PACKET;
-    public String commands; //JSON-encoded command pos
+    public String commands; //JSON-encoded command data
     public String unknown = "";
 
     @Override

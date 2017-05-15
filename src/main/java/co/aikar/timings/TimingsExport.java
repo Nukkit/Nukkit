@@ -75,7 +75,7 @@ public class TimingsExport extends Thread {
             out.addProperty("server", Server.getInstance().getName());
             out.addProperty("motd", Server.getInstance().getMotd());
             out.addProperty("online-mode", false); //In MCPE we have permanent offline mode.
-            out.addProperty("icon", ""); //"pos:image/png;base64,"
+            out.addProperty("icon", ""); //"data:image/png;base64,"
         }
 
         final Runtime runtime = Runtime.getRuntime();
@@ -195,7 +195,7 @@ public class TimingsExport extends Thread {
     @Override
     public void run() {
         this.sender.sendMessage(new TranslationContainer("nukkit.command.timings.uploadStart"));
-        this.out.add("pos", JsonUtil.mapToArray(this.history, TimingsHistory::export));
+        this.out.add("data", JsonUtil.mapToArray(this.history, TimingsHistory::export));
 
         String response = null;
         try {

@@ -207,7 +207,7 @@ public interface Plugin extends CommandExecutor {
      * <p>执行这个函数时，Nukkit会在资源文件夹内寻找开发者配置好的默认配置文件config.yml，然后保存在数据文件夹。
      * 如果数据文件夹已经有一个config.yml文件，Nukkit不会替换这个文件。<br>
      * When this is used, Nukkit will look for the default 'config.yml' file which is configured by plugin developer
-     * and save it to the pos folder. If a config.yml file exists in the pos folder, Nukkit won't replace it.</p>
+     * and save it to the data folder. If a config.yml file exists in the data folder, Nukkit won't replace it.</p>
      * <p>
      * <p>这个函数通常用来在插件被加载(load)时，保存默认的配置文件。这样插件在启用(enable)时不会错误读取空的配置文件，
      * 用户也无需从开发者处手动下载配置文件保存后再使用插件。<br>

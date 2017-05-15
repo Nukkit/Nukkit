@@ -3,7 +3,7 @@ package cn.nukkit.network.rcon;
 import java.nio.channels.SocketChannel;
 
 /**
- * A pos structure to hold sender, request ID and command itself.
+ * A data structure to hold sender, request ID and command itself.
  *
  * @author Tee7even
  */

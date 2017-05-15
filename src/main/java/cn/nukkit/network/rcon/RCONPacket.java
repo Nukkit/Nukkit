@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * A pos structure representing an RCON packet.
+ * A data structure representing an RCON packet.
  *
  * @author Tee7even
  */
