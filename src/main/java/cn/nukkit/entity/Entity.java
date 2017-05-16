@@ -732,7 +732,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void sendData(Player player, EntityMetadata data) {
         SetEntityDataPacket pk = new SetEntityDataPacket();
-        pk.eid = player == this ? 0 : this.getId();
+        pk.eid = this.getId();
         pk.metadata = data == null ? this.dataProperties : data;
 
         player.dataPacket(pk);

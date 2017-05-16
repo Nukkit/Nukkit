@@ -2833,7 +2833,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             pk = new SetEntityLinkPacket();
                             pk.rider = targetEntity.getId();
-                            pk.riding = 0;
+                            pk.riding = this.getId();
                             pk.type = 3;
                             dataPacket(pk);
 
