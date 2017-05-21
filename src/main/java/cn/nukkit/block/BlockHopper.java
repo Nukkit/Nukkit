@@ -34,6 +34,16 @@ public class BlockHopper extends BlockTransparent {
     }
 
     @Override
+    public double getHardness() {
+        return 3;
+    }
+
+    @Override
+    public double getResistance() {
+        return 24;
+    }
+
+    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         BlockFace facing = face.getOpposite();
 
@@ -121,5 +131,19 @@ public class BlockHopper extends BlockTransparent {
         }
 
         return 0;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public int[][] getDrops(Item item) {
+        if (item.getTier() >= ItemTool.TIER_WOODEN) {
+            return new int[][]{{Item.CAULDRON, 0, 1}};
+        }
+
+        return new int[0][0];
     }
 }
