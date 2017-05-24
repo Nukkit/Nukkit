@@ -142,7 +142,7 @@ public class BlockHopper extends BlockTransparent {
     @Override
     public int[][] getDrops(Item item) {
         if (item.getTier() >= ItemTool.TIER_WOODEN) {
-            return new int[][]{{Item.CAULDRON, 0, 1}};
+            return new int[][]{{Item.HOPPER, 0, 1}};
         }
 
         return new int[0][0];
