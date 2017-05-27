@@ -167,7 +167,7 @@ public class PluginManager {
                             String name = description.getName();
 
                             if (plugins.containsKey(name) || this.getPlugin(name) != null) {
-                                this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.duplicateError", name));
+                                this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.duplicateError", new String[]{name}));
                                 continue;
                             }
 
@@ -220,8 +220,8 @@ public class PluginManager {
                         }
                     } catch (Exception e) {
                         this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin" +
-                                ".fileError", file.getName(), dictionary.toString(), Utils
-                                .getExceptionMessage(e)));
+                                ".fileError", new String[]{file.getName(), dictionary.toString(), Utils
+                                .getExceptionMessage(e)}));
                         MainLogger logger = this.server.getLogger();
                         if (logger != null) {
                             logger.logException(e);
@@ -269,7 +269,7 @@ public class PluginManager {
                         if (plugin != null) {
                             loadedPlugins.put(name, plugin);
                         } else {
-                            this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.genericLoadError", name));
+                            this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.genericLoadError", new String[]{name}));
                         }
                     }
                 }
@@ -285,7 +285,7 @@ public class PluginManager {
                             if (plugin != null) {
                                 loadedPlugins.put(name, plugin);
                             } else {
-                                this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.genericLoadError", name));
+                                this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.genericLoadError", new String[]{name}));
                             }
                         }
                     }
@@ -552,7 +552,7 @@ public class PluginManager {
                 try {
                     registration.callEvent(event);
                 } catch (Exception e) {
-                    this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.eventError", event.getEventName(), registration.getPlugin().getDescription().getFullName(), e.getMessage(), registration.getListener().getClass().getName()));
+                    this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.eventError", new String[]{event.getEventName(), registration.getPlugin().getDescription().getFullName(), e.getMessage(), registration.getListener().getClass().getName()}));
                     this.server.getLogger().logException(e);
                 }
             }
@@ -599,7 +599,7 @@ public class PluginManager {
                 // This loop checks for extending deprecated events
                 if (clazz.getAnnotation(Deprecated.class) != null) {
                     if (Boolean.valueOf(String.valueOf(this.server.getConfig("settings.deprecated-verbpse", true)))) {
-                        this.server.getLogger().warning(this.server.getLanguage().translateString("nukkit.plugin.deprecatedEvent", plugin.getName(), clazz.getName(), listener.getClass().getName() + "." + method.getName() + "()"));
+                        this.server.getLogger().warning(this.server.getLanguage().translateString("nukkit.plugin.deprecatedEvent", new String[]{plugin.getName(), clazz.getName(), listener.getClass().getName() + "." + method.getName() + "()"}));
                     }
                     break;
                 }

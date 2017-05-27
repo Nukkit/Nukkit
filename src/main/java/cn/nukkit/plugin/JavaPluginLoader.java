@@ -34,7 +34,7 @@ public class JavaPluginLoader implements PluginLoader {
     public Plugin loadPlugin(File file) throws Exception {
         PluginDescription description = this.getPluginDescription(file);
         if (description != null) {
-            this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.plugin.load", description.getFullName()));
+            this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.plugin.load", new String[]{description.getFullName()}));
             File dataFolder = new File(file.getParentFile(), description.getName());
             if (dataFolder.exists() && !dataFolder.isDirectory()) {
                 throw new IllegalStateException("Projected dataFolder '" + dataFolder.toString() + "' for " + description.getName() + " exists and is not a directory");
@@ -114,7 +114,7 @@ public class JavaPluginLoader implements PluginLoader {
     @Override
     public void enablePlugin(Plugin plugin) {
         if (plugin instanceof PluginBase && !plugin.isEnabled()) {
-            this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.plugin.enable", plugin.getDescription().getFullName()));
+            this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.plugin.enable", new String[]{plugin.getDescription().getFullName()}));
 
             ((PluginBase) plugin).setEnabled(true);
 
@@ -125,7 +125,7 @@ public class JavaPluginLoader implements PluginLoader {
     @Override
     public void disablePlugin(Plugin plugin) {
         if (plugin instanceof PluginBase && plugin.isEnabled()) {
-            this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.plugin.disable", plugin.getDescription().getFullName()));
+            this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.plugin.disable", new String[]{plugin.getDescription().getFullName()}));
 
             this.server.getServiceManager().cancel(plugin);
 

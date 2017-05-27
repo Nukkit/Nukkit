@@ -227,11 +227,11 @@ public class TimingsExport extends Thread {
             String location = con.getHeaderField("Location");
             this.sender.sendMessage(new TranslationContainer("nukkit.command.timings.timingsLocation", location));
             if (!(this.sender instanceof ConsoleCommandSender)) {
-                Server.getInstance().getLogger().info(Server.getInstance().getLanguage().translateString("nukkit.command.timings.timingsLocation", location));
+                Server.getInstance().getLogger().info(Server.getInstance().getLanguage().translateString("nukkit.command.timings.timingsLocation", new String[]{location}));
             }
 
             if (response != null && !response.isEmpty()) {
-                Server.getInstance().getLogger().info(Server.getInstance().getLanguage().translateString("nukkit.command.timings.timingsResponse", response));
+                Server.getInstance().getLogger().info(Server.getInstance().getLanguage().translateString("nukkit.command.timings.timingsResponse", new String[]{response}));
             }
 
             File timingFolder = new File(Server.getInstance().getDataPath() + File.separator + "timings");
@@ -239,11 +239,11 @@ public class TimingsExport extends Thread {
             String fileName = timingFolder + File.separator + new SimpleDateFormat("'timings-'yyyy-MM-dd-hh-mm'.txt'").format(new Date());
 
             FileWriter writer = new FileWriter(fileName);
-            writer.write(Server.getInstance().getLanguage().translateString("nukkit.command.timings.timingsLocation", location) + "\n\n");
+            writer.write(Server.getInstance().getLanguage().translateString("nukkit.command.timings.timingsLocation", new String[]{location}) + "\n\n");
             writer.write(new GsonBuilder().setPrettyPrinting().create().toJson(this.out));
             writer.close();
 
-            Server.getInstance().getLogger().info(Server.getInstance().getLanguage().translateString("nukkit.command.timings.timingsWrite", fileName));
+            Server.getInstance().getLogger().info(Server.getInstance().getLanguage().translateString("nukkit.command.timings.timingsWrite", new String[]{fileName}));
         } catch (IOException exception) {
             this.sender.sendMessage(TextFormat.RED + "" + new TranslationContainer("nukkit.command.timings.reportError"));
             if (response != null) {

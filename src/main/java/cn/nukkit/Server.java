@@ -290,7 +290,7 @@ public class Server {
         this.forceLanguage = (Boolean) this.getConfig("settings.force-language", false);
         this.baseLang = new BaseLang((String) this.getConfig("settings.language", BaseLang.FALLBACK_LANGUAGE));
         this.logger.info(this.getLanguage().translateString("language.selected", new String[]{getLanguage().getName(), getLanguage().getLang()}));
-        this.logger.info(getLanguage().translateString("nukkit.server.start", TextFormat.AQUA + this.getVersion() + TextFormat.WHITE));
+        this.logger.info(getLanguage().translateString("nukkit.server.start", new String[]{TextFormat.AQUA + this.getVersion() + TextFormat.WHITE}));
 
         Object poolSize = this.getConfig("settings.async-workers", "auto");
         if (!(poolSize instanceof Integer)) {
@@ -361,8 +361,8 @@ public class Server {
         this.network = new Network(this);
         this.network.setName(this.getMotd());
 
-        this.logger.info(this.getLanguage().translateString("nukkit.server.info", this.getName(), TextFormat.YELLOW + this.getNukkitVersion() + TextFormat.WHITE, TextFormat.AQUA + this.getCodename() + TextFormat.WHITE, this.getApiVersion()));
-        this.logger.info(this.getLanguage().translateString("nukkit.server.license", this.getName()));
+        this.logger.info(this.getLanguage().translateString("nukkit.server.info", new String[]{this.getName(), TextFormat.YELLOW + this.getNukkitVersion() + TextFormat.WHITE, TextFormat.AQUA + this.getCodename() + TextFormat.WHITE, this.getApiVersion()}));
+        this.logger.info(this.getLanguage().translateString("nukkit.server.license", new String[]{this.getName()}));
 
 
         this.consoleSender = new ConsoleCommandSender();
@@ -779,9 +779,9 @@ public class Server {
 
         this.tickCounter = 0;
 
-        this.logger.info(this.getLanguage().translateString("nukkit.server.defaultGameMode", getGamemodeString(this.getGamemode())));
+        this.logger.info(this.getLanguage().translateString("nukkit.server.defaultGameMode", new String[]{getGamemodeString(this.getGamemode())}));
 
-        this.logger.info(this.getLanguage().translateString("nukkit.server.startFinished", String.valueOf((double) (System.currentTimeMillis() - Nukkit.START_TIME) / 1000)));
+        this.logger.info(this.getLanguage().translateString("nukkit.server.startFinished", new String[]{String.valueOf((double) (System.currentTimeMillis() - Nukkit.START_TIME) / 1000)}));
 
         this.tickProcessor();
         this.forceShutdown();
@@ -1398,10 +1398,10 @@ public class Server {
                 return NBTIO.readCompressed(new FileInputStream(file));
             } catch (Exception e) {
                 file.renameTo(new File(path + name + ".dat.bak"));
-                this.logger.notice(this.getLanguage().translateString("nukkit.data.playerCorrupted", name));
+                this.logger.notice(this.getLanguage().translateString("nukkit.data.playerCorrupted", new String[]{name}));
             }
         } else {
-            this.logger.notice(this.getLanguage().translateString("nukkit.data.playerNotFound", name));
+            this.logger.notice(this.getLanguage().translateString("nukkit.data.playerNotFound", new String[]{name}));
         }
 
         Position spawn = this.getDefaultLevel().getSafeSpawn();
@@ -1573,7 +1573,7 @@ public class Server {
         if (this.isLevelLoaded(name)) {
             return true;
         } else if (!this.isLevelGenerated(name)) {
-            this.logger.notice(this.getLanguage().translateString("nukkit.level.notFound", name));
+            this.logger.notice(this.getLanguage().translateString("nukkit.level.notFound", new String[]{name}));
 
             return false;
         }

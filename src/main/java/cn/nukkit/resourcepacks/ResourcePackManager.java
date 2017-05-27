@@ -18,7 +18,7 @@ public class ResourcePackManager {
             path.mkdirs();
         } else if (!path.isDirectory()) {
             throw new IllegalArgumentException(Server.getInstance().getLanguage()
-                    .translateString("nukkit.resources.invalid-path", path.getName()));
+                    .translateString("nukkit.resources.invalid-path", new String[]{path.getName()}));
         }
 
         List<ResourcePack> loadedResourcePacks = new ArrayList<>();
@@ -33,7 +33,7 @@ public class ResourcePackManager {
                             break;
                         default:
                             Server.getInstance().getLogger().warning(Server.getInstance().getLanguage()
-                                    .translateString("nukkit.resources.unknown-format", pack.getName()));
+                                    .translateString("nukkit.resources.unknown-format", new String[]{pack.getName()}));
                             break;
                     }
                 }
@@ -44,13 +44,13 @@ public class ResourcePackManager {
                 }
             } catch (IllegalArgumentException e) {
                 Server.getInstance().getLogger().warning(Server.getInstance().getLanguage()
-                        .translateString("nukkit.resources.fail", pack.getName(), e.getMessage()));
+                        .translateString("nukkit.resources.fail", new String[]{pack.getName(), e.getMessage()}));
             }
         }
 
         this.resourcePacks = loadedResourcePacks.toArray(new ResourcePack[loadedResourcePacks.size()]);
         Server.getInstance().getLogger().info(Server.getInstance().getLanguage()
-                .translateString("nukkit.resources.success", String.valueOf(this.resourcePacks.length)));
+                .translateString("nukkit.resources.success", new String[]{String.valueOf(this.resourcePacks.length)}));
     }
 
     public ResourcePack[] getResourceStack() {

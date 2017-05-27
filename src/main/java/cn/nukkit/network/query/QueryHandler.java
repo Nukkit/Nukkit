@@ -30,7 +30,7 @@ public class QueryHandler {
         String ip = this.server.getIp();
         String addr = (!"".equals(ip)) ? ip : "0.0.0.0";
         int port = this.server.getPort();
-        this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.server.query.info", String.valueOf(port)));
+        this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.server.query.info", new String[]{String.valueOf(port)}));
 
         this.regenerateToken();
         this.lastToken = this.token;

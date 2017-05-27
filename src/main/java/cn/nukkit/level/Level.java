@@ -265,7 +265,7 @@ public class Level implements ChunkManager, Metadatable {
 
         if (convert) {
             this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.updating",
-                    TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE));
+                    new String[]{TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE}));
             LevelProvider old = this.provider;
             try {
                 this.provider = new LevelProviderConverter(this, path)
@@ -281,7 +281,7 @@ public class Level implements ChunkManager, Metadatable {
         this.provider.updateLevelName(name);
 
         this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.preparing",
-                TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE));
+                new String[]{TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE}));
 
         this.generator = Generator.getGenerator(this.provider.getGenerator());
 
@@ -564,7 +564,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.unloading",
-                TextFormat.GREEN + this.getName() + TextFormat.WHITE));
+                new String[]{TextFormat.GREEN + this.getName() + TextFormat.WHITE}));
         Level defaultLevel = this.server.getDefaultLevel();
 
         for (Player player : new ArrayList<>(this.getPlayers().values())) {
@@ -2671,7 +2671,7 @@ public class Level implements ChunkManager, Metadatable {
             this.provider.unloadChunk(x, z, safe);
         } catch (Exception e) {
             MainLogger logger = this.server.getLogger();
-            logger.error(this.server.getLanguage().translateString("nukkit.level.chunkUnloadError", e.toString()));
+            logger.error(this.server.getLanguage().translateString("nukkit.level.chunkUnloadError", new String[]{e.toString()}));
             logger.logException(e);
         }
 

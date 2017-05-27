@@ -245,7 +245,7 @@ public class SimpleCommandMap implements CommandMap {
             target.execute(sender, sentCommandLabel, args);
         } catch (Exception e) {
             sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.exception"));
-            this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.command.exception", cmdLine, target.toString(), Utils.getExceptionMessage(e)));
+            this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.command.exception", new String[]{cmdLine, target.toString(), Utils.getExceptionMessage(e)}));
             MainLogger logger = sender.getServer().getLogger();
             if (logger != null) {
                 logger.logException(e);
@@ -283,7 +283,7 @@ public class SimpleCommandMap implements CommandMap {
             String alias = entry.getKey();
             List<String> commandStrings = entry.getValue();
             if (alias.contains(" ") || alias.contains(":")) {
-                this.server.getLogger().warning(this.server.getLanguage().translateString("nukkit.command.alias.illegal", alias));
+                this.server.getLogger().warning(this.server.getLanguage().translateString("nukkit.command.alias.illegal", new String[]{alias}));
                 continue;
             }
             List<String> targets = new ArrayList<>();

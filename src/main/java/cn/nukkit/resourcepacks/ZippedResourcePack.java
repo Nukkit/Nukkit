@@ -20,7 +20,7 @@ public class ZippedResourcePack extends AbstractResourcePack {
     public ZippedResourcePack(File file) {
         if (!file.exists()) {
             throw new IllegalArgumentException(Server.getInstance().getLanguage()
-                    .translateString("nukkit.resources.zip.not-found", file.getName()));
+                    .translateString("nukkit.resources.zip.not-found", new String[]{file.getName()}));
         }
 
         this.file = file;
