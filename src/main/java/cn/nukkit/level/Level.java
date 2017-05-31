@@ -2418,7 +2418,7 @@ public class Level implements ChunkManager, Metadatable {
     public void setSpawnLocation(Vector3 pos) {
         Position previousSpawn = this.getSpawnLocation();
         this.provider.setSpawn(pos);
-        this.server.getPluginManager().callEvent(new SpawnChangeEvent(this, previousSpawn););
+        this.server.getPluginManager().callEvent(new SpawnChangeEvent(this, previousSpawn));
         SetSpawnPositionPacket pk = new SetSpawnPositionPacket();
         pk.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
         pk.x = pos.getFloorX();
