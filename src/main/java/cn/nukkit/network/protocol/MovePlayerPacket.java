@@ -11,7 +11,8 @@ public class MovePlayerPacket extends DataPacket {
 
     public static final byte MODE_NORMAL = 0;
     public static final byte MODE_RESET = 1;
-    public static final byte MODE_ROTATION = 2;
+    public static final byte MODE_TELEPORT = 2;
+    public static final byte MODE_PITCH = 3; //facepalm Mojang
 
     public long eid;
     public float x;
@@ -22,7 +23,9 @@ public class MovePlayerPacket extends DataPacket {
     public float pitch;
     public byte mode = MODE_NORMAL;
     public boolean onGround;
-    public long otherEid;
+    public long ridingEid;
+    public int int1 = 0;
+    public int int2 = 0;
 
     @Override
     public void decode() {
@@ -36,7 +39,11 @@ public class MovePlayerPacket extends DataPacket {
         this.yaw = this.getLFloat();
         this.mode = (byte) this.getByte();
         this.onGround = this.getBoolean();
-        this.otherEid = this.getVarLong();
+        this.ridingEid = this.getVarLong();
+        if (this.mode == MODE_TELEPORT){
+            this.int1 = this.getLInt();
+            this.int2 = this.getLInt();
+        }
     }
 
     @Override
@@ -49,7 +56,11 @@ public class MovePlayerPacket extends DataPacket {
         this.putLFloat(this.headYaw);
         this.putByte(this.mode);
         this.putBoolean(this.onGround);
-        this.putVarLong(this.otherEid);
+        this.putVarLong(this.ridingEid);
+        if (this.mode == MODE_TELEPORT){
+            this.putLInt(this.int1);
+            this.putLInt(this.int2);
+        }
     }
 
     @Override

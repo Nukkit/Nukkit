@@ -100,22 +100,24 @@ public class LevelSoundEventPacket extends DataPacket {
     public static final byte SOUND_HAGGLE_YES = 91;
     public static final byte SOUND_HAGGLE_NO = 92;
     public static final byte SOUND_HAGGLE_IDLE = 93;
-    public static final byte SOUND_DEFAULT = 94;
-    public static final byte SOUND_UNDEFINED = 95;
+    public static final byte SOUND_CHORUSGROW = 94;
+    public static final byte SOUND_CHORUSDEATH = 95;
+    public static final byte SOUND_DEFAULT = 96;
+    public static final byte SOUND_UNDEFINED = 97;
 
 
-    public byte type;
+    public int sound;
     public float x;
     public float y;
     public float z;
     public int extraData = -1;
-    public int pitch = -1;
+    public int pitch = 1;
     public boolean unknownBool;
     public boolean disableRelativeVolume;
 
     @Override
     public void decode() {
-        this.type = (byte) this.getByte();
+        this.sound = this.getByte();
         Vector3f v = this.getVector3f();
         this.x = v.x;
         this.y = v.y;
@@ -129,7 +131,7 @@ public class LevelSoundEventPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putByte(this.type);
+        this.putByte((byte) this.sound);
         this.putVector3f(this.x, this.y, this.z);
         this.putVarInt(this.extraData);
         this.putVarInt(this.pitch);

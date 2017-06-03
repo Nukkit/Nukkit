@@ -39,6 +39,11 @@ public class BlockLadder extends BlockTransparent {
     }
 
     @Override
+    public boolean canBeClimbed() {
+        return true;
+    }
+
+    @Override
     public boolean isSolid() {
         return false;
     }

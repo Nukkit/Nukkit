@@ -57,6 +57,11 @@ public class BlockVine extends BlockTransparent {
     }
 
     @Override
+    public boolean canBeClimbed() {
+        return true;
+    }
+
+    @Override
     public void onEntityCollide(Entity entity) {
         entity.resetFallDistance();
         entity.onGround = true;
@@ -123,7 +128,7 @@ public class BlockVine extends BlockTransparent {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!target.isTransparent() && target.isSolid()) {
+        if (target.isSolid()) {
             int[] faces = new int[]{
                     0,
                     0,

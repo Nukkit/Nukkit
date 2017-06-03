@@ -1080,7 +1080,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (newSettings == null) {
             newSettings = this.getAdventureSettings().clone(this);
-            newSettings.setCanDestroyBlock((gamemode & 0x02) == 0);
+            newSettings.setCanDestroyBlock(gamemode != 3);
             newSettings.setCanFly((gamemode & 0x01) > 0);
             newSettings.setNoclip(gamemode == 0x03);
             newSettings.setFlying(gamemode == 0x03);
@@ -1841,6 +1841,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.sendAttributes();
         this.setNameTagVisible(true);
         this.setNameTagAlwaysVisible(true);
+        this.setCanClimb(true);
 
         this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn",
                 TextFormat.AQUA + this.username + TextFormat.WHITE,
@@ -2182,7 +2183,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (!this.canInteract(blockVector.add(0.5, 0.5, 0.5), this.isCreative() ? 13 : 7)) {
                         } else if (this.isCreative()) {
                             Item i = this.inventory.getItemInHand();
-                            if (this.level.useItemOn(blockVector, i, face, useItemPacket.fx, useItemPacket.fy, useItemPacket.fz, this) != null) {
+                            if (this.level.useItemOn(blockVector, i, face, useItemPacket.fx, useItemPacket.fy, useItemPacket.fz, this, true) != null) {
                                 break;
                             }
                         } else if (!this.inventory.getItemInHand().deepEquals(useItemPacket.item)) {
@@ -2191,7 +2192,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             item = this.inventory.getItemInHand();
                             Item oldItem = item.clone();
                             //TODO: Implement adventure mode checks
-                            if ((item = this.level.useItemOn(blockVector, item, face, useItemPacket.fx, useItemPacket.fy, useItemPacket.fz, this)) != null) {
+                            if ((item = this.level.useItemOn(blockVector, item, face, useItemPacket.fx, useItemPacket.fy, useItemPacket.fz, this, true)) != null) {
                                 if (!item.deepEquals(oldItem) || item.getCount() != oldItem.getCount()) {
                                     this.inventory.setItemInHand(item);
                                     this.inventory.sendHeldItem(this.hasSpawned.values());
@@ -2503,8 +2504,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                                     .add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
                                                     .add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
                                             .putList(new ListTag<FloatTag>("Rotation")
-                                                    .add(new FloatTag("", (float) yaw))
-                                                    .add(new FloatTag("", (float) pitch)))
+                                                    .add(new FloatTag("", (yaw > 180 ? 360 : 0) - (float) yaw))
+                                                    .add(new FloatTag("", (float) -pitch)))
                                             .putShort("Fire", this.isOnFire() || flame ? 45 * 60 : 0)
                                             .putDouble("damage", damage);
 
@@ -2596,10 +2597,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.deadTicks = 0;
                             this.noDamageTicks = 60;
 
+                            this.removeAllEffects();
                             this.setHealth(this.getMaxHealth());
                             this.getFoodData().setLevel(20, 20);
 
-                            this.removeAllEffects();
                             this.sendData(this);
 
                             this.setMovementSpeed(DEFAULT_SPEED);
@@ -2623,7 +2624,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             } else {
                                 this.setSprinting(true);
                             }
-                            break packetswitch;
+                            return;
 
                         case PlayerActionPacket.ACTION_STOP_SPRINT:
                             playerToggleSprintEvent = new PlayerToggleSprintEvent(this, false);
@@ -2633,7 +2634,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             } else {
                                 this.setSprinting(false);
                             }
-                            break packetswitch;
+                            return;
 
                         case PlayerActionPacket.ACTION_START_SNEAK:
                             PlayerToggleSneakEvent playerToggleSneakEvent = new PlayerToggleSneakEvent(this, true);

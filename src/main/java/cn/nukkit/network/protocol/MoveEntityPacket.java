@@ -32,8 +32,8 @@ public class MoveEntityPacket extends DataPacket {
         this.y = v.y;
         this.z = v.z;
         this.pitch = this.getByte() * (360d / 256d);
-        this.yaw = this.getByte() * (360d / 256d);
         this.headYaw = this.getByte() * (360d / 256d);
+        this.yaw = this.getByte() * (360d / 256d);
         this.onGround = this.getBoolean();
         this.teleport = this.getBoolean();
     }

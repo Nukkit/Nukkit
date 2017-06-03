@@ -490,7 +490,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void addLevelSoundEvent(byte type, int pitch, int data, Vector3 pos, Collection<Player> players, boolean unknown, boolean disableRelativeVolume) {
         LevelSoundEventPacket pk = new LevelSoundEventPacket();
-        pk.type = type;
+        pk.sound = type;
         pk.pitch = pitch;
         pk.extraData = data;
         pk.x = (float) pos.x;
@@ -1944,6 +1944,10 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public Item useItemOn(Vector3 vector, Item item, BlockFace face, float fx, float fy, float fz, Player player) {
+        return this.useItemOn(vector, item, face, fx, fy, fz, player, false);
+    }
+
+    public Item useItemOn(Vector3 vector, Item item, BlockFace face, float fx, float fy, float fz, Player player, boolean playSound) {
         Block target = this.getBlock(vector);
         Block block = target.getSide(face);
 
@@ -2081,6 +2085,10 @@ public class Level implements ChunkManager, Metadatable {
             if (!player.isCreative()) {
                 item.setCount(item.getCount() - 1);
             }
+        }
+
+        if (playSound) {
+            this.addSound(new BlockPlaceSound(hand, hand.getId()));
         }
 
         if (item.getCount() <= 0) {
@@ -2349,18 +2357,20 @@ public class Level implements ChunkManager, Metadatable {
 
             Map<Long, BlockEntity> oldBlockEntities = oldChunk != null ? oldChunk.getBlockEntities() : new HashMap<>();
 
-            this.provider.setChunk(chunkX, chunkZ, chunk);
-            this.chunks.put(index, chunk);
-
             for (Entity entity : oldEntities.values()) {
                 chunk.addEntity(entity);
+                oldChunk.removeEntity(entity);
                 entity.chunk = chunk;
             }
 
             for (BlockEntity blockEntity : oldBlockEntities.values()) {
                 chunk.addBlockEntity(blockEntity);
+                oldChunk.removeBlockEntity(blockEntity);
                 blockEntity.chunk = chunk;
             }
+
+            this.provider.setChunk(chunkX, chunkZ, chunk);
+            this.chunks.put(index, chunk);
         }
 
         this.chunkCache.remove(index);

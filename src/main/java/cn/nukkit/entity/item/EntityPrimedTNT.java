@@ -9,8 +9,10 @@ import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
 import cn.nukkit.level.Explosion;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.sound.IgniteSound;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 /**
  * @author MagicDroidX
@@ -18,6 +20,8 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 public class EntityPrimedTNT extends Entity implements EntityExplosive {
 
     public static final int NETWORK_ID = 65;
+
+    protected double baseOffset = 0.49;
 
     @Override
     public float getWidth() {
@@ -76,6 +80,8 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
 
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, true);
         this.setDataProperty(new IntEntityData(DATA_FUSE_LENGTH, fuse));
+
+        this.level.addSound(new IgniteSound(this));
     }
 
 

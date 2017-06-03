@@ -726,6 +726,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return 0;
     }
 
+    public boolean canBeClimbed() {
+        return false;
+    }
+
     public BlockColor getColor() {
         return BlockColor.VOID_BLOCK_COLOR;
     }

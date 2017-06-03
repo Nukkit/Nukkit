@@ -36,6 +36,8 @@ public class EntityItem extends Entity {
 
     protected int pickupDelay = 0;
 
+    protected double baseOffset = 0.125;
+
     @Override
     public float getWidth() {
         return 0.25f;
@@ -244,10 +246,9 @@ public class EntityItem extends Entity {
         pk.speedX = (float) this.motionX;
         pk.speedY = (float) this.motionY;
         pk.speedZ = (float) this.motionZ;
+        pk.metadata = this.dataProperties;
         pk.item = this.getItem();
         player.dataPacket(pk);
-
-        this.sendData(player);
 
         super.spawnTo(player);
     }
