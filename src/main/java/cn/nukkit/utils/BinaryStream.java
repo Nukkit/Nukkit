@@ -226,6 +226,9 @@ public class BinaryStream {
         }
         int auxValue = this.getVarInt();
         int data = auxValue >> 8;
+        if (data == Short.MAX_VALUE) {
+            data = -1;
+        }
         int cnt = auxValue & 0xff;
 
         int nbtLen = this.getLShort();
@@ -246,11 +249,13 @@ public class BinaryStream {
         }
 
         this.putVarInt(item.getId());
-        int auxValue = ((item.hasMeta() ? item.getDamage() : -1) << 8) | item.getCount();
+        int auxValue = ((item.hasMeta() ? item.getDamage() : Short.MAX_VALUE) << 8) | item.getCount();
         this.putVarInt(auxValue);
         byte[] nbt = item.getCompoundTag();
         this.putLShort(nbt.length);
         this.put(nbt);
+        this.putVarInt(0);
+        this.putVarInt(0);
     }
 
     public byte[] getByteArray() {
@@ -325,6 +330,20 @@ public class BinaryStream {
         this.putLFloat(x);
         this.putLFloat(y);
         this.putLFloat(z);
+    }
+
+    public RuleData getRuleData() {
+        RuleData rule = new RuleData();
+        rule.name = this.getString();
+        rule.unknown1 = this.getBoolean();
+        rule.unknown2 = this.getBoolean();
+        return rule;
+    }
+
+    public void putRuleData(RuleData rule) {
+        this.putString(rule.name);
+        this.putBoolean(rule.unknown1);
+        this.putBoolean(rule.unknown2);
     }
 
     public boolean feof() {

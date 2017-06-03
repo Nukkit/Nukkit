@@ -320,6 +320,7 @@ public class PlayerInventory extends BaseInventory {
             if (player.equals(this.getHolder())) {
                 ContainerSetContentPacket pk2 = new ContainerSetContentPacket();
                 pk2.windowid = ContainerSetContentPacket.SPECIAL_ARMOR;
+                pk2.eid = player.getId();
                 pk2.slots = armor;
                 player.dataPacket(pk2);
             } else {

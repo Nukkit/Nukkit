@@ -1,5 +1,7 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.utils.RuleData;
+
 /**
  * Created on 15-10-13.
  */
@@ -14,6 +16,7 @@ public class StartGamePacket extends DataPacket {
 
     public long entityUniqueId;
     public long entityRuntimeId;
+    public int playerGamemode;
     public float x;
     public float y;
     public float z;
@@ -32,8 +35,12 @@ public class StartGamePacket extends DataPacket {
     public float lightningLevel;
     public boolean commandsEnabled;
     public boolean isTexturePacksRequired = false;
+    public RuleData[] ruleDatas = new RuleData[0];
     public String levelId = ""; //base64 string, usually the same as world folder name in vanilla
     public String worldName;
+    public String premiumWorldTemplateId;
+    public boolean unknown;
+    public long currentTick;
 
     @Override
     public void decode() {
@@ -45,6 +52,7 @@ public class StartGamePacket extends DataPacket {
         this.reset();
         this.putVarLong(this.entityUniqueId);
         this.putVarLong(this.entityRuntimeId);
+        this.putVarInt(this.playerGamemode);
         this.putVector3f(this.x, this.y, this.z);
         this.putLFloat(0);
         this.putLFloat(0);
@@ -61,8 +69,14 @@ public class StartGamePacket extends DataPacket {
         this.putLFloat(this.lightningLevel);
         this.putBoolean(this.commandsEnabled);
         this.putBoolean(this.isTexturePacksRequired);
+        for (RuleData rule : this.ruleDatas) {
+            this.putRuleData(rule);
+        }
         this.putString(this.levelId);
         this.putString(this.worldName);
+        this.putString(this.premiumWorldTemplateId);
+        this.putBoolean(this.unknown);
+        this.putLLong(this.currentTick);
     }
 
 }

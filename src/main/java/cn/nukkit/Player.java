@@ -622,7 +622,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.usedChunks = new HashMap<>();
             SetTimePacket pk = new SetTimePacket();
             pk.time = this.level.getTime();
-            pk.started = !this.level.stopTime;
             this.dataPacket(pk);
 
             // TODO: Remove this hack
@@ -764,7 +763,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         SetTimePacket setTimePacket = new SetTimePacket();
         setTimePacket.time = this.level.getTime();
-        setTimePacket.started = !this.level.stopTime;
         this.dataPacket(setTimePacket);
 
         Position pos = this.level.getSafeSpawn(this);
@@ -1837,7 +1835,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         SetTimePacket setTimePacket = new SetTimePacket();
         setTimePacket.time = this.level.getTime();
-        setTimePacket.started = !this.level.stopTime;
         this.dataPacket(setTimePacket);
 
         this.setMovementSpeed(DEFAULT_SPEED);
@@ -4369,7 +4366,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.server.getPluginManager().callEvent(event);
             if (event.isCancelled()) return false;
             to = event.getTo();
-            if (from.getLevel().getId() != to.getLevel().getId()){ //Different level, update compass position
+            if (from.getLevel().getId() != to.getLevel().getId()) { //Different level, update compass position
                 SetSpawnPositionPacket pk = new SetSpawnPositionPacket();
                 pk.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
                 Position spawn = to.getLevel().getSpawnLocation();
@@ -4425,7 +4422,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.removeWindow(window);
             }
 
-            if (from.getLevel().getId() != location.getLevel().getId()){ //Different level, update compass position
+            if (from.getLevel().getId() != location.getLevel().getId()) { //Different level, update compass position
                 SetSpawnPositionPacket pk = new SetSpawnPositionPacket();
                 pk.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
                 Position spawn = location.getLevel().getSpawnLocation();
@@ -4665,9 +4662,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        batch.encode();
-        batch.isEncoded = true;
         return batch;
     }
 

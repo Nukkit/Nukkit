@@ -1,13 +1,10 @@
 package cn.nukkit.network.protocol;
 
-/**
- * author: MagicDroidX
- * Nukkit Project
- */
-public class BatchPacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.BATCH_PACKET;
+public class RiderJumpPacket extends DataPacket {
 
-    public byte[] payload;
+    public static final byte NETWORK_ID = ProtocolInfo.RIDER_JUMP_PACKET;
+
+    public int unknown;
 
     @Override
     public byte pid() {
@@ -21,6 +18,6 @@ public class BatchPacket extends DataPacket {
 
     @Override
     public void encode() {
-
+        this.putVarInt(this.unknown);
     }
 }

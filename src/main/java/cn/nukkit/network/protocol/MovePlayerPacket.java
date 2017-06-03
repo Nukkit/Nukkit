@@ -22,6 +22,7 @@ public class MovePlayerPacket extends DataPacket {
     public float pitch;
     public byte mode = MODE_NORMAL;
     public boolean onGround;
+    public long otherEid;
 
     @Override
     public void decode() {
@@ -35,6 +36,7 @@ public class MovePlayerPacket extends DataPacket {
         this.yaw = this.getLFloat();
         this.mode = (byte) this.getByte();
         this.onGround = this.getBoolean();
+        this.otherEid = this.getVarLong();
     }
 
     @Override
@@ -47,6 +49,7 @@ public class MovePlayerPacket extends DataPacket {
         this.putLFloat(this.headYaw);
         this.putByte(this.mode);
         this.putBoolean(this.onGround);
+        this.putVarLong(this.otherEid);
     }
 
     @Override

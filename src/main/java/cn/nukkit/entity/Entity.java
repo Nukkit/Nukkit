@@ -118,21 +118,23 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_IMMOBILE = 16, DATA_FLAG_NO_AI = 16;
     public static final int DATA_FLAG_SILENT = 17;
     public static final int DATA_FLAG_WALLCLIMBING = 18;
-    public static final int DATA_FLAG_RESTING = 19; //for bats?
-    public static final int DATA_FLAG_SITTING = 20;
-    public static final int DATA_FLAG_ANGRY = 21;
-    public static final int DATA_FLAG_INTERESTED = 22; //for mobs following players with food?
-    public static final int DATA_FLAG_CHARGED = 23;
-    public static final int DATA_FLAG_TAMED = 24;
-    public static final int DATA_FLAG_LEASHED = 25;
-    public static final int DATA_FLAG_SHEARED = 26; //for sheep
-    public static final int DATA_FLAG_GLIDING = 27, DATA_FLAG_FALL_FLYING = 27;
-    public static final int DATA_FLAG_ELDER = 28; //elder guardian
-    public static final int DATA_FLAG_MOVING = 29;
-    public static final int DATA_FLAG_BREATHING = 30; //hides bubbles if true
-    public static final int DATA_FLAG_CHESTED = 31; //for mules?
-    public static final int DATA_FLAG_STACKABLE = 32;
-    public static final int DATA_FLAG_IDLING = 36;
+
+    public static final int DATA_FLAG_RESTING = 22; //for bats?
+    public static final int DATA_FLAG_SITTING = 23;
+    public static final int DATA_FLAG_ANGRY = 24;
+    public static final int DATA_FLAG_INTERESTED = 25; //for mobs following players with food?
+    public static final int DATA_FLAG_CHARGED = 26;
+    public static final int DATA_FLAG_TAMED = 27;
+    public static final int DATA_FLAG_LEASHED = 28;
+    public static final int DATA_FLAG_SHEARED = 29; //for sheep
+    public static final int DATA_FLAG_GLIDING = 30, DATA_FLAG_FALL_FLYING = 30;
+    public static final int DATA_FLAG_ELDER = 31; //elder guardian
+    public static final int DATA_FLAG_MOVING = 32;
+    public static final int DATA_FLAG_BREATHING = 33; //hides bubbles if true
+    public static final int DATA_FLAG_CHESTED = 34; //for mules?
+    public static final int DATA_FLAG_STACKABLE = 35;
+
+    public static final int DATA_FLAG_IDLING = 39;
 
     public static final int DATA_LEAD_HOLDER = 23;
     public static final int DATA_LEAD = 24;

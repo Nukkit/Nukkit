@@ -303,18 +303,6 @@ public class Server {
 
         ServerScheduler.WORKERS = (int) poolSize;
 
-        int threshold;
-        try {
-            threshold = Integer.valueOf(String.valueOf(this.getConfig("network.batch-threshold", 256)));
-        } catch (Exception e) {
-            threshold = 256;
-        }
-
-        if (threshold < 0) {
-            threshold = -1;
-        }
-
-        Network.BATCH_THRESHOLD = threshold;
         this.networkCompressionLevel = (int) this.getConfig("network.compression-level", 7);
         this.networkCompressionAsync = (boolean) this.getConfig("network.async-compression", true);
 
@@ -547,10 +535,6 @@ public class Server {
     public static void broadcastPacket(Player[] players, DataPacket packet) {
         packet.encode();
         packet.isEncoded = true;
-        if (Network.BATCH_THRESHOLD >= 0 && packet.getBuffer().length >= Network.BATCH_THRESHOLD) {
-            Server.getInstance().batchPackets(players, new DataPacket[]{packet}, false);
-            return;
-        }
 
         for (Player player : players) {
             player.dataPacket(packet);
@@ -606,8 +590,6 @@ public class Server {
     public void broadcastPacketsCallback(byte[] data, List<String> identifiers) {
         BatchPacket pk = new BatchPacket();
         pk.payload = data;
-        pk.encode();
-        pk.isEncoded = true;
 
         for (String i : identifiers) {
             if (this.players.containsKey(i)) {

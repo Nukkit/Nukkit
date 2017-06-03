@@ -675,13 +675,11 @@ public class Level implements ChunkManager, Metadatable {
         if (this.stopTime) {
             SetTimePacket pk0 = new SetTimePacket();
             pk0.time = (int) this.time;
-            pk0.started = true;
             player.dataPacket(pk0);
         }
 
         SetTimePacket pk = new SetTimePacket();
         pk.time = (int) this.time;
-        pk.started = !this.stopTime;
 
         player.dataPacket(pk);
     }
@@ -690,13 +688,11 @@ public class Level implements ChunkManager, Metadatable {
         if (this.stopTime) {
             SetTimePacket pk0 = new SetTimePacket();
             pk0.time = (int) this.time;
-            pk0.started = true;
             Server.broadcastPacket(this.players.values().stream().toArray(Player[]::new), pk0);
         }
 
         SetTimePacket pk = new SetTimePacket();
         pk.time = (int) this.time;
-        pk.started = !this.stopTime;
 
         Server.broadcastPacket(this.players.values().stream().toArray(Player[]::new), pk);
     }

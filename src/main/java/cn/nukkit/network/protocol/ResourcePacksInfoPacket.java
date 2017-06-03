@@ -20,7 +20,7 @@ public class ResourcePacksInfoPacket extends DataPacket {
         this.reset();
         this.putBoolean(this.mustAccept);
 
-        this.putLShort(this.behaviourPackEntries.length);
+        this.putVarInt(this.behaviourPackEntries.length);
         for (ResourcePack entry : this.behaviourPackEntries) {
             this.putString(entry.getPackId());
             this.putString(entry.getPackVersion());
@@ -28,7 +28,7 @@ public class ResourcePacksInfoPacket extends DataPacket {
             this.putString(""); //unknown
         }
 
-        this.putLShort(this.resourcePackEntries.length);
+        this.putVarInt(this.resourcePackEntries.length);
         for (ResourcePack entry : this.resourcePackEntries) {
             this.putString(entry.getPackId());
             this.putString(entry.getPackVersion());
