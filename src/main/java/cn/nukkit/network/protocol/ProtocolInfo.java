@@ -84,7 +84,7 @@ public interface ProtocolInfo {
     byte REQUEST_CHUNK_RADIUS_PACKET = 0x45;
     byte CHUNK_RADIUS_UPDATED_PACKET = 0x46;
     byte ITEM_FRAME_DROP_ITEM_PACKET = 0x47;
-    byte REPLACE_ITEM_IN_SLOT_PACKET = 0x48; //ReplaceSelectedItemPacket
+    byte REPLACE_ITEM_IN_SLOT_PACKET = 0x48;
     byte GAME_RULES_CHANGED_PACKET = 0x49;
     byte CAMERA_PACKET = 0x4a;
     byte ADD_ITEM_PACKET = 0x4b;

@@ -18,6 +18,7 @@ public class ContainerSetContentPacket extends DataPacket {
     public static final byte SPECIAL_ARMOR = 0x78;
     public static final byte SPECIAL_CREATIVE = 0x79;
     public static final byte SPECIAL_HOTBAR = 0x7a;
+    public static final byte SPECIAL_FIXED_INVENTORY = 0x7b;
 
     public long windowid;
     public long eid;
