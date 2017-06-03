@@ -49,6 +49,11 @@ public class EntityFallingBlock extends Entity {
     }
 
     @Override
+    protected float getBaseOffset() {
+        return 0.49f;
+    }
+
+    @Override
     public boolean canCollide() {
         return false;
     }
@@ -113,17 +118,6 @@ public class EntityFallingBlock extends Entity {
         boolean hasUpdate = entityBaseTick(tickDiff);
 
         if (isAlive()) {
-            Vector3 pos = new Vector3(x - 0.5, y, z - 0.5).round();
-
-            if (ticksLived == 1) {
-                Block block = level.getBlock(pos);
-                if (block.getId() != blockId) {
-                    kill();
-                    return true;
-                }
-                level.setBlock(pos, new BlockAir(), true);
-            }
-
             motionY -= getGravity();
 
             move(motionX, motionY, motionZ);
@@ -134,12 +128,12 @@ public class EntityFallingBlock extends Entity {
             motionY *= 1 - getDrag();
             motionZ *= friction;
 
-            pos = (new Vector3(x - 0.5, y, z - 0.5)).round();
+            Vector3 pos = (new Vector3(x - 0.5, y, z - 0.5)).round();
 
             if (onGround) {
                 kill();
                 Block block = level.getBlock(pos);
-                if (block.getId() > 0 && !block.isSolid() && !(block instanceof BlockLiquid)) {
+                if (block.getId() > 0 && block.isTransparent() & !block.canBeReplaced()) {
                     getLevel().dropItem(this, Item.get(this.getBlock(), this.getDamage(), 1));
                 } else {
                     EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, block, Block.get(getBlock(), getDamage()));

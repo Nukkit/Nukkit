@@ -245,8 +245,6 @@ public abstract class Entity extends Location implements Metadatable {
     public int deadTicks = 0;
     protected int age = 0;
 
-    protected double baseOffset = 0;
-
     protected float health = 20;
     private int maxHealth = 20;
 
@@ -314,6 +312,10 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     protected float getDrag() {
+        return 0;
+    }
+
+    protected float getBaseOffset() {
         return 0;
     }
 
@@ -1117,7 +1119,7 @@ public abstract class Entity extends Location implements Metadatable {
             this.lastYaw = this.yaw;
             this.lastPitch = this.pitch;
 
-            this.addMovement(this.x, this.y + this.baseOffset, this.z, this.yaw, this.pitch, this.yaw);
+            this.addMovement(this.x, this.y + this.getBaseOffset(), this.z, this.yaw, this.pitch, this.yaw);
         }
 
         if (diffMotion > 0.0025 || (diffMotion > 0.0001 && this.getMotion().lengthSquared() <= 0.0001)) { //0.05 ** 2

@@ -414,6 +414,7 @@ public class PlayerInventory extends BaseInventory {
                 this.close(player);
                 continue;
             }
+            pk.eid = player.getId();
             pk.windowid = (byte) id;
             player.dataPacket(pk.clone());
         }

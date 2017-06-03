@@ -21,9 +21,9 @@ public class AddEntityPacket extends DataPacket {
     public float x;
     public float y;
     public float z;
-    public float speedX;
-    public float speedY;
-    public float speedZ;
+    public float speedX = 0f;
+    public float speedY = 0f;
+    public float speedZ = 0f;
     public float yaw;
     public float pitch;
     public int modifiers;

@@ -36,8 +36,6 @@ public class EntityItem extends Entity {
 
     protected int pickupDelay = 0;
 
-    protected double baseOffset = 0.125;
-
     @Override
     public float getWidth() {
         return 0.25f;
@@ -61,6 +59,11 @@ public class EntityItem extends Entity {
     @Override
     public float getDrag() {
         return 0.02f;
+    }
+
+    @Override
+    protected float getBaseOffset() {
+        return 0.125f;
     }
 
     @Override

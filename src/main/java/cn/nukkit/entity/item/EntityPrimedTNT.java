@@ -21,8 +21,6 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
 
     public static final int NETWORK_ID = 65;
 
-    protected double baseOffset = 0.49;
-
     @Override
     public float getWidth() {
         return 0.98f;
@@ -46,6 +44,11 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
     @Override
     protected float getDrag() {
         return 0.02f;
+    }
+
+    @Override
+    protected float getBaseOffset() {
+        return 0.49f;
     }
 
     @Override

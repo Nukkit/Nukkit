@@ -45,6 +45,7 @@ import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
+import cn.nukkit.level.particle.PunchBlockParticle;
 import cn.nukkit.level.sound.ExperienceOrbSound;
 import cn.nukkit.level.sound.ItemFrameItemRemovedSound;
 import cn.nukkit.level.sound.LaunchSound;
@@ -1119,6 +1120,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             ContainerSetContentPacket containerSetContentPacket = new ContainerSetContentPacket();
             containerSetContentPacket.windowid = ContainerSetContentPacket.SPECIAL_CREATIVE;
+            containerSetContentPacket.eid = this.id;
             this.dataPacket(containerSetContentPacket);
         } else {
             if (this.isSurvival()) {
@@ -1126,6 +1128,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
             ContainerSetContentPacket containerSetContentPacket = new ContainerSetContentPacket();
             containerSetContentPacket.windowid = ContainerSetContentPacket.SPECIAL_CREATIVE;
+            containerSetContentPacket.eid = this.id;
             containerSetContentPacket.slots = Item.getCreativeItems().stream().toArray(Item[]::new);
             this.dataPacket(containerSetContentPacket);
         }
@@ -1420,7 +1423,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.level);
         Location to = this.getLocation();
 
-        if (!revert && (Math.pow(this.lastX - to.x, 2) + Math.pow(this.lastY - to.y, 2) + Math.pow(this.lastZ - to.z, 2)) > (1d / 16d) || (Math.abs(this.lastYaw - to.yaw) + Math.abs(this.lastPitch - to.pitch)) > 10) {
+        double delta = Math.pow(this.lastX - to.x, 2) + Math.pow(this.lastY - to.y, 2) + Math.pow(this.z - to.z, 2);
+        double deltaAngle = Math.abs(this.lastYaw - to.yaw) + Math.abs(this.lastPitch - to.pitch);
+
+        if (!revert && (delta > 0.0001d || deltaAngle > 1d)) {
             boolean isFirst = this.firstMove;
 
             this.firstMove = false;
@@ -1860,10 +1866,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.gamemode == Player.SPECTATOR) {
             ContainerSetContentPacket containerSetContentPacket = new ContainerSetContentPacket();
             containerSetContentPacket.windowid = ContainerSetContentPacket.SPECIAL_CREATIVE;
+            containerSetContentPacket.eid = this.id;
             this.dataPacket(containerSetContentPacket);
         } else {
             ContainerSetContentPacket containerSetContentPacket = new ContainerSetContentPacket();
             containerSetContentPacket.windowid = ContainerSetContentPacket.SPECIAL_CREATIVE;
+            containerSetContentPacket.eid = this.id;
             containerSetContentPacket.slots = Item.getCreativeItems().stream().toArray(Item[]::new);
             this.dataPacket(containerSetContentPacket);
         }
@@ -2436,13 +2444,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     playerActionPacket.entityId = this.id;
                     Vector3 pos = new Vector3(playerActionPacket.x, playerActionPacket.y, playerActionPacket.z);
+                    BlockFace face = BlockFace.fromIndex(playerActionPacket.face);
 
                     switch (playerActionPacket.action) {
                         case PlayerActionPacket.ACTION_START_BREAK:
                             if (this.lastBreak != Long.MAX_VALUE || pos.distanceSquared(this) > 10000) {
                                 break;
                             }
-                            BlockFace face = BlockFace.fromIndex(playerActionPacket.face);
                             Block target = this.level.getBlock(pos);
                             PlayerInteractEvent playerInteractEvent = new PlayerInteractEvent(this, this.inventory.getItemInHand(), target, face, target.getId() == 0 ? PlayerInteractEvent.LEFT_CLICK_AIR : PlayerInteractEvent.LEFT_CLICK_BLOCK);
                             this.getServer().getPluginManager().callEvent(playerInteractEvent);
@@ -2624,7 +2632,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             } else {
                                 this.setSprinting(true);
                             }
-                            return;
+                            break packetswitch;
 
                         case PlayerActionPacket.ACTION_STOP_SPRINT:
                             playerToggleSprintEvent = new PlayerToggleSprintEvent(this, false);
@@ -2634,7 +2642,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             } else {
                                 this.setSprinting(false);
                             }
-                            return;
+                            break packetswitch;
 
                         case PlayerActionPacket.ACTION_START_SNEAK:
                             PlayerToggleSneakEvent playerToggleSneakEvent = new PlayerToggleSneakEvent(this, true);
@@ -2675,6 +2683,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.setGliding(false);
                             }
                             break packetswitch;
+                        case PlayerActionPacket.ACTION_WORLD_IMMUTABLE:
+                            break; //TODO
+                        case PlayerActionPacket.ACTION_CONTINUE_BREAK:
+                            block = this.level.getBlock(pos);
+                            this.level.addParticle(new PunchBlockParticle(pos, block, face));
+                            break;
                     }
 
                     this.startAction = -1;

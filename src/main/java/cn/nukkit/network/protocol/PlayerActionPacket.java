@@ -26,6 +26,7 @@ public class PlayerActionPacket extends DataPacket {
     public static final byte ACTION_START_GLIDE = 15;
     public static final byte ACTION_STOP_GLIDE = 16;
     public static final byte ACTION_WORLD_IMMUTABLE = 17;
+    public static final byte ACTION_CONTINUE_BREAK = 18;
 
     public long entityId;
     public int action;
