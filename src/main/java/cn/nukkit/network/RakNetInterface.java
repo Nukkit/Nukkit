@@ -258,11 +258,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
             }
             String identifier = this.identifiers.get(player.rawHashCode());
             EncapsulatedPacket pk = null;
-            if (!packet.isEncoded) {
-                packet.encode();
-                packet.isEncoded = true;
-                buffer = packet.getBuffer();
-            } else if (!needACK) {
+            if (!needACK) {
                 if (packet.encapsulatedPacket == null) {
                     packet.encapsulatedPacket = new CacheEncapsulatedPacket();
                     packet.encapsulatedPacket.identifierACK = null;

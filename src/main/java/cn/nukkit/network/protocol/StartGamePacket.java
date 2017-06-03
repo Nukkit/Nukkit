@@ -38,7 +38,7 @@ public class StartGamePacket extends DataPacket {
     public RuleData[] ruleDatas = new RuleData[0];
     public String levelId = ""; //base64 string, usually the same as world folder name in vanilla
     public String worldName;
-    public String premiumWorldTemplateId;
+    public String premiumWorldTemplateId = "";
     public boolean unknown;
     public long currentTick;
 
