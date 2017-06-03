@@ -42,12 +42,10 @@ public class ContainerSetContentPacket extends DataPacket {
             this.slots[s] = this.getSlot();
         }
 
-        if (this.windowid == SPECIAL_INVENTORY) {
-            count = (int) this.getUnsignedVarInt();
-            this.hotbar = new int[count];
-            for (int s = 0; s < count && !this.feof(); ++s) {
-                this.hotbar[s] = this.getVarInt();
-            }
+        count = (int) this.getUnsignedVarInt();
+        this.hotbar = new int[count];
+        for (int s = 0; s < count && !this.feof(); ++s) {
+            this.hotbar[s] = this.getVarInt();
         }
     }
 
