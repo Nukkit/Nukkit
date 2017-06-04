@@ -97,24 +97,18 @@ public class BlockAnvil extends BlockFallable {
     }
 
     @Override
-    public int[][] getDrops(Item item) {
+    public Item[] getDrops(Item item) {
         int damage = this.getDamage();
         if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
-            if (damage >= 0 && damage <= 3) { //Anvil
-                return new int[][]{
-                        {this.getId(), 0, 1}
-                };
-            } else if (damage >= 4 && damage <= 7) { //Slightly Anvil
-                return new int[][]{
-                        {this.getId(), this.meta & 0x04, 1}
-                };
+            Item drop = this.toItem();
+
+            if (damage >= 4 && damage <= 7) { //Slightly Anvil
+                drop.setDamage(drop.getDamage() & 0x04);
             } else if (damage >= 8 && damage <= 11) { //Very Damaged Anvil
-                return new int[][]{
-                        {this.getId(), this.meta & 0x08, 1}
-                };
+                drop.setDamage(drop.getDamage() & 0x08);
             }
         }
-        return new int[0][0];
+        return new Item[0];
     }
 
     @Override

@@ -42,7 +42,7 @@ public class BlockConcrete extends BlockSolid {
     }
 
     @Override
-    public int[][] getDrops(Item item) {
-        return item.getTier() >= ItemTool.TIER_WOODEN ? new int[][]{{CONCRETE, 0, 1}} : new int[0][0];
+    public Item[] getDrops(Item item) {
+        return item.getTier() >= ItemTool.TIER_WOODEN ? new Item[]{toItem()} : new Item[0];
     }
 }
