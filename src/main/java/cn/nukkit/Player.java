@@ -1074,9 +1074,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * TODO: remove this when Spectator Mode gets added properly to MCPE
      *
      */
-    public static int getClientFriendlyGamemode(int gamemode){
+    private static int getClientFriendlyGamemode(int gamemode){
         gamemode &= 0x03;
-        if(gamemode == Player.SPECTATOR){
+        if (gamemode == Player.SPECTATOR) {
             return Player.CREATIVE;
         }
         return gamemode;
