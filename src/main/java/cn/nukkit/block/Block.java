@@ -288,6 +288,26 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int END_ROD = 208;
     public static final int END_GATEWAY = 209;
 
+    public static final int SHULKER_BOX = 218;
+    public static final int PURPLE_GLAZED_TERRACOTTA = 219;
+    public static final int WHITE_GLAZED_TERRACOTTA = 220;
+    public static final int ORANGE_GLAZED_TERRACOTTA = 221;
+    public static final int MAGENTA_GLAZED_TERRACOTTA = 222;
+    public static final int LIGHT_BLUE_GLAZED_TERRACOTTA = 223;
+    public static final int YELLOW_GLAZED_TERRACOTTA = 224;
+    public static final int LIME_GLAZED_TERRACOTTA = 225;
+    public static final int PINK_GLAZED_TERRACOTTA = 226;
+    public static final int GRAY_GLAZED_TERRACOTTA = 227;
+    public static final int SILVER_GLAZED_TERRACOTTA = 228;
+    public static final int CYAN_GLAZED_TERRACOTTA = 229;
+    public static final int BLUE_GLAZED_TERRACOTTA = 231;
+    public static final int BROWN_GLAZED_TERRACOTTA = 232;
+    public static final int GREEN_GLAZED_TERRACOTTA = 233;
+    public static final int RED_GLAZED_TERRACOTTA = 234;
+    public static final int BLACK_GLAZED_TERRACOTTA = 235;
+    public static final int CONCRETE = 236;
+    public static final int CONCRETE_POWDER = 237;
+
     public static final int CHORUS_PLANT = 240;
     public static final int STAINED_GLASS = 241;
     public static final int PODZOL = 243;
@@ -530,6 +550,25 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
             //TODO: list[END_ROD] = BlockEndRod.class; //208
             //TODO: list[END_GATEWAY] = BlockEndGateway.class; //209
+
+            list[BLACK_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[BLUE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlue.class;
+            list[BROWN_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[CYAN_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[GRAY_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[GREEN_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[LIGHT_BLUE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[LIME_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[MAGENTA_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[ORANGE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[PINK_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[PURPLE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[RED_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[SILVER_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[WHITE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[YELLOW_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
+            list[CONCRETE] = BlockConcrete.class;
+            list[CONCRETE_POWDER] = BlockConcretePowder.class;
 
             //TODO: list[CHORUS_PLANT] = BlockChorusPlant.class; //240
             list[PODZOL] = BlockPodzol.class; //243
