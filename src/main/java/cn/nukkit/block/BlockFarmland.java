@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
@@ -106,9 +107,9 @@ public class BlockFarmland extends BlockTransparent {
     }
 
     @Override
-    public int[][] getDrops(Item item) {
-        return new int[][]{
-                {Item.DIRT, 0, 1}
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                new ItemBlock(new BlockDirt())
         };
     }
 

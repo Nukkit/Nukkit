@@ -1,7 +1,5 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.Item;
-
 /**
  * Created by Pub4Game on 21.02.2016.
  */
@@ -28,12 +26,5 @@ public class BlockSlime extends BlockSolid {
     @Override
     public double getResistance() {
         return 0;
-    }
-
-    @Override
-    public int[][] getDrops(Item item) {
-        return new int[][]{
-                {Item.SLIME_BLOCK, 0, 1}
-        };
     }
 }

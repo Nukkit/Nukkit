@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.Position;
@@ -573,7 +574,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             //TODO: list[CHORUS_PLANT] = BlockChorusPlant.class; //240
             list[PODZOL] = BlockPodzol.class; //243
             list[BEETROOT_BLOCK] = BlockBeetroot.class; //244
-            list[STONECUTTER] = BlockStonecutter.class; //245
             list[GLOWING_OBSIDIAN] = BlockObsidianGlowing.class; //246
             //TODO: list[NETHER_REACTOR] = BlockNetherReactor.class; //247 Should not be removed
 
@@ -797,12 +797,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         this.boundingBox = null;
     }
 
-    public int[][] getDrops(Item item) {
+    public Item[] getDrops(Item item) {
         if (this.getId() < 0 || this.getId() > list.length) { //Unknown blocks
-            return new int[0][0];
+            return new Item[0];
         } else {
-            return new int[][]{
-                    {this.getId(), this.getDamage(), 1}
+            return new Item[]{
+                    this.toItem()
             };
         }
     }
@@ -1102,5 +1102,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
     public static boolean equals(Block b1, Block b2, boolean checkDamage) {
         return b1 != null && b2 != null && b1.getId() == b2.getId() && (!checkDamage || b1.getDamage() == b2.getDamage());
+    }
+
+    public Item toItem() {
+        return new ItemBlock(this, this.meta, 1);
     }
 }

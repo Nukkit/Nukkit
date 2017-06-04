@@ -4,7 +4,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockTNT;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.item.EntityPrimedTNT;
 import cn.nukkit.event.block.BlockUpdateEvent;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -16,7 +15,6 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.particle.HugeExplodeSeedParticle;
 import cn.nukkit.level.sound.ExplodeSound;
 import cn.nukkit.math.*;
-import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.ExplodePacket;
 
 import java.util.ArrayList;
@@ -172,8 +170,8 @@ public class Explosion {
             if (block.getId() == Block.TNT) {
                 ((BlockTNT) block).prime(new NukkitRandom().nextRange(10, 30));
             } else if (Math.random() * 100 < yield) {
-                for (int[] drop : block.getDrops(air)) {
-                    this.level.dropItem(block.add(0.5, 0.5, 0.5), Item.get(drop[0], drop[1], drop[2]));
+                for (Item drop : block.getDrops(air)) {
+                    this.level.dropItem(block.add(0.5, 0.5, 0.5), drop);
                 }
             }
 

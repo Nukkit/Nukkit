@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBed;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBed;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
@@ -182,10 +183,8 @@ public class BlockBed extends BlockTransparent {
     }
 
     @Override
-    public int[][] getDrops(Item item) {
-        return new int[][]{
-                {Item.BED, 0, 1}
-        };
+    public Item toItem() {
+        return new ItemBed(); //TODO: color
     }
 
     @Override

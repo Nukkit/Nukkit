@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemString;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
 
@@ -49,13 +50,13 @@ public class BlockCobweb extends BlockFlowable {
     }
 
     @Override
-    public int[][] getDrops(Item item) {
+    public Item[] getDrops(Item item) {
         if (item.isShears() || item.isSword()) {
-            return new int[][]{
-                    {Item.STRING, 0, 1}
+            return new Item[]{
+                    new ItemString()
             };
         } else {
-            return new int[0][0];
+            return new Item[0];
         }
     }
 

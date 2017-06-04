@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemEmerald;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.NukkitRandom;
 
@@ -44,13 +45,13 @@ public class BlockOreEmerald extends BlockSolid {
     }
 
     @Override
-    public int[][] getDrops(Item item) {
+    public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_IRON) {
-            return new int[][]{
-                    {Item.EMERALD, 0, 1}
+            return new Item[]{
+                    new ItemEmerald()
             };
         } else {
-            return new int[0][0];
+            return new Item[0];
         }
     }
 

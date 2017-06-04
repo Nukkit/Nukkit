@@ -90,13 +90,6 @@ public class BlockFenceGate extends BlockTransparent {
     }
 
     @Override
-    public int[][] getDrops(Item item) {
-        return new int[][]{
-                {this.getId(), 0, 1}
-        };
-    }
-
-    @Override
     public boolean onActivate(Item item, Player player) {
         if (player == null) {
             return false;

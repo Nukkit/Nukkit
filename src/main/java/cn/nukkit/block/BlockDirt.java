@@ -35,13 +35,6 @@ public class BlockDirt extends BlockSolid {
     }
 
     @Override
-    public int[][] getDrops(Item item) {
-        return new int[][]{
-                {Item.DIRT, 0, 1}
-        };
-    }
-
-    @Override
     public double getHardness() {
         return 0.5;
     }

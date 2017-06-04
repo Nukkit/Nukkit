@@ -1825,11 +1825,7 @@ public class Level implements ChunkManager, Metadatable {
         } else if (!target.isBreakable(item)) {
             return null;
         } else {
-            int[][] d = target.getDrops(item);
-            drops = new Item[d.length];
-            for (int i = 0; i < d.length; i++) {
-                drops[i] = Item.get(d[i][0], d[i][1], d[i][2]);
-            }
+            drops = target.getDrops(item);
         }
 
         Block above = this.getBlock(new Vector3(target.x, target.y + 1, target.z));
