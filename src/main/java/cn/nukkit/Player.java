@@ -1066,6 +1066,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return gamemode;
     }
 
+    /**
+     *
+     * Returns a client-friendly gamemode of the specified real gamemode
+     * This function takes care of handling gamemodes known to MCPE (as of 1.1.0.3, that includes Survival, Creative and Adventure)
+     *
+     * TODO: remove this when Spectator Mode gets added properly to MCPE
+     *
+     */
+    public static int getClientFriendlyGamemode(int gamemode){
+        gamemode &= 0x03;
+        if(gamemode == Player.SPECTATOR){
+            return Player.CREATIVE;
+        }
+        return gamemode;
+    }
+
     public boolean setGamemode(int gamemode) {
         return this.setGamemode(gamemode, false, null);
     }
@@ -1108,7 +1124,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (!clientSide) {
             SetPlayerGameTypePacket pk = new SetPlayerGameTypePacket();
-            pk.gamemode = this.gamemode & 0x01;
+            pk.gamemode = getClientFriendlyGamemode(gamemode);
             this.dataPacket(pk);
         }
 
@@ -1818,12 +1834,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         StartGamePacket startGamePacket = new StartGamePacket();
         startGamePacket.entityUniqueId = this.id;
         startGamePacket.entityRuntimeId = this.id;
+        startGamePacket.playerGamemode = getClientFriendlyGamemode(this.gamemode);
         startGamePacket.x = (float) this.x;
         startGamePacket.y = (float) this.y;
         startGamePacket.z = (float) this.z;
+        startGamePacket.yaw = (float) this.yaw;
+        startGamePacket.pitch = (float) this.pitch;
         startGamePacket.seed = -1;
         startGamePacket.dimension = (byte) (this.level.getDimension() & 0xff);
-        startGamePacket.gamemode = this.gamemode & 0x01;
+        startGamePacket.gamemode = getClientFriendlyGamemode(this.gamemode);
         startGamePacket.difficulty = this.server.getDifficulty();
         startGamePacket.spawnX = (int) spawnPosition.x;
         startGamePacket.spawnY = (int) spawnPosition.y;
@@ -1833,9 +1852,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.eduMode = false;
         startGamePacket.rainLevel = 0;
         startGamePacket.lightningLevel = 0;
-        startGamePacket.commandsEnabled = true;
+        startGamePacket.commandsEnabled = this.isEnableClientCommand();
         startGamePacket.levelId = "";
-        startGamePacket.worldName = this.level.getName();
+        startGamePacket.worldName = this.getServer().getNetwork().getName();
         startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat
         this.dataPacket(startGamePacket);
 

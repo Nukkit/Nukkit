@@ -20,6 +20,8 @@ public class StartGamePacket extends DataPacket {
     public float x;
     public float y;
     public float z;
+    public float yaw;
+    public float pitch;
     public int seed;
     public byte dimension;
     public int generator = 1;
@@ -54,8 +56,8 @@ public class StartGamePacket extends DataPacket {
         this.putVarLong(this.entityRuntimeId);
         this.putVarInt(this.playerGamemode);
         this.putVector3f(this.x, this.y, this.z);
-        this.putLFloat(0);
-        this.putLFloat(0);
+        this.putLFloat(this.yaw);
+        this.putLFloat(this.pitch);
         this.putVarInt(this.seed);
         this.putVarInt(this.dimension);
         this.putVarInt(this.generator);
