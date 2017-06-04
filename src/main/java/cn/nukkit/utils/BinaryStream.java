@@ -1,5 +1,6 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockVector3;
@@ -7,7 +8,9 @@ import cn.nukkit.math.Vector3f;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -197,6 +200,50 @@ public class BinaryStream {
 
     public void putByte(byte b) {
         this.put(new byte[]{b});
+    }
+
+    /**
+     * Reads a list of Attributes from the stream.
+     * @return Attribute[]
+     */
+    public Attribute[] getAttributeList() throws Exception {
+        List<Attribute> list = new ArrayList<>();
+        long count = this.getUnsignedVarInt();
+
+        for(int i = 0; i < count; ++i){
+            float min = this.getLFloat();
+            float max = this.getLFloat();
+            float current = this.getLFloat();
+            float defaultValue = this.getLFloat();
+            String name = this.getString();
+
+            Attribute attr = Attribute.getAttributeByName(name);
+            if(attr != null){
+                attr.setMinValue(min);
+                attr.setMaxValue(max);
+                attr.setValue(current);
+                attr.setDefaultValue(defaultValue);
+                list.add(attr);
+            }else{
+                throw new Exception("Unknown attribute type \"" + name + "\"");
+            }
+        }
+
+        return list.stream().toArray(Attribute[]::new);
+    }
+
+    /**
+     * Writes a list of Attributes to the packet buffer using the standard format.
+     */
+    public void putAttributeList(Attribute[] attributes){
+        this.putUnsignedVarInt(attributes.length);
+        for (Attribute attribute: attributes){
+            this.putLFloat(attribute.getMinValue());
+            this.putLFloat(attribute.getMaxValue());
+            this.putLFloat(attribute.getValue());
+            this.putLFloat(attribute.getDefaultValue());
+            this.putString(attribute.getName());
+        }
     }
 
     public void putUUID(UUID uuid) {
