@@ -284,6 +284,22 @@ public class BinaryStream {
             nbt = this.get(nbtLen);
         }
 
+        //TODO
+        int canPlaceOn = this.getVarInt();
+        if(canPlaceOn > 0){
+            for(int i = 0; i < canPlaceOn; ++i){
+                this.getString();
+            }
+        }
+
+        //TODO
+        int canDestroy = this.getVarInt();
+        if(canDestroy > 0){
+            for(int i = 0; i < canDestroy; ++i){
+                this.getString();
+            }
+        }
+
         return Item.get(
                 id, data, cnt, nbt
         );
@@ -301,8 +317,8 @@ public class BinaryStream {
         byte[] nbt = item.getCompoundTag();
         this.putLShort(nbt.length);
         this.put(nbt);
-        this.putVarInt(0);
-        this.putVarInt(0);
+        this.putVarInt(0); //TODO CanPlaceOn entry count
+        this.putVarInt(0); //TODO CanDestroy entry count
     }
 
     public byte[] getByteArray() {

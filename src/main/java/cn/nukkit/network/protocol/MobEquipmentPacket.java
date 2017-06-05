@@ -22,7 +22,7 @@ public class MobEquipmentPacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.eid = this.getUnsignedVarLong().longValue(); //EntityRuntimeID
+        this.eid = this.getVarLong(); //EntityRuntimeID
         this.item = this.getSlot();
         this.slot = this.getByte();
         this.selectedSlot = this.getByte();
@@ -32,7 +32,7 @@ public class MobEquipmentPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putUnsignedVarLong(this.eid); //EntityRuntimeID
+        this.putVarLong(this.eid); //EntityRuntimeID
         this.putSlot(this.item);
         this.putByte((byte) this.slot);
         this.putByte((byte) this.selectedSlot);
