@@ -1859,7 +1859,7 @@ public abstract class Entity extends Location implements Metadatable {
                 this.setDataProperty(new ByteEntityData(propertyId, flags));
             } else {
                 long flags = this.getDataPropertyLong(propertyId);
-                flags ^= 1 << id;
+                flags ^= 1L << id;
                 this.setDataProperty(new LongEntityData(propertyId, flags));
             }
 
@@ -1867,7 +1867,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean getDataFlag(int propertyId, int id) {
-        return (((propertyId == EntityHuman.DATA_PLAYER_FLAGS ? this.getDataPropertyByte(propertyId) & 0xff : this.getDataPropertyLong(propertyId))) & (1 << id)) > 0;
+        return (((propertyId == EntityHuman.DATA_PLAYER_FLAGS ? this.getDataPropertyByte(propertyId) & 0xff : this.getDataPropertyLong(propertyId))) & (1L << id)) > 0;
     }
 
     @Override
