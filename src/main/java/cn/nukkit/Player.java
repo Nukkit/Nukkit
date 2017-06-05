@@ -2875,6 +2875,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                     }
                     break;
+                case ProtocolInfo.BLOCK_PICK_REQUEST_PACKET:
+                    BlockPickRequestPacket pickRequestPacket = (BlockPickRequestPacket) packet;
+                    if (this.isCreative()) {
+                        BlockEntity be = this.getLevel().getBlockEntity(new Vector3(pickRequestPacket.x, pickRequestPacket.y, pickRequestPacket.z));
+                        if (be != null) {
+                            CompoundTag nbt = be.getCleanedNBT();
+                            if(nbt != null){
+                                Item item1 = this.getInventory().getItemInHand();
+                                item1.setCustomBlockData(nbt);
+                                item1.setLore("+(DATA)");
+                                this.getInventory().setItemInHand(item1);
+                            }
+                        }
+                    }
+                    break;
                 case ProtocolInfo.ANIMATE_PACKET:
                     if (!this.spawned || !this.isAlive()) {
                         break;
