@@ -85,7 +85,7 @@ public class FloatingTextParticle extends Particle {
             );
             pk.metadata = new EntityMetadata()
                     .putLong(Entity.DATA_FLAGS, flags)
-                    .putString(Entity.DATA_NAMETAG, this.title + (!"".equals(this.text) ? "\n" + this.text : ""));
+                    .putString(Entity.DATA_NAMETAG, this.title + (!this.text.isEmpty() ? "\n" + this.text : ""));
             packets.add(pk);
         }
 
