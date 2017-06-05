@@ -2,14 +2,13 @@ package cn.nukkit.level.particle;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.EntityMetadata;
-import cn.nukkit.item.Item;
+import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.network.protocol.AddPlayerPacket;
+import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.RemoveEntityPacket;
 
 import java.util.ArrayList;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -67,13 +66,12 @@ public class FloatingTextParticle extends Particle {
         }
 
         if (!this.invisible) {
-            AddPlayerPacket pk = new AddPlayerPacket();
-            pk.uuid = UUID.randomUUID();
-            pk.username = "";
+            AddEntityPacket pk = new AddEntityPacket();
             pk.entityUniqueId = this.entityId;
             pk.entityRuntimeId = this.entityId;
+            pk.type = EntityItem.NETWORK_ID;
             pk.x = (float) this.x;
-            pk.y = (float) (this.y - 1.62);
+            pk.y = (float) (this.y - 0.75);
             pk.z = (float) this.z;
             pk.speedX = 0;
             pk.speedY = 0;
@@ -81,14 +79,14 @@ public class FloatingTextParticle extends Particle {
             pk.yaw = 0;
             pk.pitch = 0;
             long flags = (
-                    (1 << Entity.DATA_FLAG_CAN_SHOW_NAMETAG) |
-                            (1 << Entity.DATA_FLAG_ALWAYS_SHOW_NAMETAG) |
-                            (1 << Entity.DATA_FLAG_IMMOBILE)
+                    (1L << Entity.DATA_FLAG_CAN_SHOW_NAMETAG) |
+                    (1L << Entity.DATA_FLAG_ALWAYS_SHOW_NAMETAG) |
+                    (1L << Entity.DATA_FLAG_IMMOBILE) |
+                    (1L << Entity.DATA_FLAG_INVISIBLE)
             );
             pk.metadata = new EntityMetadata()
                     .putLong(Entity.DATA_FLAGS, flags)
                     .putString(Entity.DATA_NAMETAG, this.title + (!"".equals(this.text) ? "\n" + this.text : ""));
-            pk.item = Item.get(Item.AIR);
             packets.add(pk);
         }
 
