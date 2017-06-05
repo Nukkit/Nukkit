@@ -18,21 +18,24 @@ public class MobEquipmentPacket extends DataPacket {
     public Item item;
     public int slot;
     public int selectedSlot;
+    public int unknownByte;
 
     @Override
     public void decode() {
-        this.eid = this.getVarLong(); //EntityRuntimeID
+        this.eid = this.getUnsignedVarLong().longValue(); //EntityRuntimeID
         this.item = this.getSlot();
         this.slot = this.getByte();
         this.selectedSlot = this.getByte();
+        this.unknownByte = this.getByte();
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putVarLong(this.eid); //EntityRuntimeID
+        this.putUnsignedVarLong(this.eid); //EntityRuntimeID
         this.putSlot(this.item);
         this.putByte((byte) this.slot);
         this.putByte((byte) this.selectedSlot);
+        this.putByte((byte) this.unknownByte);
     }
 }
