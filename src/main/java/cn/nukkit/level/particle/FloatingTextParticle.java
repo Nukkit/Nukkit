@@ -81,8 +81,7 @@ public class FloatingTextParticle extends Particle {
             long flags = (
                     (1L << Entity.DATA_FLAG_CAN_SHOW_NAMETAG) |
                     (1L << Entity.DATA_FLAG_ALWAYS_SHOW_NAMETAG) |
-                    (1L << Entity.DATA_FLAG_IMMOBILE) |
-                    (1L << Entity.DATA_FLAG_INVISIBLE)
+                    (1L << Entity.DATA_FLAG_IMMOBILE)
             );
             pk.metadata = new EntityMetadata()
                     .putLong(Entity.DATA_FLAGS, flags)
