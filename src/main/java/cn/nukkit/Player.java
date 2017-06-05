@@ -1658,7 +1658,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return true;
     }
 
-    private ArrayList<String> messageQueue = new ArrayList<String>();
+    private ArrayList<String> messageQueue = new ArrayList<>();
 
     public void checkNetwork() {
         if (!this.isOnline()) {
