@@ -2760,10 +2760,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (!this.spawned || !this.isAlive()) {
                         break;
                     }
-                    this.craftingType = CRAFTING_SMALL;
 
                     InteractPacket interactPacket = (InteractPacket) packet;
 
+                    if(interactPacket.action == InteractPacket.ACTION_MOUSEOVER){
+                        if(interactPacket.target == 0){
+                            break;
+                        }
+                    }
+                    
+                    this.craftingType = CRAFTING_SMALL;
+                    
                     Entity targetEntity = this.level.getEntity(interactPacket.target);
 
                     if (targetEntity == null || !this.isAlive() || !targetEntity.isAlive()) {
