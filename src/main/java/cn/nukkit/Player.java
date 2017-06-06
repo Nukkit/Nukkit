@@ -2762,20 +2762,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     InteractPacket interactPacket = (InteractPacket) packet;
-
-                    if(interactPacket.action == InteractPacket.ACTION_MOUSEOVER){
-                        if(interactPacket.target == 0){
-                            break;
-                        }
-                    }
-                    
-                    this.craftingType = CRAFTING_SMALL;
                     
                     Entity targetEntity = this.level.getEntity(interactPacket.target);
 
                     if (targetEntity == null || !this.isAlive() || !targetEntity.isAlive()) {
                         break;
                     }
+
+                    this.craftingType = CRAFTING_SMALL;
 
                     if (targetEntity instanceof EntityItem || targetEntity instanceof EntityArrow || targetEntity instanceof EntityXPOrb) {
                         this.kick(PlayerKickEvent.Reason.INVALID_PVE, "Attempting to attack an invalid entity");
