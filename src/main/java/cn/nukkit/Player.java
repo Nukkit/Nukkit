@@ -61,6 +61,7 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.utils.Binary;
+import cn.nukkit.utils.PlayerLoginChainData;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
 import co.aikar.timings.Timing;
@@ -140,7 +141,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected String username;
     protected String iusername;
     protected String displayName;
-    protected String xuid;
 
     protected int startAction = -1;
 
@@ -200,7 +200,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected int lastEnderPearl = -1;
 
-    private String deviceModel;
+    private PlayerLoginChainData loginChainData;
 
     public BlockEnderChest getViewingEnderChest() {
         return viewingEnderChest;
@@ -1951,8 +1951,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.username = TextFormat.clean(loginPacket.username);
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();
-                    this.xuid = loginPacket.xuid;
                     this.setDataProperty(new StringEntityData(DATA_NAMETAG, this.username), false);
+
+                    this.loginChainData = PlayerLoginChainData.fromLoginPacket(loginPacket);
 
                     if (this.server.getOnlinePlayers().size() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull", false)) {
                         break;
@@ -1995,8 +1996,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     } else {
                         this.setSkin(loginPacket.getSkin());
                     }
-
-                    this.deviceModel = loginPacket.deviceModel;
 
                     PlayerPreLoginEvent playerPreLoginEvent;
                     this.server.getPluginManager().callEvent(playerPreLoginEvent = new PlayerPreLoginEvent(this, "Plugin reason"));
@@ -4801,8 +4800,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.close(message, message, false);
     }
 
-    public String getDeviceModel() {
-        return deviceModel;
+    public PlayerLoginChainData getLoginChainData() {
+        return this.loginChainData;
     }
 
     @Override

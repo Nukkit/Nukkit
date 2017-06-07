@@ -25,10 +25,6 @@ public class LoginPacket extends DataPacket {
     public byte gameEdition;
     public UUID clientUUID;
     public long clientId;
-    public String identityPublicKey;
-    public String serverAddress;
-    public String deviceModel;
-    public String xuid;
 
     public Skin skin;
 
@@ -68,10 +64,7 @@ public class LoginPacket extends DataPacket {
                 JsonObject extra = chainMap.get("extraData").getAsJsonObject();
                 if (extra.has("displayName")) this.username = extra.get("displayName").getAsString();
                 if (extra.has("identity")) this.clientUUID = UUID.fromString(extra.get("identity").getAsString());
-                if (extra.has("XUID")) this.xuid = extra.get("XUID").getAsString();
             }
-            if (chainMap.has("identityPublicKey"))
-                this.identityPublicKey = chainMap.get("identityPublicKey").getAsString();
         }
     }
 
@@ -79,17 +72,8 @@ public class LoginPacket extends DataPacket {
         JsonObject skinToken = decodeToken(new String(this.get(this.getLInt())));
         String skinId = null;
         if (skinToken.has("ClientRandomId")) this.clientId = skinToken.get("ClientRandomId").getAsLong();
-        if (skinToken.has("ServerAddress")) this.serverAddress = skinToken.get("ServerAddress").getAsString();
         if (skinToken.has("SkinId")) skinId = skinToken.get("SkinId").getAsString();
         if (skinToken.has("SkinData")) this.skin = new Skin(skinToken.get("SkinData").getAsString(), skinId);
-        if (skinToken.has("DeviceModel")) this.deviceModel = skinToken.get("DeviceModel").getAsString();
-        if (skinToken.has("DeviceOS")) ; //TODO: add variables
-        if (skinToken.has("GameVersion")) ;
-        if (skinToken.has("GuiScale")) ;
-        if (skinToken.has("LanguageCode")) ;
-        if (skinToken.has("CurrentInputMode")) ;
-        if (skinToken.has("DefaultInputMode")) ;
-        if (skinToken.has("ADRole")) ;
     }
 
     private JsonObject decodeToken(String token) {
