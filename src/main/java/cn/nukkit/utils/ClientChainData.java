@@ -71,7 +71,7 @@ public final class ClientChainData {
     return languageCode;
   }
 
-  public String getXuid() {
+  public String getXUID() {
     return xuid;
   }
 
