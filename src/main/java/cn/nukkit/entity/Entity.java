@@ -10,6 +10,7 @@ import cn.nukkit.entity.data.*;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.player.PlayerInteractEvent;
+import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
@@ -1252,7 +1253,7 @@ public abstract class Entity extends Location implements Metadatable {
             if (down == Item.FARMLAND) {
                 if (this instanceof Player) {
                     Player p = (Player) this;
-                    PlayerInteractEvent ev = new PlayerInteractEvent(p, p.getInventory().getItemInHand(), this.temporalVector.setComponents(v.x, v.y, v.z), null, PlayerInteractEvent.PHYSICAL);
+                    PlayerInteractEvent ev = new PlayerInteractEvent(p, p.getInventory().getItemInHand(), this.temporalVector.setComponents(v.x, v.y, v.z), null, Action.PHYSICAL);
                     this.server.getPluginManager().callEvent(ev);
                     if (ev.isCancelled()) {
                         return;
