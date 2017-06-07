@@ -61,7 +61,7 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.utils.Binary;
-import cn.nukkit.utils.PlayerLoginChainData;
+import cn.nukkit.utils.ClientChainData;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
 import co.aikar.timings.Timing;
@@ -200,7 +200,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected int lastEnderPearl = -1;
 
-    private PlayerLoginChainData loginChainData;
+    private ClientChainData loginChainData;
 
     public BlockEnderChest getViewingEnderChest() {
         return viewingEnderChest;
@@ -1953,7 +1953,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.iusername = this.username.toLowerCase();
                     this.setDataProperty(new StringEntityData(DATA_NAMETAG, this.username), false);
 
-                    this.loginChainData = PlayerLoginChainData.fromLoginPacket(loginPacket);
+                    this.loginChainData = ClientChainData.read(loginPacket);
 
                     if (this.server.getOnlinePlayers().size() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull", false)) {
                         break;
@@ -4800,7 +4800,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.close(message, message, false);
     }
 
-    public PlayerLoginChainData getLoginChainData() {
+    public ClientChainData getLoginChainData() {
         return this.loginChainData;
     }
 
