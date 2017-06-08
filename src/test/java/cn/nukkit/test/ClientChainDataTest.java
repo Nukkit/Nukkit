@@ -31,7 +31,7 @@ public class ClientChainDataTest {
             data.getServerAddress(), data.getDeviceModel(),
             data.getDeviceOS(), data.getGameVersion(),
             data.getGuiScale(), data.getLanguageCode(),
-            data.getXuid(), data.getCurrentInputMode(),
+            data.getXUID(), data.getCurrentInputMode(),
             data.getDefaultInputMode(), data.getADRole(),
             data.getTenantId(), data.getUIProfile()
     );
