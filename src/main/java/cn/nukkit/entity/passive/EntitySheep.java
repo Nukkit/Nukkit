@@ -11,6 +11,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.DyeColor;
 
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -111,7 +112,8 @@ public class EntitySheep extends EntityAnimal {
     @Override
     public Item[] getDrops() {
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            return new Item[]{Item.get(Item.WOOL, getColor(), 1)};
+            Random r = new Random();
+            return new Item[]{Item.get(Item.WOOL, getColor(), 1), Item.get(Item.RAW_MUTTON, 0, r.nextInt(2))};
         }
         return new Item[0];
     }
