@@ -892,11 +892,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
                 Optional.ofNullable(player.getInventory().getHelmet().getEnchantment(Enchantment.ID_WATER_WORKER))
                         .map(Enchantment::getLevel).map(l -> l >= 1).orElse(false);
         boolean outOfWaterButNotOnGround = (!player.isInsideOfWater()) && (!player.isOnGround());
-
-//        System.out.println(String.format("H: %f, T: %b, ID: %d, TYPE: %d, TIER: %d, EFF: %d, HAS: %d, W: %b, O: %b",
-//                blockHardness, correctTool, blockId, itemToolType, itemTier,
-//                efficiencyLoreLevel, hasteEffectLevel, insideOfWaterWithoutAquaAffinity, outOfWaterButNotOnGround));
-
         return breakTime0(blockHardness, correctTool, canHarvestWithHand, blockId, itemToolType, itemTier,
                 efficiencyLoreLevel, hasteEffectLevel, insideOfWaterWithoutAquaAffinity, outOfWaterButNotOnGround);
     }
