@@ -60,4 +60,9 @@ public class BlockLapis extends BlockSolid {
         return BlockColor.LAPIS_BLOCK_COLOR;
     }
 
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
 }

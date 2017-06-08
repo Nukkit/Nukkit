@@ -53,4 +53,8 @@ public class BlockCobblestone extends BlockSolid {
         }
     }
 
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

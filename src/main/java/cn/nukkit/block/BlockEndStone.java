@@ -52,4 +52,9 @@ public class BlockEndStone extends BlockSolid {
             return new Item[0];
         }
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

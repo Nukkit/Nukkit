@@ -160,4 +160,9 @@ public class BlockEnderChest extends BlockTransparent {
     public boolean canBePushed() {
         return false;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

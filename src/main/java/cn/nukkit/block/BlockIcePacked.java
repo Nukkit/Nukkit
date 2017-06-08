@@ -35,4 +35,9 @@ public class BlockIcePacked extends BlockIce {
     public int onUpdate(int type) {
         return 0; //not being melted
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

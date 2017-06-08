@@ -64,4 +64,9 @@ public class BlockCobweb extends BlockFlowable {
     public BlockColor getColor() {
         return BlockColor.CLOTH_BLOCK_COLOR;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

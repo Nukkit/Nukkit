@@ -14,6 +14,11 @@ public class BlockSlime extends BlockSolid {
     }
 
     @Override
+    public double getHardness() {
+        return 0;
+    }
+
+    @Override
     public String getName() {
         return "Slime Block";
     }

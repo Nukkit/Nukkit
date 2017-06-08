@@ -59,4 +59,10 @@ public class BlockOreQuartz extends BlockSolid {
     public int getDropExp() {
         return new NukkitRandom().nextRange(1, 5);
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
 }

@@ -77,4 +77,9 @@ public class BlockNetherPortal extends BlockFlowable {
     public boolean canBePushed() {
         return false;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

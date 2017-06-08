@@ -156,4 +156,9 @@ public class BlockBrewingStand extends BlockSolid {
 
         return super.getComparatorInputOverride();
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

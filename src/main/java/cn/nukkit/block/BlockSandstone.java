@@ -74,4 +74,9 @@ public class BlockSandstone extends BlockSolid {
     public BlockColor getColor() {
         return BlockColor.SAND_BLOCK_COLOR;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

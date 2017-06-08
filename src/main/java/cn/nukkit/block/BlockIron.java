@@ -59,4 +59,9 @@ public class BlockIron extends BlockSolid {
     public BlockColor getColor() {
         return BlockColor.IRON_BLOCK_COLOR;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

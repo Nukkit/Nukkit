@@ -44,4 +44,9 @@ public abstract class BlockTerracottaGlazed extends BlockSolid {
         this.meta = faces[player != null ? player.getDirection().getHorizontalIndex() : 0];
         return this.getLevel().setBlock(block, this, true, true);
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

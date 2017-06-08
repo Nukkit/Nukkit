@@ -235,4 +235,9 @@ public class BlockCauldron extends BlockSolid {
     public int getComparatorInputOverride() {
         return this.meta;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

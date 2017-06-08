@@ -152,4 +152,9 @@ public class BlockFurnaceBurning extends BlockSolid {
 
         return super.getComparatorInputOverride();
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

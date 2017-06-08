@@ -59,4 +59,9 @@ public class BlockGold extends BlockSolid {
     public BlockColor getColor() {
         return BlockColor.GOLD_BLOCK_COLOR;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

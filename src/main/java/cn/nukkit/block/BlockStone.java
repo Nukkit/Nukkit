@@ -71,4 +71,9 @@ public class BlockStone extends BlockSolid {
         }
     }
 
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
 }

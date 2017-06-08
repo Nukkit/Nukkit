@@ -75,4 +75,9 @@ public class BlockDoorIron extends BlockDoor {
     public boolean onActivate(Item item, Player player) {
         return false;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

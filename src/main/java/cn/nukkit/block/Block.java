@@ -6,6 +6,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.AxisAlignedBB;
@@ -14,10 +15,13 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
 import cn.nukkit.plugin.Plugin;
+import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockColor;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * author: MagicDroidX
@@ -190,6 +194,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int DRAGON_EGG = 122;
     public static final int REDSTONE_LAMP = 123;
     public static final int LIT_REDSTONE_LAMP = 124;
+    //Note: dropper CAN NOT BE HARVESTED WITH HAND -- canHarvestWithHand method should be overridden FALSE.
     public static final int DROPPER = 125;
     public static final int ACTIVATOR_RAIL = 126;
     public static final int COCOA = 127;
@@ -285,7 +290,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int DOUBLE_PURPUR_SLAB = 204;
     public static final int PURPUR_SLAB = 205;
     public static final int END_BRICKS = 206;
-
+    //Note: frosted ice CAN NOT BE HARVESTED WITH HAND -- canHarvestWithHand method should be overridden FALSE.
+    public static final int ICE_FROSTED = 207;
     public static final int END_ROD = 208;
     public static final int END_GATEWAY = 209;
 
@@ -669,6 +675,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return this.getLevel().setBlock(this, this, true, true);
     }
 
+    //http://minecraft.gamepedia.com/Breaking
+    public boolean canHarvestWithHand() {  //used for calculating breaking time
+        return true;
+    }
+
     public boolean isBreakable(Item item) {
         return true;
     }
@@ -807,6 +818,93 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         }
     }
 
+    private static double toolBreakTimeBonus0(
+            int toolType, int toolTier, boolean isWoolBlock, boolean isCobweb) {
+        if(toolType == ItemTool.TYPE_SWORD) return isCobweb ? 15.0: 1.0;
+        if(toolType == ItemTool.TYPE_SHEARS) return isWoolBlock ? 5.0: 15.0;
+        if(toolType == ItemTool.TYPE_NONE) return 1.0;
+        switch (toolTier) {
+            case ItemTool.TIER_WOODEN: return 2.0;
+            case ItemTool.TIER_STONE: return 4.0;
+            case ItemTool.TIER_IRON: return 6.0;
+            case ItemTool.TIER_DIAMOND: return 8.0;
+            case ItemTool.TIER_GOLD: return 12.0;
+            default: return 1.0;
+        }
+    }
+
+    private static double speedBonusByEfficiencyLore0(int efficiencyLoreLevel) {
+        if(efficiencyLoreLevel == 0) return 0;
+        return efficiencyLoreLevel * efficiencyLoreLevel + 1;
+    }
+
+    private static double speedRateByHasteLore0(int hasteLoreLevel) {
+        return 1.0 + (0.2 * hasteLoreLevel);
+    }
+
+    private static int toolType0(Item item) {
+        if(item.isSword())      return ItemTool.TYPE_SWORD      ;
+        if(item.isShovel())     return ItemTool.TYPE_SHOVEL     ;
+        if(item.isPickaxe())    return ItemTool.TYPE_PICKAXE    ;
+        if(item.isAxe())        return ItemTool.TYPE_AXE        ;
+        if(item.isShears())     return ItemTool.TYPE_SHEARS     ;
+        return ItemTool.TYPE_NONE;
+    }
+
+    private static boolean correctTool0(int blockToolType, Item item) {
+        return (blockToolType == ItemTool.TYPE_SWORD    && item.isSword()   ) ||
+                (blockToolType == ItemTool.TYPE_SHOVEL  && item.isShovel()  ) ||
+                (blockToolType == ItemTool.TYPE_PICKAXE && item.isPickaxe() ) ||
+                (blockToolType == ItemTool.TYPE_AXE     && item.isAxe()     ) ||
+                (blockToolType == ItemTool.TYPE_SHEARS  && item.isShears()  ) ||
+                blockToolType == ItemTool.TYPE_NONE;
+    }
+
+    //http://minecraft.gamepedia.com/Breaking
+    private static double breakTime0(double blockHardness, boolean correctTool, boolean canHarvestWithHand,
+                                     int blockId, int toolType, int toolTier, int efficiencyLoreLevel, int hasteEffectLevel,
+                                     boolean insideOfWaterWithoutAquaAffinity, boolean outOfWaterButNotOnGround) {
+        double baseTime = ((correctTool || canHarvestWithHand) ? 1.5 : 5.0) * blockHardness;
+        double speed = 1.0 / baseTime;
+        boolean isWoolBlock = blockId == Block.WOOL, isCobweb = blockId == Block.COBWEB;
+        if(correctTool) speed *= toolBreakTimeBonus0(toolType, toolTier, isWoolBlock, isCobweb);
+        speed += speedBonusByEfficiencyLore0(efficiencyLoreLevel);
+        speed *= speedRateByHasteLore0(hasteEffectLevel);
+        if(insideOfWaterWithoutAquaAffinity) speed *= 0.2;
+        if(outOfWaterButNotOnGround) speed *= 0.2;
+        return 1.0 / speed;
+    }
+
+    public double getBreakTime(Item item, Player player) {
+        Objects.requireNonNull(item, "getBreakTime: Item can not be null");
+        Objects.requireNonNull(player, "getBreakTime: Player can not be null");
+        double blockHardness = getHardness();
+        boolean correctTool = correctTool0(getToolType(), item);
+        boolean canHarvestWithHand = canHarvestWithHand();
+        int blockId = getId();
+        int itemToolType = toolType0(item);
+        int itemTier = item.getTier();
+        int efficiencyLoreLevel = Optional.ofNullable(item.getEnchantment(Enchantment.ID_EFFICIENCY))
+                .map(Enchantment::getLevel).orElse(0);
+        int hasteEffectLevel = Optional.ofNullable(player.getEffect(Effect.HASTE))
+                .map(Effect::getAmplifier).orElse(0);
+        boolean insideOfWaterWithoutAquaAffinity = player.isInsideOfWater() &&
+                Optional.ofNullable(player.getInventory().getHelmet().getEnchantment(Enchantment.ID_WATER_WORKER))
+                        .map(Enchantment::getLevel).map(l -> l >= 1).orElse(false);
+        boolean outOfWaterButNotOnGround = (!player.isInsideOfWater()) && (!player.isOnGround());
+
+//        System.out.println(String.format("H: %f, T: %b, ID: %d, TYPE: %d, TIER: %d, EFF: %d, HAS: %d, W: %b, O: %b",
+//                blockHardness, correctTool, blockId, itemToolType, itemTier,
+//                efficiencyLoreLevel, hasteEffectLevel, insideOfWaterWithoutAquaAffinity, outOfWaterButNotOnGround));
+
+        return breakTime0(blockHardness, correctTool, canHarvestWithHand, blockId, itemToolType, itemTier,
+                efficiencyLoreLevel, hasteEffectLevel, insideOfWaterWithoutAquaAffinity, outOfWaterButNotOnGround);
+    }
+
+    /**
+     * @deprecated This function is lack of Player class and is not accurate enough, use #getBreakTime(Item, Player)
+     */
+    @Deprecated
     public double getBreakTime(Item item) {
         double base = this.getHardness() * 1.5;
         if (this.canBeBrokenWith(item)) {

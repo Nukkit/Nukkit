@@ -59,4 +59,9 @@ public class BlockOreCoal extends BlockSolid {
     public int getDropExp() {
         return new NukkitRandom().nextRange(0, 2);
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

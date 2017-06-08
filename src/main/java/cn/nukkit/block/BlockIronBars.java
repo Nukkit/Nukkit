@@ -58,4 +58,9 @@ public class BlockIronBars extends BlockThin {
     public BlockColor getColor() {
         return BlockColor.IRON_BLOCK_COLOR;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

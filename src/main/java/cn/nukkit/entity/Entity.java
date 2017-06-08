@@ -572,7 +572,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public Effect getEffect(int effectId) {
-        return this.effects.containsKey(effectId) ? this.effects.get(effectId) : null;
+        return this.effects.getOrDefault(effectId, null);
     }
 
     public boolean hasEffect(int effectId) {

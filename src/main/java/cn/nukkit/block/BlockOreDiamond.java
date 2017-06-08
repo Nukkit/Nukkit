@@ -60,4 +60,9 @@ public class BlockOreDiamond extends BlockSolid {
     public int getDropExp() {
         return new NukkitRandom().nextRange(3, 7);
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

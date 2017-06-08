@@ -153,4 +153,9 @@ public class BlockHopper extends BlockTransparent {
     public Item toItem() {
         return new ItemHopper();
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

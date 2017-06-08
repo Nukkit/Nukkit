@@ -62,4 +62,9 @@ public class BlockObsidianGlowing extends BlockSolid {
     public boolean canBePushed() {
         return false;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

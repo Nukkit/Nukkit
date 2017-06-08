@@ -96,4 +96,9 @@ public class BlockDoubleSlabStone extends BlockSolid {
                 return BlockColor.STONE_BLOCK_COLOR;     //unreachable
         }
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

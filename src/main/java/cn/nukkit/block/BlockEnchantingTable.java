@@ -127,4 +127,9 @@ public class BlockEnchantingTable extends BlockTransparent {
 
         return true;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

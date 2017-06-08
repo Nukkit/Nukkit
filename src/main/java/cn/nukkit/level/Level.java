@@ -1772,7 +1772,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (player != null) {
-            double breakTime = target.getBreakTime(item); // TODO: fix
+            double breakTime = target.getBreakTime(item, player);
             // this in
             // block
             // class

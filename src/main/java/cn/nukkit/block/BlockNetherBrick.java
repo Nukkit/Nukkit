@@ -58,4 +58,9 @@ public class BlockNetherBrick extends BlockSolid {
     public BlockColor getColor() {
         return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

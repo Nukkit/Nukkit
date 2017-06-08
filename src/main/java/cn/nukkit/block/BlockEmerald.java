@@ -58,4 +58,9 @@ public class BlockEmerald extends BlockSolid {
     public BlockColor getColor() {
         return BlockColor.EMERALD_BLOCK_COLOR;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

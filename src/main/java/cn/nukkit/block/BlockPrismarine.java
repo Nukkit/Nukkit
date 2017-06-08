@@ -60,4 +60,8 @@ public class BlockPrismarine extends BlockSolid {
         }
     }
 
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

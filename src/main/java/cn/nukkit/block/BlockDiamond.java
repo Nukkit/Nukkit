@@ -58,4 +58,8 @@ public class BlockDiamond extends BlockSolid {
         return BlockColor.DIAMOND_BLOCK_COLOR;
     }
 
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }

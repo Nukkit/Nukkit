@@ -71,4 +71,9 @@ public class BlockRedstone extends BlockSolid {
     public int getWeakPower(BlockFace face) {
         return 15;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 }
