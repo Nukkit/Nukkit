@@ -18,7 +18,6 @@ public class BlockEndRod extends BlockTransparent {
 
     public BlockEndRod(int meta) {
         super(meta);
-        System.out.println(meta + "");
     }
 
     @Override
