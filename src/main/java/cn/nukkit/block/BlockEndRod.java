@@ -7,6 +7,7 @@ import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 
 /**
+ * http://minecraft.gamepedia.com/End_Rod
  *
  * @author PikyCZ
  */
@@ -32,18 +33,22 @@ public class BlockEndRod extends BlockTransparent {
 
     @Override
     public double getHardness() {
-        return 2;
+        return 0;
     }
 
     @Override
     public double getResistance() {
-        return 15;
+        return 0;
     }
 
     @Override
     public int getLightLevel() {
-
         return 14;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return true;
     }
 
     @Override
@@ -65,7 +70,7 @@ public class BlockEndRod extends BlockTransparent {
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         int[] faces = {0, 1, 3, 2, 5, 4};
-        this.meta = faces[player != null ? player.getDirection().getHorizontalIndex() : 0];
+        this.meta = faces[player != null ? face.getIndex() : 0];
         this.getLevel().setBlock(block, this, true, true);
 
         return true;
