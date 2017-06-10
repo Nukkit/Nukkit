@@ -138,30 +138,28 @@ public class BlockTrapdoor extends BlockTransparent {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if ((!target.isTransparent() || target.getId() == SLAB)) {
-            BlockFace facing;
-            boolean top;
+        BlockFace facing;
+        boolean top;
 
-            if (face.getAxis().isHorizontal() || player == null) {
-                facing = face;
-                top = fy > 0.5;
-            } else {
-                facing = player.getDirection().getOpposite();
-                top = face != BlockFace.UP;
-            }
-
-            int faceBit = getMetaFromFacing(facing);
-
-            this.meta |= faceBit;
-
-            if (top) {
-                this.meta |= 0x08;
-            }
-
-            this.getLevel().setBlock(block, this, true, true);
-            return true;
+        if (face.getAxis().isHorizontal() || player == null) {
+            facing = face;
+            top = fy > 0.5;
+        } else {
+            facing = player.getDirection().getOpposite();
+            top = face != BlockFace.UP;
         }
-        return false;
+
+        int[] faces = {2, 1, 3, 0};
+        int faceBit = faces[facing.getHorizontalIndex()];
+
+        this.meta |= faceBit;
+
+        if (top) {
+            this.meta |= 0x04;
+        }
+
+        this.getLevel().setBlock(block, this, true, true);
+        return true;
     }
 
     @Override
@@ -194,18 +192,12 @@ public class BlockTrapdoor extends BlockTransparent {
         }
 
 
-        int sideBit = this.meta & 0x03;
-        boolean top = isTop();
+        int sideBit = this.meta & 0x07;
         boolean open = isOpen();
 
-        this.meta = 0;
-        this.meta |= sideBit;
+        this.meta = sideBit;
 
-        if (!open) {
-            this.meta |= 0x04;
-        }
-
-        if (top) {
+        if (open) {
             this.meta |= 0x08;
         }
 
@@ -214,39 +206,16 @@ public class BlockTrapdoor extends BlockTransparent {
         return true;
     }
 
-    public static int getMetaFromFacing(BlockFace facing) {
-        switch (facing) {
-            case NORTH:
-                return 0;
-            case SOUTH:
-                return 1;
-            case WEST:
-                return 2;
-            case EAST:
-            default:
-                return 3;
-        }
-    }
-
     public BlockFace getFacing() {
-        switch (this.meta & 3) {
-            case 0:
-                return BlockFace.NORTH;
-            case 1:
-                return BlockFace.SOUTH;
-            case 2:
-                return BlockFace.WEST;
-            case 3:
-            default:
-                return BlockFace.EAST;
-        }
+        int[] faces = {3, 1, 0, 2};
+        return BlockFace.fromHorizontalIndex(faces[this.meta & 0x03]);
     }
 
     public boolean isOpen() {
-        return (this.meta & 0x04) != 0;
+        return (this.meta & 0x08) != 0;
     }
 
     public boolean isTop() {
-        return (this.meta & 8) != 0;
+        return (this.meta & 0x04) != 0;
     }
 }
