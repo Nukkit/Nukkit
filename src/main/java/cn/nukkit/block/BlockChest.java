@@ -169,13 +169,6 @@ public class BlockChest extends BlockTransparent {
     }
 
     @Override
-    public int[][] getDrops(Item item) {
-        return new int[][]{
-                {this.getId(), 0, 1}
-        };
-    }
-
-    @Override
     public BlockColor getColor() {
         return BlockColor.WOOD_BLOCK_COLOR;
     }

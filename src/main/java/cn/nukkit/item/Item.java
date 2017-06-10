@@ -311,6 +311,26 @@ public class Item implements Cloneable {
     public static final int END_ROD = 208;
     public static final int END_GATEWAY = 209;
 
+    public static final int SHULKER_BOX = 218;
+    public static final int PURPLE_GLAZED_TERRACOTTA = 219;
+    public static final int WHITE_GLAZED_TERRACOTTA = 220;
+    public static final int ORANGE_GLAZED_TERRACOTTA = 221;
+    public static final int MAGENTA_GLAZED_TERRACOTTA = 222;
+    public static final int LIGHT_BLUE_GLAZED_TERRACOTTA = 223;
+    public static final int YELLOW_GLAZED_TERRACOTTA = 224;
+    public static final int LIME_GLAZED_TERRACOTTA = 225;
+    public static final int PINK_GLAZED_TERRACOTTA = 226;
+    public static final int GRAY_GLAZED_TERRACOTTA = 227;
+    public static final int SILVER_GLAZED_TERRACOTTA = 228;
+    public static final int CYAN_GLAZED_TERRACOTTA = 229;
+    public static final int BLUE_GLAZED_TERRACOTTA = 231;
+    public static final int BROWN_GLAZED_TERRACOTTA = 232;
+    public static final int GREEN_GLAZED_TERRACOTTA = 233;
+    public static final int RED_GLAZED_TERRACOTTA = 234;
+    public static final int BLACK_GLAZED_TERRACOTTA = 235;
+    public static final int CONCRETE = 236;
+    public static final int CONCRETE_POWDER = 237;
+
     public static final int CHORUS_PLANT = 240;
     public static final int STAINED_GLASS = 241;
     public static final int PODZOL = 243;
@@ -963,6 +983,21 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.FENCE_GATE_DARK_OAK, 0));
         addCreativeItem(Item.get(Item.IRON_BARS, 0));
         addCreativeItem(Item.get(Item.BED, 0));
+        addCreativeItem(Item.get(Item.BED, 8));
+        addCreativeItem(Item.get(Item.BED, 7));
+        addCreativeItem(Item.get(Item.BED, 15));
+        addCreativeItem(Item.get(Item.BED, 12));
+        addCreativeItem(Item.get(Item.BED, 14));
+        addCreativeItem(Item.get(Item.BED, 1));
+        addCreativeItem(Item.get(Item.BED, 4));
+        addCreativeItem(Item.get(Item.BED, 5));
+        addCreativeItem(Item.get(Item.BED, 13));
+        addCreativeItem(Item.get(Item.BED, 9));
+        addCreativeItem(Item.get(Item.BED, 3));
+        addCreativeItem(Item.get(Item.BED, 11));
+        addCreativeItem(Item.get(Item.BED, 10));
+        addCreativeItem(Item.get(Item.BED, 2));
+        addCreativeItem(Item.get(Item.BED, 6));
         addCreativeItem(Item.get(Item.BOOKSHELF, 0));
         addCreativeItem(Item.get(Item.SIGN, 0));
         addCreativeItem(Item.get(Item.PAINTING, 0));
