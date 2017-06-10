@@ -242,9 +242,22 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
             byte[] buffer;
             if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
                 buffer = ((BatchPacket) packet).payload;
-            } else {
+            } else if (!needACK) {
                 this.server.batchPackets(new Player[]{player}, new DataPacket[]{packet}, true);
                 return null;
+            } else {
+                if (!packet.isEncoded) {
+                    packet.encode();
+                    packet.isEncoded = true;
+                }
+                buffer = packet.getBuffer();
+                try {
+                    buffer = Zlib.deflate(
+                            Binary.appendBytes(Binary.writeUnsignedVarInt(buffer.length), buffer),
+                            Server.getInstance().networkCompressionLevel);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
             String identifier = this.identifiers.get(player.rawHashCode());
             EncapsulatedPacket pk = null;
