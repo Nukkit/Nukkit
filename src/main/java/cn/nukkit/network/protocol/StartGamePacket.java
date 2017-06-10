@@ -41,7 +41,7 @@ public class StartGamePacket extends DataPacket {
     public String levelId = ""; //base64 string, usually the same as world folder name in vanilla
     public String worldName;
     public String premiumWorldTemplateId = "";
-    public boolean unknown;
+    public boolean unknown = false;
     public long currentTick;
 
     @Override
@@ -71,6 +71,7 @@ public class StartGamePacket extends DataPacket {
         this.putLFloat(this.lightningLevel);
         this.putBoolean(this.commandsEnabled);
         this.putBoolean(this.isTexturePacksRequired);
+        this.putUnsignedVarInt(this.ruleDatas.length);
         for (RuleData rule : this.ruleDatas) {
             this.putRuleData(rule);
         }
