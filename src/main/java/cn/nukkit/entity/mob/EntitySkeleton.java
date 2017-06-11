@@ -1,23 +1,24 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
 /**
- * Created by Dr. Nick Doran on 4/23/2017.
+ * @author PikyCZ
  */
-public class EntityZombie extends EntityMob {
+public class EntitySkeleton extends EntityMob {
 
-    public static final int NETWORK_ID = 32;
+    public static final int NETWORK_ID = 34;
 
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
 
-    public EntityZombie(FullChunk chunk, CompoundTag nbt) {
+    public EntitySkeleton(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
@@ -29,17 +30,12 @@ public class EntityZombie extends EntityMob {
 
     @Override
     public float getWidth() {
-        return 0.72f;
+        return 0.65f;
     }
 
     @Override
     public float getHeight() {
         return 1.8f;
-    }
-
-    @Override
-    public String getName() {
-        return "Zombie";
     }
 
     @Override
@@ -59,4 +55,10 @@ public class EntityZombie extends EntityMob {
 
         super.spawnTo(player);
     }
+
+    @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.BONE)};
+    }
+
 }

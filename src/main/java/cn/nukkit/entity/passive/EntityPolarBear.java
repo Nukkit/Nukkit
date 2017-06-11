@@ -7,49 +7,15 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
 /**
- * Author: BeYkeRYkt 
- * Nukkit Project
+ *
+ * @author PikyCZ
  */
-public class EntityRabbit extends EntityAnimal {
+public class EntityPolarBear extends EntityAnimal {
 
-    public static final int NETWORK_ID = 18;
+    public static final int NETWORK_ID = 28;
 
-    public EntityRabbit(FullChunk chunk, CompoundTag nbt) {
+    public EntityPolarBear(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-    }
-
-    @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.2f;
-        }
-        return 0.4f;
-    }
-
-    @Override
-    public float getHeight() {
-        if (this.isBaby()) {
-            return 0.25f;
-        }
-        return 0.5f;
-    }
-
-    @Override
-    public float getEyeHeight() {
-        if (isBaby()) {
-            return 0.25f;
-        }
-        return 0.5f;
-    }
-
-    @Override
-    public String getName() {
-        return this.getNameTag();
-    }
-
-    @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(Item.RAW_RABBIT), Item.get(Item.RABBIT_HIDE), Item.get(Item.RABBIT_FOOT)};
     }
 
     @Override
@@ -58,9 +24,38 @@ public class EntityRabbit extends EntityAnimal {
     }
 
     @Override
-    protected void initEntity() {
+    public float getWidth() {
+        if (this.isBaby()) {
+            return 0.65f;
+        }
+        return 1.3f;
+    }
+
+    @Override
+    public float getHeight() {
+        if (this.isBaby()) {
+            return 0.7f;
+        }
+        return 1.4f;
+    }
+
+    @Override
+    public float getEyeHeight() {
+        if (this.isBaby()) {
+            return 0.65f;
+        }
+        return 1.4f;
+    }
+
+    @Override
+    public void initEntity() {
         super.initEntity();
-        setMaxHealth(10);
+        this.setMaxHealth(30);
+    }
+
+    @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.RAW_FISH), Item.get(Item.RAW_SALMON)};
     }
 
     @Override

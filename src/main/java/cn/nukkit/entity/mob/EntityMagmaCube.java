@@ -6,40 +6,40 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
 /**
- * Created by Dr. Nick Doran on 4/23/2017.
+ * @author PikyCZ
  */
-public class EntityZombie extends EntityMob {
+public class EntityMagmaCube extends EntityMob {
 
-    public static final int NETWORK_ID = 32;
+    public static final int NETWORK_ID = 42;
 
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
 
-    public EntityZombie(FullChunk chunk, CompoundTag nbt) {
+    public EntityMagmaCube(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
     @Override
     protected void initEntity() {
         super.initEntity();
-        this.setMaxHealth(20);
+        this.setMaxHealth(16);
     }
 
     @Override
     public float getWidth() {
-        return 0.72f;
+        return 2.04f;
     }
 
     @Override
     public float getHeight() {
-        return 1.8f;
+        return 2.04f;
     }
 
     @Override
     public String getName() {
-        return "Zombie";
+        return "Magma Cube";
     }
 
     @Override

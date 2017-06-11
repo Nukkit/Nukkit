@@ -1,45 +1,51 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
 /**
- * Created by Dr. Nick Doran on 4/23/2017.
+ * @author PikyCZ
  */
-public class EntityZombie extends EntityMob {
+public class EntitySlime extends EntityMob {
 
-    public static final int NETWORK_ID = 32;
+    public static final int NETWORK_ID = 37;
 
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
 
-    public EntityZombie(FullChunk chunk, CompoundTag nbt) {
+    public EntitySlime(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
     @Override
     protected void initEntity() {
         super.initEntity();
-        this.setMaxHealth(20);
+        this.setMaxHealth(4);
     }
 
     @Override
     public float getWidth() {
-        return 0.72f;
+        return 1.02f;
     }
 
     @Override
     public float getHeight() {
-        return 1.8f;
+        return 1.02f;
     }
 
     @Override
     public String getName() {
-        return "Zombie";
+        return "Slime";
+    }
+
+    @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.SLIMEBALL)};
     }
 
     @Override
