@@ -73,7 +73,8 @@ public class BlockAnvil extends BlockFallable {
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (!target.isTransparent()) {
             int damage = this.getDamage();
-            this.meta = player != null ? player.getDirection().getHorizontalIndex() : 0;
+            int[] faces = {1, 2, 3, 0};
+            this.meta = faces[player != null ? player.getDirection().getHorizontalIndex() : 0];
             if (damage >= 4 && damage <= 7) {
                 this.meta |=  0x04;
             } else if (damage >= 8 && damage <= 11) {

@@ -240,7 +240,7 @@ public abstract class BlockDoor extends BlockTransparent {
             if (!blockUp.canBeReplaced() || blockDown.isTransparent()) {
                 return false;
             }
-            int[] faces = {3, 0, 1, 2};
+            int[] faces = {1, 2, 3, 0};
             int direction = faces[player != null ? player.getDirection().getHorizontalIndex() : 0];
 
             Block left = this.getSide(player.getDirection().rotateYCCW());
