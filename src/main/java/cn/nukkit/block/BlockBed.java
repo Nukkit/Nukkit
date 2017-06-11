@@ -124,15 +124,14 @@ public class BlockBed extends BlockTransparent {
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         Block down = this.down();
         if (!down.isTransparent()) {
-            int[] faces = {3, 4, 2, 5};
-            int d = player != null ? player.getDirection().getHorizontalIndex() : 0;
-            Block next = this.getSide(BlockFace.fromIndex(faces[((d + 3) % 4)]));
-            Block downNext = this.down();
+            Block next = this.getSide(player.getDirection());
+            Block downNext = next.down();
 
             if (next.canBeReplaced() && !downNext.isTransparent()) {
-                int meta = ((d + 3) % 4) & 0x03;
-                this.getLevel().setBlock(block, Block.get(this.getId(), meta), true, true);
-                this.getLevel().setBlock(next, Block.get(this.getId(), meta | 0x08), true, true);
+                int meta = player.getDirection().getHorizontalIndex();
+
+                this.getLevel().setBlock(block, Block.get(this.getId(), meta), false, true);
+                this.getLevel().setBlock(next, Block.get(this.getId(), meta | 0x08), false, true);
 
                 createBlockEntity(this, item.getDamage());
                 createBlockEntity(next, item.getDamage());
