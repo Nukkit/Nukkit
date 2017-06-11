@@ -20,6 +20,6 @@ public class BlockTerracottaGlazedSilver extends BlockTerracottaGlazed {
 
     @Override
     public String getName() {
-        return "Silver Glazed Terracotta";
+        return "Light Gray Glazed Terracotta";
     }
 }

@@ -558,24 +558,26 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[END_ROD] = BlockEndRod.class; //208
             list[END_GATEWAY] = BlockEndGateway.class; //209
 
-            list[BLACK_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[BLUE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlue.class;
-            list[BROWN_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[CYAN_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[GRAY_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[GREEN_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[LIGHT_BLUE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[LIME_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[MAGENTA_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[ORANGE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[PINK_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[PURPLE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[RED_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[SILVER_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[WHITE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[YELLOW_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class;
-            list[CONCRETE] = BlockConcrete.class;
-            list[CONCRETE_POWDER] = BlockConcretePowder.class;
+            //TODO: list[SHULKER_BOX] = BlockShulkerBox.class; //218
+            list[PURPLE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedPurple.class; //219
+            list[WHITE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedWhite.class; //220
+            list[ORANGE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedOrange.class; //221
+            list[MAGENTA_GLAZED_TERRACOTTA] = BlockTerracottaGlazedMagenta.class; //222
+            list[LIGHT_BLUE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedLightBlue.class; //223
+            list[YELLOW_GLAZED_TERRACOTTA] = BlockTerracottaGlazedYellow.class; //224
+            list[LIME_GLAZED_TERRACOTTA] = BlockTerracottaGlazedLime.class; //225
+            list[PINK_GLAZED_TERRACOTTA] = BlockTerracottaGlazedPink.class; //226
+            list[GRAY_GLAZED_TERRACOTTA] = BlockTerracottaGlazedGray.class; //227
+            list[SILVER_GLAZED_TERRACOTTA] = BlockTerracottaGlazedSilver.class; //228
+            list[CYAN_GLAZED_TERRACOTTA] = BlockTerracottaGlazedCyan.class; //229
+
+            list[BLUE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlue.class; //231
+            list[BROWN_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBrown.class; //232
+            list[GREEN_GLAZED_TERRACOTTA] = BlockTerracottaGlazedGreen.class; //233
+            list[RED_GLAZED_TERRACOTTA] = BlockTerracottaGlazedRed.class; //234
+            list[BLACK_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class; //235
+            list[CONCRETE] = BlockConcrete.class; //236
+            list[CONCRETE_POWDER] = BlockConcretePowder.class; //237
 
             //TODO: list[CHORUS_PLANT] = BlockChorusPlant.class; //240
             list[PODZOL] = BlockPodzol.class; //243

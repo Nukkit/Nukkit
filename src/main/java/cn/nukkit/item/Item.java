@@ -1046,6 +1046,24 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.LEAVES, 3));
         addCreativeItem(Item.get(Item.LEAVES2, 0));
         addCreativeItem(Item.get(Item.LEAVES2, 1));
+
+        addCreativeItem(Item.get(Item.WHITE_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.SILVER_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.GRAY_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.BLACK_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.BROWN_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.RED_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.ORANGE_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.LIME_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.GREEN_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.CYAN_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.LIGHT_BLUE_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.BLUE_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.PURPLE_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.MAGENTA_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.WHITE_GLAZED_TERRACOTTA));
+        addCreativeItem(Item.get(Item.PINK_GLAZED_TERRACOTTA));
+
         addCreativeItem(Item.get(Item.CAKE, 0));
 
         addCreativeItem(Item.get(Item.SKULL, ItemSkull.SKELETON_SKULL));
