@@ -8,38 +8,38 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 /**
  * @author PikyCZ
  */
-public class EntityZombie extends EntityMob {
+public class EntitySilverfish extends EntityMob {
 
-    public static final int NETWORK_ID = 32;
+    public static final int NETWORK_ID = 39;
 
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
 
-    public EntityZombie(FullChunk chunk, CompoundTag nbt) {
+    public EntitySilverfish(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
     @Override
-    protected void initEntity() {
-        super.initEntity();
-        this.setMaxHealth(20);
+    public String getName() {
+        return "Silver fish";
     }
 
     @Override
     public float getWidth() {
-        return 0.72f;
+        return 0.45f;
     }
 
     @Override
     public float getHeight() {
-        return 1.8f;
+        return 0.3f;
     }
 
     @Override
-    public String getName() {
-        return "Zombie";
+    public void initEntity() {
+        super.initEntity();
+        this.setMaxHealth(8);
     }
 
     @Override

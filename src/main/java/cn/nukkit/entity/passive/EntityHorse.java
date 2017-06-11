@@ -7,49 +7,15 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
 /**
- * Author: BeYkeRYkt 
- * Nukkit Project
+ *
+ * @author PikyCZ
  */
-public class EntityRabbit extends EntityAnimal {
+public class EntityHorse extends EntityAnimal {
 
-    public static final int NETWORK_ID = 18;
+    public static final int NETWORK_ID = 23;
 
-    public EntityRabbit(FullChunk chunk, CompoundTag nbt) {
+    public EntityHorse(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-    }
-
-    @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.2f;
-        }
-        return 0.4f;
-    }
-
-    @Override
-    public float getHeight() {
-        if (this.isBaby()) {
-            return 0.25f;
-        }
-        return 0.5f;
-    }
-
-    @Override
-    public float getEyeHeight() {
-        if (isBaby()) {
-            return 0.25f;
-        }
-        return 0.5f;
-    }
-
-    @Override
-    public String getName() {
-        return this.getNameTag();
-    }
-
-    @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(Item.RAW_RABBIT), Item.get(Item.RABBIT_HIDE), Item.get(Item.RABBIT_FOOT)};
     }
 
     @Override
@@ -58,9 +24,30 @@ public class EntityRabbit extends EntityAnimal {
     }
 
     @Override
-    protected void initEntity() {
+    public float getWidth() {
+        if (this.isBaby()) {
+            return 0.6982f;
+        }
+        return 1.3965f;
+    }
+
+    @Override
+    public float getHeight() {
+        if (this.isBaby()) {
+            return 0.8f;
+        }
+        return 1.6f;
+    }
+
+    @Override
+    public void initEntity() {
         super.initEntity();
-        setMaxHealth(10);
+        this.setMaxHealth(15);
+    }
+
+    @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.LEATHER)};
     }
 
     @Override

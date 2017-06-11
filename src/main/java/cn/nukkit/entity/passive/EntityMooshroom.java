@@ -7,39 +7,36 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
 /**
- * Author: BeYkeRYkt 
+ * Author: BeYkeRYkt
  * Nukkit Project
  */
-public class EntityRabbit extends EntityAnimal {
+public class EntityMooshroom extends EntityAnimal {
 
-    public static final int NETWORK_ID = 18;
+    public static final int NETWORK_ID = 16;
 
-    public EntityRabbit(FullChunk chunk, CompoundTag nbt) {
+    public EntityMooshroom(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
     @Override
     public float getWidth() {
-        if (this.isBaby()) {
-            return 0.2f;
-        }
-        return 0.4f;
+        return 0.9f;
     }
 
     @Override
     public float getHeight() {
-        if (this.isBaby()) {
-            return 0.25f;
+        if (isBaby()) {
+            return 0.65f;
         }
-        return 0.5f;
+        return 1.3f;
     }
 
     @Override
     public float getEyeHeight() {
         if (isBaby()) {
-            return 0.25f;
+            return 0.65f;
         }
-        return 0.5f;
+        return 1.2f;
     }
 
     @Override
@@ -49,7 +46,7 @@ public class EntityRabbit extends EntityAnimal {
 
     @Override
     public Item[] getDrops() {
-        return new Item[]{Item.get(Item.RAW_RABBIT), Item.get(Item.RABBIT_HIDE), Item.get(Item.RABBIT_FOOT)};
+        return new Item[]{Item.get(Item.LEATHER), Item.get(Item.RAW_BEEF)};
     }
 
     @Override
@@ -62,7 +59,7 @@ public class EntityRabbit extends EntityAnimal {
         super.initEntity();
         setMaxHealth(10);
     }
-
+    
     @Override
     public void spawnTo(Player player) {
         AddEntityPacket pk = new AddEntityPacket();

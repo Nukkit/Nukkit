@@ -8,16 +8,16 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 /**
  * @author PikyCZ
  */
-public class EntityZombie extends EntityMob {
+public class EntityHusk extends EntityMob {
 
-    public static final int NETWORK_ID = 32;
+    public static final int NETWORK_ID = 47;
 
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
 
-    public EntityZombie(FullChunk chunk, CompoundTag nbt) {
+    public EntityHusk(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
@@ -39,7 +39,7 @@ public class EntityZombie extends EntityMob {
 
     @Override
     public String getName() {
-        return "Zombie";
+        return "Hask";
     }
 
     @Override
