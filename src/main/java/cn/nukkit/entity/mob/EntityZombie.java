@@ -6,7 +6,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
 /**
- * @author PikyCZ
+ * Created by Dr. Nick Doran on 4/23/2017.
  */
 public class EntityZombie extends EntityMob {
 
