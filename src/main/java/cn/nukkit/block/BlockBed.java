@@ -134,10 +134,8 @@ public class BlockBed extends BlockTransparent {
                 this.getLevel().setBlock(block, Block.get(this.getId(), meta), true, true);
                 this.getLevel().setBlock(next, Block.get(this.getId(), meta | 0x08), true, true);
 
-                int color = item.getCustomBlockData().getInt("color");
-
-                createBlockEntity(this, color);
-                createBlockEntity(next, color);
+                createBlockEntity(this, item.getDamage());
+                createBlockEntity(next, item.getDamage());
                 return true;
             }
         }
@@ -187,7 +185,7 @@ public class BlockBed extends BlockTransparent {
 
     @Override
     public Item toItem() {
-        return new ItemBed().setCustomBlockData(new CompoundTag().putInt("color", this.getDyeColor().getWoolData()));
+        return new ItemBed(this.getDyeColor().getWoolData());
     }
 
     @Override

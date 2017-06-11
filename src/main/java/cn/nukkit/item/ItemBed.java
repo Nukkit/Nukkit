@@ -17,7 +17,7 @@ public class ItemBed extends Item {
     }
 
     public ItemBed(Integer meta, int count) {
-        super(BED, 0, count, "BlockBed");
+        super(BED, meta, count, "Bed");
         this.block = new BlockBed();
     }
 

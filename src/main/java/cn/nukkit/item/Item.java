@@ -982,10 +982,9 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.FENCE_GATE_ACACIA, 0));
         addCreativeItem(Item.get(Item.FENCE_GATE_DARK_OAK, 0));
         addCreativeItem(Item.get(Item.IRON_BARS, 0));
-        CompoundTag bed = new CompoundTag();
         int[] dyeColors = {0, 8, 7, 15, 12, 14, 1, 4, 5, 13, 9, 3, 11, 10, 2, 6};
         for (int color : dyeColors) {
-            addCreativeItem(Item.get(Item.BED).setCustomBlockData(bed.putInt("color", color)));
+            addCreativeItem(Item.get(Item.BED, color));
         }
         addCreativeItem(Item.get(Item.BOOKSHELF, 0));
         addCreativeItem(Item.get(Item.SIGN, 0));
