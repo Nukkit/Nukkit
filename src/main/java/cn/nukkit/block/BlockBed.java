@@ -11,6 +11,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.TextFormat;
 
 /**
@@ -133,8 +134,10 @@ public class BlockBed extends BlockTransparent {
                 this.getLevel().setBlock(block, Block.get(this.getId(), meta), true, true);
                 this.getLevel().setBlock(next, Block.get(this.getId(), meta | 0x08), true, true);
 
-                createBlockEntity(this, item.getDamage());
-                createBlockEntity(next, item.getDamage());
+                int color = item.getCustomBlockData().getInt("color");
+
+                createBlockEntity(this, color);
+                createBlockEntity(next, color);
                 return true;
             }
         }
@@ -184,11 +187,20 @@ public class BlockBed extends BlockTransparent {
 
     @Override
     public Item toItem() {
-        return new ItemBed(); //TODO: color
+        return new ItemBed().setCustomBlockData(new CompoundTag().putInt("color", this.getDyeColor().getWoolData()));
     }
 
     @Override
     public BlockColor getColor() {
-        return BlockColor.CLOTH_BLOCK_COLOR;
+        return this.getDyeColor().getColor();
+    }
+
+    public DyeColor getDyeColor() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (blockEntity instanceof BlockEntityBed) {
+            return ((BlockEntityBed) blockEntity).getDyeColor();
+        }
+        return DyeColor.WHITE;
     }
 }

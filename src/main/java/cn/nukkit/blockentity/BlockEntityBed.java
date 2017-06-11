@@ -3,6 +3,7 @@ package cn.nukkit.blockentity;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.DyeColor;
 
 /**
  * Created by CreeperFace on 2.6.2017.
@@ -15,7 +16,7 @@ public class BlockEntityBed extends BlockEntitySpawnable {
         super(chunk, nbt);
 
         if (!this.namedTag.contains("color")) {
-            this.namedTag.putByte("color", 14);
+            this.namedTag.putByte("color", 0);
         }
 
         this.color = this.namedTag.getByte("color");
@@ -40,5 +41,9 @@ public class BlockEntityBed extends BlockEntitySpawnable {
                 .putInt("y", (int) this.y)
                 .putInt("z", (int) this.z)
                 .putByte("color", this.color);
+    }
+
+    public DyeColor getDyeColor() {
+        return DyeColor.getByWoolData(color);
     }
 }
