@@ -1953,6 +1953,7 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.PISTON_ARM, BlockEntityPistonArm.class);
         BlockEntity.registerBlockEntity(BlockEntity.COMPARATOR, BlockEntityComparator.class);
         BlockEntity.registerBlockEntity(BlockEntity.HOPPER, BlockEntityHopper.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BED, BlockEntityBed.class);
     }
 
     public static Server getInstance() {
