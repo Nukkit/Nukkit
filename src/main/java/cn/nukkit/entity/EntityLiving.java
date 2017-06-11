@@ -11,7 +11,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.ShortTag;
+import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockIterator;
@@ -52,15 +52,15 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         super.initEntity();
 
         if (this.namedTag.contains("HealF")) {
-            this.namedTag.putShort("Health", this.namedTag.getShort("HealF"));
+            this.namedTag.putFloat("Health", this.namedTag.getShort("HealF"));
             this.namedTag.remove("HealF");
         }
 
-        if (!this.namedTag.contains("Health") || !(this.namedTag.get("Health") instanceof ShortTag)) {
-            this.namedTag.putShort("Health", this.getMaxHealth());
+        if (!this.namedTag.contains("Health") || !(this.namedTag.get("Health") instanceof FloatTag)) {
+            this.namedTag.putFloat("Health", this.getMaxHealth());
         }
 
-        this.setHealth(this.namedTag.getShort("Health"));
+        this.setHealth(this.namedTag.getFloat("Health"));
     }
 
     @Override
@@ -78,7 +78,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     @Override
     public void saveNBT() {
         super.saveNBT();
-        this.namedTag.putShort("Health", (int) this.getHealth());
+        this.namedTag.putFloat("Health", this.getHealth());
     }
 
     public boolean hasLineOfSight(Entity entity) {
