@@ -1146,36 +1146,44 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.IRON_HORSE_ARMOR, 0));
         addCreativeItem(Item.get(Item.GOLD_HORSE_ARMOR, 0));
         addCreativeItem(Item.get(Item.DIAMOND_HORSE_ARMOR, 0));
+        
         addCreativeItem(Item.get(Item.SPAWN_EGG, 10)); //Chicken
         addCreativeItem(Item.get(Item.SPAWN_EGG, 11)); //Cow
         addCreativeItem(Item.get(Item.SPAWN_EGG, 12)); //Pig
         addCreativeItem(Item.get(Item.SPAWN_EGG, 13)); //Sheep
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 14)); //Wolf
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 18)); //Rabbit
         addCreativeItem(Item.get(Item.SPAWN_EGG, 15)); //Villager
-        /*
         addCreativeItem(Item.get(Item.SPAWN_EGG, 16)); //Mooshroom
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 19)); //Bat
-        */
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 17)); //Squid
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 19)); //Bat 
+		//addCreativeItem(Item.get(Item.SPAWN_EGG, 20)); //Iron Golem
+        //addCreativeItem(Item.get(Item.SPAWN_EGG, 21)); //Snow Golem
         addCreativeItem(Item.get(Item.SPAWN_EGG, 22)); //Ocelot
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 33)); //Creeper
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 23)); //Horse
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 24)); //Donkey
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 25)); //Mule
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 26)); //SkeletonHorse
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 27)); //ZombieHorse
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 28)); //PolarBear
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 29)); //Llama
         addCreativeItem(Item.get(Item.SPAWN_EGG, 32)); //Zombie
-        /*
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 38)); //Enderman
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 39)); //Silverfish
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 33)); //Creeper
         addCreativeItem(Item.get(Item.SPAWN_EGG, 34)); //Skeleton
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 37)); //Slime
         addCreativeItem(Item.get(Item.SPAWN_EGG, 35)); //Spider
         addCreativeItem(Item.get(Item.SPAWN_EGG, 36)); //Zombie Pigman
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 17)); //Squid
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 37)); //Slime
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 38)); //Enderman
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 39)); //Silverfish
         addCreativeItem(Item.get(Item.SPAWN_EGG, 40)); //Cave spider
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 42)); //Magma Cube
         addCreativeItem(Item.get(Item.SPAWN_EGG, 41)); //Ghast
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 42)); //MagmaCube
         addCreativeItem(Item.get(Item.SPAWN_EGG, 43)); //Blaze
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 20)); //Iron Golem
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 21)); //Snow Golem
-        addCreativeItem(Item.get(Item.SPAWN_EGG, 44)); //Zombie Villager
-        */
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 45)); //Witch
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 46)); //Stray
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 47)); //Husk
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 49)); //Guardian
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 50)); //ElderGuardian
+        addCreativeItem(Item.get(Item.SPAWN_EGG, 54)); //Shulker
+        
         addCreativeItem(Item.get(Item.FIRE_CHARGE, 0));
         addCreativeItem(Item.get(Item.WOODEN_SWORD));
         addCreativeItem(Item.get(Item.WOODEN_HOE));
