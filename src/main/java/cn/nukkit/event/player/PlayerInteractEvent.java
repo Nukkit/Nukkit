@@ -21,12 +21,6 @@ public class PlayerInteractEvent extends PlayerEvent implements Cancellable {
         return handlers;
     }
 
-    public static final int LEFT_CLICK_BLOCK = 0;
-    public static final int RIGHT_CLICK_BLOCK = 1;
-    public static final int LEFT_CLICK_AIR = 2;
-    public static final int RIGHT_CLICK_AIR = 3;
-    public static final int PHYSICAL = 4;
-
     protected final Block blockTouched;
 
     protected final Vector3 touchVector;
