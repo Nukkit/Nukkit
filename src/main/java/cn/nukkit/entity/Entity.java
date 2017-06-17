@@ -1247,19 +1247,18 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         if (fallDistance > 0.75) {
-            BlockVector3 v = new BlockVector3(getFloorX(), getFloorY() - 1, getFloorZ());
-            int down = this.level.getBlockIdAt(v.x, v.y, v.z);
+            Block down = this.level.getBlock(this.floor().down());
 
-            if (down == Item.FARMLAND) {
+            if (down.getId() == Item.FARMLAND) {
                 if (this instanceof Player) {
                     Player p = (Player) this;
-                    PlayerInteractEvent ev = new PlayerInteractEvent(p, p.getInventory().getItemInHand(), this.temporalVector.setComponents(v.x, v.y, v.z), null, Action.PHYSICAL);
+                    PlayerInteractEvent ev = new PlayerInteractEvent(p, p.getInventory().getItemInHand(), down, null, Action.PHYSICAL);
                     this.server.getPluginManager().callEvent(ev);
                     if (ev.isCancelled()) {
                         return;
                     }
                 }
-                this.level.setBlock(this.temporalVector.setComponents(v.x, v.y, v.z), new BlockDirt(), true, true);
+                this.level.setBlock(down, new BlockDirt(), true, true);
             }
         }
     }
