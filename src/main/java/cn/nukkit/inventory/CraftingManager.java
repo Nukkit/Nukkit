@@ -25,6 +25,62 @@ public class CraftingManager {
     private static int RECIPE_COUNT = 0;
 
     public CraftingManager() {
+        /*try { //TODO: json
+            Utils.writeFile(Server.getInstance().getDataPath() + "recipes.json", Server.class.getClassLoader().getResourceAsStream("recipes.json"));
+        } catch (IOException e) {
+            MainLogger.getLogger().logException(e);
+        }
+
+
+        Config recipes = new Config(Server.getInstance().getDataPath() + "recipes.json", Config.JSON);
+
+        MainLogger.getLogger().info("Loading recipes...");
+        for (Object obj : recipes.getAll().values()) {
+            ConfigSection recipe;
+            if (obj instanceof ConfigSection) {
+                recipe = (ConfigSection) obj;
+            } else {
+                continue;
+            }
+
+
+            switch (recipe.getInt("type")) {
+                case 0:
+                    // TODO: handle multiple result items
+                    Map<String, Object> first = recipe.getMapList("output").get(0);
+                    ShapelessRecipe result = new ShapelessRecipe(Item.get((int) first.get("id"), (int) first.get("damage"), (int) first.get("count"), first.get("nbt").toString().getBytes()));
+                    for (Map<String, Object> ingredient : recipe.getMapList("input")) {
+                        result.addIngredient(Item.get((int) ingredient.get("id"), (int) ingredient.get("damage"), (int) ingredient.get("count"), ingredient.get("nbt").toString().getBytes()));
+                    }
+                    this.registerRecipe(result);
+                    break;
+                case 1:
+                    // TODO: handle multiple result items
+                    first = recipe.getMapList("output").get(0);
+                    ShapedRecipe shapedRecipe = new ShapedRecipe(Item.get((int) first.get("id"), (int) first.get("damage"), (int) first.get("count"), first.get("nbt").toString().getBytes()));
+                    List<List<Map<String, Object>>> shape = Utils.toChunk(recipe.getList("input"), recipe.getInt("width"));
+
+                    for (int y = 0; y < shape.size(); y++) {
+                        List<Map<String, Object>> row = shape.get(y);
+
+                        for (int x = 0; x < row.size(); x++) {
+                            Map<String, Object> ingredient = row.get(x);
+                            shapedRecipe.addIngredient(x, y, Item.get((int) ingredient.get("id"), (int) ingredient.get("damage"), (int) ingredient.get("count"), ingredient.get("nbt").toString().getBytes()));
+                        }
+                    }
+                    this.registerRecipe(shapedRecipe);
+                    break;
+                case 2:
+                case 3:
+                    ConfigSection resultMap = recipe.getSection("output");
+                    Item resultItem = Item.get(resultMap.getInt("id"), resultMap.getInt("damage"), resultMap.getInt("count"), resultMap.getString("nbt").getBytes());
+                    this.registerRecipe(new FurnaceRecipe(resultItem, Item.get(recipe.getInt("id"), recipe.getInt("damage", -1), 1)));
+                    break;
+                default:
+                    break;
+            }
+        }*/
+
         this.registerFurnace();
         this.registerBrewing();
         this.registerDyes();

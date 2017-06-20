@@ -4422,15 +4422,31 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
 
+            if (this.isLevelChange) { //TODO: remove this
+                PlayStatusPacket statusPacket0 = new PlayStatusPacket();//Weather
+                this.getLevel().sendWeather(this);
+                //Update time
+                this.getLevel().sendTime(this);
+                statusPacket0.status = PlayStatusPacket.PLAYER_SPAWN;
+                this.dataPacket(statusPacket0);
+
+                //Weather
+                this.getLevel().sendWeather(this);
+                //Update time
+                this.getLevel().sendTime(this);
+            }
+
             this.spawnToAll();
+            this.isLevelChange = false;
             this.forceMovement = this.teleportPosition;
             this.teleportPosition = null;
-
             return true;
         }
 
         return false;
     }
+
+    private boolean isLevelChange = false;
 
     @Override
     public boolean teleport(Location location, TeleportCause cause) {
@@ -4457,7 +4473,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        Position oldPos = this.getPosition();
         if (super.teleport(to, null)) { // null to prevent fire of duplicate EntityTeleportEvent
 
             for (Inventory window : new ArrayList<>(this.windowIndex.values())) {
@@ -4481,10 +4496,56 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.getLevel().sendWeather(this);
             //Update time
             this.getLevel().sendTime(this);
+
+            if (from.getLevel().getId() != to.level.getId()) {
+                if (this.spawned && this.isAlive()) { //probably
+                    //TODO: remove this in future version
+                    this.isLevelChange = true;
+                    this.nextChunkOrderRun = 10000;
+
+                    ChangeDimensionPacket changeDimensionPacket1 = new ChangeDimensionPacket();
+                    changeDimensionPacket1.dimension = 1;
+                    changeDimensionPacket1.x = (float) this.getX();
+                    changeDimensionPacket1.y = (float) this.getY();
+                    changeDimensionPacket1.z = (float) this.getZ();
+                    this.dataPacket(changeDimensionPacket1);
+
+                    this.forceSendEmptyChunks();
+                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
+                        PlayStatusPacket statusPacket0 = new PlayStatusPacket();
+                        statusPacket0.status = PlayStatusPacket.PLAYER_SPAWN;
+                        dataPacket(statusPacket0);
+                    }, 8);
+
+                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
+                        ChangeDimensionPacket changeDimensionPacket = new ChangeDimensionPacket();
+                        changeDimensionPacket.dimension = 0;
+                        changeDimensionPacket.x = (float) this.getX();
+                        changeDimensionPacket.y = (float) this.getY();
+                        changeDimensionPacket.z = (float) this.getZ();
+                        dataPacket(changeDimensionPacket);
+                        nextChunkOrderRun = 0;
+                    }, 9);
+                }
+            }
             return true;
         }
 
         return false;
+    }
+
+    protected void forceSendEmptyChunks() {
+        int chunkPositionX = this.getFloorX() >> 4;
+        int chunkPositionZ = this.getFloorZ() >> 4;
+        for (int x = -3; x < 3; x++) {
+            for (int z = -3; z < 3; z++) {
+                FullChunkDataPacket chunk = new FullChunkDataPacket();
+                chunk.chunkX = chunkPositionX + x;
+                chunk.chunkZ = chunkPositionZ + z;
+                chunk.data = new byte[0];
+                this.dataPacket(chunk);
+            }
+        }
     }
 
     public void teleportImmediate(Location location) {
