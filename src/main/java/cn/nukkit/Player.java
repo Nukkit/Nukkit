@@ -4498,7 +4498,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.getLevel().sendTime(this);
 
             if (from.getLevel().getId() != to.level.getId()) {
-                if (this.spawned && this.isAlive()) { //probably
+                if (this.spawned) {
                     //TODO: remove this in future version
                     this.isLevelChange = true;
                     this.nextChunkOrderRun = 10000;
