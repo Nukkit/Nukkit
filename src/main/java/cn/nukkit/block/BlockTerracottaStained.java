@@ -6,35 +6,31 @@ import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DyeColor;
 
 /**
- * Created on 2015/11/24 by xtypr.
+ * Created on 2015/12/2 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockClayHardened extends BlockSolid {
-    public BlockClayHardened() {
+public class BlockTerracottaStained extends BlockSolid {
+
+    public BlockTerracottaStained() {
         this(0);
     }
 
-    public BlockClayHardened(int meta) {
-        super(0);
+    public BlockTerracottaStained(int meta) {
+        super(meta);
     }
 
-    public BlockClayHardened(DyeColor dyeColor) {
+    public BlockTerracottaStained(DyeColor dyeColor) {
         this(dyeColor.getWoolData());
     }
 
     @Override
-    public int getId() {
-        return HARDENED_CLAY;
-    }
-
-    @Override
     public String getName() {
-        return "Hardened Clay";
+        return getDyeColor().getName() + " Terracotta";
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public int getId() {
+        return STAINED_TERRACOTTA;
     }
 
     @Override
@@ -44,15 +40,18 @@ public class BlockClayHardened extends BlockSolid {
 
     @Override
     public double getResistance() {
-        return 7;
+        return 0.75;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
-            return new Item[]{
-                    toItem()
-            };
+            return new Item[]{toItem()};
         } else {
             return new Item[0];
         }
@@ -66,4 +65,5 @@ public class BlockClayHardened extends BlockSolid {
     public DyeColor getDyeColor() {
         return DyeColor.getByWoolData(meta);
     }
+
 }

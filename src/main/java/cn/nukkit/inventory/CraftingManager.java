@@ -882,7 +882,7 @@ public class CraftingManager {
         this.registerRecipe(new FurnaceRecipe(Item.get(Item.BAKED_POTATO, 0, 1), Item.get(Item.POTATO, null, 1)));
         this.registerRecipe(new FurnaceRecipe(Item.get(Item.COOKED_MUTTON, 0, 1), Item.get(Item.RAW_MUTTON, null, 1)));
 
-        this.registerRecipe(new FurnaceRecipe(Item.get(Item.HARDENED_CLAY, 0, 1), Item.get(Item.CLAY_BLOCK, null, 1)));
+        this.registerRecipe(new FurnaceRecipe(Item.get(Item.TERRACOTTA, 0, 1), Item.get(Item.CLAY_BLOCK, null, 1)));
     }
 
     protected void registerBrewing() {
@@ -1133,11 +1133,11 @@ public class CraftingManager {
                     "DW"
             )).setIngredient('D', Item.get(Item.DYE, i, 1)).setIngredient('W', Item.get(Item.WOOL, 0, 1)));
 
-            this.registerRecipe((new BigShapedRecipe(Item.get(Item.STAINED_CLAY, 15 - i, 8),
+            this.registerRecipe((new BigShapedRecipe(Item.get(Item.STAINED_TERRACOTTA, 15 - i, 8),
                     "CCC",
                     "CDC",
                     "CCC"
-            )).setIngredient('D', Item.get(Item.DYE, i, 1)).setIngredient('C', Item.get(Item.HARDENED_CLAY, 0, 1)));
+            )).setIngredient('D', Item.get(Item.DYE, i, 1)).setIngredient('C', Item.get(Item.TERRACOTTA, 0, 1)));
             //TODO: add glass things?
 
             this.registerRecipe((new ShapedRecipe(Item.get(Item.CARPET, i, 3),
