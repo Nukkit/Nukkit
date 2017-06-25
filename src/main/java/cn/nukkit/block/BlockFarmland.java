@@ -76,18 +76,23 @@ public class BlockFarmland extends BlockTransparent {
 
             boolean found = false;
 
-            for (int x = (int) this.x - 4; x <= this.x + 4; x++) {
-                for (int z = (int) this.z - 4; z <= this.z + 4; z++) {
-                    for (int y = (int) this.y; y <= this.y + 1; y++) {
-                        if (z == this.z && x == this.x && y == this.y) {
-                            continue;
-                        }
+            if (this.level.isRaining()) {
+                found = true;
+            } else {
+                for (int x = (int) this.x - 4; x <= this.x + 4; x++) {
+                    for (int z = (int) this.z - 4; z <= this.z + 4; z++) {
+                        for (int y = (int) this.y; y <= this.y + 1; y++) {
+                            if (z == this.z && x == this.x && y == this.y) {
+                                continue;
+                            }
 
-                        Block block = this.level.getBlock(v.setComponents(x, y, z));
+                            v.setComponents(x, y, z);
+                            int block = this.level.getBlockIdAt(v.getFloorX(), v.getFloorY(), v.getFloorZ());
 
-                        if (block instanceof BlockWater) {
-                            found = true;
-                            break;
+                            if (block == WATER || block == STILL_WATER) {
+                                found = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -95,10 +100,19 @@ public class BlockFarmland extends BlockTransparent {
 
             Block block = this.level.getBlock(v.setComponents(x, y - 1, z));
             if (found || block instanceof BlockWater) {
+                if (this.meta < 7) {
+                    this.meta = 7;
+                    this.level.setBlock(this, this, true, false);
+                }
                 return Level.BLOCK_UPDATE_RANDOM;
             }
 
-            this.level.setBlock(this, new BlockDirt(), true, true);
+            if (this.meta > 0) {
+                this.meta--;
+                this.level.setBlock(this, this, true, false);
+            } else {
+                this.level.setBlock(this, new BlockDirt(), true, true);
+            }
 
             return Level.BLOCK_UPDATE_RANDOM;
         }
