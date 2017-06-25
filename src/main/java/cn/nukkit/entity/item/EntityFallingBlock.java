@@ -2,8 +2,6 @@ package cn.nukkit.entity.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockAir;
-import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.event.entity.EntityBlockChangeEvent;
@@ -133,8 +131,10 @@ public class EntityFallingBlock extends Entity {
             if (onGround) {
                 kill();
                 Block block = level.getBlock(pos);
-                if (block.getId() > 0 && block.isTransparent() & !block.canBeReplaced()) {
-                    getLevel().dropItem(this, Item.get(this.getBlock(), this.getDamage(), 1));
+                if (block.getId() > 0 && block.isTransparent() && !block.canBeReplaced()) {
+                    if (this.level.getGameRules().getBoolean("doEntityDrops")) {
+                        getLevel().dropItem(this, Item.get(this.getBlock(), this.getDamage(), 1));
+                    }
                 } else {
                     EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, block, Block.get(getBlock(), getDamage()));
                     server.getPluginManager().callEvent(event);

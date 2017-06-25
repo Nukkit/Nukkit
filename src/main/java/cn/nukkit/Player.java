@@ -1595,6 +1595,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.entityBaseTick(tickDiff);
 
+            if (this.getServer().getDifficulty() == 0 && this.level.getGameRules().getBoolean("naturalRegeneration")) {
+                if (this.getHealth() < this.getMaxHealth() && this.ticksLived % 20 == 0) {
+                    this.heal(1);
+                }
+
+                PlayerFood foodData = this.getFoodData();
+
+                if (foodData.getLevel() < 20 && this.ticksLived % 10 == 0) {
+                    foodData.addFoodLevel(1, 0);
+                }
+            }
+
             if (this.isOnFire() && this.lastUpdate % 10 == 0) {
                 if (this.isCreative() && !this.isInsideOfFire()) {
                     this.extinguish();
@@ -4019,128 +4031,137 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
+        boolean showMessages = this.level.getGameRules().getBoolean("showDeathMessages");
         String message = "death.attack.generic";
 
         List<String> params = new ArrayList<>();
         params.add(this.getDisplayName());
+        if (showMessages) {
 
-        EntityDamageEvent cause = this.getLastDamageCause();
+            EntityDamageEvent cause = this.getLastDamageCause();
 
-        switch (cause == null ? DamageCause.CUSTOM : cause.getCause()) {
-            case ENTITY_ATTACK:
-                if (cause instanceof EntityDamageByEntityEvent) {
-                    Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
-                    killer = e;
-                    if (e instanceof Player) {
-                        message = "death.attack.player";
-                        params.add(((Player) e).getDisplayName());
-                        break;
-                    } else if (e instanceof EntityLiving) {
-                        message = "death.attack.mob";
-                        params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
-                        break;
+            switch (cause == null ? DamageCause.CUSTOM : cause.getCause()) {
+                case ENTITY_ATTACK:
+                    if (cause instanceof EntityDamageByEntityEvent) {
+                        Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
+                        killer = e;
+                        if (e instanceof Player) {
+                            message = "death.attack.player";
+                            params.add(((Player) e).getDisplayName());
+                            break;
+                        } else if (e instanceof EntityLiving) {
+                            message = "death.attack.mob";
+                            params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
+                            break;
+                        } else {
+                            params.add("Unknown");
+                        }
+                    }
+                    break;
+                case PROJECTILE:
+                    if (cause instanceof EntityDamageByEntityEvent) {
+                        Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
+                        killer = e;
+                        if (e instanceof Player) {
+                            message = "death.attack.arrow";
+                            params.add(((Player) e).getDisplayName());
+                        } else if (e instanceof EntityLiving) {
+                            message = "death.attack.arrow";
+                            params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
+                            break;
+                        } else {
+                            params.add("Unknown");
+                        }
+                    }
+                    break;
+                case SUICIDE:
+                    message = "death.attack.generic";
+                    break;
+                case VOID:
+                    message = "death.attack.outOfWorld";
+                    break;
+                case FALL:
+                    if (cause != null) {
+                        if (cause.getFinalDamage() > 2) {
+                            message = "death.fell.accident.generic";
+                            break;
+                        }
+                    }
+                    message = "death.attack.fall";
+                    break;
+
+                case SUFFOCATION:
+                    message = "death.attack.inWall";
+                    break;
+
+                case LAVA:
+                    message = "death.attack.lava";
+                    break;
+
+                case FIRE:
+                    message = "death.attack.onFire";
+                    break;
+
+                case FIRE_TICK:
+                    message = "death.attack.inFire";
+                    break;
+
+                case DROWNING:
+                    message = "death.attack.drown";
+                    break;
+
+                case CONTACT:
+                    if (cause instanceof EntityDamageByBlockEvent) {
+                        if (((EntityDamageByBlockEvent) cause).getDamager().getId() == Block.CACTUS) {
+                            message = "death.attack.cactus";
+                        }
+                    }
+                    break;
+
+                case BLOCK_EXPLOSION:
+                case ENTITY_EXPLOSION:
+                    if (cause instanceof EntityDamageByEntityEvent) {
+                        Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
+                        killer = e;
+                        if (e instanceof Player) {
+                            message = "death.attack.explosion.player";
+                            params.add(((Player) e).getDisplayName());
+                        } else if (e instanceof EntityLiving) {
+                            message = "death.attack.explosion.player";
+                            params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
+                            break;
+                        }
                     } else {
-                        params.add("Unknown");
+                        message = "death.attack.explosion";
                     }
-                }
-                break;
-            case PROJECTILE:
-                if (cause instanceof EntityDamageByEntityEvent) {
-                    Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
-                    killer = e;
-                    if (e instanceof Player) {
-                        message = "death.attack.arrow";
-                        params.add(((Player) e).getDisplayName());
-                    } else if (e instanceof EntityLiving) {
-                        message = "death.attack.arrow";
-                        params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
-                        break;
-                    } else {
-                        params.add("Unknown");
-                    }
-                }
-                break;
-            case SUICIDE:
-                message = "death.attack.generic";
-                break;
-            case VOID:
-                message = "death.attack.outOfWorld";
-                break;
-            case FALL:
-                if (cause != null) {
-                    if (cause.getFinalDamage() > 2) {
-                        message = "death.fell.accident.generic";
-                        break;
-                    }
-                }
-                message = "death.attack.fall";
-                break;
+                    break;
 
-            case SUFFOCATION:
-                message = "death.attack.inWall";
-                break;
+                case MAGIC:
+                    message = "death.attack.magic";
+                    break;
 
-            case LAVA:
-                message = "death.attack.lava";
-                break;
+                case CUSTOM:
+                    break;
 
-            case FIRE:
-                message = "death.attack.onFire";
-                break;
+                default:
+                    break;
 
-            case FIRE_TICK:
-                message = "death.attack.inFire";
-                break;
-
-            case DROWNING:
-                message = "death.attack.drown";
-                break;
-
-            case CONTACT:
-                if (cause instanceof EntityDamageByBlockEvent) {
-                    if (((EntityDamageByBlockEvent) cause).getDamager().getId() == Block.CACTUS) {
-                        message = "death.attack.cactus";
-                    }
-                }
-                break;
-
-            case BLOCK_EXPLOSION:
-            case ENTITY_EXPLOSION:
-                if (cause instanceof EntityDamageByEntityEvent) {
-                    Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
-                    killer = e;
-                    if (e instanceof Player) {
-                        message = "death.attack.explosion.player";
-                        params.add(((Player) e).getDisplayName());
-                    } else if (e instanceof EntityLiving) {
-                        message = "death.attack.explosion.player";
-                        params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
-                        break;
-                    }
-                } else {
-                    message = "death.attack.explosion";
-                }
-                break;
-
-            case MAGIC:
-                message = "death.attack.magic";
-                break;
-
-            case CUSTOM:
-                break;
-
-            default:
-                break;
-
+            }
+        } else {
+            message = "";
+            params.clear();
         }
 
         this.health = 0;
         this.scheduleUpdate();
 
-        PlayerDeathEvent ev;
-        this.server.getPluginManager().callEvent(ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new)), this.getExperienceLevel()));
+        PlayerDeathEvent ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new)), this.getExperienceLevel());
 
-        if (!ev.getKeepInventory()) {
+        ev.setKeepExperience(this.level.gameRules.getBoolean("keepInventory"));
+        ev.setKeepInventory(ev.getKeepExperience());
+        this.server.getPluginManager().callEvent(ev);
+
+        if (!ev.getKeepInventory() && this.level.getGameRules().getBoolean("doEntityDrops")) {
             for (Item item : ev.getDrops()) {
                 this.level.dropItem(this, item, null, true, 40);
             }
@@ -4150,7 +4171,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        if (!ev.getKeepExperience()) {
+        if (!ev.getKeepExperience() && this.level.getGameRules().getBoolean("doEntityDrops")) {
             if (this.isSurvival() || this.isAdventure()) {
                 int exp = ev.getExperience() * 7;
                 if (exp > 100) exp = 100;
@@ -4163,7 +4184,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.setExperience(0, 0);
         }
 
-        if (!Objects.equals(ev.getDeathMessage().toString(), "")) {
+        if (showMessages && !ev.getDeathMessage().toString().isEmpty()) {
             this.server.broadcast(ev.getDeathMessage(), Server.BROADCAST_CHANNEL_USERS);
         }
 
