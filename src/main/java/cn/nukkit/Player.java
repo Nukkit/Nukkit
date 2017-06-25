@@ -4423,12 +4423,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             if (this.isLevelChange) { //TODO: remove this
-                PlayStatusPacket statusPacket0 = new PlayStatusPacket();//Weather
                 this.getLevel().sendWeather(this);
                 //Update time
                 this.getLevel().sendTime(this);
-                statusPacket0.status = PlayStatusPacket.PLAYER_SPAWN;
-                this.dataPacket(statusPacket0);
 
                 //Weather
                 this.getLevel().sendWeather(this);
@@ -4456,6 +4453,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         Location from = this.getLocation();
         Location to = location;
+
+        if (from.getLevel().getId() != to.level.getId()) {
+            if (this.spawned) {
+                    //TODO: remove this in future version
+                this.isLevelChange = true;
+                this.nextChunkOrderRun = 10000;
+
+                this.forceSendEmptyChunks();
+            }
+        }
 
         if (cause != null) {
             PlayerTeleportEvent event = new PlayerTeleportEvent(this, from, to, cause);
@@ -4497,37 +4504,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             //Update time
             this.getLevel().sendTime(this);
 
-            if (from.getLevel().getId() != to.level.getId()) {
-                if (this.spawned) {
-                    //TODO: remove this in future version
-                    this.isLevelChange = true;
-                    this.nextChunkOrderRun = 10000;
-
-                    ChangeDimensionPacket changeDimensionPacket1 = new ChangeDimensionPacket();
-                    changeDimensionPacket1.dimension = 1;
-                    changeDimensionPacket1.x = (float) this.getX();
-                    changeDimensionPacket1.y = (float) this.getY();
-                    changeDimensionPacket1.z = (float) this.getZ();
-                    this.dataPacket(changeDimensionPacket1);
-
-                    this.forceSendEmptyChunks();
-                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
-                        PlayStatusPacket statusPacket0 = new PlayStatusPacket();
-                        statusPacket0.status = PlayStatusPacket.PLAYER_SPAWN;
-                        dataPacket(statusPacket0);
-                    }, 8);
-
-                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
-                        ChangeDimensionPacket changeDimensionPacket = new ChangeDimensionPacket();
-                        changeDimensionPacket.dimension = 0;
-                        changeDimensionPacket.x = (float) this.getX();
-                        changeDimensionPacket.y = (float) this.getY();
-                        changeDimensionPacket.z = (float) this.getZ();
-                        dataPacket(changeDimensionPacket);
-                        nextChunkOrderRun = 0;
-                    }, 9);
-                }
-            }
             return true;
         }
 
