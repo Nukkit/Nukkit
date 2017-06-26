@@ -266,19 +266,14 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         pk.type = SetEntityLinkPacket.TYPE_PASSENGER;
         Server.broadcastPacket(hasSpawned.values(), pk);
 
-        // Player are passanger and rider
+        // Bug found: Player wont SIT on minecart properly
+        // Question: Are the player riding the minecart upside down?
         pk = new SetEntityLinkPacket();
         pk.rider = getId();
         pk.riding = p.getId();
         pk.type = SetEntityLinkPacket.TYPE_PASSENGER;
         p.dataPacket(pk);
-
-        pk = new SetEntityLinkPacket();
-        pk.rider = getId();
-        pk.riding = p.getId();
-        pk.type = SetEntityLinkPacket.TYPE_RIDE;
-        p.dataPacket(pk);
-
+        
         p.riding = this;
         linkedEntity = p;
 
