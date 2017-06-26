@@ -506,6 +506,21 @@ public class LevelDB implements LevelProvider {
         this.levelData.putInt("SpawnY", (int) pos.y);
         this.levelData.putInt("SpawnZ", (int) pos.z);
     }
+    
+    @Override
+    public GameRules getGamerules() {
+        GameRules rules = new GameRules();
+
+        if (this.levelData.contains("GameRules"))
+            rules.readNBT(this.levelData.getCompound("GameRules"));
+
+        return rules;
+    }
+
+    @Override
+    public void setGameRules(GameRules rules) {
+        this.levelData.putCompound("GameRules", rules.writeNBT());
+    }
 
     @Override
     public void doGarbageCollection() {
