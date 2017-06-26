@@ -98,7 +98,6 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_AREA_EFFECT_CLOUD_PARTICLE = 63; //int
     public static final int DATA_TRADE_PLAYER = 68;//long
 
-
     public static final int DATA_FLAG_ONFIRE = 0;
     public static final int DATA_FLAG_SNEAKING = 1;
     public static final int DATA_FLAG_RIDING = 2;
@@ -521,9 +520,13 @@ public abstract class Entity extends Location implements Metadatable {
 
         Effect oldEffect = this.effects.getOrDefault(effect.getId(), null);
         if (oldEffect != null) {
-            if (Math.abs(effect.getAmplifier()) < Math.abs(oldEffect.getAmplifier())) return;
+            if (Math.abs(effect.getAmplifier()) < Math.abs(oldEffect.getAmplifier())) {
+                return;
+            }
             if (Math.abs(effect.getAmplifier()) == Math.abs(oldEffect.getAmplifier())
-                    && effect.getDuration() < oldEffect.getDuration()) return;
+                    && effect.getDuration() < oldEffect.getDuration()) {
+                return;
+            }
             effect.add(this, true);
         } else {
             effect.add(this, false);
@@ -1207,6 +1210,34 @@ public abstract class Entity extends Location implements Metadatable {
 
     }
 
+    public void onCollideWithVehicle(Entity entity) {
+        if (entity.riding != this && entity.linkedEntity != this) {
+            double dx = entity.x - this.x;
+            double dy = entity.z - this.z;
+            double dz = MathHelper.getDirection(dx, dy);
+
+            if (dz >= 0.009999999776482582D) {
+                dz = (double) MathHelper.sqrt((float) dz);
+                dx /= dz;
+                dy /= dz;
+                double d3 = 1.0D / dz;
+
+                if (d3 > 1.0D) {
+                    d3 = 1.0D;
+                }
+
+                dx *= d3;
+                dy *= d3;
+                dx *= 0.05000000074505806D;
+                dy *= 0.05000000074505806D;
+                dx *= (double) (1.0F - this.y);
+                dy *= (double) (1.0F - this.y);
+                this.setMotion(new Vector3(-dx, 0.0D, -dy));
+                entity.setMotion(new Vector3(dx, 0.0D, dy));
+            }
+        }
+    }
+
     public void onStruckByLightning(Entity entity) {
         this.attack(new EntityDamageByEntityEvent(entity, this, DamageCause.LIGHTNING, 5));
 
@@ -1366,7 +1397,6 @@ public abstract class Entity extends Location implements Metadatable {
 
             this.boundingBox.offset(0, 0, dz);
 
-
             if (this.getStepHeight() > 0 && fallingFlag && this.ySize < 0.05 && (movX != dx || movZ != dz)) {
                 double cx = dx;
                 double cy = dy;
@@ -1432,7 +1462,6 @@ public abstract class Entity extends Location implements Metadatable {
             if (movZ != dz) {
                 this.motionZ = 0;
             }
-
 
             //TODO: vehicle collision events (first we need to spawn them!)
             Timings.entityMoveTimer.stopTiming();
@@ -1581,8 +1610,8 @@ public abstract class Entity extends Location implements Metadatable {
 
         double radius = this.getWidth() / 2d;
 
-        this.boundingBox.setBounds(pos.x - radius, pos.y, pos.z - radius, pos.x + radius, pos.y + (this.getHeight() * this.scale), pos.z +
-                radius);
+        this.boundingBox.setBounds(pos.x - radius, pos.y, pos.z - radius, pos.x + radius, pos.y + (this.getHeight() * this.scale), pos.z
+                + radius);
 
         this.checkChunks();
 
@@ -1724,8 +1753,9 @@ public abstract class Entity extends Location implements Metadatable {
     public boolean setDataProperty(EntityData data, boolean send) {
         if (!Objects.equals(data, this.getDataProperties().get(data.getId()))) {
             this.getDataProperties().put(data);
-            if (send)
+            if (send) {
                 this.sendData(this.hasSpawned.values().stream().toArray(Player[]::new), new EntityMetadata().put(this.dataProperties.get(data.getId())));
+            }
             return true;
         }
         return false;
