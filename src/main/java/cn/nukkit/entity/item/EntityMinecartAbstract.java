@@ -6,6 +6,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.EntityLiving;
+import cn.nukkit.entity.data.Vector3fEntityData;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -20,6 +21,8 @@ import cn.nukkit.network.protocol.SetEntityLinkPacket;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
 import static cn.nukkit.item.Item.*;
+import cn.nukkit.math.Vector3f;
+import co.aikar.timings.Timings;
 
 /**
  * Author: Adam Matthew [larryTheCoder]
@@ -28,6 +31,9 @@ import static cn.nukkit.item.Item.*;
  */
 public abstract class EntityMinecartAbstract extends EntityVehicle {
 
+    /**
+     * Minecart: Nukkit Project
+     */
     private boolean hasCurvedRail;
     private String name;
     private final int[][][] blockFace = new int[][][]{{{0, 0, -1}, {0, 0, 1}},
@@ -35,12 +41,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     {1, -1, 0}}, {{0, 0, -1}, {0, -1, 1}}, {{0, -1, -1}, {0, 0, 1}},
     {{0, 0, 1}, {1, 0, 0}}, {{0, 0, 1}, {-1, 0, 0}}, {{0, 0, -1},
     {-1, 0, 0}}, {{0, 0, -1}, {1, 0, 0}}};
-    private int instead;
-    private double noseX;
-    private double noseY;
-    private double noseZ;
-    private double headed;
-    private double headPitch;
     private double currentSpeed = 0;
 
     // anyone can tell me what these DATA_FLAGS are?
@@ -112,91 +112,71 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             if (y < -64.0D) {
                 kill();
             }
-            // isStatic is used for static level (eg. Unloaded chunks)
-            // But the 'isStatic' not used for Chunk Checking so it might be
-            // useless here. This can being changed with:
-            // [!level.isChunkLoaded(here, here)]
-            if (this.isStatic) {
-                if (this.instead > 0) {
-                    double dx = this.x + (this.noseX - this.x) / (double) this.instead;
-                    double dy = this.y + (this.noseY - this.y) / (double) this.instead;
-                    double dz = this.z + (this.noseZ - this.z) / (double) this.instead;
-                    double headTo = calculateVelocityWYaw(this.headed - (double) this.yaw);
+            this.lastX = this.x;
+            this.lastY = this.y;
+            this.lastZ = this.z;
+            motionY -= 0.03999999910593033D;
+            int dx = MathHelper.floor(x);
+            int dy = MathHelper.floor(y);
+            int dz = MathHelper.floor(z);
 
-                    this.yaw = (float) ((double) this.yaw + headTo / (double) this.instead);
-                    this.pitch = (float) ((double) this.pitch + (this.headPitch - (double) this.pitch) / (double) this.instead);
-                    --this.instead;
-                    this.setPosition(new Vector3(dx, dy, dz));
-                    this.setRotation(this.yaw % 360.0F, this.pitch % 360.0F);
-                } else {
-                    this.setPosition(new Vector3(this.x, this.y, this.z));
-                    this.setRotation(this.yaw % 360.0F, this.pitch % 360.0F);
+            // Check if the rail exsits
+            if (isRail(level.getBlock(new Vector3(dx, dy - 1, dz)))) {
+                --dy; // check again down
+            }
+
+            double speeds = 0.4D; // The current exact minecart speed
+            double drag = 0.0078125; // The minecart drag
+            Block block = level.getBlock(new Vector3(dx, dy, dz)); // get the rail
+
+            // Now start to check if the block is 'Rail'
+            if (isRail(block)) {
+                // Okay we got the rail, now get the Minecart damage
+                int l = level.getBlock(new Vector3(dx, dy, dz)).getDamage();
+
+                // Make it runs and see whats happend
+                processMovement(dx, dy, dz, speeds, drag, block, l);
+                if (block.equals(Block.ACTIVATOR_RAIL)) {
+                    // If the minecart are TNT, we explode it
+                    activate(dx, dy, dz, (l & 8) != 0);
                 }
             } else {
-                this.lastX = this.x;
-                this.lastY = this.y;
-                this.lastZ = this.z;
-                motionY -= 0.03999999910593033D;
-                int dx = MathHelper.floor(x);
-                int dy = MathHelper.floor(y);
-                int dz = MathHelper.floor(z);
+                // return slow down minecart
+                setSlowdown(speeds);
+            }
 
-                // Check if the rail exsits
-                if (isRail(level.getBlock(new Vector3(dx, dy - 1, dz)))) {
-                    --dy; // check again down
-                }
+            // Curved rail
+            pitch = 0.0F;
+            double befX = lastX - x;
+            double befZ = lastZ - z;
 
-                double speeds = 0.4D; // The current exact minecart speed
-                double drag = 0.0078125; // The minecart drag
-                Block block = level.getBlock(new Vector3(dx, dy, dz)); // get the rail
-
-                // Now start to check if the block is 'Rail'
-                if (isRail(block)) {
-                    // Okay we got the rail, now get the Minecart damage
-                    int l = level.getBlock(new Vector3(dx, dy, dz)).getDamage();
-
-                    // Make it runs and see whats happend
-                    processMovement(dx, dy, dz, speeds, drag, block, l);
-                    if (block.equals(Block.ACTIVATOR_RAIL)) {
-                        // If the minecart are TNT, we explode it
-                        activate(dx, dy, dz, (l & 8) != 0);
-                    }
-                } else {
-                    // return slow down minecart
-                    setSlowdown(speeds);
-                }
-
-                // Curved rail
-                pitch = 0.0F;
-                double befX = lastX - x;
-                double befZ = lastZ - z;
-
-                // rotation check #1 (executed below)
-                if (befX * befX + befZ * befZ > 0.001D) {
-                    yaw = (float) (Math.atan2(befZ, befX) * 180.0D / 3.141592653589793D);
-                    if (hasCurvedRail) { // Has curved rail rotate 90'
-                        yaw += 180.0F;
-                    }
-                }
-
-                // Rotation execution
-                double rotate = setMinecartRotation(yaw - lastYaw);
-
-                if (rotate < -170.0D || rotate >= 170.0D) {
+            // rotation check #1 (executed below)
+            if (befX * befX + befZ * befZ > 0.001D) {
+                yaw = (float) (Math.atan2(befZ, befX) * 180.0D / 3.141592653589793D);
+                if (hasCurvedRail) { // Has curved rail rotate 90'
                     yaw += 180.0F;
-                    hasCurvedRail = !hasCurvedRail;
-                }
-
-                setRotation(yaw % 360.0F, pitch % 360.0F);
-
-                // Entity colliding (eg. When minecart and minecart hits together
-                // It will moved to opposite direction)
-                for (Entity entity : level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224D, 0.0D, 0.20000000298023224D), this)) {
-                    if (entity != this.linkedEntity && entity instanceof EntityMinecartAbstract) {
-                        ((EntityMinecartAbstract) entity).onCollideWithVehicle(this);
-                    }
                 }
             }
+
+            // Rotation execution
+            double rotate = setMinecartRotation(yaw - lastYaw);
+
+            if (rotate < -170.0D || rotate >= 170.0D) {
+                yaw += 180.0F;
+                hasCurvedRail = !hasCurvedRail;
+            }
+
+            setRotation(yaw % 360.0F, pitch % 360.0F);
+
+            // Entity colliding (eg. When minecart and minecart hits together
+            // It will moved to opposite direction)
+            Timings.tickEntityTimer.startTiming();
+            for (Entity entity : level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224D, 0.0D, 0.20000000298023224D), this)) {
+                if (entity != this.linkedEntity && entity instanceof EntityMinecartAbstract) {
+                    ((EntityMinecartAbstract) entity).onCollideWithVehicle(this);
+                }
+            }
+            Timings.tickEntityTimer.stopTiming();
             // Any suggestion?
             hasUpdate = true;
         }
@@ -246,9 +226,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     @Override
     public void initEntity() {
         super.initEntity();
-
-//        setMaxHealth(6);
-//        setHealth(getMaxHealth());
+        
         setName("Minecart");
     }
 
@@ -263,21 +241,24 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         pk = new SetEntityLinkPacket();
         pk.rider = getId();
         pk.riding = p.getId();
-        pk.type = SetEntityLinkPacket.TYPE_PASSENGER;
-        Server.broadcastPacket(hasSpawned.values(), pk);
+        pk.type = 2;
+        Server.broadcastPacket(this.hasSpawned.values(), pk);
 
-        // Bug found: Player wont SIT on minecart properly
-        // Question: Are the player riding the minecart upside down?
         pk = new SetEntityLinkPacket();
         pk.rider = getId();
-        pk.riding = p.getId();
-        pk.type = SetEntityLinkPacket.TYPE_PASSENGER;
+        pk.riding = 0;
+        pk.type = 2;
         p.dataPacket(pk);
-        
+
         p.riding = this;
         linkedEntity = p;
-
+        
         p.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
+        // YES! THANK YOU FOR THESE NEW FLAGS! BRANCH 1.1!
+        // Player will ride -1(y) when riding.So in MC 1.8 player(y) position
+        // should add +0.9(y) (Math: y = -1; y + 0.9; y: -0.1)
+        // So when riding, player will ride -0.1 hight from Minecart
+        p.setDataProperty(new Vector3fEntityData(56, new Vector3f(0, 0.9f, 0)));
         return true;
     }
 
@@ -303,18 +284,17 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public void onCollideWithVehicle(Entity entity) {
-        super.onCollideWithVehicle(entity);
         if (entity != riding) {
             if (entity instanceof EntityLiving && !(entity instanceof EntityHuman) && motionX * motionX + motionZ * motionZ > 0.01D && linkedEntity == null && entity.riding == null) {
-                entity.setLinkedEntity(null);
+                // Here is the place where NPC ride minecart
             }
 
-            float motiveX = (float) (entity.x - x);
-            float motiveZ = (float) (entity.z - z);
-            float square = motiveX * motiveX + motiveZ * motiveZ;
+            double motiveX = entity.x - x;
+            double motiveZ = entity.z - z;
+            double square = motiveX * motiveX + motiveZ * motiveZ;
 
             if (square >= 9.999999747378752E-5D) {
-                square = MathHelper.sqrt(square);
+                square = Math.sqrt(square);
                 motiveX /= square;
                 motiveZ /= square;
                 double next = 1.0D / square;
@@ -348,13 +328,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                     if (((EntityMinecartAbstract) entity).getMineId() == 2 && getMineId() != 2) {
                         motionX *= 0.20000000298023224D;
                         motionZ *= 0.20000000298023224D;
-                        setMinecartMotion(entity.motionX - motiveX, 0.0D, entity.motionZ - motiveZ);
+                        setMotion(entity.motionX - motiveX, 0.0D, entity.motionZ - motiveZ);
                         entity.motionX *= 0.949999988079071D;
                         entity.motionZ *= 0.949999988079071D;
                     } else if (((EntityMinecartAbstract) entity).getMineId() != 2 && getMineId() == 2) {
                         entity.motionX *= 0.20000000298023224D;
                         entity.motionZ *= 0.20000000298023224D;
-                        setMinecartMotion(entity, motionX + motiveX, 0.0D, motionZ + motiveZ);
+                        setMotion(entity, motionX + motiveX, 0.0D, motionZ + motiveZ);
                         motionX *= 0.949999988079071D;
                         motionZ *= 0.949999988079071D;
                     } else {
@@ -362,14 +342,14 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         motZ /= 2.0D;
                         motionX *= 0.20000000298023224D;
                         motionZ *= 0.20000000298023224D;
-                        setMinecartMotion(motX - motiveX, 0.0D, motZ - motiveZ);
+                        setMotion(motX - motiveX, 0.0D, motZ - motiveZ);
                         entity.motionX *= 0.20000000298023224D;
                         entity.motionZ *= 0.20000000298023224D;
-                        setMinecartMotion(entity, motX + motiveX, 0.0D, motZ + motiveZ);
+                        setMotion(entity, motX + motiveX, 0.0D, motZ + motiveZ);
                     }
                 } else {
-                    setMinecartMotion(-motiveX, 0.0D, -motiveZ);
-                    setMinecartMotion(entity, motiveX / 4.0D, 0.0D, motiveZ / 4.0D);
+                    setMotion(-motiveX, 0.0D, -motiveZ);
+                    setMotion(entity, motiveX / 4.0D, 0.0D, motiveZ / 4.0D);
                 }
             }
         }
@@ -603,6 +583,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 }
             }
         }
+
     }
 
     protected double setMinecartRotation(double rotate) {
@@ -630,11 +611,11 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         }
     }
 
-    public void setMinecartMotion(Entity ent, double x, double y, double z) {
-        ((EntityMinecartAbstract) ent).setMinecartMotion(x, y, z);
+    public void setMotion(Entity ent, double x, double y, double z) {
+        ent.setMotion(new Vector3(x, y, z));
     }
 
-    public void setMinecartMotion(double x, double y, double z) {
+    public void setMotion(double x, double y, double z) {
         super.setMotion(new Vector3(x, y, z));
         super.updateMovement();
     }
@@ -675,7 +656,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             if (l >= 2 && l <= 5) {
                 dy = (double) (checkY + 1);
             }
-            
+
             int[][] facing = blockFace[l];
             double rail;
             // Genisys minstake (Doesn't check surrounding more exactly)

@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * author: MagicDroidX Nukkit Project
+ * author: MagicDroidX 
+ * Nukkit Project
  */
 public abstract class EntityLiving extends Entity implements EntityDamageable {
 
@@ -87,15 +88,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         return true;
     }
 
-    public void checkCollide() { // can override
-        for (Entity entity : level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224D, 0.0D, 0.20000000298023224D), this)) {
-            if (entity instanceof EntityVehicle) {
-                this.collidingWith(entity);
-            }
-        }
-    }
-
-    public void collidingWith(Entity ent) { // can override (IronGolem|Bats)
+    public void collidingWith(EntityVehicle ent) { // can override (IronGolem|Bats)
         ent.onCollideWithVehicle(this);
     }
 
@@ -241,7 +234,11 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             this.attackTime -= tickDiff;
         }
         if (this.riding == null) {
-            checkCollide();
+            for (Entity entity : level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224D, 0.0D, 0.20000000298023224D), this)) {
+                if (entity instanceof EntityVehicle) {
+                    this.collidingWith((EntityVehicle) entity);
+                }
+            }
         }
 
         Timings.livingEntityBaseTickTimer.stopTiming();
