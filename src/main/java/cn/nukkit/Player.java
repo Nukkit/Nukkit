@@ -2093,16 +2093,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 getServer().getLogger().info("CURRENT SPEED: " + distance);
                             }
                         }
-                        if (riding instanceof EntityMinecartEmpty) {
-                            // TODO: check this numbers
-                            MovePlayerPacket loc = movePlayerPacket;
-                            double dx = lastX - loc.x;
-                            double dz = lastZ - loc.z;
-                            double distance = Math.sqrt(dx * dx + dz * dz);
-                            if (distance > 0.1) {
-                                ((EntityMinecartEmpty) riding).setCurrentSpeed(10); // Unknown value
-                            }
-                        }
                     }
 
                     break;
