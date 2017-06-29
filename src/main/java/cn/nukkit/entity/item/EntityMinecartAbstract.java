@@ -284,6 +284,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public void onCollideWithVehicle(Entity entity) {
+        timing.startTiming();
         if (entity != riding) {
             if (entity instanceof EntityLiving && !(entity instanceof EntityHuman) && motionX * motionX + motionZ * motionZ > 0.01D && linkedEntity == null && entity.riding == null) {
                 // Here is the place where NPC ride minecart
@@ -348,11 +349,11 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         setMotion(entity, motX + motiveX, 0.0D, motZ + motiveZ);
                     }
                 } else {
-                    setMotion(-motiveX, 0.0D, -motiveZ);
-                    setMotion(entity, motiveX / 4.0D, 0.0D, motiveZ / 4.0D);
+                    setMotion(motiveX, 0.0D, motiveZ);
                 }
             }
         }
+        timing.stopTiming();
     }
 
     public Item dropItem() {
@@ -399,17 +400,16 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
         y = (double) dy;
         boolean hasCurved = false;
-        boolean setCurved = false;
+        boolean redstoneMultiply = false;
 
         if (block.equals(Block.POWERED_RAIL)) {
-            hasCurved = (rail & 8) != 0;
-            setCurved = !hasCurved;
+            hasCurved = true;
+            redstoneMultiply = true;
         }
 
-        // Used for redstone (Implement this after Redstone update)
-//        if (((BlockMinecartTrackAbstract) block).e()) {
-        rail &= 7;
-//        }
+        if (isRedstonePowered(block)) {
+            rail &= 7;
+        }
 
         if (rail >= 2 && rail <= 5) {
             y = (double) (dy + 1);
@@ -464,12 +464,12 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 if (motion < 0.01D) {
                     motionX += playerYawNeg * 0.1D;
                     motionZ += playerYawPos * 0.1D;
-                    setCurved = false;
+                    redstoneMultiply = false;
                 }
             }
         }
 
-        if (setCurved) {
+        if (redstoneMultiply) {
             expectedSpeed = Math.sqrt(motionX * motionX + motionZ * motionZ);
             if (expectedSpeed < 0.03D) {
                 motionX *= 0.0D;
@@ -479,6 +479,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 motionX *= 0.5D;
                 motionY *= 0.0D;
                 motionZ *= 0.5D;
+                getServer().getLogger().info("COMPLICATED 1");
             }
         }
 
@@ -562,6 +563,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         }
 
         if (hasCurved) {
+            getServer().getLogger().info("COMPLICATED 2");
             double newMovie = Math.sqrt(motionX * motionX + motionZ * motionZ);
 
             if (newMovie > 0.01D) {
@@ -649,9 +651,9 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             int l = level.getBlock(new Vector3(checkX, checkY, checkZ)).getDamage();
 
             dy = (double) checkY;
-//            if (((BlockMinecartTrackAbstract) block).e()) {
-            l &= 7;
-//            }
+            if (isRedstonePowered(block)) {
+                l &= 7;
+            }
 
             if (l >= 2 && l <= 5) {
                 dy = (double) (checkY + 1);
@@ -714,9 +716,32 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         this.currentSpeed = speed;
     }
 
+    /**
+     * Define if the Block is rail
+     * 
+     * @param block Block of the current target
+     * @return boolean
+     */
     private boolean isRail(Block block) {
         switch (block.getId()) {
             case RAIL:
+            case POWERED_RAIL:
+            case ACTIVATOR_RAIL:
+            case DETECTOR_RAIL:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Define if the Block is Redstone-powered rail
+     * 
+     * @param block Block of the current target
+     * @return boolean
+     */
+    private boolean isRedstonePowered(Block block) {
+        switch (block.getId()) {
             case POWERED_RAIL:
             case ACTIVATOR_RAIL:
             case DETECTOR_RAIL:

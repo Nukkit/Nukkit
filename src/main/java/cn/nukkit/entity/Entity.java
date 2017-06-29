@@ -7,6 +7,7 @@ import cn.nukkit.block.BlockDirt;
 import cn.nukkit.block.BlockFire;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.data.*;
+import cn.nukkit.entity.item.EntityVehicle;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.player.PlayerInteractEvent;
@@ -26,6 +27,7 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.MobEffectPacket;
 import cn.nukkit.network.protocol.RemoveEntityPacket;
 import cn.nukkit.network.protocol.SetEntityDataPacket;
+import cn.nukkit.network.protocol.SetEntityLinkPacket;
 import cn.nukkit.network.protocol.SetEntityMotionPacket;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
@@ -1702,6 +1704,74 @@ public abstract class Entity extends Location implements Metadatable {
         return false;
     }
 
+    /**
+     * Mount an Entity into a vehicle
+     *
+     * @param entity The target Entity
+     * @return {@code true} if the mounting successful
+     */
+    public boolean mount(Entity entity) {
+        if (entity.riding != null || !(this instanceof EntityVehicle)) {
+            return false;
+        }
+        SetEntityLinkPacket pk;
+
+        pk = new SetEntityLinkPacket();
+        pk.rider = this.getId();
+        pk.riding = entity.getId();
+        pk.type = 2;
+        Server.broadcastPacket(this.hasSpawned.values(), pk);
+
+        if (entity instanceof Player) {
+            pk = new SetEntityLinkPacket();
+            pk.rider = this.getId();
+            pk.riding = 0;
+            pk.type = 2;
+            ((Player) entity).dataPacket(pk);
+        }
+
+        entity.riding = this;
+        linkedEntity = entity;
+
+        entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
+        entity.setDataProperty(
+                new Vector3fEntityData(57, new Vector3f(0, 0.9f, 0)));
+        return true;
+    }
+
+    /**
+     * Dismount an Entity into a vehicle
+     *
+     * @param entity The target Entity
+     * @return {@code true} if the mounting successful
+     */
+    public boolean dismount(Entity entity) {
+        if (entity.riding != null || !(this instanceof EntityVehicle)) {
+            return false;
+        }
+        SetEntityLinkPacket pk;
+
+        pk = new SetEntityLinkPacket();
+        pk.rider = this.getId();
+        pk.riding = entity.getId();
+        pk.type = 2;
+        Server.broadcastPacket(this.hasSpawned.values(), pk);
+
+        if (entity instanceof Player) {
+            pk = new SetEntityLinkPacket();
+            pk.rider = this.getId();
+            pk.riding = 0;
+            pk.type = 2;
+            ((Player) entity).dataPacket(pk);
+        }
+
+        entity.riding = null;
+        linkedEntity = null;
+
+        entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
+        return true;
+    }
+    
     public long getId() {
         return this.id;
     }

@@ -17,6 +17,18 @@ import java.util.List;
  */
 public class BlockRail extends BlockFlowable {
 
+    public static boolean isRail(Level level, int x, int y, int z) {
+        switch (level.getBlockIdAt(x, y, z)) {
+            case RAIL:
+            case POWERED_RAIL:
+            case ACTIVATOR_RAIL:
+            case DETECTOR_RAIL:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public BlockRail() {
         this(0);
     }

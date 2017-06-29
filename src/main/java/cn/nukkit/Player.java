@@ -2080,6 +2080,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (riding != null) {
                         if (riding instanceof EntityBoat) {
                             riding.setPositionAndRotation(this.temporalVector.setComponents(movePlayerPacket.x, movePlayerPacket.y - 1, movePlayerPacket.z), (movePlayerPacket.headYaw + 90) % 360, 0);
+                        } else if(riding instanceof EntityMinecartAbstract){
+                            MovePlayerPacket loc = movePlayerPacket;
+                            double dx = lastX - loc.x;
+                            double dz = lastZ - loc.z;
+                            double distance = Math.sqrt(dx * dx + dz * dz);
+                            if (distance > 0.1) {
+                                ((EntityMinecartEmpty) riding).setCurrentSpeed(8); // Max 8 block per Axis
+                                getServer().getLogger().info("CURRENT SPEED: " + distance);
+                            } else {
+                                ((EntityMinecartEmpty) riding).setCurrentSpeed(0);
+                                getServer().getLogger().info("CURRENT SPEED: " + distance);
+                            }
                         }
                         if (riding instanceof EntityMinecartEmpty) {
                             // TODO: check this numbers
