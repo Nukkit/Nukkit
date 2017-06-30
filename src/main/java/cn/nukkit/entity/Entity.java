@@ -1804,8 +1804,9 @@ public abstract class Entity extends Location implements Metadatable {
         linkedEntity = entity;
 
         entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
+        // TODO: If the player should be 0.8 or 0.6? 0.9?
         entity.setDataProperty(
-                new Vector3fEntityData(57, new Vector3f(0, 0.9f, 0)));
+                new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, new Vector3f(0, 0.8f, 0)));
         return true;
     }
 

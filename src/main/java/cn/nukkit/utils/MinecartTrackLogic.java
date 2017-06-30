@@ -1,7 +1,8 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockRail;
+import cn.nukkit.block.BlockRailAbstract;
 import cn.nukkit.level.ChunkPosition;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
@@ -20,30 +21,30 @@ public class MinecartTrackLogic {
      * Complex? I don't think so
      * Try to think something else
      */
-    private final BlockRail rail;
-    private final ArrayList listTrack;
+    private final BlockRailAbstract rail;
+    private final ArrayList<ChunkPosition> listTrack;
     private final Level level;
     private final int x;
     private final int y;
     private final int z;
     private final boolean canPower;
 
-    public MinecartTrackLogic(BlockRail rail, Level world, int x, int y, int z) {
+    public MinecartTrackLogic(BlockRailAbstract rail, Level world, int x, int y, int z) {
         this.rail = rail;
-        this.listTrack = new ArrayList();
-        this.level = world;
+        listTrack = new ArrayList();
+        level = world;
         this.x = x;
         this.y = y;
         this.z = z;
         Block block = world.getBlock(new Vector3(x, y, z));
         int meta = block.getDamage();
 
-//        if (((BlockRail) rail).redstonePowered()) {
-//            canPower = true;
-//            meta &= -9;
-//        } else {
+        if (((BlockRailAbstract) rail).redstonePowered()) {
+            canPower = true;
+            meta &= -9;
+        } else {
             canPower = false;
-//        }
+        }
 
         listBlocks(meta);
     }
@@ -97,34 +98,36 @@ public class MinecartTrackLogic {
     }
 
     private void removeJunks() {
-        for (int i = 0; i < this.listTrack.size(); ++i) {
-            MinecartTrackLogic track = this.isRail((ChunkPosition) this.listTrack.get(i));
+        for (int i = 0; i < listTrack.size(); ++i) {
+            MinecartTrackLogic track = getRail(listTrack.get(i));
 
-            if (track != null && track.isRail(this)) {
-                this.listTrack.set(i, new ChunkPosition(track.x, track.y, track.z));
+            if (track != null && track.isTrackRail(this)) {
+                listTrack.set(i, new ChunkPosition(track.x, track.y, track.z));
             } else {
-                this.listTrack.remove(i--);
+                listTrack.remove(i--);
             }
         }
     }
 
-    private boolean isRail(int i, int j, int k) {
-        return BlockRail.isRail(this.level, i, j, k) ? true : (BlockRail.isRail(this.level, i, j + 1, k) ? true : BlockRail.isRail(this.level, i, j - 1, k));
+    private boolean isLocationRail(int i, int j, int k) {
+        return BlockRailAbstract.isRail(level, i, j, k) ? true 
+                : (BlockRailAbstract.isRail(level, i, j + 1, k) ? true 
+                : BlockRailAbstract.isRail(level, i, j - 1, k));
     }
 
-    private MinecartTrackLogic isRail(ChunkPosition pos) {
-        return BlockRail.isRail(this.level, pos.x, pos.y, pos.z) 
-                ? new MinecartTrackLogic(this.rail, this.level, pos.x, pos.y, pos.z) 
-                : (BlockRail.isRail(this.level, pos.x, pos.y + 1, pos.z) 
-                ? new MinecartTrackLogic(this.rail, this.level, pos.x, pos.y + 1, pos.z)
-                : (BlockRail.isRail(this.level, pos.x, pos.y - 1, pos.z)
-                ? new MinecartTrackLogic(this.rail, this.level, pos.x, pos.y - 1, pos.z)
+    private MinecartTrackLogic getRail(ChunkPosition pos) {
+        return BlockRailAbstract.isRail(level, pos.x, pos.y, pos.z) 
+                ? new MinecartTrackLogic(rail, level, pos.x, pos.y, pos.z) 
+                : (BlockRailAbstract.isRail(level, pos.x, pos.y + 1, pos.z) 
+                ? new MinecartTrackLogic(rail, level, pos.x, pos.y + 1, pos.z)
+                : (BlockRailAbstract.isRail(level, pos.x, pos.y - 1, pos.z)
+                ? new MinecartTrackLogic(rail, level, pos.x, pos.y - 1, pos.z)
                 : null));
     }
 
-    private boolean isRail(MinecartTrackLogic track) {
-        for (int i = 0; i < this.listTrack.size(); ++i) {
-            ChunkPosition pos = (ChunkPosition) this.listTrack.get(i);
+    private boolean isTrackRail(MinecartTrackLogic track) {
+        for (int i = 0; i < listTrack.size(); ++i) {
+            ChunkPosition pos = listTrack.get(i);
 
             if (pos.x == track.x && pos.z == track.z) {
                 return true;
@@ -135,8 +138,8 @@ public class MinecartTrackLogic {
     }
 
     private boolean isRail(int i, int k) {
-        for (int l = 0; l < this.listTrack.size(); ++l) {
-            ChunkPosition pos = (ChunkPosition) this.listTrack.get(l);
+        for (int l = 0; l < listTrack.size(); ++l) {
+            ChunkPosition pos = listTrack.get(l);
 
             if (pos.x == i && pos.z == k) {
                 return true;
@@ -146,233 +149,245 @@ public class MinecartTrackLogic {
         return false;
     }
 
-    protected int countRails() {
+    public int countRails() {
         int i = 0;
 
-        if (this.isRail(this.x, this.y, this.z - 1)) {
+        if (isLocationRail(x, y, z - 1)) {
             ++i;
         }
 
-        if (this.isRail(this.x, this.y, this.z + 1)) {
+        if (isLocationRail(x, y, z + 1)) {
             ++i;
         }
 
-        if (this.isRail(this.x - 1, this.y, this.z)) {
+        if (isLocationRail(x - 1, y, z)) {
             ++i;
         }
 
-        if (this.isRail(this.x + 1, this.y, this.z)) {
+        if (isLocationRail(x + 1, y, z)) {
             ++i;
         }
 
         return i;
     }
 
-    private boolean unknownVarStatement(MinecartTrackLogic track) {
-        return this.isRail(track) ? true : (this.listTrack.size() == 2 ? false : (this.listTrack.isEmpty() ? true : true));
+    private boolean hasOtherRails(MinecartTrackLogic track) {
+        return isTrackRail(track) ? true 
+                : (listTrack.size() == 2 ? false 
+                : (listTrack.isEmpty() ? true 
+                : true));
     }
 
     private void changeShape(MinecartTrackLogic track) {
-        this.listTrack.add(new ChunkPosition(track.x, track.y, track.z));
-        boolean flag = this.isRail(this.x, this.z - 1);
-        boolean flag1 = this.isRail(this.x, this.z + 1);
-        boolean flag2 = this.isRail(this.x - 1, this.z);
-        boolean flag3 = this.isRail(this.x + 1, this.z);
-        byte b0 = -1;
+        listTrack.add(new ChunkPosition(track.x, track.y, track.z));
+        boolean negZ = isRail(x, z - 1);
+        boolean posZ = isRail(x, z + 1);
+        boolean negX = isRail(x - 1, z);
+        boolean posX = isRail(x + 1, z);
+        byte meta = -1;
 
-        if (flag || flag1) {
-            b0 = 0;
+        if (negZ || posZ) {
+            meta = 0;
         }
 
-        if (flag2 || flag3) {
-            b0 = 1;
+        if (negX || posX) {
+            meta = 1;
         }
 
-        if (!this.canPower) {
-            if (flag1 && flag3 && !flag && !flag2) {
-                b0 = 6;
+        if (!canPower) {
+            if (posZ && posX && !negZ && !negX) {
+                meta = 6;
             }
 
-            if (flag1 && flag2 && !flag && !flag3) {
-                b0 = 7;
+            if (posZ && negX && !negZ && !posX) {
+                meta = 7;
             }
 
-            if (flag && flag2 && !flag1 && !flag3) {
-                b0 = 8;
+            if (negZ && negX && !posZ && !posX) {
+                meta = 8;
             }
 
-            if (flag && flag3 && !flag1 && !flag2) {
-                b0 = 9;
-            }
-        }
-
-        if (b0 == 0) {
-            if (BlockRail.isRail(this.level, this.x, this.y + 1, this.z - 1)) {
-                b0 = 4;
-            }
-
-            if (BlockRail.isRail(this.level, this.x, this.y + 1, this.z + 1)) {
-                b0 = 5;
+            if (negZ && posX && !posZ && !negX) {
+                meta = 9;
             }
         }
 
-        if (b0 == 1) {
-            if (BlockRail.isRail(this.level, this.x + 1, this.y + 1, this.z)) {
-                b0 = 2;
+        if (meta == 0) {
+            if (BlockRailAbstract.isRail(level, x, y + 1, z - 1)) {
+                meta = 4;
             }
 
-            if (BlockRail.isRail(this.level, this.x - 1, this.y + 1, this.z)) {
-                b0 = 3;
+            if (BlockRailAbstract.isRail(level, x, y + 1, z + 1)) {
+                meta = 5;
             }
         }
 
-        if (b0 < 0) {
-            b0 = 0;
+        if (meta == 1) {
+            if (BlockRailAbstract.isRail(level, x + 1, y + 1, z)) {
+                meta = 2;
+            }
+
+            if (BlockRailAbstract.isRail(level, x - 1, y + 1, z)) {
+                meta = 3;
+            }
         }
 
-        int i = b0;
-
-        if (this.canPower) {
-            i = this.level.getBlock(new Vector3(this.x, this.y, this.z)).getDamage() & 8 | b0;
+        if (meta < 0) {
+            meta = 0;
         }
 
-        this.level.getBlock(new Vector3(this.x, this.y, this.z)).setDamage(i);
+        int data = meta;
+
+        if (canPower) {
+            data = rail.getDamage() & 8 | meta;
+        }
+
+        rail.setDamage(data);
     }
 
-    private boolean isPRail(int i, int j, int k) {
-        MinecartTrackLogic track = this.isRail(new ChunkPosition(i, j, k));
+    private boolean hasOtherRail(int i, int j, int k) {
+        MinecartTrackLogic track = getRail(new ChunkPosition(i, j, k));
 
         if (track == null) {
             return false;
         } else {
-            track.countRails();
-            return track.unknownVarStatement(this);
+            track.removeJunks();
+            return track.hasOtherRails(this);
         }
     }
 
-    public void doChange(boolean flag, boolean flag1) {
-        boolean flag2 = this.isPRail(this.x, this.y, this.z - 1);
-        boolean flag3 = this.isPRail(this.x, this.y, this.z + 1);
-        boolean flag4 = this.isPRail(this.x - 1, this.y, this.z);
-        boolean flag5 = this.isPRail(this.x + 1, this.y, this.z);
-        byte b0 = -1;
+    /**
+     * Do changes on Rail
+     * 
+     * @param hasRedstone Has Redstone power
+     * @param brandNew New block
+     */
+    public void doChange(boolean hasRedstone, boolean brandNew) {
+        boolean posZ = hasOtherRail(x, y, z - 1);
+        boolean negZ = hasOtherRail(x, y, z + 1);
+        boolean posX = hasOtherRail(x - 1, y, z);
+        boolean negX = hasOtherRail(x + 1, y, z);
+        byte meta = -1;
 
-        if ((flag2 || flag3) && !flag4 && !flag5) {
-            b0 = 0;
+        if ((posZ || negZ) && !posX && !negX) {
+            meta = 0;
         }
 
-        if ((flag4 || flag5) && !flag2 && !flag3) {
-            b0 = 1;
+        if ((posX || negX) && !posZ && !negZ) {
+            meta = 1;
         }
 
-        if (!this.canPower) {
-            if (flag3 && flag5 && !flag2 && !flag4) {
-                b0 = 6;
+        if (!canPower) {
+            if (negZ && negX && !posZ && !posX) {
+                meta = 6;
             }
 
-            if (flag3 && flag4 && !flag2 && !flag5) {
-                b0 = 7;
+            if (negZ && posX && !posZ && !negX) {
+                meta = 7;
             }
 
-            if (flag2 && flag4 && !flag3 && !flag5) {
-                b0 = 8;
+            if (posZ && posX && !negZ && !negX) {
+                meta = 8;
             }
 
-            if (flag2 && flag5 && !flag3 && !flag4) {
-                b0 = 9;
+            if (posZ && negX && !negZ && !posX) {
+                meta = 9;
             }
         }
 
-        if (b0 == -1) {
-            if (flag2 || flag3) {
-                b0 = 0;
+        if (meta == -1) {
+            if (posZ || negZ) {
+                meta = 0;
             }
 
-            if (flag4 || flag5) {
-                b0 = 1;
+            if (posX || negX) {
+                meta = 1;
             }
 
-            if (!this.canPower) {
-                if (flag) {
-                    if (flag3 && flag5) {
-                        b0 = 6;
+            if (!canPower) {
+                if (hasRedstone) {
+                    if (negZ && negX) {
+                        meta = 6;
                     }
 
-                    if (flag4 && flag3) {
-                        b0 = 7;
+                    if (posX && negZ) {
+                        meta = 7;
                     }
 
-                    if (flag5 && flag2) {
-                        b0 = 9;
+                    if (negX && posZ) {
+                        meta = 9;
                     }
 
-                    if (flag2 && flag4) {
-                        b0 = 8;
+                    if (posZ && posX) {
+                        meta = 8;
                     }
                 } else {
-                    if (flag2 && flag4) {
-                        b0 = 8;
+                    if (posZ && posX) {
+                        meta = 8;
                     }
 
-                    if (flag5 && flag2) {
-                        b0 = 9;
+                    if (negX && posZ) {
+                        meta = 9;
                     }
 
-                    if (flag4 && flag3) {
-                        b0 = 7;
+                    if (posX && negZ) {
+                        meta = 7;
                     }
 
-                    if (flag3 && flag5) {
-                        b0 = 6;
+                    if (negZ && negX) {
+                        meta = 6;
                     }
                 }
             }
         }
 
-        if (b0 == 0) {
-            if (BlockRail.isRail(this.level, this.x, this.y + 1, this.z - 1)) {
-                b0 = 4;
+        if (meta == 0) {
+            if (BlockRailAbstract.isRail(level, x, y + 1, z - 1)) {
+                meta = 4;
             }
 
-            if (BlockRail.isRail(this.level, this.x, this.y + 1, this.z + 1)) {
-                b0 = 5;
-            }
-        }
-
-        if (b0 == 1) {
-            if (BlockRail.isRail(this.level, this.x + 1, this.y + 1, this.z)) {
-                b0 = 2;
-            }
-
-            if (BlockRail.isRail(this.level, this.x - 1, this.y + 1, this.z)) {
-                b0 = 3;
+            if (BlockRailAbstract.isRail(level, x, y + 1, z + 1)) {
+                meta = 5;
             }
         }
 
-        if (b0 < 0) {
-            b0 = 0;
+        if (meta == 1) {
+            if (BlockRailAbstract.isRail(level, x + 1, y + 1, z)) {
+                meta = 2;
+            }
+
+            if (BlockRailAbstract.isRail(level, x - 1, y + 1, z)) {
+                meta = 3;
+            }
         }
 
-        this.listBlocks(b0);
-        int i = b0;
-
-        if (this.canPower) {
-            i = this.level.getBlock(new Vector3(this.x, this.y, this.z)).getDamage() & 8 | b0;
+        if (meta < 0) {
+            meta = 0;
         }
 
-        if (flag1 || this.level.getBlock(new Vector3(this.x, this.y, this.z)).getDamage() != i) {
-            this.level.getBlock(new Vector3(this.x, this.y, this.z)).setDamage(i);
+        listBlocks(meta);
+        int data = meta;
+        
+        if (canPower) {
+            data = rail.getDamage() & 8 | meta;
+        }
 
-            for (int j = 0; j < this.listTrack.size(); ++j) {
-                MinecartTrackLogic track = this.isRail((ChunkPosition) this.listTrack.get(j));
+        if (brandNew || rail.getDamage() != data) {
+            level.setBlockExtraDataAt(1,1,1,1,data);
+
+            for (int j = 0; j < listTrack.size(); ++j) {
+                MinecartTrackLogic track = getRail(listTrack.get(j));
 
                 if (track != null) {
-                    track.countRails();
-                    if (track.unknownVarStatement(this)) {
+                    track.removeJunks();
+                    if (track.hasOtherRails(this)) {
                         track.changeShape(this);
                     }
                 }
             }
         }
+        // Set that block!
+        level.setBlock(rail, rail, true, true);
+        Server.getInstance().getLogger().info("META: " + meta + " DATA: " + data);
     }
 }

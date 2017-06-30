@@ -6,7 +6,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.EntityLiving;
-import cn.nukkit.entity.data.Vector3fEntityData;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -17,12 +16,9 @@ import cn.nukkit.math.MathHelper;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
-import cn.nukkit.network.protocol.SetEntityLinkPacket;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
 import static cn.nukkit.item.Item.*;
-import cn.nukkit.math.Vector3f;
-import co.aikar.timings.Timings;
 
 /**
  * Author: Adam Matthew [larryTheCoder]
@@ -32,7 +28,10 @@ import co.aikar.timings.Timings;
 public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     /**
-     * Minecart: Nukkit Project
+     * Minecart: Nukkit Project 
+     * --- 
+     * Made by @larryTheCoder 
+     * DO NOT COPY!
      */
     private boolean hasCurvedRail;
     private String name;
@@ -170,17 +169,34 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
             // Entity colliding (eg. When minecart and minecart hits together
             // It will moved to opposite direction)
-            Timings.tickEntityTimer.startTiming();
             for (Entity entity : level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224D, 0.0D, 0.20000000298023224D), this)) {
                 if (entity != this.linkedEntity && entity instanceof EntityMinecartAbstract) {
                     ((EntityMinecartAbstract) entity).onCollideWithVehicle(this);
                 }
             }
-            Timings.tickEntityTimer.stopTiming();
+            
             // Any suggestion?
             hasUpdate = true;
         }
+        
+        // This (code) will check if the entity (mobs|player) is dead!
+        if (this.linkedEntity != null && !this.isAlive() || this.linkedEntity != null) {
+            if (!this.linkedEntity.isAlive()) {
+                if (this.linkedEntity.riding == this) {
+                    this.linkedEntity.riding = null;
+                }
 
+                this.linkedEntity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
+                this.linkedEntity = null;
+            } else if (!this.isAlive()) {
+                if (this.linkedEntity.riding == this) {
+                    this.linkedEntity.riding = null;
+                }
+
+                this.linkedEntity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
+                this.linkedEntity = null;
+            }
+        }
         return hasUpdate || !onGround || Math.abs(motionX) > 0.00001 || Math.abs(motionY) > 0.00001 || Math.abs(motionZ) > 0.00001;
     }
 
@@ -192,7 +208,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 if (((Player) damager).isCreative()) {
                     kill();
                 }
-//                source.setDamage(source.getDamage() + source.getFinalDamage() * 10.0F);
                 if (getHealth() <= 0) {
                     if (((Player) damager).isSurvival()) {
                         level.dropItem(this, dropItem());
@@ -226,7 +241,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     @Override
     public void initEntity() {
         super.initEntity();
-        
+
         setName("Minecart");
     }
 
@@ -236,29 +251,9 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             return false;
         }
 
-        SetEntityLinkPacket pk;
-
-        pk = new SetEntityLinkPacket();
-        pk.rider = getId();
-        pk.riding = p.getId();
-        pk.type = 2;
-        Server.broadcastPacket(this.hasSpawned.values(), pk);
-
-        pk = new SetEntityLinkPacket();
-        pk.rider = getId();
-        pk.riding = 0;
-        pk.type = 2;
-        p.dataPacket(pk);
-
-        p.riding = this;
-        linkedEntity = p;
-        
-        p.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
-        // YES! THANK YOU FOR THESE NEW FLAGS! BRANCH 1.1!
-        // Player will ride -1(y) when riding.So in MC 1.8 player(y) position
-        // should add +0.9(y) (Math: y = -1; y + 0.9; y: -0.1)
-        // So when riding, player will ride -0.1 hight from Minecart
-        p.setDataProperty(new Vector3fEntityData(56, new Vector3f(0, 0.9f, 0)));
+        if (this instanceof EntityMinecartEmpty) {
+            this.mount(p); // Simple
+        }
         return true;
     }
 
@@ -287,7 +282,9 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         timing.startTiming();
         if (entity != riding) {
             if (entity instanceof EntityLiving && !(entity instanceof EntityHuman) && motionX * motionX + motionZ * motionZ > 0.01D && linkedEntity == null && entity.riding == null) {
-                // Here is the place where NPC ride minecart
+                if (riding == null) {
+                    this.mount(entity); // Just like MC logic: Entity will ride minecart
+                }
             }
 
             double motiveX = entity.x - x;
@@ -330,22 +327,22 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         motionX *= 0.20000000298023224D;
                         motionZ *= 0.20000000298023224D;
                         setMotion(entity.motionX - motiveX, 0.0D, entity.motionZ - motiveZ);
-                        entity.motionX *= 0.949999988079071D;
-                        entity.motionZ *= 0.949999988079071D;
+                        entity.motionX *= -0.949999988079071D;
+                        entity.motionZ *= -0.949999988079071D;
                     } else if (((EntityMinecartAbstract) entity).getMineId() != 2 && getMineId() == 2) {
                         entity.motionX *= 0.20000000298023224D;
                         entity.motionZ *= 0.20000000298023224D;
                         setMotion(entity, motionX + motiveX, 0.0D, motionZ + motiveZ);
-                        motionX *= 0.949999988079071D;
-                        motionZ *= 0.949999988079071D;
+                        motionX *= -0.949999988079071D;
+                        motionZ *= -0.949999988079071D;
                     } else {
                         motX /= 2.0D;
                         motZ /= 2.0D;
                         motionX *= 0.20000000298023224D;
                         motionZ *= 0.20000000298023224D;
                         setMotion(motX - motiveX, 0.0D, motZ - motiveZ);
-                        entity.motionX *= 0.20000000298023224D;
-                        entity.motionZ *= 0.20000000298023224D;
+                        entity.motionX *= -0.20000000298023224D;
+                        entity.motionZ *= -0.20000000298023224D;
                         setMotion(entity, motX + motiveX, 0.0D, motZ + motiveZ);
                     }
                 } else {
@@ -718,7 +715,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     /**
      * Define if the Block is rail
-     * 
+     *
      * @param block Block of the current target
      * @return boolean
      */
@@ -736,7 +733,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     /**
      * Define if the Block is Redstone-powered rail
-     * 
+     *
      * @param block Block of the current target
      * @return boolean
      */
