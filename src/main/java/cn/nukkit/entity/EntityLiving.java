@@ -176,8 +176,11 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         super.kill();
         EntityDeathEvent ev = new EntityDeathEvent(this, this.getDrops());
         this.server.getPluginManager().callEvent(ev);
-        for (cn.nukkit.item.Item item : ev.getDrops()) {
-            this.getLevel().dropItem(this, item);
+
+        if (this.level.getGameRules().getBoolean("doEntityDrops")) {
+            for (cn.nukkit.item.Item item : ev.getDrops()) {
+                this.getLevel().dropItem(this, item);
+            }
         }
     }
 
@@ -194,6 +197,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         boolean hasUpdate = super.entityBaseTick(tickDiff);
 
         if (this.isAlive()) {
+
             if (this.isInsideOfSolid()) {
                 hasUpdate = true;
                 this.attack(new EntityDamageEvent(this, DamageCause.SUFFOCATION, 1));
