@@ -2077,6 +2077,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     dataPacket.progress = 1048576 * requestPacket.chunkIndex;
                     this.dataPacket(dataPacket);
                     break;
+                // New protocol (Hope I didn't mess this out)
+                case ProtocolInfo.PLAYER_INPUT_PACKET:
+                    if(!this.isAlive() || !this.spawned){
+                        break;
+                    }
+                    PlayerInputPacket ipk = (PlayerInputPacket) packet;
+                    if(riding instanceof EntityMinecartAbstract){
+                        ((EntityMinecartEmpty) riding).setCurrentSpeed(ipk.motionY);
+                    }
+                    getServer().getLogger().info("CURRENT SPEED x?: " + ipk.motionX);
+                    getServer().getLogger().info("CURRENT SPEED y?: " + ipk.motionY);
+                    getServer().getLogger().info("PACKET UNKNOWN1: " + ipk.unknownBool1);
+                    getServer().getLogger().info("PACKET UNKNOWN2: " + ipk.unknownBool2);
+                    break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:
                     if (this.teleportPosition != null) {
                         break;
@@ -2114,18 +2128,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (riding != null) {
                         if (riding instanceof EntityBoat) {
                             riding.setPositionAndRotation(this.temporalVector.setComponents(movePlayerPacket.x, movePlayerPacket.y - 1, movePlayerPacket.z), (movePlayerPacket.headYaw + 90) % 360, 0);
-                        } else if(riding instanceof EntityMinecartAbstract){
-                            MovePlayerPacket loc = movePlayerPacket;
-                            double dx = lastX - loc.x;
-                            double dz = lastZ - loc.z;
-                            double distance = Math.sqrt(dx * dx + dz * dz);
-                            if (distance > 0.1) {
-                                ((EntityMinecartEmpty) riding).setCurrentSpeed(8); // Max 8 block per Axis
-                                getServer().getLogger().info("CURRENT SPEED: " + distance);
-                            } else {
-                                ((EntityMinecartEmpty) riding).setCurrentSpeed(0);
-                                getServer().getLogger().info("CURRENT SPEED: " + distance);
-                            }
                         }
                     }
 

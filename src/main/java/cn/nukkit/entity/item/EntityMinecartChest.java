@@ -1,5 +1,7 @@
 package cn.nukkit.entity.item;
 
+import cn.nukkit.block.*;
+import cn.nukkit.item.*;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -9,10 +11,11 @@ import cn.nukkit.nbt.tag.CompoundTag;
  */
 public class EntityMinecartChest extends EntityMinecartAbstract {
 
-    public static final int NETWORK_ID = 62;
+    public static final int NETWORK_ID = 84;
 
     public EntityMinecartChest(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+        super.setBlockInside(new BlockChest());
     }
 
     // TODO: 2016/1/30 inventory
@@ -26,5 +29,10 @@ public class EntityMinecartChest extends EntityMinecartAbstract {
     public int getNetworkId() {
         return NETWORK_ID;
     }
-
+    
+    @Override
+    public Item dropItem() {
+        return new ItemMinecartChest();
+    }
+    
 }

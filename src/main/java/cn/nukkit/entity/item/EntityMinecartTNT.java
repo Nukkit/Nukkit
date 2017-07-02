@@ -1,5 +1,7 @@
 package cn.nukkit.entity.item;
 
+import cn.nukkit.block.*;
+import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
 import cn.nukkit.item.Item;
@@ -16,13 +18,15 @@ import java.util.Random;
  * <p>
  * Nukkit Project.
  */
-public class EntityMinecartTNT extends EntityMinecartAbstract {
+public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityExplosive {
 
-    public static final int NETWORK_ID = 98;
+    public static final int NETWORK_ID = 84;
     private int fuse = 0;
+    private boolean activated;
 
     public EntityMinecartTNT(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+        super.setBlockInside(new BlockTNT());
     }
 
     @Override
@@ -35,20 +39,23 @@ public class EntityMinecartTNT extends EntityMinecartAbstract {
     @Override
     public boolean onUpdate(int currentDiff) {
         boolean hasUpdate = super.onUpdate(currentDiff);
-        if (this.fuse > 0) {
-            --this.fuse;
-            this.level.addParticle(new SmokeParticle(new Vector3(this.x, this.y + 0.5D, this.z)));
-        } else if (this.fuse == 0) {
-            this.explode(this.motionX * this.motionX + this.motionZ * this.motionZ);
-        }
+        if (activated) {
+            if (this.fuse > 0) {
+                --this.fuse;
+                this.level.addParticle(new SmokeParticle(new Vector3(this.x, this.y + 0.5D, this.z)));
+            } else if (this.fuse == 0) {
+                this.explode(this.motionX * this.motionX + this.motionZ * this.motionZ);
+            }
 
-        if (this.positionChanged) {
-            double square = this.motionX * this.motionX + this.motionZ * this.motionZ;
+            if (this.positionChanged) {
+                double square = this.motionX * this.motionX + this.motionZ * this.motionZ;
 
-            if (square >= 0.009999999776482582D) {
-                this.explode(square);
+                if (square >= 0.009999999776482582D) {
+                    this.explode(square);
+                }
             }
         }
+
         return hasUpdate || !onGround || Math.abs(motionX) > 0.00001 || Math.abs(motionY) > 0.00001 || Math.abs(motionZ) > 0.00001;
 
     }
@@ -56,11 +63,17 @@ public class EntityMinecartTNT extends EntityMinecartAbstract {
     @Override
     public void activate(int i, int j, int k, boolean flag) {
         this.fuse = 80;
+        this.activated = true;
 
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, true);
         this.setDataProperty(new IntEntityData(DATA_FUSE_LENGTH, fuse));
     }
 
+    @Override
+    public void explode() {
+        explode(0);
+    }
+    
     public void explode(double square) {
         double root = Math.sqrt(square);
 
@@ -78,6 +91,7 @@ public class EntityMinecartTNT extends EntityMinecartAbstract {
             explosion.explodeA();
         }
         explosion.explodeB();
+        kill();
     }
 
     @Override
