@@ -1,18 +1,28 @@
 package cn.nukkit.entity.item;
 
-import cn.nukkit.*;
-import cn.nukkit.math.*;
-import cn.nukkit.item.*;
-import cn.nukkit.block.*;
-import cn.nukkit.entity.*;
-import cn.nukkit.entity.data.*;
-import cn.nukkit.event.entity.*;
-import cn.nukkit.network.protocol.*;
+import cn.nukkit.Player;
+import cn.nukkit.Server;
+import cn.nukkit.block.Block;
+
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityHuman;
+import cn.nukkit.entity.EntityLiving;
+import cn.nukkit.entity.data.ByteEntityData;
+import cn.nukkit.entity.data.IntEntityData;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemMinecart;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.SmokeParticle;
+import cn.nukkit.math.MathHelper;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.EntityEventPacket;
+import cn.nukkit.network.protocol.AddEntityPacket;
 
 import static cn.nukkit.block.BlockRail.*;
+import cn.nukkit.utils.MainLogger;
 
 /**
  * Author: Adam Matthew [larryTheCoder]
@@ -22,24 +32,17 @@ import static cn.nukkit.block.BlockRail.*;
 public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     /**
-     * Minecart: Nukkit Project 
-     * --- 
-     * Made by @larryTheCoder 
-     * DO NOT COPY!
+     * Minecart: Nukkit Project
      */
     private String name;
-    private final int[][][] blockFace = new int[][][]{{{0, 0, -1}, {0, 0, 1}},
-    {{-1, 0, 0}, {1, 0, 0}},
-    {{-1, -1, 0}, {1, 0, 0}},
-    {{-1, 0, 0}, {1, -1, 0}},
-    {{0, 0, -1}, {0, -1, 1}},
-    {{0, -1, -1}, {0, 0, 1}},
-    {{0, 0, 1}, {1, 0, 0}},
-    {{0, 0, 1}, {-1, 0, 0}},
-    {{0, 0, -1}, {-1, 0, 0}},
-    {{0, 0, -1}, {1, 0, 0}}};
+    private final int[][][] blockMSpace = new int[][][]{{{0, 0, -1}, {0, 0, 1}},
+    {{-1, 0, 0}, {1, 0, 0}}, {{-1, -1, 0}, {1, 0, 0}}, {{-1, 0, 0},
+    {1, -1, 0}}, {{0, 0, -1}, {0, -1, 1}}, {{0, -1, -1}, {0, 0, 1}},
+    {{0, 0, 1}, {1, 0, 0}}, {{0, 0, 1}, {-1, 0, 0}}, {{0, 0, -1},
+    {-1, 0, 0}}, {{0, 0, -1}, {1, 0, 0}}};
     private double currentSpeed = 0;
     protected Block blockInside = null;
+    public MainLogger logger = Server.getInstance().getLogger();
 
     /**
      * Get the type of the minecart id:
@@ -90,8 +93,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         super.initEntity();
 
         prepareDataProperty();
-        setMaxHealth(6);
-        setHealth(getMaxHealth());
         setName("Minecart");
     }
 
@@ -111,31 +112,36 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
         if (isAlive()) {
-            // Time to go rouge
+            if (y < -64.0D) {
+                kill();
+            }
+            this.lastX = this.x;
+            this.lastY = this.y;
+            this.lastZ = this.z;
             motionY -= 0.03999999910593033D;
             int dx = MathHelper.floor(x);
-            int dy = MathHelper.floor(y);// The minecart: 0.5, floor 1, so -1
+            int dy = MathHelper.floor(y);
             int dz = MathHelper.floor(z);
 
-            if (isRail(level.getBlock(new Vector3(dx, dy - 1, dz)))) {
-                --dy;
+            // Check if the rail exsits
+            if (!isRail(level.getBlock(new Vector3(dx, dy - 1, dz)))) {
+                --dy; // check again down
             }
 
-            double speeds = 0.4D;
-            double drag = 0.0078125;
-            Block block = level.getBlock(new Vector3(dx, dy, dz));
+            double speeds = 0.4D; // The current exact minecart speed
+            double drag = 0.0078125; // The minecart drag
+            Block block = level.getBlock(new Vector3(dx, dy, dz)); // get the rail
 
-            /////////////////////////////////
-            // MINECART BEHAVIOR: MOVEMENT //
-            /////////////////////////////////
+            // Now start to check if the block is 'Rail'
             if (isRail(block)) {
+                // Okay we got the rail, now get the Minecart damage
                 int l = level.getBlock(new Vector3(dx, dy, dz)).getDamage();
 
                 // Make it runs and see whats happend
                 processMovement(dx, dy, dz, speeds, drag, block, l);
                 if (block.equals(Block.ACTIVATOR_RAIL)) {
                     // If the minecart are TNT, we explode it
-                    activate(dx, dy, dz, (l & 8) != 8);
+                    activate(dx, dy, dz, (l & 8) != 0);
                 }
             } else {
                 // return slow down minecart
@@ -168,16 +174,16 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         break;
                     case SLOPED_ASCENDING_NORTH:
                         yaw = 0;
-                        if (getNextRail(dx, dy + 1, dz + 1) != null
-                                || getNextRail(dx + 1, dy + 1, dz) != null) {
+                        if (isRail(block.add(0, 1, 1).getLevelBlock())
+                                || isRail(block.add(1, 1, 0).getLevelBlock())) {
                             pitch = 135;
                         } else {
                             pitch = 45;
                         }
                     case SLOPED_ASCENDING_WEST:
                         yaw = 90;
-                        if (getNextRail(dx, dy + 1, dz + 1) != null
-                                || getNextRail(dx + 1, dy + 1, dz) != null) {
+                        if (isRail(block.add(0, 1, 1).getLevelBlock())
+                                || isRail(block.add(1, 1, 0).getLevelBlock())) {
                             pitch = 135;
                         } else {
                             pitch = 45;
@@ -192,20 +198,16 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             //////////////////////////////////
             // MINECART BEHAVIOR: COLLIDING //
             //////////////////////////////////
-            for (Entity entity : level.getNearbyEntities(this.boundingBox.grow(0.2D, 0.0D, 0.2D), this)) {
+            for (Entity entity : level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224D, 0.0D, 0.20000000298023224D), this)) {
                 if (entity != this.linkedEntity && entity instanceof EntityMinecartAbstract) {
                     ((EntityMinecartAbstract) entity).onCollideWithVehicle(this);
-                    Server.getInstance().getLogger().info("COLLIDING!");
                 }
             }
-
-            // Debug
-            Server.getInstance().getLogger().info("OBJECT ID: " + getId() + "!");
-            Server.getInstance().getLogger().info("Object XYZ: " + x + " " + y + " " + z);
+            logger.info("X:" + x + "Y:" + y + "Z:" + z);
             double speed = Math.sqrt(motionX * motionX + motionZ * motionZ);
-            Server.getInstance().getLogger().info("Object Speed: " + speed);
-            Server.getInstance().getLogger().info("Object YAW: " + yaw);
-            Server.getInstance().getLogger().info("Object PITCH: " + pitch);
+            logger.info("Object Speed: " + speed);
+            logger.info("Object YAW: " + yaw);
+            logger.info("Object PITCH: " + pitch);
             // Any suggestion?
             hasUpdate = true;
         }
@@ -219,7 +221,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
                 this.linkedEntity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
                 this.linkedEntity = null;
-            } else {
+            } else if (!this.isAlive()) {
                 if (this.linkedEntity.riding == this) {
                     this.linkedEntity.riding = null;
                 }
@@ -344,11 +346,9 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                     Vector3 vector1 = slice(new Vector3((double) MathHelper.cos((float) yaw * 3.1415927F / 180.0F), 0.0D, (double) MathHelper.sin((float) yaw * 3.1415927F / 180.0F)));
                     double desinityXZ = Math.abs(vector.dot(vector1));
 
-                    Server.getInstance().getLogger().info("COLLIDING! MOTS");
                     if (desinityXZ < 0.800000011920929D) {
                         return;
                     }
-                    Server.getInstance().getLogger().info("COLLIDING! PASSED");
 
                     double motX = entity.motionX + motionX;
                     double motZ = entity.motionZ + motionZ;
@@ -368,15 +368,16 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                     } else {
                         motX /= 2.0D;
                         motZ /= 2.0D;
-                        motionX *= 0.20000000298023224D;
-                        motionZ *= 0.20000000298023224D;
+                        motionX *= 0.18;
+                        motionZ *= 0.18;
                         setMotion(motX - motiveX, 0.0D, motZ - motiveZ);
-                        entity.motionX *= 0.20000000298023224D;
-                        entity.motionZ *= 0.20000000298023224D;
+                        entity.motionX *= 0.21;
+                        entity.motionZ *= 0.21;
                         ((EntityMinecartAbstract) entity).setMotion(motX + motiveX, 0.0D, motZ + motiveZ);
                     }
                 } else {
-                    setMotion(new Vector3(motiveX / 4.0D, 0.0D, motiveZ / 4.0D));
+                    // Avoid false colliding
+                    setMotion(motiveX / 10, 0.0D, motiveZ / 10);
                 }
             }
         }
@@ -415,11 +416,11 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
         if (onGround) {
             motionX *= 0.5D;
-            motionY *= 0.5D;
+            motionY = 0;
             motionZ *= 0.5D;
         }
 
-        moveMinecart(motionX, motionY + 1, motionZ);
+        moveMinecart(motionX, motionY, motionZ);
         if (!onGround) {
             motionX *= 0.949999988079071D;
             motionY *= 0.949999988079071D;
@@ -429,7 +430,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     protected void processMovement(int dx, int dy, int dz, double speed, double drag, Block block, int rail) {
         fallDistance = 0.0F;
-        Vector3 vector = getNextRail(dx, dy, dz);
+        Vector3 vector = getNextRail(x, y, z);
 
         y = (double) dy;
         boolean isPowered = false;
@@ -441,8 +442,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         }
 
         if (rail >= SLOPED_ASCENDING_NORTH && rail <= SLOPED_ASCENDING_WEST) {
-            if (getNextRail(dx, dy + 1, dz + 1) != null
-                    || getNextRail(dx + 1, dy + 1, dz) != null) {
+            if (isRail(block.add(0, 1, 1).getLevelBlock())
+                    || isRail(block.add(1, 1, 0).getLevelBlock())) {
                 y = (double) (dy + 1);
             } else {
                 y = (double) (dy - 1);
@@ -469,7 +470,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             motionZ -= drag;
         }
 
-        int[][] facing = blockFace[rail];
+        int[][] facing = blockMSpace[rail];
         double facing1 = (double) (facing[1][0] - facing[0][0]);
         double facing2 = (double) (facing[1][2] - facing[0][2]);
         double speedOnTurns = Math.sqrt(facing1 * facing1 + facing2 * facing2);
@@ -510,9 +511,9 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         if (isSlowed) {
             expectedSpeed = Math.sqrt(motionX * motionX + motionZ * motionZ);
             if (expectedSpeed < 0.03D) {
-                motionX = 0.0D;
-                motionY = 0.0D;
-                motionZ = 0.0D;
+                motionX *= 0.0D;
+                motionY *= 0.0D;
+                motionZ *= 0.0D;
             } else {
                 motionX *= 0.5D;
                 motionY *= 0.0D;
@@ -624,6 +625,19 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     }
 
+    protected double setMinecartRotation(double rotate) {
+        rotate %= 360.0;
+        if (rotate >= 180.0) {
+            rotate -= 360.0;
+        }
+
+        if (rotate < -180.0) {
+            rotate += 360.0;
+        }
+
+        return rotate;
+    }
+
     protected void reduce() {
         if (this.linkedEntity != null) {
             this.motionX *= 0.996999979019165D;
@@ -636,25 +650,46 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         }
     }
 
+    public double calculateVelocityWYaw(double yaw) {
+        yaw %= 360.0D;
+        if (yaw >= 180.0D) {
+            yaw -= 360.0D;
+        }
+
+        if (yaw < -180.0D) {
+            yaw += 360.0D;
+        }
+
+        return yaw;
+    }
+
+    @SuppressWarnings("UnusedAssignment")
     public Vector3 getNextRail(double dx, double dy, double dz) {
         int checkX = MathHelper.floor(dx);
         int checkY = MathHelper.floor(dy);
         int checkZ = MathHelper.floor(dz);
 
-        if (isRail(level.getBlock(new Vector3(checkX, checkY - 1, checkZ)))) {
+        if (!isRail(level.getBlock(new Vector3(checkX, checkY - 1, checkZ)))) {
             --checkY;
         }
 
         Block block = level.getBlock(new Vector3(checkX, checkY, checkZ));
-
+        logger.info("ID: "  + block.getId());
+        logger.info("Damage: " + block.getDamage());
+        
         if (isRail(block)) {
-            int l = level.getBlock(new Vector3(checkX, checkY, checkZ)).getDamage();
+            int l = block.getDamage();
 
+            dy = (double) checkY;
             if (isRedstonePowered(block)) {
                 l &= 7;
             }
 
-            int[][] facing = blockFace[l];
+            if (l >= 2 && l <= 5) {
+                dy = (double) (checkY + 1);
+            }
+
+            int[][] facing = blockMSpace[l];
             double rail;
             // Genisys minstake (Doesn't check surrounding more exactly)
             double nextOne = (double) checkX + 0.5D + (double) facing[0][0] * 0.5D;
@@ -668,8 +703,10 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             double nextMax = nextSix - nextThree;
 
             if (nextSeven == 0.0D) {
+                dx = (double) checkX + 0.5D;
                 rail = dz - (double) checkZ;
             } else if (nextMax == 0.0D) {
+                dz = (double) checkZ + 0.5D;
                 rail = dx - (double) checkX;
             } else {
                 double whatOne = dx - nextOne;
@@ -763,7 +800,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 setDataProperty(new IntEntityData(DATA_MINECART_DISPLAY_OFFSET, offSet));
             }
         } else {
-            int display = blockInside != null ? 0
+            int display = blockInside == null ? 0
                     : blockInside.getId()
                     | blockInside.getDamage() << 16;
             if (display == 0) {
@@ -811,5 +848,4 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         prepareDataProperty();
         return true;
     }
-
 }

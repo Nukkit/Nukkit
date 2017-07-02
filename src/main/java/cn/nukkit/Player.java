@@ -2077,7 +2077,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     dataPacket.progress = 1048576 * requestPacket.chunkIndex;
                     this.dataPacket(dataPacket);
                     break;
-                // New protocol (Hope I didn't mess this out)
                 case ProtocolInfo.PLAYER_INPUT_PACKET:
                     if(!this.isAlive() || !this.spawned){
                         break;
@@ -2086,10 +2085,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if(riding instanceof EntityMinecartAbstract){
                         ((EntityMinecartEmpty) riding).setCurrentSpeed(ipk.motionY);
                     }
-                    getServer().getLogger().info("CURRENT SPEED x?: " + ipk.motionX);
-                    getServer().getLogger().info("CURRENT SPEED y?: " + ipk.motionY);
-                    getServer().getLogger().info("PACKET UNKNOWN1: " + ipk.unknownBool1);
-                    getServer().getLogger().info("PACKET UNKNOWN2: " + ipk.unknownBool2);
                     break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:
                     if (this.teleportPosition != null) {
