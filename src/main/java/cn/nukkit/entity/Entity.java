@@ -1302,10 +1302,9 @@ public abstract class Entity extends Location implements Metadatable {
                 dy *= d3;
                 dx *= 0.05000000074505806D;
                 dy *= 0.05000000074505806D;
-                dx *= (double) (1.0F - this.y);
-                dy *= (double) (1.0F - this.y);
-                this.setMotion(new Vector3(-dx, 0.0D, -dy));
-                entity.setMotion(new Vector3(dx, 0.0D, dy));
+                dx *= (double) (1.0F);
+                dy *= (double) (1.0F);
+                this.setMotion(new Vector3(dx, 0.0D, dy));
             }
         }
     }
@@ -1807,6 +1806,7 @@ public abstract class Entity extends Location implements Metadatable {
         // TODO: If the player should be 0.8 or 0.6? 0.9?
         entity.setDataProperty(
                 new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, new Vector3f(0, 0.8f, 0)));
+        getServer().getLogger().info("Entity Riding!");
         return true;
     }
 

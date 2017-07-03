@@ -11,7 +11,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
  */
 public class EntityMinecartChest extends EntityMinecartAbstract {
 
-    public static final int NETWORK_ID = 84;
+    public static final int NETWORK_ID = 98;
 
     public EntityMinecartChest(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);

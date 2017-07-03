@@ -74,6 +74,10 @@ public class MathHelper {
     public static int clamp(int check, int min, int max) {
         return check > max ? max : (check < min ? min : check);
     }
+    
+    public static double clamp(double check, double min, double max) {
+        return check > max ? max : (check < min ? min : check);
+    }
 
     public static double getDirection(double d0, double d1) {
         if (d0 < 0.0D) {

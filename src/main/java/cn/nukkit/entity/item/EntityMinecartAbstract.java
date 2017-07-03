@@ -124,28 +124,23 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             int dz = MathHelper.floor(z);
 
             // Check if the rail exsits
-            if (!isRail(level.getBlock(new Vector3(dx, dy - 1, dz)))) {
+            if (isRail(level.getBlock(new Vector3(dx, dy - 1, dz)))) {
                 --dy; // check again down
             }
 
-            double speeds = 0.4D; // The current exact minecart speed
-            double drag = 0.0078125; // The minecart drag
             Block block = level.getBlock(new Vector3(dx, dy, dz)); // get the rail
 
             // Now start to check if the block is 'Rail'
             if (isRail(block)) {
-                // Okay we got the rail, now get the Minecart damage
-                int l = level.getBlock(new Vector3(dx, dy, dz)).getDamage();
-
-                // Make it runs and see whats happend
-                processMovement(dx, dy, dz, speeds, drag, block, l);
+//                logger.info("IS RAIL!");
+                processMovement(dx, dy, dz, block);
                 if (block.equals(Block.ACTIVATOR_RAIL)) {
-                    // If the minecart are TNT, we explode it
-                    activate(dx, dy, dz, (l & 8) != 0);
+                    activate(dx, dy, dz, (block.getDamage() & 8) != 0);
                 }
             } else {
+//                logger.info("NOT RAIL!");
                 // return slow down minecart
-                setSlowdown(speeds);
+                setSlowdown();
             }
 
             /////////////////////////////////////////
@@ -168,27 +163,23 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                     case CURVED_NORTH_WEST:
                     case STRAIGHT_EAST_WEST:
                         yaw = 90;
+                        pitch = 0;
                         break;
                     case STRAIGHT_NORTH_SOUTH:
                         yaw = 0;
+                        pitch = 0;
                         break;
                     case SLOPED_ASCENDING_NORTH:
                         yaw = 0;
-                        if (isRail(block.add(0, 1, 1).getLevelBlock())
-                                || isRail(block.add(1, 1, 0).getLevelBlock())) {
-                            pitch = 135;
-                        } else {
-                            pitch = 45;
-                        }
+                        pitch = 45;
+                        break;
                     case SLOPED_ASCENDING_WEST:
                         yaw = 90;
-                        if (isRail(block.add(0, 1, 1).getLevelBlock())
-                                || isRail(block.add(1, 1, 0).getLevelBlock())) {
-                            pitch = 135;
-                        } else {
-                            pitch = 45;
-                        }
+                        pitch = 45;
+                        break;
                     default:
+                        pitch = 0;
+                        yaw = 0;
                         break;
                 }
             }
@@ -203,11 +194,11 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                     ((EntityMinecartAbstract) entity).onCollideWithVehicle(this);
                 }
             }
-            logger.info("X:" + x + "Y:" + y + "Z:" + z);
-            double speed = Math.sqrt(motionX * motionX + motionZ * motionZ);
-            logger.info("Object Speed: " + speed);
-            logger.info("Object YAW: " + yaw);
-            logger.info("Object PITCH: " + pitch);
+//            logger.info("X:" + x + "Y:" + y + "Z:" + z);
+//            double speed = Math.sqrt(motionX * motionX + motionZ * motionZ);
+//            logger.info("Object Speed: " + speed);
+//            logger.info("Object YAW: " + yaw);
+//            logger.info("Object PITCH: " + pitch);
             // Any suggestion?
             hasUpdate = true;
         }
@@ -335,16 +326,16 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 motiveZ *= next;
                 motiveX *= 0.10000000149011612D;
                 motiveZ *= 0.10000000149011612D;
-                motiveX *= (double) (1.0F - y);
-                motiveZ *= (double) (1.0F - y);
-                motiveX *= 0.5D;
-                motiveZ *= 0.5D;
+                motiveX *= 1.0D; // HOW DO I MISSED THIS SIMPLE THING??
+                motiveZ *= 1.0D;
                 if (entity instanceof EntityMinecartAbstract) {
+                    motiveX *= 0.5D;
+                    motiveZ *= 0.5D;
                     double desinityX = entity.x - x;
                     double desinityZ = entity.z - z;
                     Vector3 vector = slice(new Vector3(desinityX, 0.0D, desinityZ));
-                    Vector3 vector1 = slice(new Vector3((double) MathHelper.cos((float) yaw * 3.1415927F / 180.0F), 0.0D, (double) MathHelper.sin((float) yaw * 3.1415927F / 180.0F)));
-                    double desinityXZ = Math.abs(vector.dot(vector1));
+                    Vector3 vec = slice(new Vector3((double) MathHelper.cos((float) yaw * 0.017453292F), 0.0D, (double) MathHelper.sin((float) yaw * 0.017453292F)));
+                    double desinityXZ = Math.abs(vector.dot(vec));
 
                     if (desinityXZ < 0.800000011920929D) {
                         return;
@@ -376,8 +367,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         ((EntityMinecartAbstract) entity).setMotion(motX + motiveX, 0.0D, motZ + motiveZ);
                     }
                 } else {
-                    // Avoid false colliding
-                    setMotion(motiveX / 10, 0.0D, motiveZ / 10);
+                    setMotion(-motiveX, 0.0D, -motiveZ);
                 }
             }
         }
@@ -397,26 +387,15 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     protected void activate(int x, int y, int z, boolean flag) {
     }
 
-    protected void setSlowdown(double slow) {
-        if (motionX < -slow) {
-            motionX = -slow;
-        }
-
-        if (motionX > slow) {
-            motionX = slow;
-        }
-
-        if (motionZ < -slow) {
-            motionZ = -slow;
-        }
-
-        if (motionZ > slow) {
-            motionZ = slow;
-        }
-
+    protected void setSlowdown() {
+        // The problem was minecart height -0.7F from the ground. So add 0.7 to
+        // adjust minecart height from ground
+        motionX = MathHelper.clamp(motionX, -0.4D, 0.4D);
+        motionZ = MathHelper.clamp(motionZ, -0.4D, 0.4D);
+        
         if (onGround) {
             motionX *= 0.5D;
-            motionY = 0;
+            motionY *= 0.5D;
             motionZ *= 0.5D;
         }
 
@@ -428,7 +407,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         }
     }
 
-    protected void processMovement(int dx, int dy, int dz, double speed, double drag, Block block, int rail) {
+    protected void processMovement(int dx, int dy, int dz, Block block) {
         fallDistance = 0.0F;
         Vector3 vector = getNextRail(x, y, z);
 
@@ -437,40 +416,30 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         boolean isSlowed = false;
 
         if (block.equals(Block.POWERED_RAIL)) {
-            isPowered = (rail & 0x8) != 8;
+            isPowered = (block.getDamage() & 0x8) != 0;
             isSlowed = !isPowered;
         }
 
-        if (rail >= SLOPED_ASCENDING_NORTH && rail <= SLOPED_ASCENDING_WEST) {
-            if (isRail(block.add(0, 1, 1).getLevelBlock())
-                    || isRail(block.add(1, 1, 0).getLevelBlock())) {
-                y = (double) (dy + 1);
-            } else {
-                y = (double) (dy - 1);
-            }
+        switch (block.getDamage()) {
+            case SLOPED_ASCENDING_NORTH:
+                motionX -= 0.0078125D;
+                y += 1.0D;
+                break;
+            case SLOPED_ASCENDING_SOUTH:
+                motionX += 0.0078125D;
+                y += 1.0D;
+                break;
+            case SLOPED_ASCENDING_EAST:
+                motionZ += 0.0078125D;
+                y += 1.0D;
+                break;
+            case SLOPED_ASCENDING_WEST:
+                motionZ -= 0.0078125D;
+                y += 1.0D;
+                break;
         }
 
-        if (isRedstonePowered(block)) {
-            rail &= 7;
-        }
-
-        if (rail == SLOPED_ASCENDING_NORTH) {
-            motionX -= drag;
-        }
-
-        if (rail == SLOPED_ASCENDING_SOUTH) {
-            motionX += drag;
-        }
-
-        if (rail == SLOPED_ASCENDING_EAST) {
-            motionZ += drag;
-        }
-
-        if (rail == SLOPED_ASCENDING_WEST) {
-            motionZ -= drag;
-        }
-
-        int[][] facing = blockMSpace[rail];
+        int[][] facing = blockMSpace[block.getDamage()];
         double facing1 = (double) (facing[1][0] - facing[0][0]);
         double facing2 = (double) (facing[1][2] - facing[0][2]);
         double speedOnTurns = Math.sqrt(facing1 * facing1 + facing2 * facing2);
@@ -503,11 +472,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 if (motion < 0.01D) {
                     motionX += playerYawNeg * 0.1D;
                     motionZ += playerYawPos * 0.1D;
+
                     isSlowed = false;
                 }
             }
         }
 
+        //http://minecraft.gamepedia.com/Powered_Rail#Rail
         if (isSlowed) {
             expectedSpeed = Math.sqrt(motionX * motionX + motionZ * motionZ);
             if (expectedSpeed < 0.03D) {
@@ -552,22 +523,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             motX *= 0.75D;
             motZ *= 0.75D;
         }
-
-        if (motX < -speed) {
-            motX = -speed;
-        }
-
-        if (motX > speed) {
-            motX = speed;
-        }
-
-        if (motZ < -speed) {
-            motZ = -speed;
-        }
-
-        if (motZ > speed) {
-            motZ = speed;
-        }
+        motX = MathHelper.clamp(motX, -0.4D, 0.4D);
+        motZ = MathHelper.clamp(motZ, -0.4D, 0.4D);
 
         moveMinecart(motX, 0.0D, motZ);
         if (facing[0][1] != 0 && MathHelper.floor(x) - dx == facing[0][0] && MathHelper.floor(z) - dz == facing[0][2]) {
@@ -598,7 +555,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             squareOfFame = Math.sqrt(motionX * motionX + motionZ * motionZ);
             motionX = squareOfFame * (double) (floorX - dx);
             motionZ = squareOfFame * (double) (floorZ - dz);
-        }
+            }
 
         if (isPowered) {
             double newMovie = Math.sqrt(motionX * motionX + motionZ * motionZ);
@@ -608,13 +565,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
                 motionX += motionX / newMovie * nextMovie;
                 motionZ += motionZ / newMovie * nextMovie;
-            } else if (rail == STRAIGHT_NORTH_SOUTH) {
+            } else if (block.getDamage() == STRAIGHT_NORTH_SOUTH) {
                 if (level.getBlock(new Vector3(dx - 1, dy, dz)).isNormalBlock()) {
                     motionX = 0.02D;
                 } else if (level.getBlock(new Vector3(dx + 1, dy, dz)).isNormalBlock()) {
                     motionX = -0.02D;
                 }
-            } else if (rail == STRAIGHT_EAST_WEST) {
+            } else if (block.getDamage() == STRAIGHT_EAST_WEST) {
                 if (level.getBlock(new Vector3(dx, dy, dz - 1)).isNormalBlock()) {
                     motionZ = 0.02D;
                 } else if (level.getBlock(new Vector3(dx, dy, dz + 1)).isNormalBlock()) {
@@ -623,19 +580,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             }
         }
 
-    }
-
-    protected double setMinecartRotation(double rotate) {
-        rotate %= 360.0;
-        if (rotate >= 180.0) {
-            rotate -= 360.0;
-        }
-
-        if (rotate < -180.0) {
-            rotate += 360.0;
-        }
-
-        return rotate;
     }
 
     protected void reduce() {
@@ -650,33 +594,20 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         }
     }
 
-    public double calculateVelocityWYaw(double yaw) {
-        yaw %= 360.0D;
-        if (yaw >= 180.0D) {
-            yaw -= 360.0D;
-        }
-
-        if (yaw < -180.0D) {
-            yaw += 360.0D;
-        }
-
-        return yaw;
-    }
-
     @SuppressWarnings("UnusedAssignment")
     public Vector3 getNextRail(double dx, double dy, double dz) {
         int checkX = MathHelper.floor(dx);
         int checkY = MathHelper.floor(dy);
         int checkZ = MathHelper.floor(dz);
 
-        if (!isRail(level.getBlock(new Vector3(checkX, checkY - 1, checkZ)))) {
+        if (isRail(level.getBlock(new Vector3(checkX, checkY - 1, checkZ)))) {
             --checkY;
         }
 
         Block block = level.getBlock(new Vector3(checkX, checkY, checkZ));
         logger.info("ID: "  + block.getId());
         logger.info("Damage: " + block.getDamage());
-        
+
         if (isRail(block)) {
             int l = block.getDamage();
 
