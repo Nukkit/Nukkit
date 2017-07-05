@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.api.API;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockRail;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.EntityLiving;
@@ -18,13 +19,13 @@ import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.AddEntityPacket;
-import cn.nukkit.block.BlockRail;
+import cn.nukkit.network.protocol.EntityEventPacket;
+import cn.nukkit.utils.Rail;
 import cn.nukkit.utils.Rail.Orientation;
 
-import static cn.nukkit.api.API.*;
-import static cn.nukkit.block.BlockRail.*;
+import static cn.nukkit.api.API.Definition;
+import static cn.nukkit.api.API.Usage;
 
 /**
  * Author: Adam Matthew [larryTheCoder]
@@ -36,22 +37,12 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     /**
      * Minecart: Nukkit Project
      */
-    public static final int STRAIGHT_EAST_WEST = 0;
-    public static final int STRAIGHT_NORTH_SOUTH = 1;
-    public static final int SLOPED_ASCENDING_NORTH = 2;
-    public static final int SLOPED_ASCENDING_SOUTH = 3;
-    public static final int SLOPED_ASCENDING_EAST = 4;
-    public static final int SLOPED_ASCENDING_WEST = 5;
-    public static final int CURVED_SOUTH_WEST = 6;
-    public static final int CURVED_NORTH_WEST = 7;
-    public static final int CURVED_NORTH_EAST = 8;
-    public static final int CURVED_SOUTH_EAST = 9;  
     private String name;
     private final int[][][] blockMSpace = new int[][][]{{{0, 0, -1}, {0, 0, 1}},
-    {{-1, 0, 0}, {1, 0, 0}}, {{-1, -1, 0}, {1, 0, 0}}, {{-1, 0, 0},
-    {1, -1, 0}}, {{0, 0, -1}, {0, -1, 1}}, {{0, -1, -1}, {0, 0, 1}},
-    {{0, 0, 1}, {1, 0, 0}}, {{0, 0, 1}, {-1, 0, 0}}, {{0, 0, -1},
-    {-1, 0, 0}}, {{0, 0, -1}, {1, 0, 0}}};
+            {{-1, 0, 0}, {1, 0, 0}}, {{-1, -1, 0}, {1, 0, 0}}, {{-1, 0, 0},
+            {1, -1, 0}}, {{0, 0, -1}, {0, -1, 1}}, {{0, -1, -1}, {0, 0, 1}},
+            {{0, 0, 1}, {1, 0, 0}}, {{0, 0, 1}, {-1, 0, 0}}, {{0, 0, -1},
+            {-1, 0, 0}}, {{0, 0, -1}, {1, 0, 0}}};
     private double currentSpeed = 0;
     protected Block blockInside = null;
     private boolean slowWhenEmpty = false;
@@ -136,14 +127,14 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             int dz = MathHelper.floor(z);
 
             // Check if the rail exsits
-            if (isRail(level.getBlock(new Vector3(dx, dy - 1, dz)))) {
+            if (Rail.isRailBlock(level.getBlockIdAt(dx, dy - 1, dz))) {
                 --dy; // check again down
             }
 
             Block block = level.getBlock(new Vector3(dx, dy, dz)); // get the rail
 
             // Now start to check if the block is 'Rail'
-            if (isRail(block)) {
+            if (Rail.isRailBlock(block)) {
                 processMovement(dx, dy, dz, (BlockRail) block);
                 if (block.getId() == Block.ACTIVATOR_RAIL) {
                     activate(dx, dy, dz, (block.getDamage() & 8) != 0);
@@ -164,8 +155,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             }
 
             // N W S E
-            if (isRail(block)) {
-                switch (block.getDamage()) {
+            if (Rail.isRailBlock(block)) {
+                switch (Orientation.byMetadata(block.getDamage())) {
                     case CURVED_SOUTH_EAST:
                     case CURVED_SOUTH_WEST:
                     case CURVED_NORTH_EAST:
@@ -174,13 +165,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         yaw = 90;
                         pitch = 0;
                         break;
-                    case SLOPED_ASCENDING_NORTH:   
-                    case SLOPED_ASCENDING_SOUTH:
+                    case ASCENDING_NORTH:
+                    case ASCENDING_SOUTH:
                         yaw = 0;
                         pitch = 45;
                         break;
-                    case SLOPED_ASCENDING_EAST:
-                    case SLOPED_ASCENDING_WEST:
+                    case ASCENDING_EAST:
+                    case ASCENDING_WEST:
                         yaw = 90;
                         pitch = 45;
                         break;
@@ -426,20 +417,20 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             isSlowed = !isPowered;
         }
 
-        switch (block.getDamage()) {
-            case SLOPED_ASCENDING_NORTH:
+        switch (Orientation.byMetadata(block.getDamage())) {
+            case ASCENDING_NORTH:
                 motionX -= 0.0078125D;
                 y += 1.0D;
                 break;
-            case SLOPED_ASCENDING_SOUTH:
+            case ASCENDING_SOUTH:
                 motionX += 0.0078125D;
                 y += 1.0D;
                 break;
-            case SLOPED_ASCENDING_EAST:
+            case ASCENDING_EAST:
                 motionZ += 0.0078125D;
                 y += 1.0D;
                 break;
-            case SLOPED_ASCENDING_WEST:
+            case ASCENDING_WEST:
                 motionZ -= 0.0078125D;
                 y += 1.0D;
                 break;
@@ -605,13 +596,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         int checkY = MathHelper.floor(dy);
         int checkZ = MathHelper.floor(dz);
 
-        if (isRail(level.getBlock(new Vector3(checkX, checkY - 1, checkZ)))) {
+        if (Rail.isRailBlock(level.getBlockIdAt(checkX, checkY - 1, checkZ))) {
             --checkY;
         }
 
         Block block = level.getBlock(new Vector3(checkX, checkY, checkZ));
 
-        if (isRail(block)) {
+        if (Rail.isRailBlock(block)) {
             int l = block.getDamage();
 
             if (isRedstonePowered(block)) {
@@ -677,24 +668,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         this.currentSpeed = speed;
     }
 
-    /**
-     * Define if the Block is rail
-     *
-     * @param block Block of the current target
-     * @return boolean
-     */
-    private boolean isRail(Block block) {
-        switch (block.getId()) {
-            case RAIL:
-            case POWERED_RAIL:
-            case ACTIVATOR_RAIL:
-            case DETECTOR_RAIL:
-                return true;
-            default:
-                return false;
-        }
-    }
-
     public void setMotion(double dx, double dy, double dz) {
         setMotion(new Vector3(dx, dy, dz));
         super.updateMovement();
@@ -708,9 +681,9 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
      */
     private boolean isRedstonePowered(Block block) {
         switch (block.getId()) {
-            case POWERED_RAIL:
-            case ACTIVATOR_RAIL:
-            case DETECTOR_RAIL:
+            case Block.POWERED_RAIL:
+            case Block.ACTIVATOR_RAIL:
+            case Block.DETECTOR_RAIL:
                 return true;
             default:
                 return false;

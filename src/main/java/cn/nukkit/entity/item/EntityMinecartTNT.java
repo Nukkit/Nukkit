@@ -1,6 +1,5 @@
 package cn.nukkit.entity.item;
 
-import cn.nukkit.block.*;
 import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
@@ -11,6 +10,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+
 import java.util.Random;
 
 /**
@@ -73,7 +73,7 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
     public void explode() {
         explode(0);
     }
-    
+
     public void explode(double square) {
         double root = Math.sqrt(square);
 

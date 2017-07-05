@@ -2,7 +2,6 @@ package cn.nukkit.utils;
 
 import cn.nukkit.api.API;
 import cn.nukkit.block.Block;
-import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 
 import java.util.*;
@@ -141,39 +140,7 @@ public final class Rail {
         }
     }
 
-//    /**
-//     * todo Put the rail block.
-//     */
-//    private static Orientation placeRailBlock
-//    () {
-//        // 1. If there are no other rails adjacent
-//        //    it will be placed as a straight track oriented north-south.
-//
-//        // 2. If placed at the end of an existing stretch of track, the new rail will
-//        // be a straight track section oriented to continue the existing track,
-//        // either east-west or north-south.
-//
-//
-//        // 3. If placed beside an existing stretch of track (of any type)
-//        // the newly placed rail will be straight and oriented north-south
-//
-//        // 4. If there are two adjacent rails on its level, or one level up or down,
-//        // the newly placed rail will configure itself to connect the other two.
-//        // This means that it will be placed as a straight or curved track as needed.
-//
-//        // 5. If placed between three adjacent rails (thus always forming a T-junction)
-//        // the newly placed rail will be placed as a curved track south-to-east, north-to-east,
-//        // or south-to-west to join those sides.
-//
-//    }
-
-
-    static boolean isRailBlock(Level level, int x, int y, int z) {
-        Objects.requireNonNull(level, "Rail block predicate can not accept null level");
-        return isRailBlock(level.getBlockIdAt(x, y, z));
-    }
-
-    private static boolean isRailBlock(int blockId) {
+    public static boolean isRailBlock(int blockId) {
         switch (blockId) {
             case Block.RAIL:
             case Block.POWERED_RAIL:

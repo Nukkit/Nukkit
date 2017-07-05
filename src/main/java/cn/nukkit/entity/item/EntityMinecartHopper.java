@@ -1,7 +1,5 @@
 package cn.nukkit.entity.item;
 
-import cn.nukkit.block.*;
-import cn.nukkit.item.*;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 

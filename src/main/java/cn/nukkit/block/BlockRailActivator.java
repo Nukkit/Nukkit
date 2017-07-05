@@ -1,7 +1,5 @@
 package cn.nukkit.block;
 
-import cn.nukkit.math.BlockFace;
-
 /**
  * @author Nukkit Project Team
  */

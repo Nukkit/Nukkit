@@ -1,6 +1,5 @@
 package cn.nukkit.entity.item;
 
-import cn.nukkit.block.*;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -25,5 +24,5 @@ public class EntityMinecartEmpty extends EntityMinecartAbstract {
     public int getMineId() {
         return 0;
     }
-    
+
 }
