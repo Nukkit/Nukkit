@@ -26,6 +26,7 @@ public class BlockRail extends BlockFlowable {
     public boolean isComplex = false;
     public int redstonePower;
     public boolean triggered;
+
     public BlockRail() {
         this(0);
     }
@@ -64,14 +65,14 @@ public class BlockRail extends BlockFlowable {
         return ItemTool.TYPE_PICKAXE;
     }
 
-    protected void setIsDiode(boolean isDiode){
+    protected void setIsDiode(boolean isDiode) {
         this.isDiode = isDiode;
     }
-    
-    protected void setComplexDiode(boolean complex){
+
+    protected void setComplexDiode(boolean complex) {
         this.isComplex = complex;
     }
-    
+
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
@@ -79,7 +80,7 @@ public class BlockRail extends BlockFlowable {
             if (this.down().isTransparent() || (ascendingDirection.isPresent() && this.getSide(ascendingDirection.get()).isTransparent())) {
                 this.getLevel().useBreakOn(this);
                 return Level.BLOCK_UPDATE_NORMAL;
-            } else if (isDiode){
+            } else if (isDiode) {
                 //computeRedstoneCount();
             }
         }
@@ -220,11 +221,11 @@ public class BlockRail extends BlockFlowable {
             this.level.setBlock(this, this, true, true);
         }
     }
-    
-    public void setTriggered(boolean flag){
+
+    public void setTriggered(boolean flag) {
         this.triggered = flag;
     }
-    
+
     public void computeRedstoneCount() {
         if (!(this instanceof BlockRailPowered)) { // Activator or Dectector
             if (!triggered) { // If the rail was triggered
@@ -234,7 +235,7 @@ public class BlockRail extends BlockFlowable {
             } else {
                 setDamage(meta ^ 0x8); // power this up
                 level.setBlock(this, this, true, true);
-                level.scheduleUpdate(this, 2);                
+                level.scheduleUpdate(this, 2);
             }
             triggered = false;
             return;
@@ -247,7 +248,7 @@ public class BlockRail extends BlockFlowable {
             if (goldenRail instanceof BlockRailPowered && (redstonePower > 0 || goldenRail.redstonePower > 0)) { // Check if rail is Golden Rails
                 goldenRail.setDamage(goldenRail.getDamage() ^ 0x8);
                 level.setBlock(goldenRail, goldenRail, true, true);
-            } else if((goldenRail.getDamage() & 0x8) != 0){
+            } else if ((goldenRail.getDamage() & 0x8) != 0) {
                 setDamage(meta & 0x8);
                 level.setBlock(goldenRail, goldenRail, true, true);
             }
@@ -258,5 +259,5 @@ public class BlockRail extends BlockFlowable {
     public int getWeakPower(BlockFace face) {
         return redstonePower;
     }
-    
+
 }
