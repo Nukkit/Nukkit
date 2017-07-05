@@ -5,12 +5,14 @@ package cn.nukkit.block;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockRailDetector extends BlockRail {
+
     public BlockRailDetector() {
         this(0);
     }
 
     public BlockRailDetector(int meta) {
         super(meta);
+        setComplexDiode(true);
     }
 
     @Override

@@ -15,7 +15,7 @@ public class EntityMinecartChest extends EntityMinecartAbstract {
 
     public EntityMinecartChest(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-        super.setBlockInside(new BlockChest());
+        super.setDisplayBlock(new BlockChest());
     }
 
     // TODO: 2016/1/30 inventory

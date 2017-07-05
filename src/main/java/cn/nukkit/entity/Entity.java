@@ -545,7 +545,7 @@ public abstract class Entity extends Location implements Metadatable {
     public float getScale() {
         return this.scale;
     }
-
+    
     public Entity getLinkedEntity() {
         return linkedEntity;
     }
@@ -1303,8 +1303,9 @@ public abstract class Entity extends Location implements Metadatable {
                 dx *= 0.05000000074505806D;
                 dy *= 0.05000000074505806D;
                 dx *= (double) (1.0F);
-                dy *= (double) (1.0F);
-                this.setMotion(new Vector3(dx, 0.0D, dy));
+                dz *= (double) (1.0F);
+                this.setMotion(new Vector3(-dx, 0.0D, -dy));
+                entity.setMotion(new Vector3(dx / 4.0D, 0.0D, dy / 4.0D));
             }
         }
     }
@@ -1393,6 +1394,10 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean fastMove(double dx, double dy, double dz) {
+        return fastMove(dx, dy, dz, 0);
+    }
+    
+    public boolean fastMove(double dx, double dy, double dz, double adjust) {
         if (dx == 0 && dy == 0 && dz == 0) {
             return true;
         }
@@ -1406,7 +1411,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         this.x = (this.boundingBox.minX + this.boundingBox.maxX) / 2;
-        this.y = this.boundingBox.minY - this.ySize;
+        this.y = this.boundingBox.minY - this.ySize + adjust;
         this.z = (this.boundingBox.minZ + this.boundingBox.maxZ) / 2;
 
         this.checkChunks();
@@ -1424,14 +1429,17 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean move(double dx, double dy, double dz) {
-
+        return move(dx, dy, dz, 0);
+    }
+        
+    public boolean move(double dx, double dy, double dz, double adjust) {
         if (dx == 0 && dz == 0 && dy == 0) {
             return true;
         }
 
         if (this.keepMovement) {
             this.boundingBox.offset(dx, dy, dz);
-            this.setPosition(this.temporalVector.setComponents((this.boundingBox.minX + this.boundingBox.maxX) / 2, this.boundingBox.minY, (this.boundingBox.minZ + this.boundingBox.maxZ) / 2));
+            this.setPosition(this.temporalVector.setComponents((this.boundingBox.minX + this.boundingBox.maxX) / 2, this.boundingBox.minY + adjust, (this.boundingBox.minZ + this.boundingBox.maxZ) / 2));
             this.onGround = this.isPlayer;
             return true;
         } else {
@@ -1514,7 +1522,7 @@ public abstract class Entity extends Location implements Metadatable {
             }
 
             this.x = (this.boundingBox.minX + this.boundingBox.maxX) / 2;
-            this.y = this.boundingBox.minY - this.ySize;
+            this.y = this.boundingBox.minY - this.ySize + adjust;
             this.z = (this.boundingBox.minZ + this.boundingBox.maxZ) / 2;
 
             this.checkChunks();
@@ -1780,6 +1788,7 @@ public abstract class Entity extends Location implements Metadatable {
      * @return {@code true} if the mounting successful
      */
     public boolean mount(Entity entity) {
+        // Player can ride other vehicle but not the same vehicle
         if (entity.riding != null || !(this instanceof EntityVehicle)) {
             return false;
         }
@@ -1806,7 +1815,6 @@ public abstract class Entity extends Location implements Metadatable {
         // TODO: If the player should be 0.8 or 0.6? 0.9?
         entity.setDataProperty(
                 new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, new Vector3f(0, 0.8f, 0)));
-        getServer().getLogger().info("Entity Riding!");
         return true;
     }
 

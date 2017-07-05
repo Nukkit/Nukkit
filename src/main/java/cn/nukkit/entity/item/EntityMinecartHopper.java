@@ -7,11 +7,10 @@ import cn.nukkit.nbt.tag.CompoundTag;
 
 public class EntityMinecartHopper extends EntityMinecartAbstract {
 
-    public static final int NETWORK_ID = 84;
+    public static final int NETWORK_ID = 96;
 
     public EntityMinecartHopper(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-        super.setBlockInside(new BlockHopper());
     }
 
     // TODO: 2016/12/18 inventory

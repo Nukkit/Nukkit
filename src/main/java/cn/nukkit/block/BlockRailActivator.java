@@ -1,5 +1,7 @@
 package cn.nukkit.block;
 
+import cn.nukkit.math.BlockFace;
+
 /**
  * @author Nukkit Project Team
  */
@@ -11,6 +13,8 @@ public class BlockRailActivator extends BlockRail {
 
     public BlockRailActivator() {
         this(0);
+        setIsDiode(true); // can power
+        setComplexDiode(true);
     }
 
     @Override

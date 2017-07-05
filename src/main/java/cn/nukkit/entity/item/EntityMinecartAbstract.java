@@ -2,8 +2,8 @@ package cn.nukkit.entity.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.api.API;
 import cn.nukkit.block.Block;
-
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.EntityLiving;
@@ -20,9 +20,11 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.AddEntityPacket;
+import cn.nukkit.block.BlockRail;
+import cn.nukkit.utils.Rail.Orientation;
 
+import static cn.nukkit.api.API.*;
 import static cn.nukkit.block.BlockRail.*;
-import cn.nukkit.utils.MainLogger;
 
 /**
  * Author: Adam Matthew [larryTheCoder]
@@ -34,6 +36,16 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     /**
      * Minecart: Nukkit Project
      */
+    public static final int STRAIGHT_EAST_WEST = 0;
+    public static final int STRAIGHT_NORTH_SOUTH = 1;
+    public static final int SLOPED_ASCENDING_NORTH = 2;
+    public static final int SLOPED_ASCENDING_SOUTH = 3;
+    public static final int SLOPED_ASCENDING_EAST = 4;
+    public static final int SLOPED_ASCENDING_WEST = 5;
+    public static final int CURVED_SOUTH_WEST = 6;
+    public static final int CURVED_NORTH_WEST = 7;
+    public static final int CURVED_NORTH_EAST = 8;
+    public static final int CURVED_SOUTH_EAST = 9;  
     private String name;
     private final int[][][] blockMSpace = new int[][][]{{{0, 0, -1}, {0, 0, 1}},
     {{-1, 0, 0}, {1, 0, 0}}, {{-1, -1, 0}, {1, 0, 0}}, {{-1, 0, 0},
@@ -42,7 +54,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     {-1, 0, 0}}, {{0, 0, -1}, {1, 0, 0}}};
     private double currentSpeed = 0;
     protected Block blockInside = null;
-    public MainLogger logger = Server.getInstance().getLogger();
+    private boolean slowWhenEmpty = false;
 
     /**
      * Get the type of the minecart id:
@@ -132,15 +144,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
             // Now start to check if the block is 'Rail'
             if (isRail(block)) {
-//                logger.info("IS RAIL!");
-                processMovement(dx, dy, dz, block);
-                if (block.equals(Block.ACTIVATOR_RAIL)) {
+                processMovement(dx, dy, dz, (BlockRail) block);
+                if (block.getId() == Block.ACTIVATOR_RAIL) {
                     activate(dx, dy, dz, (block.getDamage() & 8) != 0);
                 }
             } else {
-//                logger.info("NOT RAIL!");
-                // return slow down minecart
-                setSlowdown();
+                // control falling and movement (off rail)
+                setFalling();
             }
 
             /////////////////////////////////////////
@@ -148,7 +158,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             /////////////////////////////////////////
             double befX = lastX - x;
             double befZ = lastZ - z;
-            int railType = block.getDamage();
 
             if (befX * befX + befZ * befZ > 0.001D) {
                 yaw = (float) (Math.atan2(befZ, befX) * 180.0D / 3.141592653589793D);
@@ -156,7 +165,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
             // N W S E
             if (isRail(block)) {
-                switch (railType) {
+                switch (block.getDamage()) {
                     case CURVED_SOUTH_EAST:
                     case CURVED_SOUTH_WEST:
                     case CURVED_NORTH_EAST:
@@ -165,14 +174,12 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         yaw = 90;
                         pitch = 0;
                         break;
-                    case STRAIGHT_NORTH_SOUTH:
-                        yaw = 0;
-                        pitch = 0;
-                        break;
-                    case SLOPED_ASCENDING_NORTH:
+                    case SLOPED_ASCENDING_NORTH:   
+                    case SLOPED_ASCENDING_SOUTH:
                         yaw = 0;
                         pitch = 45;
                         break;
+                    case SLOPED_ASCENDING_EAST:
                     case SLOPED_ASCENDING_WEST:
                         yaw = 90;
                         pitch = 45;
@@ -194,11 +201,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                     ((EntityMinecartAbstract) entity).onCollideWithVehicle(this);
                 }
             }
-//            logger.info("X:" + x + "Y:" + y + "Z:" + z);
-//            double speed = Math.sqrt(motionX * motionX + motionZ * motionZ);
-//            logger.info("Object Speed: " + speed);
-//            logger.info("Object YAW: " + yaw);
-//            logger.info("Object PITCH: " + pitch);
             // Any suggestion?
             hasUpdate = true;
         }
@@ -233,7 +235,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                     kill();
                 }
                 if (getHealth() <= 0) {
-                    if (((Player) damager).isSurvival()) {
+                    if (((Player) damager).isSurvival() && this.level.getGameRules().getBoolean("doEntityDrops")) {
                         level.dropItem(this, dropItem());
                     }
                     close();
@@ -359,15 +361,16 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                     } else {
                         motX /= 2.0D;
                         motZ /= 2.0D;
-                        motionX *= 0.18;
-                        motionZ *= 0.18;
+                        motionX *= 0.20000000298023224D;
+                        motionZ *= 0.20000000298023224D;
                         setMotion(motX - motiveX, 0.0D, motZ - motiveZ);
-                        entity.motionX *= 0.21;
-                        entity.motionZ *= 0.21;
+                        entity.motionX *= 0.20000000298023224D;
+                        entity.motionZ *= 0.20000000298023224D;
                         ((EntityMinecartAbstract) entity).setMotion(motX + motiveX, 0.0D, motZ + motiveZ);
                     }
                 } else {
-                    setMotion(-motiveX, 0.0D, -motiveZ);
+                    setMotion(-motiveX + (-motiveX * 0.2D), 0.0D, -motiveZ + (-motiveZ * 0.2D));
+                    entity.setMotion(new Vector3(motiveX / 4.0D, 0.0D, motiveX / 4.0D));
                 }
             }
         }
@@ -387,19 +390,21 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     protected void activate(int x, int y, int z, boolean flag) {
     }
 
-    protected void setSlowdown() {
-        // The problem was minecart height -0.7F from the ground. So add 0.7 to
-        // adjust minecart height from ground
+    protected void setFalling() {
+        // The problem is the minecart on ground flag has to be at 0.5D from
+        // a block. Also, the minecart are controlled by client, not server.
+        // This is the reason why minecart always be in a block!
+        // How to fix: adjust the hieght on movement BoundingBox
         motionX = MathHelper.clamp(motionX, -0.4D, 0.4D);
         motionZ = MathHelper.clamp(motionZ, -0.4D, 0.4D);
-        
+
         if (onGround) {
             motionX *= 0.5D;
             motionY *= 0.5D;
             motionZ *= 0.5D;
         }
 
-        moveMinecart(motionX, motionY, motionZ);
+        moveMinecart(motionX, motionY, motionZ, 0.48D);
         if (!onGround) {
             motionX *= 0.949999988079071D;
             motionY *= 0.949999988079071D;
@@ -407,7 +412,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         }
     }
 
-    protected void processMovement(int dx, int dy, int dz, Block block) {
+    protected void processMovement(int dx, int dy, int dz, BlockRail block) {
         fallDistance = 0.0F;
         Vector3 vector = getNextRail(x, y, z);
 
@@ -415,7 +420,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         boolean isPowered = false;
         boolean isSlowed = false;
 
-        if (block.equals(Block.POWERED_RAIL)) {
+        // My minstake [cant use .equals()]
+        if (block.getId() == Block.POWERED_RAIL) {
             isPowered = (block.getDamage() & 0x8) != 0;
             isSlowed = !isPowered;
         }
@@ -519,14 +525,14 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         setPosition(new Vector3(x, y + (double) getHeight(), z));
         motX = motionX;
         motZ = motionZ;
-        if (linkedEntity != null) {
+        if (linkedEntity != null || !slowWhenEmpty) {
             motX *= 0.75D;
             motZ *= 0.75D;
         }
         motX = MathHelper.clamp(motX, -0.4D, 0.4D);
         motZ = MathHelper.clamp(motZ, -0.4D, 0.4D);
 
-        moveMinecart(motX, 0.0D, motZ);
+        moveMinecart(motX, 0.0D, motZ, -0.5);
         if (facing[0][1] != 0 && MathHelper.floor(x) - dx == facing[0][0] && MathHelper.floor(z) - dz == facing[0][2]) {
             setPosition(new Vector3(x, y + (double) facing[0][1], z));
         } else if (facing[1][1] != 0 && MathHelper.floor(x) - dx == facing[1][0] && MathHelper.floor(z) - dz == facing[1][2]) {
@@ -555,7 +561,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             squareOfFame = Math.sqrt(motionX * motionX + motionZ * motionZ);
             motionX = squareOfFame * (double) (floorX - dx);
             motionZ = squareOfFame * (double) (floorZ - dz);
-            }
+        }
 
         if (isPowered) {
             double newMovie = Math.sqrt(motionX * motionX + motionZ * motionZ);
@@ -565,13 +571,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
                 motionX += motionX / newMovie * nextMovie;
                 motionZ += motionZ / newMovie * nextMovie;
-            } else if (block.getDamage() == STRAIGHT_NORTH_SOUTH) {
+            } else if (block.getOrientation() == Orientation.STRAIGHT_NORTH_SOUTH) {
                 if (level.getBlock(new Vector3(dx - 1, dy, dz)).isNormalBlock()) {
                     motionX = 0.02D;
                 } else if (level.getBlock(new Vector3(dx + 1, dy, dz)).isNormalBlock()) {
                     motionX = -0.02D;
                 }
-            } else if (block.getDamage() == STRAIGHT_EAST_WEST) {
+            } else if (block.getOrientation() == Orientation.STRAIGHT_EAST_WEST) {
                 if (level.getBlock(new Vector3(dx, dy, dz - 1)).isNormalBlock()) {
                     motionZ = 0.02D;
                 } else if (level.getBlock(new Vector3(dx, dy, dz + 1)).isNormalBlock()) {
@@ -583,7 +589,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     }
 
     protected void reduce() {
-        if (this.linkedEntity != null) {
+        if (this.linkedEntity != null || !slowWhenEmpty) {
             this.motionX *= 0.996999979019165D;
             this.motionY *= 0.0D;
             this.motionZ *= 0.996999979019165D;
@@ -594,7 +600,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         }
     }
 
-    @SuppressWarnings("UnusedAssignment")
     public Vector3 getNextRail(double dx, double dy, double dz) {
         int checkX = MathHelper.floor(dx);
         int checkY = MathHelper.floor(dy);
@@ -605,19 +610,12 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         }
 
         Block block = level.getBlock(new Vector3(checkX, checkY, checkZ));
-        logger.info("ID: "  + block.getId());
-        logger.info("Damage: " + block.getDamage());
 
         if (isRail(block)) {
             int l = block.getDamage();
 
-            dy = (double) checkY;
             if (isRedstonePowered(block)) {
                 l &= 7;
-            }
-
-            if (l >= 2 && l <= 5) {
-                dy = (double) (checkY + 1);
             }
 
             int[][] facing = blockMSpace[l];
@@ -634,10 +632,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             double nextMax = nextSix - nextThree;
 
             if (nextSeven == 0.0D) {
-                dx = (double) checkX + 0.5D;
                 rail = dz - (double) checkZ;
             } else if (nextMax == 0.0D) {
-                dz = (double) checkZ + 0.5D;
                 rail = dx - (double) checkX;
             } else {
                 double whatOne = dx - nextOne;
@@ -664,7 +660,11 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     }
 
     private void moveMinecart(double motionX, double motionY, double motionZ) {
-        move(motionX, motionY, motionZ);
+        moveMinecart(motionX, motionY, motionZ, 0);
+    }
+
+    private void moveMinecart(double motionX, double motionY, double motionZ, double adjust) {
+        move(motionX, motionY, motionZ, adjust);
         super.updateMovement();
     }
 
@@ -718,9 +718,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     }
 
     private void prepareDataProperty() {
-        // A long journey to wait Mojang changes these Entity Data
-        // Notice: These flags will need to be checked after
-        //         New version of Minecraft released
         setDataProperty(new IntEntityData(DATA_HEALTH, 6));
         if (namedTag.contains("CustomDisplayTile")) {
             if (namedTag.getBoolean("CustomDisplayTile")) {
@@ -753,7 +750,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         if (hasDisplay) {
             display = blockInside.getId()
                     | blockInside.getDamage() << 16;
-            offSet = 6; // todo: research
+            offSet = getDataPropertyInt(DATA_MINECART_DISPLAY_OFFSET);
             namedTag.putInt("DisplayTile", display);
             namedTag.putInt("DisplayOffset", offSet);
         }
@@ -766,17 +763,79 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     }
 
     /**
-     * Set the block inside the minecart. ONLY WORKS ON MINECART EMPTY!
+     * Set the minecart display block!
      *
-     * @param block The block that will changed (Normal blocks only!)
+     * @param block The block that will changed. Set {@code null} for BlockAir
      * @return {@code true} if the block is normal block
      */
-    public boolean setBlockInside(Block block) {
-        if (!block.isNormalBlock()) {
-            return false;
+    @API(usage = Usage.MAINTAINED, definition = Definition.UNIVERSAL)
+    public boolean setDisplayBlock(Block block) {
+        if (block != null) {
+            if (block.isNormalBlock()) {
+                blockInside = block;
+                int display = blockInside.getId()
+                        | blockInside.getDamage() << 16;
+                setDataProperty(new ByteEntityData(DATA_MINECART_HAS_DISPLAY, 1));
+                setDataProperty(new IntEntityData(DATA_MINECART_DISPLAY_BLOCK, display));
+                setDisplayBlockOffset(6);
+            }
+        } else {
+            // Set block to air (default).
+            blockInside = null;
+            setDataProperty(new ByteEntityData(DATA_MINECART_HAS_DISPLAY, 0));
+            setDataProperty(new IntEntityData(DATA_MINECART_DISPLAY_BLOCK, 0));
+            setDisplayBlockOffset(0);
         }
-        blockInside = block;
-        prepareDataProperty();
         return true;
+    }
+
+    /**
+     * Get the minecart display block
+     *
+     * @return Block of minecart display block
+     */
+    @API(usage = Usage.STABLE, definition = Definition.UNIVERSAL)
+    public Block getDisplayBlock() {
+        return blockInside;
+    }
+
+    /**
+     * Set the block offset.
+     *
+     * @param offset The offset
+     */
+    @API(usage = Usage.EXPERIMENTAL, definition = Definition.PLATFORM_NATIVE)
+    public void setDisplayBlockOffset(int offset) {
+        setDataProperty(new IntEntityData(DATA_MINECART_DISPLAY_OFFSET, offset));
+    }
+
+    /**
+     * Get the block display offset
+     *
+     * @return integer
+     */
+    @API(usage = Usage.EXPERIMENTAL, definition = Definition.UNIVERSAL)
+    public int getDisplayBlockOffset() {
+        return super.getDataPropertyInt(DATA_MINECART_DISPLAY_OFFSET);
+    }
+
+    /**
+     * Is the minecart can be slowed when empty?
+     *
+     * @return boolean
+     */
+    @API(usage = Usage.EXPERIMENTAL, definition = Definition.UNIVERSAL)
+    public boolean isSlowWhenEmpty() {
+        return this.slowWhenEmpty;
+    }
+
+    /**
+     * Set the minecart slowdown flag
+     *
+     * @param slow The slowdown flag
+     */
+    @API(usage = Usage.EXPERIMENTAL, definition = Definition.UNIVERSAL)
+    public void setSlowWhenEmpty(boolean slow) {
+        this.slowWhenEmpty = slow;
     }
 }
