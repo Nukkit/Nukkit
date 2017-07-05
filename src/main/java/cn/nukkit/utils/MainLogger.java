@@ -29,7 +29,7 @@ public class MainLogger extends ThreadedLogger {
     protected static MainLogger logger;
 
     public MainLogger(String logFile) {
-        this(logFile, true);
+        this(logFile, false);
     }
 
     public MainLogger(String logFile, boolean logDebug) {
