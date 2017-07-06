@@ -40,19 +40,16 @@ public class VarInt {
      * @param v Signed long
      * @return Unsigned encoded long
      */
-    public static BigInteger encodeZigZag64(long v) {
-        BigInteger origin = BigInteger.valueOf(v);
-        BigInteger left = origin.shiftLeft(1);
-        BigInteger right = origin.shiftRight(63);
-        return left.xor(right);
+    public static long encodeZigZag64(long v) {
+	    return (v << 1) ^ (v >> 63);
     }
 
     /**
      * @param v Signed encoded long
      * @return Unsigned decoded long
      */
-    public static BigInteger decodeZigZag64(long v) {
-        return decodeZigZag64(BigInteger.valueOf(v).and(UNSIGNED_LONG_MAX_VALUE));
+    public static long decodeZigZag64(long v) {
+        return (v >>> 1) ^ -(v & 1);
     }
 
     /**
@@ -67,21 +64,17 @@ public class VarInt {
     }
 
     private static BigInteger read(BinaryStream stream, int maxSize) {
-        BigInteger result = BigInteger.ZERO;
-        int offset = 0;
-        int b;
+	    long value = 0;
+	    int size = 0;
+	    int b;
+	    while (((b = stream.getByte()) & 0x80) == 0x80) {
+		    value |= (long) (b & 0x7F) << (size++ * 7);
+		    if (size >= maxSize) {
+			    throw new IllegalArgumentException("VarLong too big");
+		    }
+	    }
 
-        do {
-            if (offset >= maxSize) {
-                throw new IllegalArgumentException("VarInt too big");
-            }
-
-            b = stream.getByte();
-            result = result.or(BigInteger.valueOf((b & 0x7f) << (offset * 7)));
-            offset++;
-        } while ((b & 0x80) > 0);
-
-        return result;
+	    return BigInteger.valueOf(value | ((long) (b & 0x7F) << (size * 7)));
     }
 
     private static BigInteger read(InputStream stream, int maxSize) throws IOException {
@@ -232,7 +225,7 @@ public class VarInt {
      * @param value  Signed long
      */
     public static void writeVarLong(BinaryStream stream, long value) {
-        writeUnsignedVarLong(stream, encodeZigZag64(value));
+        writeUnsignedVarLong(stream, BigInteger.valueOf(encodeZigZag64(value)));
     }
 
     /**
@@ -240,7 +233,7 @@ public class VarInt {
      * @param value  Signed long
      */
     public static void writeVarLong(OutputStream stream, long value) throws IOException {
-        writeUnsignedVarLong(stream, encodeZigZag64(value));
+        writeUnsignedVarLong(stream, BigInteger.valueOf(encodeZigZag64(value)));
     }
 
     /**

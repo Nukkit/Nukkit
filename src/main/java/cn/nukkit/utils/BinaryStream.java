@@ -363,18 +363,6 @@ public class BinaryStream {
         VarInt.writeVarLong(this, v);
     }
 
-    public BigInteger getUnsignedVarLong() {
-        return VarInt.readUnsignedVarLong(this);
-    }
-
-    public void putUnsignedVarLong(long v) {
-        VarInt.writeUnsignedVarLong(this, BigInteger.valueOf(v));
-    }
-
-    public void putUnsignedVarLong(BigInteger v) {
-        VarInt.writeUnsignedVarLong(this, v);
-    }
-
     public BlockVector3 getBlockCoords() {
         return new BlockVector3(this.getVarInt(), (int) this.getUnsignedVarInt(), this.getVarInt());
     }
