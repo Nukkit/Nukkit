@@ -5,6 +5,7 @@ import cn.nukkit.utils.VarInt;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.*;
 import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,20 +32,46 @@ class VarIntTest {
 		);
 	}
 
-	@DisplayName("Encoding and decoding")
+	@DisplayName("Writing")
 	@Test
-	void testCoding() {
+	void testWrite() throws IOException {
+		BinaryStream bs = new BinaryStream();
+		VarInt.writeUnsignedVarInt(bs, 237356812);
+		VarInt.writeVarInt(bs, 0xea3eca71);
+		VarInt.writeUnsignedVarLong(bs, 0x1234567812345678L);
+		VarInt.writeVarLong(bs, 0xea3eca710becececL);
+		assertAll(
+				() -> assertEquals(237356812, VarInt.readUnsignedVarInt(bs)),
+				() -> assertEquals(0xea3eca71, VarInt.readVarInt(bs)),
+				() -> assertEquals(0x1234567812345678L, VarInt.readUnsignedVarLong(bs)),
+				() -> assertEquals(0xea3eca710becececL, VarInt.readVarLong(bs))
+		);
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		VarInt.writeUnsignedVarInt(os, 237356812);
+		VarInt.writeVarInt(os, 0xea3eca71);
+		VarInt.writeUnsignedVarLong(os, 0x1234567812345678L);
+		VarInt.writeVarLong(os, 0xea3eca710becececL);
+		ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+		assertAll(
+				() -> assertEquals(237356812, VarInt.readUnsignedVarInt(is)),
+				() -> assertEquals(0xea3eca71, VarInt.readVarInt(is)),
+				() -> assertEquals(0x1234567812345678L, VarInt.readUnsignedVarLong(is)),
+				() -> assertEquals(0xea3eca710becececL, VarInt.readVarLong(is))
+		);
+	}
+
+	@DisplayName("Reading")
+	@Test
+	void testRead() {
 		assertAll(
 				() -> assertEquals(2412, VarInt.readUnsignedVarInt(wrapBinaryStream("EC123EC456"))),
 				() -> assertEquals(583868, VarInt.readUnsignedVarInt(wrapBinaryStream("BCD123EFA0"))),
 				() -> assertEquals(1206, VarInt.readVarInt(wrapBinaryStream("EC123EC456"))),
 				() -> assertEquals(291934, VarInt.readVarInt(wrapBinaryStream("BCD123EFA0"))),
-				() -> assertEquals("6015", VarInt.readUnsignedVarLong(wrapBinaryStream("FF2EC456EC789EC012EC")).toString()),
-				() -> assertEquals("3694", VarInt.readUnsignedVarLong(wrapBinaryStream("EE1CD34BCD56BCD78BCD")).toString()),
+				() -> assertEquals(6015, VarInt.readUnsignedVarLong(wrapBinaryStream("FF2EC456EC789EC012EC"))),
+				() -> assertEquals(3694, VarInt.readUnsignedVarLong(wrapBinaryStream("EE1CD34BCD56BCD78BCD"))),
 				() -> assertEquals(-3008, VarInt.readVarLong(wrapBinaryStream("FF2EC456EC789EC012EC"))),
 				() -> assertEquals(1847, VarInt.readVarLong(wrapBinaryStream("EE1CD34BCD56BCD78BCD")))
-
-
 		);
 	}
 
