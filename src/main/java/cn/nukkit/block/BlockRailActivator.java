@@ -11,8 +11,7 @@ public class BlockRailActivator extends BlockRail {
 
     public BlockRailActivator() {
         this(0);
-        setIsDiode(true); // can power
-        setComplexDiode(true);
+        canBePowered = true;
     }
 
     @Override
@@ -24,4 +23,5 @@ public class BlockRailActivator extends BlockRail {
     public int getId() {
         return ACTIVATOR_RAIL;
     }
+    // todo: Its behaviour
 }

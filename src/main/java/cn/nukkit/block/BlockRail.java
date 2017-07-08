@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
+import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Rail;
@@ -22,10 +23,10 @@ import static cn.nukkit.utils.Rail.Orientation.*;
  */
 public class BlockRail extends BlockFlowable {
 
-    public boolean isDiode = false;
-    public boolean isComplex = false;
-    public int redstonePower;
-    public boolean triggered;
+    // 0x8: Set the block active
+    // 0x7: Reset the block to normal
+    // If the rail can be powered. So its a complex rail!
+    protected boolean canBePowered = false;
 
     public BlockRail() {
         this(0);
@@ -65,14 +66,6 @@ public class BlockRail extends BlockFlowable {
         return ItemTool.TYPE_PICKAXE;
     }
 
-    protected void setIsDiode(boolean isDiode) {
-        this.isDiode = isDiode;
-    }
-
-    protected void setComplexDiode(boolean complex) {
-        this.isComplex = complex;
-    }
-
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
@@ -80,11 +73,20 @@ public class BlockRail extends BlockFlowable {
             if (this.down().isTransparent() || (ascendingDirection.isPresent() && this.getSide(ascendingDirection.get()).isTransparent())) {
                 this.getLevel().useBreakOn(this);
                 return Level.BLOCK_UPDATE_NORMAL;
-            } else if (isDiode) {
-                //computeRedstoneCount();
             }
         }
         return 0;
+    }
+
+    @Override
+    public AxisAlignedBB recalculateBoundingBox() {
+        return new AxisAlignedBB(
+                this.x,
+                this.y,
+                this.z,
+                this.x + 1,
+                this.y + 0.125D,
+                this.z + 1);
     }
 
     @Override
@@ -92,12 +94,13 @@ public class BlockRail extends BlockFlowable {
         return BlockColor.AIR_BLOCK_COLOR;
     }
 
-
     //Information from http://minecraft.gamepedia.com/Rail
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         Block down = this.down();
-        if (down == null || down.isTransparent()) return false;
+        if (down == null || down.isTransparent()) {
+            return false;
+        }
         Map<BlockRail, BlockFace> railsAround = this.checkRailsAroundAffected();
         List<BlockRail> rails = new ArrayList<>(railsAround.keySet());
         List<BlockFace> faces = new ArrayList<>(railsAround.values());
@@ -135,6 +138,9 @@ public class BlockRail extends BlockFlowable {
                     this.meta = this.connect(rails.get(faces.indexOf(f)), f).metadata();
                 }
             }
+        }
+        if (!isAbstract()) {
+            checkPowered();
         }
         this.level.setBlock(this, this, true, true);
         return true;
@@ -211,53 +217,47 @@ public class BlockRail extends BlockFlowable {
         return this.getId() == RAIL;
     }
 
+    public boolean canPowered(){
+        return this.canBePowered;
+    }
+    
     public Orientation getOrientation() {
-        return byMetadata(this.meta);
+        return byMetadata(this.getRealMeta());
     }
 
     public void setOrientation(Orientation o) {
-        if (o.metadata() != this.meta) {
+        if (o.metadata() != this.getRealMeta()) {
             this.setDamage(o.metadata());
             this.level.setBlock(this, this, true, true);
         }
     }
 
-    public void setTriggered(boolean flag) {
-        this.triggered = flag;
+    /**
+     * Get the real meta of Rail. Used to get real meta when rail (e.g powered
+     * rail, detector rail, activator rail) is activated. The meta of activated
+     * rail are different (and also unique). You also can use {@code meta & 0x8}
+     * to get if the rail is activated and {@code meta & 0x7} to get real meta
+     *
+     * @return The encoded meta (integer)
+     */
+    public int getRealMeta() {
+        // Get the real meta
+        return getDamage() & 0x7;
     }
 
-    public void computeRedstoneCount() {
-        if (!(this instanceof BlockRailPowered)) { // Activator or Dectector
-            if (!triggered) { // If the rail was triggered
-                setDamage(meta & 0x8); // disable redstone
-                level.setBlock(this, this, true, true);
-                return;
-            } else {
-                setDamage(meta ^ 0x8); // power this up
-                level.setBlock(this, this, true, true);
-                level.scheduleUpdate(this, 2);
-            }
-            triggered = false;
-            return;
+    public void setActive(boolean active) {
+        if (active) {
+            setDamage(getDamage() | 0x8);
+        } else {
+            setDamage(getDamage() & 0x7);
         }
-        if (!isDiode && level.isBlockIndirectlyGettingPowered(this) != 0) {
-            return;
-        }
-        redstonePower = level.isBlockIndirectlyGettingPowered(this);
-        for (BlockRail goldenRail : checkRailsConnected().keySet()) {
-            if (goldenRail instanceof BlockRailPowered && (redstonePower > 0 || goldenRail.redstonePower > 0)) { // Check if rail is Golden Rails
-                goldenRail.setDamage(goldenRail.getDamage() ^ 0x8);
-                level.setBlock(goldenRail, goldenRail, true, true);
-            } else if ((goldenRail.getDamage() & 0x8) != 0) {
-                setDamage(meta & 0x8);
-                level.setBlock(goldenRail, goldenRail, true, true);
-            }
-        }
+        level.setBlock(this, this, true, true);
     }
 
-    @Override
-    public int getWeakPower(BlockFace face) {
-        return redstonePower;
+    private void checkPowered() {
+        if (this instanceof BlockRailPowered) {
+            ((BlockRailPowered) this)
+                    .computeRedstone(level, getFloorX(), getFloorX(), getFloorX(), this);
+        }
     }
-
 }

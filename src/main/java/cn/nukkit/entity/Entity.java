@@ -1289,7 +1289,7 @@ public abstract class Entity extends Location implements Metadatable {
             double dz = MathHelper.getDirection(dx, dy);
 
             if (dz >= 0.009999999776482582D) {
-                dz = (double) MathHelper.sqrt((float) dz);
+                dz = MathHelper.sqrt((float) dz);
                 dx /= dz;
                 dy /= dz;
                 double d3 = 1.0D / dz;
@@ -1302,8 +1302,8 @@ public abstract class Entity extends Location implements Metadatable {
                 dy *= d3;
                 dx *= 0.05000000074505806D;
                 dy *= 0.05000000074505806D;
-                dx *= (double) (1.0F);
-                dz *= (double) (1.0F);
+                dx *= 1.0F + getWidth();
+                dz *= 1.0F + getWidth();
                 this.setMotion(new Vector3(-dx, 0.0D, -dy));
                 entity.setMotion(new Vector3(dx / 4.0D, 0.0D, dy / 4.0D));
             }

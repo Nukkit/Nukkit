@@ -65,7 +65,7 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
         this.fuse = 80;
         this.activated = true;
 
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_POWERED, true);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_CHARGED, true);
         this.setDataProperty(new IntEntityData(DATA_FUSE_LENGTH, fuse));
     }
 

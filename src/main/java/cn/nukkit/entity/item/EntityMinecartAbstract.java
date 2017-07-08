@@ -137,31 +137,33 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             if (Rail.isRailBlock(block)) {
                 processMovement(dx, dy, dz, (BlockRail) block);
                 if (block.getId() == Block.ACTIVATOR_RAIL) {
-                    activate(dx, dy, dz, (block.getDamage() & 8) != 0);
+                    activate(dx, dy, dz, (block.getDamage() & 0x8) != 0);
                 }
             } else {
                 // control falling and movement (off rail)
                 setFalling();
             }
+            // If the rail is detector rail
+            block.onEntityCollide(this);
 
             /////////////////////////////////////////
             // MINECART BEHAVIOR: DIVING & ROTATING//
             /////////////////////////////////////////
-            double befX = lastX - x;
-            double befZ = lastZ - z;
+            double befX = lastMotionX - motionX;
+            double befZ = lastMotionZ - motionZ;
 
             if (befX * befX + befZ * befZ > 0.001D) {
-                yaw = (float) (Math.atan2(befZ, befX) * 180.0D / 3.141592653589793D);
+                yaw = (Math.atan2(befZ, befX) * 180.0D / 3.141592653589793D);
             }
 
             // N W S E
             if (Rail.isRailBlock(block)) {
-                switch (Orientation.byMetadata(block.getDamage())) {
+                switch (Orientation.byMetadata(((BlockRail) block).getRealMeta())) {
                     case CURVED_SOUTH_EAST:
                     case CURVED_SOUTH_WEST:
                     case CURVED_NORTH_EAST:
                     case CURVED_NORTH_WEST:
-                    case STRAIGHT_EAST_WEST:
+                    case STRAIGHT_NORTH_SOUTH: // Recheck rail! Because this is wrong.
                         yaw = 90;
                         pitch = 0;
                         break;
@@ -180,6 +182,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         yaw = 0;
                         break;
                 }
+            } else {
+                pitch = 0;
             }
 
             setRotation(yaw, pitch);
@@ -192,7 +196,17 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                     ((EntityMinecartAbstract) entity).onCollideWithVehicle(this);
                 }
             }
-            // Any suggestion?
+            double atan = (Math.atan2(befZ, befX) * 180.0D / 3.141592653589793D);
+            
+            Server.getInstance().getLogger().debug("X:" + x);
+            Server.getInstance().getLogger().debug("Y:" + y);
+            Server.getInstance().getLogger().debug("Z:" + z);
+            Server.getInstance().getLogger().debug("motionX:" + motionX);
+            Server.getInstance().getLogger().debug("motionY:" + motionY);
+            Server.getInstance().getLogger().debug("motionZ:" + motionZ);
+            Server.getInstance().getLogger().debug("Yaw:" + yaw);
+            Server.getInstance().getLogger().debug("Atan Yaw: " + atan);
+
             hasUpdate = true;
         }
 
@@ -319,8 +333,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 motiveZ *= next;
                 motiveX *= 0.10000000149011612D;
                 motiveZ *= 0.10000000149011612D;
-                motiveX *= 1.0D; // HOW DO I MISSED THIS SIMPLE THING??
-                motiveZ *= 1.0D;
+                motiveX *= 1.0D + (entity.x - x);
+                motiveZ *= 1.0D + (entity.z - z);
                 if (entity instanceof EntityMinecartAbstract) {
                     motiveX *= 0.5D;
                     motiveZ *= 0.5D;
@@ -360,7 +374,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         ((EntityMinecartAbstract) entity).setMotion(motX + motiveX, 0.0D, motZ + motiveZ);
                     }
                 } else {
-                    setMotion(-motiveX + (-motiveX * 0.2D), 0.0D, -motiveZ + (-motiveZ * 0.2D));
+                    setMotion(-motiveX, 0.0D, -motiveZ); // A Huge Update! :D
                     entity.setMotion(new Vector3(motiveX / 4.0D, 0.0D, motiveX / 4.0D));
                 }
             }
@@ -395,7 +409,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             motionZ *= 0.5D;
         }
 
-        moveMinecart(motionX, motionY, motionZ, 0.48D);
+        moveMinecart(motionX, motionY, motionZ, 0.4D);
         if (!onGround) {
             motionX *= 0.949999988079071D;
             motionY *= 0.949999988079071D;
@@ -410,6 +424,9 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         y = (double) dy;
         boolean isPowered = false;
         boolean isSlowed = false;
+        // Adjust the minecart ONLY when ascending rail
+        // This is to avoid weird riding experience
+        double adjust = 0;
 
         // My minstake [cant use .equals()]
         if (block.getId() == Block.POWERED_RAIL) {
@@ -417,26 +434,30 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             isSlowed = !isPowered;
         }
 
-        switch (Orientation.byMetadata(block.getDamage())) {
+        switch (Orientation.byMetadata(((BlockRail) block).getRealMeta())) {
             case ASCENDING_NORTH:
                 motionX -= 0.0078125D;
                 y += 1.0D;
+                adjust = -0.2;
                 break;
             case ASCENDING_SOUTH:
                 motionX += 0.0078125D;
                 y += 1.0D;
+                adjust = -0.2;
                 break;
             case ASCENDING_EAST:
                 motionZ += 0.0078125D;
                 y += 1.0D;
+                adjust = -0.2;
                 break;
             case ASCENDING_WEST:
                 motionZ -= 0.0078125D;
                 y += 1.0D;
+                adjust = -0.2;
                 break;
         }
 
-        int[][] facing = blockMSpace[block.getDamage()];
+        int[][] facing = blockMSpace[block.getRealMeta()];
         double facing1 = (double) (facing[1][0] - facing[0][0]);
         double facing2 = (double) (facing[1][2] - facing[0][2]);
         double speedOnTurns = Math.sqrt(facing1 * facing1 + facing2 * facing2);
@@ -523,7 +544,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         motX = MathHelper.clamp(motX, -0.4D, 0.4D);
         motZ = MathHelper.clamp(motZ, -0.4D, 0.4D);
 
-        moveMinecart(motX, 0.0D, motZ, -0.5);
+        moveMinecart(motX, 0.0D, motZ, adjust);
         if (facing[0][1] != 0 && MathHelper.floor(x) - dx == facing[0][0] && MathHelper.floor(z) - dz == facing[0][2]) {
             setPosition(new Vector3(x, y + (double) facing[0][1], z));
         } else if (facing[1][1] != 0 && MathHelper.floor(x) - dx == facing[1][0] && MathHelper.floor(z) - dz == facing[1][2]) {
@@ -605,8 +626,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         if (Rail.isRailBlock(block)) {
             int l = block.getDamage();
 
-            if (isRedstonePowered(block)) {
-                l &= 7;
+            if (((BlockRail) block).canPowered()) {
+                l &= 0x7;
             }
 
             int[][] facing = blockMSpace[l];
@@ -650,10 +671,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         }
     }
 
-    private void moveMinecart(double motionX, double motionY, double motionZ) {
-        moveMinecart(motionX, motionY, motionZ, 0);
-    }
-
     private void moveMinecart(double motionX, double motionY, double motionZ, double adjust) {
         move(motionX, motionY, motionZ, adjust);
         super.updateMovement();
@@ -671,23 +688,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     public void setMotion(double dx, double dy, double dz) {
         setMotion(new Vector3(dx, dy, dz));
         super.updateMovement();
-    }
-
-    /**
-     * Define if the Block is Redstone-powered rail
-     *
-     * @param block Block of the current target
-     * @return boolean
-     */
-    private boolean isRedstonePowered(Block block) {
-        switch (block.getId()) {
-            case Block.POWERED_RAIL:
-            case Block.ACTIVATOR_RAIL:
-            case Block.DETECTOR_RAIL:
-                return true;
-            default:
-                return false;
-        }
     }
 
     private void prepareDataProperty() {
