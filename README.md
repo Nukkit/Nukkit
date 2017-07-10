@@ -1,6 +1,6 @@
 Nukkit
 ===================
-![nukkit](https://github.com/Nukkit/Nukkit/blob/master/images/banner.png)
+![nukkit](https://github.com/Nukkit/Nukkit/blob/master/images/шапка.jpg)
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
@@ -18,10 +18,6 @@ Nukkit
 
 __A Nuclear-Powered Server Software For Minecraft: Pocket Edition__
 
-[![PayPayl donate button](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=magicdroidx%40gmail%2ecom&lc=US&item_name=Nukkit&currency_code=USD&bn=PP%2dDonationsBF%3apaypal%2ddonate%2dyellow%2esvg%3aNonHostedGuest)
-[![Gitter](https://img.shields.io/gitter/room/Nukkit/Nukkit.js.svg?style=flat)](https://gitter.im/Nukkit/Nukkit)
-[![Travis](https://img.shields.io/travis/Nukkit/Nukkit.svg?style=flat)](https://travis-ci.org/Nukkit/Nukkit)
-
 Introduction
 -------------
 
@@ -35,12 +31,6 @@ Nukkit is **under improvement** yet, we welcome contributions.
 
 Get Nukkit & Plugins
 --------------------
-
-#### Recommended Sites
-
-* __[Official Site](https://nukkit.io)__
-* __[Jar Download at Circle CI](https://circleci.com/gh/Nukkit/Nukkit/tree/master/)__ (**login required**)
-* __[Discussion](#discussion)__
 
 *Thank you for visiting our official sites. Our official websites are provided free of charge, and we do not like to place ads on the home page affecting your reading. If you like this project, please [donate to us](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=magicdroidx%40gmail%2ecom&lc=US&item_name=Nukkit&currency_code=USD&bn=PP%2dDonationsBF%3apaypal%2ddonate%2dyellow%2esvg%3aNonHostedGuest). All the donations will only be used for Nukkit websites and services.*
 
@@ -59,22 +49,3 @@ Build JAR file
 Running
 -------------
 Simply run `start.sh` or `start.cmd`, or execute `java -jar Nukkit.jar`.
-
-Plugin API
--------------
-#### **Example Plugin**
-Example Plugin which shows the API of Nukkit.
-
-* __[Example Plugin](http://github.com/Nukkit/ExamplePlugin)__
-
-Development Tools
------------------
-There're some tools for Nukkit developers.
-
-* __[FDevTools](https://github.com/fengberd/FDevTools)__ (**Load source and pack them easily**)
-* __[PocketServer](https://github.com/fengberd/MinecraftPEServer)__ (**Run Nukkit on android devices**)
-
-Discussion
--------------
-* __[Forums](https://forums.nukkit.io)__
-* __[百度 Nukkit 吧](http://tieba.baidu.com/f?kw=nukkit)__
