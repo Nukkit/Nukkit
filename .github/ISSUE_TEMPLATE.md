@@ -1,49 +1,44 @@
-<!--- 
-Before creating an issue, make sure:
-  1. Your title and content is not confusing or content-less.
-  2. All texts are written in proper English.
-If it's a bug or problem:
-  1. This bug can be reproduced.
-  2. This bug can be found in latest build.
-  3. Dumps, backtraces or files are provided.
-  4. It's you yourself who first found this bug.
-If it's an advice or a feature request:
-  1. This feature does not exist in latest build.
-  2. This feature is logical and clear-cut.
-  3. It's you yourself who first came up with the idea.
- 
-While sending issues, please provide as much information as you could, or our developers might got stuck or confused when looking into your issue. 
-So let's begin :)
--->
-
-### Issue description
+### Issue Description
 <!--- Use our forum https://forums.nukkit.io for questions -->
 Write a short description about the issue
 
-### Steps to reproduce the issue
+### Steps to Reproduce the Issue
 <!--- Help us to find the problem by adding steps to reproduce the issue -->
 1. ...
 2. ...
 3. ...
 
-### OS and versions
+### OS and Versions
 <!--- Use the 'version' command in Nukkit -->
-* Nukkit Version: ?? <!--- Do not just write "latest" here -->
- <!--- Use 'java -version' in command line -->
-* Java Version: ??
-<!-- What OS do you use to open Nukkit in? Linux? Windows? Write it here -->
-* Host OS: ??
+* Nukkit Version: ?? <!--- Do not just write "latest" or "1.0dev" here. Write compile time is also fine. -->
+<!--- Use 'java -version' in command line -->
+* Java Version: 
+```
+??
+```
 <!--- Device and host configuration, such as: 8GB RAM, 12-core Intel X5650 CPU, 100Mb internet upload. You may get this info from your host provider or hardware information softwares -->
-* Host Configuration: ?? GB RAM, ?? GB ??(SSD/HDD/...) drive, ?? core CPU from ??(Intel/AMD/...), ?? Mb internet upload
-<!--- Windows 10? Android? iOS? Simulators with x86 platform? -->
-* Client Edition: ??
-<!--- Client Version, such as 0.16.1, 0.15.90 or 0.15 build 1 and so on -->
-* Client Version: ??.??.??
+* Host Configuration: 
+<!-- Do NOT write "doesn't matters", it DOES matters. I met a guy shouting his world can not be saved, after we looked into storage, we found that his SATA wire is not connected. -->
 
-### Crashdump, backtrace or other files
+| Item | Value |
+|:----:|:-----:|
+| Host OS | ?? |  <!-- What OS do you use to open Nukkit in? Linux? Windows? Write it here -->
+| Memory(RAM) | ?? GB | <!-- Open your task manager in windows, or use command "top" in linux -->
+| Storage Size | ?? GB | <!-- Max size -->
+| Storage Type | ?? | <!-- SSD or HDD -->
+| CPU Type | ?? | <!-- Such as: "Intel Xeon X5650" ,"Hisilicon HI3536C" or "AMD Ryzen 7" -->
+| CPU Core Count | ?? cores ?? threads | 
+| Upstream Bandwidth | ?? | <!-- How many Mbps/Gbps? Such as: 100 Mbps or 1 Gbps. If you are testing in LAN (wired or wifi) , it depends on speed of your router, it is normally 100 Mbps. -->
+
+* Client Configuration: 
+
+| Item | Value |
+|:----:|:-----:|
+| Client Edition | ?? | <!--- Windows 10? Android? iOS? Simulators with x86 platform? -->
+| Client Version | ?? | <!--- Client Version, such as 1.1.2, 0.15.90 or 0.15 build 1 and so on -->
+
+### Crashdump, Backtrace or Other Files
 <!--- Please use gist or anything else and add links here -->
-* 
 ```
 <!--- Copy and paste your backtrace here... -->
 ```
-* ...
