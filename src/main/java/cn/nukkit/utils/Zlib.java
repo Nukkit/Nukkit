@@ -4,25 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.Deflater;
 import java.util.zip.InflaterInputStream;
 
 
 public abstract class Zlib {
-
-    private static final ThreadLocal<byte[]> buf = ThreadLocal.withInitial(() -> new byte[1024]);
-    private static final ThreadLocal<Deflater> def = ThreadLocal.withInitial(Deflater::new);
-
-    private static Deflater getDef(int level) {
-        def.get().setLevel(level);
-        return def.get();
-    }
-
+    
     public static byte[] deflate(byte[] data) throws Exception {
         return deflate(data, Deflater.DEFAULT_COMPRESSION);
     }
@@ -48,6 +35,16 @@ public abstract class Zlib {
 
     public static byte[] inflate(byte[] data, int maxSize) throws IOException {
         return inflate(new ByteArrayInputStream(data, 0, maxSize));
+    }
+
+    /* -=-=-=-=-=- Internal -=-=-=-=-=- Do NOT attempt to use in production -=-=-=-=-=- */
+
+    private static final ThreadLocal<byte[]> buf = ThreadLocal.withInitial(() -> new byte[1024]);
+    private static final ThreadLocal<Deflater> def = ThreadLocal.withInitial(Deflater::new);
+
+    private static Deflater getDef(int level) {
+        def.get().setLevel(level);
+        return def.get();
     }
 
     private static byte[] inflate(InputStream stream) throws IOException {
