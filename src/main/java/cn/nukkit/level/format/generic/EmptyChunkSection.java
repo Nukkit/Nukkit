@@ -85,8 +85,18 @@ public class EmptyChunkSection implements ChunkSection {
     }
 
     @Override
+    public void setSkyLightArray(byte[] data) {
+
+    }
+
+    @Override
     public byte[] getLightArray() {
         return new byte[2048];
+    }
+
+    @Override
+    public void setLightArray(byte[] data) {
+
     }
 
     @Override

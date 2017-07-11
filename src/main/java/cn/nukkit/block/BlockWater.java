@@ -62,4 +62,9 @@ public class BlockWater extends BlockLiquid {
             entity.extinguish();
         }
     }
+
+    @Override
+    public int getLightFilter() {
+        return 2;
+    }
 }

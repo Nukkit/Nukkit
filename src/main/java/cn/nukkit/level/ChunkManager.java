@@ -16,6 +16,14 @@ public interface ChunkManager {
 
     void setBlockDataAt(int x, int y, int z, int data);
 
+    int getBlockLightAt(int x, int y, int z);
+
+    void setBlockLightAt(int x, int y, int z, int level);
+
+    int getBlockSkyLightAt(int x, int y, int z);
+
+    void setBlockSkyLightAt(int x, int y, int z, int level);
+
     BaseFullChunk getChunk(int chunkX, int chunkZ);
 
     void setChunk(int chunkX, int chunkZ);

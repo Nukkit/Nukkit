@@ -483,4 +483,53 @@ public class Chunk extends BaseChunk {
             return null;
         }
     }
+
+    @Override
+    public void populateSkyLight() {
+        int maxY = this.getMaxY();
+
+        for (int y = this.getHighestSubChunkIndex(); y >= 0; --y) {
+            this.getSection(y).setSkyLightArray(new byte[2048]);
+        }
+
+        for (int x = 0; x < 16; ++x) {
+            for (int z = 0; z < 16; ++z) {
+                int heightMap = this.getHeightMap(x, z);
+
+                int y;
+                for (y = maxY; y >= heightMap; --y) {
+                    this.setBlockSkyLight(x, y, z, 15);
+                }
+
+                int light = 15;
+                for (; y >= 0; --y) {
+                    if (light > 0) {
+                        light -= Block.lightFilter[this.getBlockId(x, y, z)];
+                        if (light <= 0) {
+                            break;
+                        }
+                    }
+                    this.setBlockSkyLight(x, y, z, light);
+                }
+            }
+        }
+    }
+
+    public int getMaxY() {
+        return (this.getHighestSubChunkIndex() << 4) | 0x0f;
+    }
+
+    public int getHighestSubChunkIndex() {
+        int y;
+
+        for (y = this.sections.length - 1; y >= 0; --y) {
+            if (this.sections[y] == null || sections[y] instanceof EmptyChunkSection) {
+                //No need to thoroughly prune empties at runtime, this will just reduce performance.
+                continue;
+            }
+            break;
+        }
+
+        return y;
+    }
 }

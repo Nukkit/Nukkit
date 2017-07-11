@@ -33,6 +33,9 @@ import cn.nukkit.level.format.leveldb.LevelDB;
 import cn.nukkit.level.format.mcregion.McRegion;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.generator.task.*;
+import cn.nukkit.level.light.BlockLightUpdate;
+import cn.nukkit.level.light.LightUpdate;
+import cn.nukkit.level.light.SkyLightUpdate;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.sound.BlockPlaceSound;
@@ -59,7 +62,6 @@ import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
@@ -1446,7 +1448,7 @@ public class Level implements ChunkManager, Metadatable {
         FullChunk chunk = this.getChunk((int) pos.x >> 4, (int) pos.z >> 4, false);
         int level = 0;
         if (chunk != null) {
-            level = chunk.getBlockSkyLight((int) pos.x & 0x0f, (int) pos.y & 0xff, (int) pos.z & 0x0f);
+            level = chunk.getBlockSkyLight(pos.getFloorX() & 0x0f, pos.getFloorY() & 0x0f, pos.getFloorZ() & 0x0f);
             level -= this.skyLightSubtracted;
 
             if (level < 15) {
@@ -1459,30 +1461,25 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public int calculateSkylightSubtracted(float tickDiff) {
-        float angle = this.calculateCelestialAngle(getTime(), tickDiff);
-        float light = 1 - (MathHelper.cos(angle * ((float) Math.PI * 2F)) * 2 + 0.5f);
-        light = light < 0 ? 0 : light > 1 ? 1 : light;
-        light = 1 - light;
-        light = (float) ((double) light * ((isRaining() ? 1 : 0) - (double) 5f / 16d));
-        light = (float) ((double) light * ((isThundering() ? 1 : 0) - (double) 5f / 16d));
-        light = 1 - light;
-        return (int) (light * 11f);
-    }
+        int time = getTime() % 24000;
+        int light = 11;
 
-    public float calculateCelestialAngle(int time, float tickDiff) {
-        float angle = ((float) time + tickDiff) / 24000f - 0.25f;
+        if (time >= 4283 && time <= 7700) {
+            light = 0;
+        } else if (time >= 22550) {
+            int duration = 4283 + 1450;
 
-        if (angle < 0) {
-            ++angle;
+            light = 11 - (11 * (time > 22550 ? time - 22550 : 1450 + 4283 - time)) / duration;
+        } else if (time > 7700 && time < 13050) {
+            int duration = 13050 - 7700;
+
+            light = (11 * (time - 7700)) / duration;
         }
 
-        if (angle > 1) {
-            --angle;
-        }
+        if (this.isThundering()) light += 5;
+        else if (this.isRaining()) light += 3;
 
-        float i = 1 - (float) ((Math.cos((double) angle * Math.PI) + 1) / 2d);
-        angle = angle + (i - angle) / 3;
-        return angle;
+        return Math.min(light, 11);
     }
 
     public int getMoonPhase(long worldTime) {
@@ -1531,108 +1528,81 @@ public class Level implements ChunkManager, Metadatable {
         this.updateBlockLight((int) pos.x, (int) pos.y, (int) pos.z);
     }
 
+    public int getHighestAdjacentBlockSkyLight(int x, int y, int z) {
+        return NukkitMath.max(
+                getBlockSkyLightAt(x + 1, y, z),
+                getBlockSkyLightAt(x - 1, y, z),
+                getBlockSkyLightAt(x, y + 1, z),
+                getBlockSkyLightAt(x, y - 1, z),
+                getBlockSkyLightAt(x, y, z + 1),
+                getBlockSkyLightAt(x, y, z - 1)
+        );
+    }
+
     public void updateBlockSkyLight(int x, int y, int z) {
-        //TODO: sky light
+        this.timings.doBlockSkyLightUpdates.startTiming();
+
+        int oldHeightMap = this.getHeightMap(x, z);
+        int sourceId = this.getBlockIdAt(x, y, z);
+
+        int yPlusOne = y + 1;
+
+        int newHeightMap;
+        if (yPlusOne == oldHeightMap) { //Block changed directly beneath the heightmap. Check if a block was removed or changed to a different light-filter.
+            newHeightMap = this.getChunk(x >> 4, z >> 4).recalculateHeightMapColumn(x & 0x0f, z & 0x0f);
+        } else if (yPlusOne > oldHeightMap) { //Block changed above the heightmap.
+            if (Block.lightFilter[sourceId] > 1 || Block.diffusesSkyLight[sourceId]) {
+                this.setHeightMap(x, z, yPlusOne);
+                newHeightMap = yPlusOne;
+            } else { //Block changed which has no effect on direct sky light, for example placing or removing glass.
+                this.timings.doBlockSkyLightUpdates.stopTiming();
+                return;
+            }
+        } else { //Block changed below heightmap
+            newHeightMap = oldHeightMap;
+        }
+
+        LightUpdate update = new SkyLightUpdate(this);
+
+        if (newHeightMap > oldHeightMap) { //Heightmap increase, block placed, remove sky light
+            for (int i = y; i >= oldHeightMap; --i) {
+                update.setAndUpdateLight(x, i, z, 0); //Remove all light beneath, adjacent recalculation will handle the rest.
+            }
+        } else if (newHeightMap < oldHeightMap) { //Heightmap decrease, block changed or removed, add sky light
+            for (int i = y; i >= newHeightMap; --i) {
+                update.setAndUpdateLight(x, i, z, 15);
+            }
+        } else { //No heightmap change, block changed "underground"
+            update.setAndUpdateLight(x, y, z, Math.max(0, this.getHighestAdjacentBlockSkyLight(x, y, z) - Block.lightFilter[sourceId]));
+        }
+
+        update.execute();
+
+        this.timings.doBlockSkyLightUpdates.stopTiming();
+    }
+
+    public int getHighestAdjacentBlockLight(int x, int y, int z) {
+        return NukkitMath.max(
+                getBlockLightAt(x + 1, y, z),
+                getBlockLightAt(x - 1, y, z),
+                getBlockLightAt(x, y + 1, z),
+                getBlockLightAt(x, y - 1, z),
+                getBlockLightAt(x, y, z + 1),
+                getBlockLightAt(x, y, z - 1)
+        );
     }
 
     public void updateBlockLight(int x, int y, int z) {
-        Queue<Vector3> lightPropagationQueue = new ConcurrentLinkedQueue<>();
-        Queue<Object[]> lightRemovalQueue = new ConcurrentLinkedQueue<>();
-        Map<BlockVector3, Boolean> visited = new HashMap<>();
-        Map<BlockVector3, Boolean> removalVisited = new HashMap<>();
+        this.timings.doBlockLightUpdates.startTiming();
 
-        int oldLevel = this.getBlockLightAt(x, y, z);
-        int newLevel = Block.light[this.getBlockIdAt(x, y, z)];
+        int id = this.getBlockIdAt(x, y, z);
+        int newLevel = Math.max(Block.light[id], this.getHighestAdjacentBlockLight(x, y, z) - Block.lightFilter[id]);
 
-        if (oldLevel != newLevel) {
-            this.setBlockLightAt(x, y, z, newLevel);
+        LightUpdate update = new BlockLightUpdate(this);
+        update.setAndUpdateLight(x, y, z, newLevel);
+        update.execute();
 
-            if (newLevel < oldLevel) {
-                removalVisited.put(Level.blockHash(x, y, z), true);
-                lightRemovalQueue.add(new Object[]{new Vector3(x, y, z), oldLevel});
-            } else {
-                visited.put(Level.blockHash(x, y, z), true);
-                lightPropagationQueue.add(new Vector3(x, y, z));
-            }
-        }
-
-        while (!lightRemovalQueue.isEmpty()) {
-            Object[] val = lightRemovalQueue.poll();
-            Vector3 node = (Vector3) val[0];
-            int lightLevel = (int) val[1];
-
-            this.computeRemoveBlockLight((int) node.x - 1, (int) node.y, (int) node.z, lightLevel, lightRemovalQueue,
-                    lightPropagationQueue, removalVisited, visited);
-            this.computeRemoveBlockLight((int) node.x + 1, (int) node.y, (int) node.z, lightLevel, lightRemovalQueue,
-                    lightPropagationQueue, removalVisited, visited);
-            this.computeRemoveBlockLight((int) node.x, (int) node.y - 1, (int) node.z, lightLevel, lightRemovalQueue,
-                    lightPropagationQueue, removalVisited, visited);
-            this.computeRemoveBlockLight((int) node.x, (int) node.y + 1, (int) node.z, lightLevel, lightRemovalQueue,
-                    lightPropagationQueue, removalVisited, visited);
-            this.computeRemoveBlockLight((int) node.x, (int) node.y, (int) node.z - 1, lightLevel, lightRemovalQueue,
-                    lightPropagationQueue, removalVisited, visited);
-            this.computeRemoveBlockLight((int) node.x, (int) node.y, (int) node.z + 1, lightLevel, lightRemovalQueue,
-                    lightPropagationQueue, removalVisited, visited);
-        }
-
-        while (!lightPropagationQueue.isEmpty()) {
-            Vector3 node = lightPropagationQueue.poll();
-            int lightLevel = this.getBlockLightAt((int) node.x, (int) node.y, (int) node.z)
-                    - Block.lightFilter[this.getBlockIdAt((int) node.x, (int) node.y, (int) node.z)];
-
-            if (lightLevel >= 1) {
-                this.computeSpreadBlockLight((int) node.x - 1, (int) node.y, (int) node.z, lightLevel,
-                        lightPropagationQueue, visited);
-                this.computeSpreadBlockLight((int) node.x + 1, (int) node.y, (int) node.z, lightLevel,
-                        lightPropagationQueue, visited);
-                this.computeSpreadBlockLight((int) node.x, (int) node.y - 1, (int) node.z, lightLevel,
-                        lightPropagationQueue, visited);
-                this.computeSpreadBlockLight((int) node.x, (int) node.y + 1, (int) node.z, lightLevel,
-                        lightPropagationQueue, visited);
-                this.computeSpreadBlockLight((int) node.x, (int) node.y, (int) node.z - 1, lightLevel,
-                        lightPropagationQueue, visited);
-                this.computeSpreadBlockLight((int) node.x, (int) node.y, (int) node.z + 1, lightLevel,
-                        lightPropagationQueue, visited);
-            }
-        }
-    }
-
-    private void computeRemoveBlockLight(int x, int y, int z, int currentLight, Queue<Object[]> queue,
-                                         Queue<Vector3> spreadQueue, Map<BlockVector3, Boolean> visited, Map<BlockVector3, Boolean> spreadVisited) {
-        int current = this.getBlockLightAt(x, y, z);
-        BlockVector3 index = Level.blockHash(x, y, z);
-        if (current != 0 && current < currentLight) {
-            this.setBlockLightAt(x, y, z, 0);
-
-            if (!visited.containsKey(index)) {
-                visited.put(index, true);
-                if (current > 1) {
-                    queue.add(new Object[]{new Vector3(x, y, z), current});
-                }
-            }
-        } else if (current >= currentLight) {
-            if (!spreadVisited.containsKey(index)) {
-                spreadVisited.put(index, true);
-                spreadQueue.add(new Vector3(x, y, z));
-            }
-        }
-    }
-
-    private void computeSpreadBlockLight(int x, int y, int z, int currentLight, Queue<Vector3> queue,
-                                         Map<BlockVector3, Boolean> visited) {
-        int current = this.getBlockLightAt(x, y, z);
-        BlockVector3 index = Level.blockHash(x, y, z);
-
-        if (current < currentLight) {
-            this.setBlockLightAt(x, y, z, currentLight);
-
-            if (!visited.containsKey(index)) {
-                visited.put(index, true);
-                if (currentLight > 1) {
-                    queue.add(new Vector3(x, y, z));
-                }
-            }
-        }
+        this.timings.doBlockLightUpdates.stopTiming();
     }
 
     public boolean setBlock(Vector3 pos, Block block) {
@@ -2304,6 +2274,21 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         return null;
+    }
+
+    public BaseFullChunk[] getAdjacentChunks(int x, int z) {
+        BaseFullChunk[] chunks = new BaseFullChunk[9];
+        for (int xx = 0; xx <= 2; ++xx) {
+            for (int zz = 0; zz <= 2; ++zz) {
+                int i = zz * 3 + xx;
+                if (i == 4) {
+                    continue; //center chunk
+                }
+                chunks[i] = this.getChunk(x + xx - 1, z + zz - 1, false);
+            }
+        }
+
+        return chunks;
     }
 
     public void generateChunkCallback(int x, int z, BaseFullChunk chunk) {

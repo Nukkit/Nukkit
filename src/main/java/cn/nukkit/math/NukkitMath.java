@@ -46,4 +46,19 @@ public class NukkitMath {
         return ((double) Math.round(d * Math.pow(10, precision))) / Math.pow(10, precision);
     }
 
+    public static int max(int... ints) {
+        int retVal = 0;
+        for (int i = 0; i < ints.length; i++) {
+            retVal = Math.max(ints[i], retVal);
+        }
+        return retVal;
+    }
+
+    public static int min(int... ints) {
+        int retVal = 0;
+        for (int i = 0; i < ints.length; i++) {
+            retVal = Math.min(ints[i], retVal);
+        }
+        return retVal;
+    }
 }

@@ -22,4 +22,8 @@ public abstract class BlockTransparent extends Block {
         return BlockColor.TRANSPARENT_BLOCK_COLOR;
     }
 
+    @Override
+    public int getLightFilter() {
+        return 0;
+    }
 }
