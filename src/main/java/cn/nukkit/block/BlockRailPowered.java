@@ -37,27 +37,27 @@ public class BlockRailPowered extends BlockRail {
     public int onUpdate(int type) {
         super.onUpdate(type);
         if (type == Level.BLOCK_UPDATE_NORMAL) {
-            computeRedstone(level, getFloorX(), getFloorX(), getFloorX(), this);
+            computeRedstone();
             return Level.BLOCK_UPDATE_NORMAL;
         }
         return 0;
     }
 
-    protected void computeRedstone(Level level, int dx, int dy, int dz, Block block) {
+    protected void computeRedstone() {
         boolean powered = level.isBlockIndirectlyGettingPowered(this) != 0;
         debug.debug("Powered Rail being compute");
         debug.debug("Powered Rail has Power Nearby: " + powered);
 
         powered = powered
-                || checkSurrounding(new Vector3(dx, dy, dz), block.getDamage(), true, 0)
-                || checkSurrounding(new Vector3(dx, dy, dz), block.getDamage(), false, 0);
+                || checkSurrounding(this, true, 0)
+                || checkSurrounding(this, false, 0);
         boolean hasUpdate = false;
 
-        if (powered && (block.getDamage() & 0x8) == 0) {
+        if (powered && (getDamage() & 0x8) == 0) {
             setActive(true);
             debug.debug("Powered Rail is Active");
             hasUpdate = true;
-        } else if (!powered && (block.getDamage() & 0x8) != 0) {
+        } else if (!powered && (getDamage() & 0x8) != 0) {
             setActive(false);
             debug.debug("Powered Rail is In-Active");
             hasUpdate = true;
@@ -67,13 +67,13 @@ public class BlockRailPowered extends BlockRail {
         if (hasUpdate) {
             int count = 1;
 
-            level.updateAround(new Vector3(dx, dy, dz));
+            level.updateAround(add(0, -1));
             switch (Rail.Orientation.byMetadata(getRealMeta())) {
                 case ASCENDING_EAST:
                 case ASCENDING_WEST:
                 case ASCENDING_NORTH:
                 case ASCENDING_SOUTH:
-                    level.updateAround(new Vector3(dx, dy + 1, dz));
+                    level.updateAround(add(0, 1));
                     count++;
                     break;
             }
@@ -81,11 +81,19 @@ public class BlockRailPowered extends BlockRail {
         }
     }
 
-    protected boolean checkSurrounding(Vector3 pos, int railData, boolean powered, int power) {
+    /**
+     * Check the surrounding of the rail
+     * 
+     * @param pos       The rail position
+     * @param powered   Are the rail has a power source nearby 
+     * @param power     The count of the rail that had been counted
+     * @return Boolean of the surrounding area. Where the powered rail on!
+     */
+    protected boolean checkSurrounding(Vector3 pos, boolean powered, int power) {
         if (power >= 8) {
             return false;
         } else {
-            int metaLookup = railData & 0x7;
+            int metaLookup = getDamage() & 0x7;
             boolean hasPower = true;
 
             switch (metaLookup) {
@@ -177,8 +185,9 @@ public class BlockRailPowered extends BlockRail {
             if (level.isBlockIndirectlyGettingPowered(pos) != 0) {
                 return true;
             }
-
-            return checkSurrounding(pos, metaPower, powered, power + 1);
+            
+            // Check the next rail (could be powered somehow?)
+            return checkSurrounding(pos, powered, power + 1);
         }
 
         return false;

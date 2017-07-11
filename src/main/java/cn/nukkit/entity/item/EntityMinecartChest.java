@@ -1,7 +1,6 @@
 package cn.nukkit.entity.item;
 
 import cn.nukkit.block.BlockChest;
-import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemMinecartChest;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -32,8 +31,8 @@ public class EntityMinecartChest extends EntityMinecartAbstract {
     }
 
     @Override
-    public Item dropItem() {
-        return new ItemMinecartChest();
+    public void dropItem() {
+        level.dropItem(this, new ItemMinecartChest());
     }
 
 }

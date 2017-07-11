@@ -1,5 +1,7 @@
 package cn.nukkit.entity.item;
 
+import cn.nukkit.block.BlockHopper;
+import cn.nukkit.item.ItemMinecartHopper;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -9,6 +11,7 @@ public class EntityMinecartHopper extends EntityMinecartAbstract {
 
     public EntityMinecartHopper(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+        super.setDisplayBlock(new BlockHopper());
     }
 
     // TODO: 2016/12/18 inventory
@@ -23,4 +26,8 @@ public class EntityMinecartHopper extends EntityMinecartAbstract {
         return NETWORK_ID;
     }
 
+    @Override
+    public void dropItem() {
+        level.dropItem(this, new ItemMinecartHopper());
+    }
 }

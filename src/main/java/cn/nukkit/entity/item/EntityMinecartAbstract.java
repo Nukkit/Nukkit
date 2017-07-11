@@ -17,10 +17,10 @@ import cn.nukkit.item.ItemMinecart;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.math.MathHelper;
+import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
-import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.utils.Rail;
 import cn.nukkit.utils.Rail.Orientation;
 
@@ -86,7 +86,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     public String getName() {
         return name;
     }
-
+    
     public void setName(String name) {
         this.name = name;
     }
@@ -97,6 +97,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
         prepareDataProperty();
         setName("Minecart");
+        setMaxHealth(6);
+        setHealth(getMaxHealth());
     }
 
     @Override
@@ -115,6 +117,14 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
         if (isAlive()) {
+            if (this.getHurtTime() > 0) {
+                this.setHurtTime(this.getHurtTime() - 1);
+            }
+            
+            if (this.getDamageTaken() > 0.0F) {
+                this.setDamageTaken(this.getDamageTaken() - 1.0F);
+            }
+            
             if (y < -64.0D) {
                 kill();
             }
@@ -137,14 +147,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             if (Rail.isRailBlock(block)) {
                 processMovement(dx, dy, dz, (BlockRail) block);
                 if (block.getId() == Block.ACTIVATOR_RAIL) {
+                    // TNT only explode on ACTIVATOR RAIL!
                     activate(dx, dy, dz, (block.getDamage() & 0x8) != 0);
                 }
             } else {
                 // control falling and movement (off rail)
                 setFalling();
             }
-            // If the rail is detector rail
-            block.onEntityCollide(this);
 
             /////////////////////////////////////////
             // MINECART BEHAVIOR: DIVING & ROTATING//
@@ -197,7 +206,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 }
             }
             double atan = (Math.atan2(befZ, befX) * 180.0D / 3.141592653589793D);
-            
+
             Server.getInstance().getLogger().debug("X:" + x);
             Server.getInstance().getLogger().debug("Y:" + y);
             Server.getInstance().getLogger().debug("Z:" + z);
@@ -233,29 +242,39 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public boolean attack(EntityDamageEvent source) {
-        if (source instanceof EntityDamageByEntityEvent) {
+        if (this.invulnerable){
+            return false;
+        } else {
+            this.setHurtDirection(getHurtDirection());
+            this.setHurtTime(10);
+            this.setDamageTaken(this.getDamageTaken() + source.getDamage() * 10.0F);
+
             Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
-            if (damager instanceof Player) {
-                if (((Player) damager).isCreative()) {
-                    kill();
+            boolean instantKill = damager instanceof Player
+                    ? ((Player) damager).isCreative() : false;
+            if (instantKill || this.getDamageTaken() > 40.0F) {
+                if (this.linkedEntity != null) {
+                    this.dismount(linkedEntity);
                 }
-                if (getHealth() <= 0) {
-                    if (((Player) damager).isSurvival() && this.level.getGameRules().getBoolean("doEntityDrops")) {
-                        level.dropItem(this, dropItem());
+                
+                if (instantKill) {
+                    kill();
+                } else {
+                    if(level.getGameRules().getBoolean("doEntityDrops")){
+                        dropItem();
                     }
                     close();
                 }
             }
         }
 
-        EntityEventPacket pk = new EntityEventPacket();
-        pk.eid = super.getId();
-        pk.event = EntityEventPacket.HURT_ANIMATION;
-        Server.broadcastPacket(hasSpawned.values(), pk);
-
         return true;
     }
 
+    public void dropItem() {
+        level.dropItem(this, new ItemMinecart());
+    }
+    
     @Override
     public void close() {
         super.close();
@@ -374,7 +393,12 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         ((EntityMinecartAbstract) entity).setMotion(motX + motiveX, 0.0D, motZ + motiveZ);
                     }
                 } else {
-                    setMotion(-motiveX, 0.0D, -motiveZ); // A Huge Update! :D
+                    double motX = entity.motionX + motionX;
+                    double motZ = entity.motionZ + motionZ;
+                    motX /= 2.0D;
+                    motZ /= 2.0D;
+                    // Todo: Recheck & accurate the precise collisions
+                    setMotion(motX - motiveX, 0.0D, motZ - motiveZ);
                     entity.setMotion(new Vector3(motiveX / 4.0D, 0.0D, motiveX / 4.0D));
                 }
             }
@@ -388,10 +412,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         saveEntityData();
     }
 
-    public Item dropItem() {
-        return new ItemMinecart();
-    }
-
     protected void activate(int x, int y, int z, boolean flag) {
     }
 
@@ -400,9 +420,9 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         // a block. Also, the minecart are controlled by client, not server.
         // This is the reason why minecart always be in a block!
         // How to fix: adjust the hieght on movement BoundingBox
-        motionX = MathHelper.clamp(motionX, -0.4D, 0.4D);
-        motionZ = MathHelper.clamp(motionZ, -0.4D, 0.4D);
-
+        motionX = NukkitMath.clamp(motionX, -0.4D, 0.4D);
+        motionZ = NukkitMath.clamp(motionZ, -0.4D, 0.4D);
+        
         if (onGround) {
             motionX *= 0.5D;
             motionY *= 0.5D;
@@ -541,8 +561,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             motX *= 0.75D;
             motZ *= 0.75D;
         }
-        motX = MathHelper.clamp(motX, -0.4D, 0.4D);
-        motZ = MathHelper.clamp(motZ, -0.4D, 0.4D);
+        motX = NukkitMath.clamp(motX, -0.4D, 0.4D);
+        motZ = NukkitMath.clamp(motZ, -0.4D, 0.4D);
 
         moveMinecart(motX, 0.0D, motZ, adjust);
         if (facing[0][1] != 0 && MathHelper.floor(x) - dx == facing[0][0] && MathHelper.floor(z) - dz == facing[0][2]) {
@@ -692,6 +712,9 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     private void prepareDataProperty() {
         setDataProperty(new IntEntityData(DATA_HEALTH, 6));
+        setDataProperty(new IntEntityData(DATA_HURT_TIME, 0));
+        setDataProperty(new IntEntityData(DATA_HURT_DIRECTION, 1));
+        setDataProperty(new IntEntityData(DATA_DAMAGE_TAKEN, 1));
         if (namedTag.contains("CustomDisplayTile")) {
             if (namedTag.getBoolean("CustomDisplayTile")) {
                 int display = namedTag.getInt("DisplayTile");

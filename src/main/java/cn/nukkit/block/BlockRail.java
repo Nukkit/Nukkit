@@ -139,10 +139,10 @@ public class BlockRail extends BlockFlowable {
                 }
             }
         }
-        if (!isAbstract()) {
-            checkPowered();
-        }
         this.level.setBlock(this, this, true, true);
+        if (!isAbstract()) {
+            level.scheduleUpdate(this, this, 0);
+        }
         return true;
     }
 
@@ -206,7 +206,7 @@ public class BlockRail extends BlockFlowable {
         return result;
     }
 
-    private Map<BlockRail, BlockFace> checkRailsConnected() {
+    protected Map<BlockRail, BlockFace> checkRailsConnected() {
         Map<BlockRail, BlockFace> railsAround = this.checkRailsAround(this.getOrientation().connectingDirections());
         return railsAround.keySet().stream()
                 .filter(r -> r.getOrientation().hasConnectingDirections(railsAround.get(r).getOpposite()))
@@ -217,10 +217,10 @@ public class BlockRail extends BlockFlowable {
         return this.getId() == RAIL;
     }
 
-    public boolean canPowered(){
+    public boolean canPowered() {
         return this.canBePowered;
     }
-    
+
     public Orientation getOrientation() {
         return byMetadata(this.getRealMeta());
     }
@@ -252,12 +252,5 @@ public class BlockRail extends BlockFlowable {
             setDamage(getDamage() & 0x7);
         }
         level.setBlock(this, this, true, true);
-    }
-
-    private void checkPowered() {
-        if (this instanceof BlockRailPowered) {
-            ((BlockRailPowered) this)
-                    .computeRedstone(level, getFloorX(), getFloorX(), getFloorX(), this);
-        }
     }
 }

@@ -1,9 +1,10 @@
 package cn.nukkit.entity.item;
 
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockTNT;
 import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
-import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemMinecartTNT;
 import cn.nukkit.level.Explosion;
 import cn.nukkit.level.format.FullChunk;
@@ -26,6 +27,7 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
 
     public EntityMinecartTNT(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+        super.setDisplayBlock(new BlockTNT());
     }
 
     @Override
@@ -95,10 +97,10 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
     }
 
     @Override
-    public Item dropItem() {
-        return new ItemMinecartTNT();
+    public void dropItem() {
+        level.dropItem(this, new ItemMinecartTNT());
     }
-
+    
     @Override
     public int getMineId() {
         return 3;

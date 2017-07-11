@@ -1,6 +1,5 @@
 package cn.nukkit.block;
 
-import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityMinecartAbstract;
 import cn.nukkit.level.Level;
@@ -49,51 +48,44 @@ public class BlockRailDetector extends BlockRail {
 
     @Override
     public int onUpdate(int type) {
-        super.onUpdate(type);
-        if (type == Level.BLOCK_UPDATE_SCHEDULED) {
-            int power = meta;
-            
-            updateState(power);
+        if (type == Level.BLOCK_UPDATE_SCHEDULED) {            
+            updateState();
+            return Level.BLOCK_UPDATE_SCHEDULED;
         }
-
-        return 0;
+        return super.onUpdate(type);
     }
 
     @Override
     public void onEntityCollide(Entity entity) {
-        int power = meta;
-
-        updateState(power);
+        updateState();
     }
 
-    protected void updateState(int oldStrength) {
-        boolean wasPowered = (oldStrength & 0x8) != 0;
+    protected void updateState() {
+        boolean wasPowered = (meta & 0x8) != 0;
         boolean isPowered = false;
-        
+
         for (Entity entity : level.getNearbyEntities(new AxisAlignedBB(
-                    getFloorX() + 0.125F,
-                    getFloorY(),
-                    getFloorZ() + 0.125F,
-                    getFloorX() + 0.875F,
-                    getFloorY() + 1.124F, // Todo: adjacent
-                    getFloorZ() + 0.875F))) {
-            if(entity instanceof EntityMinecartAbstract){
+                getFloorX() + 0.125D,
+                getFloorY(),
+                getFloorZ() + 0.125D,
+                getFloorX() + 0.875D,
+                getFloorY() + 1.125D, // Todo: adjacent
+                getFloorZ() + 0.875D))) {
+            if (entity instanceof EntityMinecartAbstract) {
                 isPowered = true;
             }
-            Server.getInstance().getLogger().debug("Entity name: " + entity.getName());
         }
 
         if (isPowered && !wasPowered) {
             setActive(true);
-            Server.getInstance().getLogger().debug("Powered!");
-            level.scheduleUpdate(this, this, 1);
-            level.scheduleUpdate(this, this.down(), 1);
+            level.scheduleUpdate(this, this, 0);
+            level.scheduleUpdate(this, this.down(), 0);
         }
 
         if (!isPowered && wasPowered) {
             setActive(false);
-            level.scheduleUpdate(this, this, 1);
-            level.scheduleUpdate(this, this.down(), 1);
+            level.scheduleUpdate(this, this, 0);
+            level.scheduleUpdate(this, this.down(), 0);
         }
 
         level.updateComparatorOutputLevel(this);

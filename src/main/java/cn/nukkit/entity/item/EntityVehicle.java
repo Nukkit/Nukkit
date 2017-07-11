@@ -12,9 +12,8 @@ import cn.nukkit.nbt.tag.CompoundTag;
  * Nukkit Project
  */
 public abstract class EntityVehicle extends Entity implements EntityRideable {
-    public static final int DATA_HURT_TIME = 17;
-    public static final int DATA_HURT_DIRECTION = 18;
-    public static final int DATA_DAMAGE_TAKEN = 19;
+
+    public static final int DATA_DAMAGE_TAKEN = 19; // Recheck!
 
     public EntityVehicle(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);

@@ -1286,7 +1286,7 @@ public abstract class Entity extends Location implements Metadatable {
         if (entity.riding != this && entity.linkedEntity != this) {
             double dx = entity.x - this.x;
             double dy = entity.z - this.z;
-            double dz = MathHelper.getDirection(dx, dy);
+            double dz = NukkitMath.getDirection(dx, dy);
 
             if (dz >= 0.009999999776482582D) {
                 dz = MathHelper.sqrt((float) dz);
@@ -1439,7 +1439,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (this.keepMovement) {
             this.boundingBox.offset(dx, dy, dz);
-            this.setPosition(this.temporalVector.setComponents((this.boundingBox.minX + this.boundingBox.maxX) / 2, this.boundingBox.minY + adjust, (this.boundingBox.minZ + this.boundingBox.maxZ) / 2));
+            this.setPosition(this.temporalVector.setComponents((this.boundingBox.minX + this.boundingBox.maxX) / 2, this.boundingBox.minY, (this.boundingBox.minZ + this.boundingBox.maxZ) / 2));
             this.onGround = this.isPlayer;
             return true;
         } else {
