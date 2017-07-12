@@ -203,6 +203,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private ClientChainData loginChainData;
 
+    public Block breakingBlock = null;
+
     public BlockEnderChest getViewingEnderChest() {
         return viewingEnderChest;
     }
@@ -505,7 +507,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             sendCommandData();
                             return;
                         }
-                    } catch (InterruptedException e) {}
+                    } catch (InterruptedException e) {
+                    }
                 }
             };
             t.start();
@@ -1065,14 +1068,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     /**
-     *
      * Returns a client-friendly gamemode of the specified real gamemode
      * This function takes care of handling gamemodes known to MCPE (as of 1.1.0.3, that includes Survival, Creative and Adventure)
-     *
+     * <p>
      * TODO: remove this when Spectator Mode gets added properly to MCPE
-     *
      */
-    private static int getClientFriendlyGamemode(int gamemode){
+    private static int getClientFriendlyGamemode(int gamemode) {
         gamemode &= 0x03;
         if (gamemode == Player.SPECTATOR) {
             return Player.CREATIVE;
@@ -2476,7 +2477,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     switch (playerActionPacket.action) {
                         case PlayerActionPacket.ACTION_START_BREAK:
-                            if (this.lastBreak != Long.MAX_VALUE || pos.distanceSquared(this) > 10000) {
+                            if (this.lastBreak != Long.MAX_VALUE || pos.distanceSquared(this) > 100) {
                                 break;
                             }
                             Block target = this.level.getBlock(pos);
@@ -2487,7 +2488,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 break;
                             }
                             if (target.getId() == Block.NOTEBLOCK) {
-                                ((BlockNoteblock)target).emitSound();
+                                ((BlockNoteblock) target).emitSound();
                                 break;
                             }
                             Block block = target.getSide(face);
@@ -2495,36 +2496,38 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.level.setBlock(block, new BlockAir(), true);
                                 break;
                             }
-                            if(!this.isCreative()){
+                            if (!this.isCreative()) {
                                 //improved this to take stuff like swimming, ladders, enchanted tools into account, fix wrong tool break time calculations for bad tools (pmmp/PocketMine-MP#211)
                                 //Done by lmlstarqaq
                                 double breakTime = Math.ceil(target.getBreakTime(this.inventory.getItemInHand(), this) * 20);
                                 if (breakTime > 0) {
                                     LevelEventPacket pk = new LevelEventPacket();
                                     pk.evid = LevelEventPacket.EVENT_BLOCK_START_BREAK;
-                                    pk.x = (float)pos.x;
-                                    pk.y = (float)pos.y;
-                                    pk.z = (float)pos.z;
-                                    pk.data = (int)(65535 / breakTime);
+                                    pk.x = (float) pos.x;
+                                    pk.y = (float) pos.y;
+                                    pk.z = (float) pos.z;
+                                    pk.data = (int) (65535 / breakTime);
                                     this.getLevel().addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
                                 }
                             }
+
+                            this.breakingBlock = target;
                             this.lastBreak = System.currentTimeMillis();
                             break;
 
                         case PlayerActionPacket.ACTION_ABORT_BREAK:
                             this.lastBreak = Long.MAX_VALUE;
-
+                            this.breakingBlock = null;
                         case PlayerActionPacket.ACTION_STOP_BREAK:
                             LevelEventPacket pk = new LevelEventPacket();
                             pk.evid = LevelEventPacket.EVENT_BLOCK_STOP_BREAK;
-                            pk.x = (float)pos.x;
-                            pk.y = (float)pos.y;
-                            pk.z = (float)pos.z;
+                            pk.x = (float) pos.x;
+                            pk.y = (float) pos.y;
+                            pk.z = (float) pos.z;
                             pk.data = 0;
                             this.getLevel().addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
+                            this.breakingBlock = null;
                             break;
-
                         case PlayerActionPacket.ACTION_RELEASE_ITEM:
                             if (this.startAction > -1 && this.getDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION)) {
                                 if (this.inventory.getItemInHand().getId() == Item.BOW) {
@@ -2734,8 +2737,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         case PlayerActionPacket.ACTION_WORLD_IMMUTABLE:
                             break; //TODO
                         case PlayerActionPacket.ACTION_CONTINUE_BREAK:
-                            block = this.level.getBlock(pos);
-                            this.level.addParticle(new PunchBlockParticle(pos, block, face));
+                            if (this.isBreakingBlock()) {
+                                block = this.level.getBlock(pos);
+                                this.level.addParticle(new PunchBlockParticle(pos, block, face));
+                            }
                             break;
                     }
 
@@ -2791,7 +2796,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     InteractPacket interactPacket = (InteractPacket) packet;
-                    
+
                     Entity targetEntity = this.level.getEntity(interactPacket.target);
 
                     if (targetEntity == null || !this.isAlive() || !targetEntity.isAlive()) {
@@ -2911,7 +2916,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         BlockEntity be = this.getLevel().getBlockEntity(new Vector3(pickRequestPacket.x, pickRequestPacket.y, pickRequestPacket.z));
                         if (be != null) {
                             CompoundTag nbt = be.getCleanedNBT();
-                            if(nbt != null){
+                            if (nbt != null) {
                                 Item item1 = this.getInventory().getItemInHand();
                                 item1.setCustomBlockData(nbt);
                                 item1.setLore("+(DATA)");
@@ -2993,6 +2998,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.inventory.setItemInHand(itemInHand);
                             this.inventory.sendHeldItem(this);
 
+                            break;
+                        case EntityEventPacket.CONSUME_ITEM:
+                            EntityEventPacket pk = new EntityEventPacket();
+                            pk.eid = this.getId();
+                            pk.event = EntityEventPacket.CONSUME_ITEM;
+                            pk.itemId = this.inventory.getItemInHand().getId();
+
+                            Server.broadcastPacket(this.getViewers().values(), pk);
+                            this.dataPacket(pk);
                             break;
                     }
                     break;
@@ -3691,6 +3705,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             ((ItemMap) mapItem).sendImage(this);
                         }
                     }
+
+                    break;
+                case ProtocolInfo.LEVEL_SOUND_EVENT_PACKET:
+                    LevelSoundEventPacket levelSoundEventPacket = (LevelSoundEventPacket) packet;
+
+                    if (this.isBreakingBlock()) {
+                        LevelSoundEventPacket pk1 = new LevelSoundEventPacket();
+                        pk1.sound = LevelSoundEventPacket.SOUND_HIT;
+                        pk1.extraData = this.breakingBlock.getId();
+                        pk1.pitch = 1;
+                        pk1.x = (float) this.breakingBlock.x;
+                        pk1.y = (float) this.breakingBlock.y;
+                        pk1.z = (float) this.breakingBlock.z;
+
+                        this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk1);
+                    }
                     break;
                 default:
                     break;
@@ -3835,6 +3865,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     /**
      * Sets a subtitle for the next shown title
+     *
      * @param text Subtitle text
      */
     public void setSubtitle(String text) {
@@ -3853,8 +3884,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     /**
      * Sets times for title animations
-     * @param fadeInTime For how long title fades in
-     * @param stayTime For how long title is shown
+     *
+     * @param fadeInTime  For how long title fades in
+     * @param stayTime    For how long title is shown
      * @param fadeOutTime For how long title fades out
      */
     public void setTitleAnimationTimes(int fadeInTime, int stayTime, int fadeOutTime) {
@@ -4612,8 +4644,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * Creates and sends a BossBar to the player
      *
-     * @param text  The BossBar message
-     * @param length  The BossBar percentage
+     * @param text   The BossBar message
+     * @param length The BossBar percentage
      * @return bossBarId  The BossBar ID, you should store it if you want to remove or update the BossBar later
      */
     public long createBossBar(String text, int length) {
@@ -4648,7 +4680,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         Attribute attr = Attribute.getAttribute(Attribute.MAX_HEALTH);
         attr.setMaxValue(100); // Max value - We need to change the max value first, or else the "setValue" will return a IllegalArgumentException
         attr.setValue(length); // Entity health
-        pkAttributes.entries = new Attribute[] { attr };
+        pkAttributes.entries = new Attribute[]{attr};
         this.dataPacket(pkAttributes);
 
         // And now we send the bossbar packet
@@ -4662,9 +4694,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * Updates a BossBar
      *
-     * @param text  The new BossBar message
-     * @param length  The new BossBar length
-     * @param bossBarId  The BossBar ID
+     * @param text      The new BossBar message
+     * @param length    The new BossBar length
+     * @param bossBarId The BossBar ID
      */
     public void updateBossBar(String text, int length, long bossBarId) {
         // First we update the boss bar length
@@ -4673,7 +4705,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         Attribute attr = Attribute.getAttribute(Attribute.MAX_HEALTH);
         attr.setMaxValue(100); // Max value - We need to change the max value first, or else the "setValue" will return a IllegalArgumentException
         attr.setValue(length); // Entity health
-        pkAttributes.entries = new Attribute[] { attr };
+        pkAttributes.entries = new Attribute[]{attr};
         this.dataPacket(pkAttributes);
         // And then the boss bar text
         SetEntityDataPacket pkMetadata = new SetEntityDataPacket();
@@ -4700,7 +4732,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * Removes a BossBar
      *
-     * @param bossBarId  The BossBar ID
+     * @param bossBarId The BossBar ID
      */
     public void removeBossBar(long bossBarId) {
         RemoveEntityPacket pkRemove = new RemoveEntityPacket();
@@ -4913,5 +4945,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      */
     public void notifyACK(int identification) {
         needACK.put(identification, true);
+    }
+
+    public boolean isBreakingBlock() {
+        return this.breakingBlock != null;
     }
 }
