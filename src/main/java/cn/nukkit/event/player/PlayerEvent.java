@@ -8,7 +8,7 @@ import cn.nukkit.event.Event;
  * Nukkit Project
  */
 public abstract class PlayerEvent extends Event {
-    public Player player;
+    protected Player player;
 
     public Player getPlayer() {
         return player;
