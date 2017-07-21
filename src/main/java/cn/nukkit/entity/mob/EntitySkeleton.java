@@ -39,6 +39,11 @@ public class EntitySkeleton extends EntityMob {
     }
 
     @Override
+    public float getYOffset() {
+        return super.getYOffset() - 0.5F;
+    }
+    
+    @Override
     public void spawnTo(Player player) {
         AddEntityPacket pk = new AddEntityPacket();
         pk.type = this.getNetworkId();

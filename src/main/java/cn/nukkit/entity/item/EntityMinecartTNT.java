@@ -1,6 +1,5 @@
 package cn.nukkit.entity.item;
 
-import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockTNT;
 import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.data.IntEntityData;
@@ -11,6 +10,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.EnumMinecart;
 
 import java.util.Random;
 
@@ -35,7 +35,8 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
         super.initEntity();
 
         this.fuse = namedTag.getInt("TNTFuse");
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_POWERED, fuse != 0);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_CHARGED, fuse != 0);
+        this.setDataProperty(new IntEntityData(DATA_FUSE_LENGTH, fuse));
     }
 
     @Override
@@ -100,10 +101,10 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
     public void dropItem() {
         level.dropItem(this, new ItemMinecartTNT());
     }
-    
+
     @Override
-    public int getMineId() {
-        return 3;
+    public EnumMinecart getType() {
+        return EnumMinecart.valueOf(3);
     }
 
     @Override

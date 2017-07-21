@@ -14,6 +14,7 @@ import cn.nukkit.event.entity.EntityPortalEnterEvent.PortalType;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.event.player.PlayerTeleportEvent;
+import cn.nukkit.event.vehicle.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
@@ -226,7 +227,11 @@ public abstract class Entity extends Location implements Metadatable {
 
     public double lastYaw;
     public double lastPitch;
-
+    
+    private double PitchDelta;
+    private double YawDelta;
+    
+    public double entityCollisionReduction = 0; // Higher than 0.9 will result a fast collisions
     public AxisAlignedBB boundingBox;
     public boolean onGround;
     public boolean inBlock = false;
@@ -1184,6 +1189,58 @@ public abstract class Entity extends Location implements Metadatable {
         return hasUpdate;
     }
 
+    public boolean updateRidden() {
+        if (this.linkedEntity != null) {
+            if (!linkedEntity.isAlive()) {
+                return false;
+            }
+            this.motionX = 0.0D;
+            this.motionY = 0.0D;
+            this.motionZ = 0.0D;
+            onUpdate(lastUpdate + 1);
+            if (this.linkedEntity != null) {
+                this.linkedEntity.updateRiderPosition();
+                this.YawDelta += this.linkedEntity.yaw - this.linkedEntity.lastYaw;
+                for (this.PitchDelta += this.linkedEntity.pitch - this.linkedEntity.lastPitch; this.YawDelta >= 180.0D; this.YawDelta -= 360.0D) {
+                }
+                while (this.YawDelta < -180.0D) {
+                    this.YawDelta += 360.0D;
+                }
+                while (this.PitchDelta >= 180.0D) {
+                    this.PitchDelta -= 360.0D;
+                }
+                while (this.PitchDelta < -180.0D) {
+                    this.PitchDelta += 360.0D;
+                }
+                double var1 = this.YawDelta * 0.5D;
+                double var3 = this.PitchDelta * 0.5D;
+                float var5 = 10.0F;
+                var1 = NukkitMath.clamp(var1, -var5, var5);
+                var3 = NukkitMath.clamp(var3, -var5, var5);
+                this.YawDelta -= var1;
+                this.PitchDelta -= var3;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public void updateRiderPosition() {
+        if (this.linkedEntity != null) {
+            this.linkedEntity.setPosition(linkedEntity.add(0, getMountedYOffset() + linkedEntity.getYOffset()));
+            linkedEntity.setDataProperty(
+                    new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, new Vector3f(0, (float) (getMountedYOffset() + linkedEntity.getYOffset()), 0)));
+        }
+    }
+
+    public float getYOffset() {
+        return 0.0F;
+    }
+
+    public float getMountedYOffset() {
+        return getHeight() * 0.75F;
+    }
+
     public final void scheduleUpdate() {
         this.level.updateEntities.put(this.id, this);
     }
@@ -1274,15 +1331,29 @@ public abstract class Entity extends Location implements Metadatable {
         //todo
     }
 
-    public void moveFlying() {
-        //todo
+    public void moveFlying(float strafe, float forward, float friction) {
+        // This is special for Nukkit! :)
+        float speed = strafe * strafe + forward * forward;
+        if (speed >= 1.0E-4F) {
+            speed = MathHelper.sqrt(speed);
+            if (speed < 1.0F) {
+                speed = 1.0F;
+            }
+            speed = friction / speed;
+            strafe *= speed;
+            forward *= speed;
+            float nest = MathHelper.sin((float) (this.yaw * 3.1415927F / 180.0F));
+            float place = MathHelper.cos((float) (this.yaw * 3.1415927F / 180.0F));
+            this.motionX += strafe * place - forward * nest;
+            this.motionZ += forward * place + strafe * nest;
+        }
     }
 
     public void onCollideWithPlayer(EntityHuman entityPlayer) {
 
     }
 
-    public void onCollideWithVehicle(Entity entity) {
+    public void applyEntityCollision(Entity entity) {
         if (entity.riding != this && entity.linkedEntity != this) {
             double dx = entity.x - this.x;
             double dy = entity.z - this.z;
@@ -1302,10 +1373,14 @@ public abstract class Entity extends Location implements Metadatable {
                 dy *= d3;
                 dx *= 0.05000000074505806D;
                 dy *= 0.05000000074505806D;
-                dx *= 1.0F + getWidth();
-                dz *= 1.0F + getWidth();
-                this.setMotion(new Vector3(-dx, 0.0D, -dy));
-                entity.setMotion(new Vector3(dx / 4.0D, 0.0D, dy / 4.0D));
+                dx *= 1.0F + entityCollisionReduction;
+                dz *= 1.0F + entityCollisionReduction;
+                if (this.riding == null) {
+                    setMotion(new Vector3(-dx, 0.0D, -dy));
+                }
+                if (entity.riding == null) {
+                    entity.setMotion(new Vector3(dx, 0.0D, dy));
+                }
             }
         }
     }
@@ -1392,12 +1467,8 @@ public abstract class Entity extends Location implements Metadatable {
 
         return false;
     }
-
-    public boolean fastMove(double dx, double dy, double dz) {
-        return fastMove(dx, dy, dz, 0);
-    }
     
-    public boolean fastMove(double dx, double dy, double dz, double adjust) {
+    public boolean fastMove(double dx, double dy, double dz) {
         if (dx == 0 && dy == 0 && dz == 0) {
             return true;
         }
@@ -1411,7 +1482,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         this.x = (this.boundingBox.minX + this.boundingBox.maxX) / 2;
-        this.y = this.boundingBox.minY - this.ySize + adjust;
+        this.y = this.boundingBox.minY - this.ySize;
         this.z = (this.boundingBox.minZ + this.boundingBox.maxZ) / 2;
 
         this.checkChunks();
@@ -1427,12 +1498,8 @@ public abstract class Entity extends Location implements Metadatable {
         Timings.entityMoveTimer.stopTiming();
         return true;
     }
-
-    public boolean move(double dx, double dy, double dz) {
-        return move(dx, dy, dz, 0);
-    }
         
-    public boolean move(double dx, double dy, double dz, double adjust) {
+    public boolean move(double dx, double dy, double dz) {
         if (dx == 0 && dz == 0 && dy == 0) {
             return true;
         }
@@ -1522,7 +1589,7 @@ public abstract class Entity extends Location implements Metadatable {
             }
 
             this.x = (this.boundingBox.minX + this.boundingBox.maxX) / 2;
-            this.y = this.boundingBox.minY - this.ySize + adjust;
+            this.y = this.boundingBox.minY - this.ySize;
             this.z = (this.boundingBox.minZ + this.boundingBox.maxZ) / 2;
 
             this.checkChunks();
@@ -1782,16 +1849,51 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     /**
-     * Mount an Entity into a vehicle
+     * Mount or Dismounts an Entity from a vehicle
      *
-     * @param entity The target Entity
+     * @param entity        The target Entity
      * @return {@code true} if the mounting successful
      */
-    public boolean mount(Entity entity) {
-        // Player can ride other vehicle but not the same vehicle
-        if (entity.riding != null || !(this instanceof EntityVehicle)) {
+    public boolean mountEntity(Entity entity) {
+        Objects.requireNonNull(entity, "The target of the mounting entity can't be null");
+        if (!(this instanceof EntityVehicle)) {
             return false;
         }
+        this.PitchDelta = 0.0D;
+        this.YawDelta = 0.0D;
+        if (entity.riding != null) {
+            VehicleEvent ev = new EntityExitVehicleEvent(entity, (EntityVehicle) this);
+            server.getPluginManager().callEvent(ev);
+            if (ev.isCancelled()) {
+                return false;
+            }
+            SetEntityLinkPacket pk;
+
+            pk = new SetEntityLinkPacket();
+            pk.rider = this.getId();
+            pk.riding = entity.getId();
+            pk.type = 2;
+            Server.broadcastPacket(this.hasSpawned.values(), pk);
+
+            if (entity instanceof Player) {
+                pk = new SetEntityLinkPacket();
+                pk.rider = this.getId();
+                pk.riding = 0;
+                pk.type = 2;
+                ((Player) entity).dataPacket(pk);
+            }
+
+            entity.riding = null;
+            linkedEntity = null;
+            entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
+            return true;
+        }
+        VehicleEvent ev = new EntityEnterVehicleEvent(entity, (EntityVehicle) this);
+        server.getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) {
+            return false;
+        }
+
         SetEntityLinkPacket pk;
 
         pk = new SetEntityLinkPacket();
@@ -1812,45 +1914,10 @@ public abstract class Entity extends Location implements Metadatable {
         linkedEntity = entity;
 
         entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
-        // TODO: If the player should be 0.8 or 0.6? 0.9?
-        entity.setDataProperty(
-                new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, new Vector3f(0, 0.8f, 0)));
+        updateRidden();
         return true;
     }
 
-    /**
-     * Dismount an Entity into a vehicle
-     *
-     * @param entity The target Entity
-     * @return {@code true} if the mounting successful
-     */
-    public boolean dismount(Entity entity) {
-        if (entity.riding != null || !(this instanceof EntityVehicle)) {
-            return false;
-        }
-        SetEntityLinkPacket pk;
-
-        pk = new SetEntityLinkPacket();
-        pk.rider = this.getId();
-        pk.riding = entity.getId();
-        pk.type = 2;
-        Server.broadcastPacket(this.hasSpawned.values(), pk);
-
-        if (entity instanceof Player) {
-            pk = new SetEntityLinkPacket();
-            pk.rider = this.getId();
-            pk.riding = 0;
-            pk.type = 2;
-            ((Player) entity).dataPacket(pk);
-        }
-
-        entity.riding = null;
-        linkedEntity = null;
-
-        entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
-        return true;
-    }
-    
     public long getId() {
         return this.id;
     }

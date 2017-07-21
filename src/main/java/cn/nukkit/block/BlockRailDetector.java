@@ -8,7 +8,11 @@ import cn.nukkit.math.BlockFace;
 
 /**
  * Created on 2015/11/22 by CreeperFace.
- * Package cn.nukkit.block in project Nukkit .
+ * Contributed by: larryTheCoder on 2017/7/8.
+ * <p>
+ * Nukkit Project,
+ * Minecart and Riding Project,
+ * Package cn.nukkit.block in project Nukkit.
  */
 public class BlockRailDetector extends BlockRail {
 
@@ -38,19 +42,19 @@ public class BlockRailDetector extends BlockRail {
 
     @Override
     public int getWeakPower(BlockFace side) {
-        return (meta & 0x8) != 0 ? 15 : 0;
+        return isActive() ? 15 : 0;
     }
 
     @Override
     public int getStrongPower(BlockFace side) {
-        return (meta & 0x8) == 0 ? 0 : (side == BlockFace.UP ? 15 : 0);
+        return isActive() ? 0 : (side == BlockFace.UP ? 15 : 0);
     }
 
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_SCHEDULED) {            
             updateState();
-            return Level.BLOCK_UPDATE_SCHEDULED;
+            return type;
         }
         return super.onUpdate(type);
     }
@@ -61,7 +65,7 @@ public class BlockRailDetector extends BlockRail {
     }
 
     protected void updateState() {
-        boolean wasPowered = (meta & 0x8) != 0;
+        boolean wasPowered = isActive();
         boolean isPowered = false;
 
         for (Entity entity : level.getNearbyEntities(new AxisAlignedBB(
@@ -69,7 +73,7 @@ public class BlockRailDetector extends BlockRail {
                 getFloorY(),
                 getFloorZ() + 0.125D,
                 getFloorX() + 0.875D,
-                getFloorY() + 1.125D, // Todo: adjacent
+                getFloorY() + 0.525D,
                 getFloorZ() + 0.875D))) {
             if (entity instanceof EntityMinecartAbstract) {
                 isPowered = true;

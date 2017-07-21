@@ -89,7 +89,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     public void collidingWith(EntityVehicle ent) { // can override (IronGolem|Bats)
-        ent.onCollideWithVehicle(this);
+        ent.applyEntityCollision(this);
     }
 
     @Override

@@ -14,6 +14,7 @@ import cn.nukkit.command.data.args.CommandArgBlockVector;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
+import cn.nukkit.entity.EntityInteractable;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.*;
@@ -2820,6 +2821,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     switch (interactPacket.action) {
                         case InteractPacket.ACTION_MOUSEOVER:
                             this.getServer().getPluginManager().callEvent(new PlayerMouseOverEntityEvent(this, targetEntity));
+                            // Interaction
+                            if (targetEntity instanceof EntityInteractable) {
+                                if(((EntityInteractable) targetEntity).canDoInteraction()){
+                                    setButtonText(((EntityInteractable) targetEntity).getInteractButton());
+                                } else {
+                                    setButtonText("");
+                                }
+                            } else {
+                                setButtonText("");
+                            }
                             break;
                         case InteractPacket.ACTION_LEFT_CLICK:
                             if (this.getGamemode() == Player.VIEW) {
@@ -2887,6 +2898,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 }
 
                                 this.inventory.setItemInHand(item);
+                                setButtonText(""); // Sometimes button text still available
                             }
                             break;
                         case InteractPacket.ACTION_VEHICLE_EXIT:
@@ -2894,23 +2906,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 break;
                             }
 
-                            SetEntityLinkPacket pk;
-
-                            pk = new SetEntityLinkPacket();
-                            pk.rider = targetEntity.getId();
-                            pk.riding = this.id;
-                            pk.type = 3;
-                            Server.broadcastPacket(this.hasSpawned.values(), pk);
-
-                            pk = new SetEntityLinkPacket();
-                            pk.rider = targetEntity.getId();
-                            pk.riding = this.getId();
-                            pk.type = 3;
-                            dataPacket(pk);
-
-                            riding = null;
-                            ((EntityVehicle) targetEntity).linkedEntity = null;
-                            this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
+                            riding.mountEntity(this);
                             break;
                     }
                     break;

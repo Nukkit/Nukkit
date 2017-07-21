@@ -5,8 +5,11 @@ import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.vehicle.VehicleMoveEvent;
+import cn.nukkit.event.vehicle.VehicleUpdateEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBoat;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.math.Vector3;
@@ -164,6 +167,15 @@ public class EntityBoat extends EntityVehicle {
                 this.motionY *= -0.5;
             }
 
+            Location from = new Location(lastX, lastY, lastZ, lastYaw, lastPitch, level);
+            Location to = new Location(this.x, this.y, this.z, this.yaw, this.pitch, level);
+
+            this.getServer().getPluginManager().callEvent(new VehicleUpdateEvent(this));
+
+            if (!from.equals(to)) {
+                this.getServer().getPluginManager().callEvent(new VehicleMoveEvent(this, from, to));
+            }
+
             this.updateMovement();
         }
 
@@ -176,24 +188,7 @@ public class EntityBoat extends EntityVehicle {
             return false;
         }
 
-        SetEntityLinkPacket pk;
-
-        pk = new SetEntityLinkPacket();
-        pk.rider = this.getId(); //WTF
-        pk.riding = player.getId();
-        pk.type = 2;
-        Server.broadcastPacket(this.hasSpawned.values(), pk);
-
-        pk = new SetEntityLinkPacket();
-        pk.rider = this.getId();
-        pk.riding = 0;
-        pk.type = 2;
-        player.dataPacket(pk);
-
-        player.riding = this;
-        this.linkedEntity = player;
-
-        player.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
+        super.mountEntity(player);
         return true;
     }
 }

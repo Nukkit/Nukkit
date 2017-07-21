@@ -38,6 +38,11 @@ public class EntityZombie extends EntityMob {
     }
 
     @Override
+    public float getYOffset() {
+        return super.getYOffset() - 0.5F;
+    }
+    
+    @Override
     public String getName() {
         return "Zombie";
     }

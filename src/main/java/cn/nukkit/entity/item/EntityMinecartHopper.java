@@ -4,6 +4,7 @@ import cn.nukkit.block.BlockHopper;
 import cn.nukkit.item.ItemMinecartHopper;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.EnumMinecart;
 
 public class EntityMinecartHopper extends EntityMinecartAbstract {
 
@@ -17,10 +18,10 @@ public class EntityMinecartHopper extends EntityMinecartAbstract {
     // TODO: 2016/12/18 inventory
 
     @Override
-    public int getMineId() {
-        return 5;
+    public EnumMinecart getType() {
+        return EnumMinecart.valueOf(5);
     }
-
+    
     @Override
     public int getNetworkId() {
         return NETWORK_ID;

@@ -245,6 +245,10 @@ public class BlockRail extends BlockFlowable {
         return getDamage() & 0x7;
     }
 
+    public boolean isActive() {
+        return (getDamage() & 0x8) != 0;
+    }
+
     public void setActive(boolean active) {
         if (active) {
             setDamage(getDamage() | 0x8);
