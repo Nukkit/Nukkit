@@ -30,5 +30,9 @@ public interface ChunkManager {
 
     void setChunk(int chunkX, int chunkZ, BaseFullChunk chunk);
 
+    int getHeightMap(int x, int z);
+
+    void setHeightMap(int x, int z, int value);
+
     long getSeed();
 }

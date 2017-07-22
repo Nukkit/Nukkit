@@ -109,6 +109,24 @@ public class SimpleChunkManager implements ChunkManager {
         this.chunks.put(Level.chunkHash(chunkX, chunkZ), chunk);
     }
 
+    public int getHeightMap(int x, int z) {
+        BaseFullChunk chunk;
+
+        if ((chunk = this.getChunk(x >> 4, z >> 4)) != null) {
+            return chunk.getHeightMap(x & 0x0f, z & 0x0f);
+        }
+
+        return 0;
+    }
+
+    public void setHeightMap(int x, int z, int value) {
+        BaseFullChunk chunk;
+
+        if ((chunk = this.getChunk(x >> 4, z >> 4)) != null) {
+            chunk.setHeightMap(x & 0x0f, z & 0x0f, value);
+        }
+    }
+
     public void cleanChunks() {
         this.chunks = new HashMap<>();
     }

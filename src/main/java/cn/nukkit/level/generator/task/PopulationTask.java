@@ -93,7 +93,7 @@ public class PopulationTask extends AsyncTask {
 
             chunk = manager.getChunk(chunk.getX(), chunk.getZ());
             chunk.recalculateHeightMap();
-            chunk.populateSkyLight();
+            chunk.populateSkyLight(manager);
             chunk.setLightPopulated();
             chunk.setPopulated();
             this.chunk = chunk.clone();

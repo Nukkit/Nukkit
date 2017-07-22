@@ -5,9 +5,14 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.generic.BaseChunk;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
+import cn.nukkit.level.light.BlockLightUpdate;
+import cn.nukkit.level.light.LightUpdate;
+import cn.nukkit.level.light.SkyLightUpdate;
+import cn.nukkit.math.NukkitMath;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.stream.NBTOutputStream;
@@ -485,34 +490,48 @@ public class Chunk extends BaseChunk {
     }
 
     @Override
-    public void populateSkyLight() {
-        int maxY = this.getMaxY();
+    public void populateSkyLight(ChunkManager chunkManager) {
+        for (int y = getHighestSubChunkIndex(); y >= 0; --y) {
+            this.getSection(y).setSkyLightArray(new byte[2048]);
+        }
 
         for (int y = this.getHighestSubChunkIndex(); y >= 0; --y) {
             this.getSection(y).setSkyLightArray(new byte[2048]);
         }
 
-        for (int x = 0; x < 16; ++x) {
-            for (int z = 0; z < 16; ++z) {
-                int heightMap = this.getHeightMap(x, z);
+        int maxY = getMaxY();
+        LightUpdate skyLightUpdates = new SkyLightUpdate(chunkManager);
+        LightUpdate blockLightUpdates = new BlockLightUpdate(chunkManager);
 
-                int y;
-                for (y = maxY; y >= heightMap; --y) {
-                    this.setBlockSkyLight(x, y, z, 15);
-                }
+        for (int x = this.x << 4, maxX = x + 16; x < maxX; ++x) {
+            for (int z = this.z << 4, maxZ = z + 16; z < maxZ; ++z) {
+                int heightMap = this.getHeightMap(x & 0x0f, z & 0x0f);
+                int heightMapMax = NukkitMath.max(
+                        chunkManager.getHeightMap(x + 1, z),
+                        chunkManager.getHeightMap(x - 1, z),
+                        chunkManager.getHeightMap(x, z + 1),
+                        chunkManager.getHeightMap(x, z - 1)
+                );
 
-                int light = 15;
-                for (; y >= 0; --y) {
-                    if (light > 0) {
-                        light -= Block.lightFilter[this.getBlockId(x, y, z)];
-                        if (light <= 0) {
-                            break;
+                for (int y = maxY; y >= 0; --y) {
+                    if (y >= heightMap) {
+                        if (y == heightMap || y < heightMapMax) {
+                            skyLightUpdates.setAndUpdateLight(x, y, z, 15);
+                        } else {
+                            setBlockSkyLight(x & 0x0f, y, z & 0x0f, 15);
                         }
                     }
-                    this.setBlockSkyLight(x, y, z, light);
+
+                    int blockLight;
+                    if ((blockLight = Block.light[this.getBlockId(x & 0x0f, y, z & 0x0f)]) > 0) {
+                        blockLightUpdates.setAndUpdateLight(x, y, z, blockLight);
+                    }
                 }
             }
         }
+
+        blockLightUpdates.execute();
+        skyLightUpdates.execute();
     }
 
     public int getMaxY() {
