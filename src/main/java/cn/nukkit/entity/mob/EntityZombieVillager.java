@@ -36,11 +36,6 @@ public class EntityZombieVillager extends EntityMob {
     public float getHeight() {
         return 1.8f;
     }
-    
-    @Override
-    public float getYOffset() {
-        return super.getYOffset() - 0.5F;
-    }
 
     @Override
     public String getName() {

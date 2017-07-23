@@ -75,11 +75,25 @@ public class BlockRailPowered extends BlockRail {
         if (power >= 8) {
             return false;
         }
+        // The position of the floor numbers
         int dx = pos.getFloorX();
         int dy = pos.getFloorY();
         int dz = pos.getFloorZ();
+        // First: get the base block
+        BlockRail block;
+        Block block2 = level.getBlock(new Vector3(dx, dy, dz));
+
+        // Second: check if the rail is Powered rail
+        if (Rail.isRailBlock(block2)) {
+            block = (BlockRail) block2;
+        } else {
+            return false;
+        }
+        
+        // Used to check if the next ascending rail should be what
         Rail.Orientation base = null;
-        switch (getOrientation()) {
+        // Third: Recalculate the base position
+        switch (block.getOrientation()) {
             case STRAIGHT_NORTH_SOUTH:
                 if (relative) {
                     dz++;
@@ -129,7 +143,8 @@ public class BlockRailPowered extends BlockRail {
                     dz--;
                 }
                 base = Rail.Orientation.STRAIGHT_NORTH_SOUTH;
-        }
+       } 
+        // Next check the if rail is on power state
         return canPowered(new Vector3(dx, dy, dz), base, power, relative);
     }
 
@@ -142,25 +157,18 @@ public class BlockRailPowered extends BlockRail {
 
         // Sometimes the rails are diffrent orientation
         Rail.Orientation base = ((BlockRailPowered) block).getOrientation();
-        if (state != null) {
-            // STRAIGHT_EAST_WEST
-            if (state != Rail.Orientation.STRAIGHT_EAST_WEST
-                    || (base != Rail.Orientation.STRAIGHT_NORTH_SOUTH
-                    && base != Rail.Orientation.ASCENDING_NORTH
-                    && base != Rail.Orientation.ASCENDING_SOUTH)) {
-                return false;
-            } else {// Default STRAIGHT_NORTH_SOUTH
-                if (base != Rail.Orientation.STRAIGHT_EAST_WEST
-                        && base != Rail.Orientation.ASCENDING_EAST
-                        && base != Rail.Orientation.ASCENDING_WEST) {
-                    return false;
-                }
-            }
-        }
 
         // Possible way how to know when the rail is activated is rail were directly powered
-        // OR recheck the surrounding... Which will returns here =w=
-        return level.isBlockPowered(pos) || checkSurrounding(pos, relative, power++);
+        // OR recheck the surrounding... Which will returns here =w=        
+        return (state != Rail.Orientation.STRAIGHT_EAST_WEST 
+                || base != Rail.Orientation.STRAIGHT_NORTH_SOUTH 
+                && base != Rail.Orientation.ASCENDING_NORTH 
+                && base != Rail.Orientation.ASCENDING_SOUTH) 
+                && (state != Rail.Orientation.STRAIGHT_NORTH_SOUTH 
+                || base != Rail.Orientation.STRAIGHT_EAST_WEST 
+                && base != Rail.Orientation.ASCENDING_EAST 
+                && base != Rail.Orientation.ASCENDING_WEST) 
+                && (level.isBlockPowered(pos) || checkSurrounding(pos, relative, power + 1));
     }
 
 }

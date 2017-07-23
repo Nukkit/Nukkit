@@ -84,7 +84,7 @@ public enum EnumMinecart {
     }
     
     /**
-     * Get the variants of the current minecart
+     * Gets if the minecart contains block
      *
      * @return Boolean
      */

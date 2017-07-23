@@ -31,11 +31,6 @@ public class EntityZombiePigman extends EntityMob {
     public float getWidth() {
         return 0.72f;
     }
-
-    @Override
-    public float getYOffset() {
-        return super.getYOffset() - 0.5F;
-    }
     
     @Override
     public float getHeight() {

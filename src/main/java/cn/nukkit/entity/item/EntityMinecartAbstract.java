@@ -12,6 +12,8 @@ import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.vehicle.VehicleDamageEvent;
+import cn.nukkit.event.vehicle.VehicleDestroyEvent;
 import cn.nukkit.event.vehicle.VehicleMoveEvent;
 import cn.nukkit.event.vehicle.VehicleUpdateEvent;
 import cn.nukkit.item.Item;
@@ -109,7 +111,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public float getMountedYOffset() {
-        return (getHeight() * 0.5F + 0.4F);
+        return getHeight() * 0.5F;
     }
 
     @Override
@@ -143,21 +145,9 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         this.lastUpdate = currentTick;
 
         if (isAlive()) {
-            if (getRollingAmplitude() > 0) {
-                setRollingAmplitude(getRollingAmplitude() - 1);
-            }
-
-            if (getDamage() > 0.0F) {
-                setDamage(getDamage() - 1.0F);
-            }
-
-            if (y < -64) {
-                kill();
-            }
-            updateMovement();
+            super.onUpdate(currentTick);
 
             // Entity variables
-            justCreated = false;
             lastX = x;
             lastY = y;
             lastZ = z;
@@ -166,22 +156,21 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             int dy = MathHelper.floor(y);
             int dz = MathHelper.floor(z);
 
-            // Check if the rail exsits
+            // Some hack to check rails
             if (Rail.isRailBlock(level.getBlockIdAt(dx, dy - 1, dz))) {
-                --dy; // check again down
+                --dy;
             }
 
-            Block block = level.getBlock(new Vector3(dx, dy, dz)); // get the rail
+            Block block = level.getBlock(new Vector3(dx, dy, dz));
 
-            // Now start to check if the block is 'Rail'
+            // Ensure that the block is a rail
             if (Rail.isRailBlock(block)) {
                 processMovement(dx, dy, dz, (BlockRail) block);
                 if (block instanceof BlockRailActivator) {
-                    // TNT only explode on ACTIVATOR RAIL!
+                    // Activate the minecart/TNT
                     activate(dx, dy, dz, (block.getDamage() & 0x8) != 0);
                 }
             } else {
-                // control falling and movement (off rail)
                 setFalling();
             }
             checkBlockCollision();
@@ -240,15 +229,26 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         if (invulnerable) {
             return false;
         } else {
-            // Vehicle does not respond hurt animation on packets
-            // It only respond on vehicle data flags. Such as these
-            setRollingAmplitude(10);
-            setDamage(getDamage() + source.getDamage() * 10.0F);
+            // Event start
+            VehicleDamageEvent event = new VehicleDamageEvent(this, source.getEntity(), source.getFinalDamage());
+            getServer().getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                return false;
+            }
+            // Event stop
+            performHurtAnimation((float) event.getDamage());
 
             Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
             boolean instantKill = damager instanceof Player
                     ? ((Player) damager).isCreative() : false;
-            if (instantKill || getDamage() > 40.0F) {
+            if (instantKill || getDamage() > 40) {
+                // Event start
+                VehicleDestroyEvent event2 = new VehicleDestroyEvent(this, source.getEntity());
+                getServer().getPluginManager().callEvent(event2);
+                if (event2.isCancelled()) {
+                    return false;
+                }
+                // Event stop
                 if (linkedEntity != null) {
                     mountEntity(linkedEntity);
                 }
@@ -263,7 +263,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 }
             }
         }
-
+        
         return true;
     }
 
@@ -429,7 +429,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     }
 
     protected void processMovement(int dx, int dy, int dz, BlockRail block) {
-        fallDistance = 0.0F;
+        fallDistance = 0.0F; 
         Vector3 vector = getNextRail(x, y, z);
 
         y = (double) dy;

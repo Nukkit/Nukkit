@@ -28,16 +28,12 @@ public class EntityMinecartEmpty extends EntityMinecartAbstract {
 
     @Override
     protected void activate(int x, int y, int z, boolean flag) {
-        // Some new info: Minecart will add some rolling amplitude if moving trough
-        // Activated rail
         if (flag) {
             if (this.riding != null) {
                 mountEntity(riding);
             }
-            if (getRollingAmplitude() == 0) {
-                setRollingAmplitude(10);
-                setDamage(50);
-            }
+            // looks like MCPE and MCPC not same XD
+            // removed rolling feature from here because of MCPE logic?
         }
     }
 }

@@ -1227,16 +1227,11 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void updateRiderPosition() {
         if (this.linkedEntity != null) {
-            this.linkedEntity.setPosition(linkedEntity.add(0, getMountedYOffset() + linkedEntity.getYOffset()));
             linkedEntity.setDataProperty(
-                    new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, new Vector3f(0, (float) (getMountedYOffset() + linkedEntity.getYOffset()), 0)));
+                    new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, new Vector3f(0, getMountedYOffset() + linkedEntity.getBaseOffset(), 0)));
         }
     }
-
-    public float getYOffset() {
-        return 0.0F;
-    }
-
+    
     public float getMountedYOffset() {
         return getHeight() * 0.75F;
     }

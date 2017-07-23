@@ -37,11 +37,6 @@ public class EntitySkeleton extends EntityMob {
     public float getHeight() {
         return 1.8f;
     }
-
-    @Override
-    public float getYOffset() {
-        return super.getYOffset() - 0.5F;
-    }
     
     @Override
     public void spawnTo(Player player) {
