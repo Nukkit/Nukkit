@@ -4,7 +4,10 @@ import cn.nukkit.Player;
 import cn.nukkit.api.API;
 import cn.nukkit.api.API.Definition;
 import cn.nukkit.api.API.Usage;
-import cn.nukkit.block.*;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockRail;
+import cn.nukkit.block.BlockRailActivator;
+import cn.nukkit.block.BlockRailPowered;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.EntityLiving;
@@ -29,6 +32,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.utils.EnumMinecart;
 import cn.nukkit.utils.Rail;
 import cn.nukkit.utils.Rail.Orientation;
+
 import java.util.Objects;
 
 /**
@@ -111,7 +115,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public float getMountedYOffset() {
-        return (getHeight() * 0.5F) + 0.8F;
+        return (getHeight() * 0.5F);
     }
 
     @Override
@@ -236,11 +240,10 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 return false;
             }
             // Event stop
-            performHurtAnimation((int) event.getDamage());
-
             Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
-            boolean instantKill = damager instanceof Player
-                    ? ((Player) damager).isCreative() : false;
+            boolean instantKill = damager instanceof Player && ((Player) damager).isCreative();
+            performHurtAnimation(instantKill ? 9999 : (int) event.getDamage());
+
             if (instantKill || getDamage() > 40) {
                 // Event start
                 VehicleDestroyEvent event2 = new VehicleDestroyEvent(this, source.getEntity());

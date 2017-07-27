@@ -14,7 +14,9 @@ import cn.nukkit.event.entity.EntityPortalEnterEvent.PortalType;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.event.player.PlayerTeleportEvent;
-import cn.nukkit.event.vehicle.*;
+import cn.nukkit.event.vehicle.EntityEnterVehicleEvent;
+import cn.nukkit.event.vehicle.EntityExitVehicleEvent;
+import cn.nukkit.event.vehicle.VehicleEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
@@ -27,11 +29,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.protocol.MobEffectPacket;
-import cn.nukkit.network.protocol.RemoveEntityPacket;
-import cn.nukkit.network.protocol.SetEntityDataPacket;
-import cn.nukkit.network.protocol.SetEntityLinkPacket;
-import cn.nukkit.network.protocol.SetEntityMotionPacket;
+import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.ChunkException;
@@ -1227,8 +1225,8 @@ public abstract class Entity extends Location implements Metadatable {
     public void updateRiderPosition() {
         // Messy unknown variables
         if (updateRidden()) {
-            linkedEntity.setDataProperty(new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, 
-                    new Vector3f(0, riding.getMountedYOffset() + getBaseOffset(), 0)));
+            linkedEntity.setDataProperty(new Vector3fEntityData(DATA_RIDER_SEAT_POSITION,
+                    new Vector3f(0, getMountedYOffset(), 0)));
         }
     }
 
