@@ -1197,9 +1197,8 @@ public abstract class Entity extends Location implements Metadatable {
             this.motionX = 0.0D;
             this.motionY = 0.0D;
             this.motionZ = 0.0D;
-            onUpdate(lastUpdate + 1);
+            onUpdate(lastUpdate);
             if (this.linkedEntity != null) {
-                this.linkedEntity.updateRiderPosition();
                 this.YawDelta += this.linkedEntity.yaw - this.linkedEntity.lastYaw;
                 for (this.PitchDelta += this.linkedEntity.pitch - this.linkedEntity.lastPitch; this.YawDelta >= 180.0D; this.YawDelta -= 360.0D) {
                 }
@@ -1226,12 +1225,13 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void updateRiderPosition() {
-        if (this.linkedEntity != null) {
-            linkedEntity.setDataProperty(
-                    new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, new Vector3f(0, getMountedYOffset() + linkedEntity.getBaseOffset(), 0)));
+        // Messy unknown variables
+        if (updateRidden()) {
+            linkedEntity.setDataProperty(new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, 
+                    new Vector3f(0, riding.getMountedYOffset() + getBaseOffset(), 0)));
         }
     }
-    
+
     public float getMountedYOffset() {
         return getHeight() * 0.75F;
     }
@@ -1867,14 +1867,14 @@ public abstract class Entity extends Location implements Metadatable {
             pk = new SetEntityLinkPacket();
             pk.rider = this.getId();
             pk.riding = entity.getId();
-            pk.type = 2;
+            pk.type = 3;
             Server.broadcastPacket(this.hasSpawned.values(), pk);
 
             if (entity instanceof Player) {
                 pk = new SetEntityLinkPacket();
                 pk.rider = this.getId();
                 pk.riding = 0;
-                pk.type = 2;
+                pk.type = 3;
                 ((Player) entity).dataPacket(pk);
             }
 
@@ -1909,7 +1909,7 @@ public abstract class Entity extends Location implements Metadatable {
         linkedEntity = entity;
 
         entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
-        updateRidden();
+        updateRiderPosition();
         return true;
     }
 

@@ -63,6 +63,7 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.utils.Binary;
+import cn.nukkit.utils.BlockIterator;
 import cn.nukkit.utils.ClientChainData;
 import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
@@ -1657,6 +1658,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.checkTeleportPosition();
+        this.checkInteractNearby();
 
         // TODO: remove this workaround (broken client MCPE 1.0.0)
         if (!messageQueue.isEmpty()) {
@@ -1668,7 +1670,69 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         return true;
     }
+    
+    public void checkInteractNearby(){
+        int interactDistance = isCreative() ? 5 : 3;
+        if(canInteract(this, interactDistance)){
+            if(getEntityPlayerLookingAt(interactDistance) != null){
+                EntityInteractable onInteract = getEntityPlayerLookingAt(interactDistance);
+                setButtonText(onInteract.getInteractButton());
+            } else {
+                setButtonText("");
+            }
+        } else {
+            setButtonText("");
+        }
+    }
 
+     /**
+     * Returns the Entity the player is looking at currently
+     *
+     * @param maxDistance the maximum distance to check for entities
+     * @return Entity|null    either NULL if no entity is found or an instance of the entity
+     */
+    public EntityInteractable getEntityPlayerLookingAt(int maxDistance) {
+        timing.startTiming();
+        
+        EntityInteractable entity = null;
+
+        // just a fix because player MAY not be fully initialized
+        if (temporalVector != null) {
+            Entity[] nearbyEntities = level.getNearbyEntities(boundingBox.grow(maxDistance, maxDistance, maxDistance), this);
+
+            // get all blocks in looking direction until the max interact distance is reached (it's possible that startblock isn't found!)
+            try {
+                BlockIterator itr = new BlockIterator(level, getPosition(), getDirectionVector(), getEyeHeight(), maxDistance);
+                if (itr.hasNext()) {
+                    Block block;
+                    while (itr.hasNext()) {
+                        block = itr.next();
+                        entity = getEntityAtPosition(nearbyEntities, block.getFloorX(), block.getFloorY(), block.getFloorZ());
+                        if (entity != null) {
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                // nothing to log here!
+            }
+        }
+
+        timing.stopTiming();
+
+        return entity;
+    }
+    
+    private EntityInteractable getEntityAtPosition(Entity[] nearbyEntities, int x, int y, int z) {
+        for (Entity nearestEntity : nearbyEntities) {
+            if (nearestEntity.getFloorX() == x && nearestEntity.getFloorY() == y && nearestEntity.getFloorZ() == z
+                    && nearestEntity instanceof EntityInteractable) {
+                return (EntityInteractable) nearestEntity;
+            }
+        }
+        return null;
+    }
+    
     private ArrayList<String> messageQueue = new ArrayList<>();
 
     public void checkNetwork() {
@@ -2805,6 +2869,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     Entity targetEntity = this.level.getEntity(interactPacket.target);
 
                     if (targetEntity == null || !this.isAlive() || !targetEntity.isAlive()) {
+                        setButtonText(""); // Easy way to avoid this accident
                         break;
                     }
 
@@ -2816,21 +2881,25 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
+                    if (targetEntity instanceof EntityInteractable) {
+                        if (canInteract(targetEntity, isCreative() ? 5 : 3)) {
+                            if (((EntityInteractable) targetEntity).canDoInteraction()) {
+                                setButtonText(((EntityInteractable) targetEntity).getInteractButton());
+                            } else {
+                                setButtonText("");
+                            }
+                        } else {
+                            setButtonText("");
+                        }
+                    } else {
+                        setButtonText("");
+                    }
+
                     item = this.inventory.getItemInHand();
 
                     switch (interactPacket.action) {
                         case InteractPacket.ACTION_MOUSEOVER:
                             this.getServer().getPluginManager().callEvent(new PlayerMouseOverEntityEvent(this, targetEntity));
-                            // Interaction
-                            if (targetEntity instanceof EntityInteractable) {
-                                if(((EntityInteractable) targetEntity).canDoInteraction()){
-                                    setButtonText(((EntityInteractable) targetEntity).getInteractButton());
-                                } else {
-                                    setButtonText("");
-                                }
-                            } else {
-                                setButtonText("");
-                            }
                             break;
                         case InteractPacket.ACTION_LEFT_CLICK:
                             if (this.getGamemode() == Player.VIEW) {
@@ -2898,7 +2967,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 }
 
                                 this.inventory.setItemInHand(item);
-                                setButtonText(""); // Sometimes button text still available
                             }
                             break;
                         case InteractPacket.ACTION_VEHICLE_EXIT:

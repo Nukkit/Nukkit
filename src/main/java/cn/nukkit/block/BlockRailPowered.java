@@ -35,23 +35,20 @@ public class BlockRailPowered extends BlockRail {
 
     @Override
     public int onUpdate(int type) {
+        // Warning: I din't recommended this on slow networks server or slow client
+        //          Network below 86Kb/s. This will became unresponsive to clients 
+        //          When updating the block state. Espicially on the world with many rails. 
+        //          Trust me, I tested this on my server.
         if (type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_SCHEDULED) {
             super.onUpdate(type);
             boolean wasPowered = isActive();
             boolean isPowered = level.isBlockPowered(this)
                     || checkSurrounding(this, true, 0)
                     || checkSurrounding(this, false, 0);
-            boolean hasUpdate = false;
 
-            if (isPowered && !wasPowered) {
-                setActive(true);
-                hasUpdate = true;
-            } else if (!isPowered && wasPowered) {
-                setActive(false);
-                hasUpdate = true;
-            }
-
-            if (hasUpdate) {
+            // Avoid Block minstake
+            if (wasPowered != isPowered) {
+                setActive(isPowered);
                 level.updateAround(down());
                 if (getOrientation().isAscending()) {
                     level.updateAround(up());
@@ -92,6 +89,7 @@ public class BlockRailPowered extends BlockRail {
         
         // Used to check if the next ascending rail should be what
         Rail.Orientation base = null;
+        boolean onStraight = true;
         // Third: Recalculate the base position
         switch (block.getOrientation()) {
             case STRAIGHT_NORTH_SOUTH:
@@ -114,6 +112,7 @@ public class BlockRailPowered extends BlockRail {
                 } else {
                     dx++;
                     dy++;
+                    onStraight = false;
                 }
                 base = Rail.Orientation.STRAIGHT_EAST_WEST;
                 break;
@@ -121,6 +120,7 @@ public class BlockRailPowered extends BlockRail {
                 if (relative) {
                     dx--;
                     dy++;
+                    onStraight = false;
                 } else {
                     dx++;
                 }
@@ -132,6 +132,7 @@ public class BlockRailPowered extends BlockRail {
                 } else {
                     dz--;
                     dy++;
+                    onStraight = false;
                 }
                 base = Rail.Orientation.STRAIGHT_NORTH_SOUTH;
                 break;
@@ -139,13 +140,20 @@ public class BlockRailPowered extends BlockRail {
                 if (relative) {
                     dz++;
                     dy++;
+                    onStraight = false;
                 } else {
                     dz--;
                 }
                 base = Rail.Orientation.STRAIGHT_NORTH_SOUTH;
+                break;
+            default:
+                // Unable to determinate the rail orientation
+                // Wrong rail?
+                return false;
        } 
         // Next check the if rail is on power state
-        return canPowered(new Vector3(dx, dy, dz), base, power, relative);
+        return canPowered(new Vector3(dx, dy, dz), base, power, relative)
+                || onStraight && canPowered(new Vector3(dx, dy - 1, dz), base, power, relative);
     }
 
     protected boolean canPowered(Vector3 pos, Rail.Orientation state, int power, boolean relative) {

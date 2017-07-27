@@ -111,7 +111,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public float getMountedYOffset() {
-        return getHeight() * 0.5F;
+        return (getHeight() * 0.5F) + 0.8F;
     }
 
     @Override
@@ -236,7 +236,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 return false;
             }
             // Event stop
-            performHurtAnimation((float) event.getDamage());
+            performHurtAnimation((int) event.getDamage());
 
             Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
             boolean instantKill = damager instanceof Player
@@ -487,6 +487,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         if (linkedEntity != null && linkedEntity instanceof EntityLiving) {
             expectedSpeed = currentSpeed;
             if (expectedSpeed > 0) {
+                // This is a trajectory (Angle of elevation)
                 playerYawNeg = -Math.sin((double) (linkedEntity.yaw * 3.1415927F / 180.0F));
                 playerYawPos = Math.cos((double) (linkedEntity.yaw * 3.1415927F / 180.0F));
                 motion = motionX * motionX + motionZ * motionZ;
@@ -692,7 +693,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     }
 
     private void prepareDataProperty() {
-        setDataProperty(new IntEntityData(DATA_HEALTH, 6));
         setRollingAmplitude(0);
         setRollingDirection(1);
         setDamage(0);
