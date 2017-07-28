@@ -11,11 +11,7 @@ import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.command.data.args.CommandArg;
 import cn.nukkit.command.data.args.CommandArgBlockVector;
-import cn.nukkit.entity.Attribute;
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityHuman;
-import cn.nukkit.entity.EntityInteractable;
-import cn.nukkit.entity.EntityLiving;
+import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.EntityCreeper;
@@ -62,11 +58,7 @@ import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePack;
-import cn.nukkit.utils.Binary;
-import cn.nukkit.utils.BlockIterator;
-import cn.nukkit.utils.ClientChainData;
-import cn.nukkit.utils.TextFormat;
-import cn.nukkit.utils.Zlib;
+import cn.nukkit.utils.*;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
 import com.google.gson.Gson;
@@ -2970,7 +2962,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                             break;
                         case InteractPacket.ACTION_VEHICLE_EXIT:
-                            if (!(targetEntity instanceof EntityVehicle)) {
+                            if (!(targetEntity instanceof EntityVehicle) || this.riding != null) {
                                 break;
                             }
 

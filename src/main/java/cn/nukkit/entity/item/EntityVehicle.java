@@ -80,11 +80,18 @@ public abstract class EntityVehicle extends EntityInteractable implements Entity
         return true;
     }
 
+    protected boolean rollingDirection = true;
+
     public boolean performHurtAnimation(int damage) {
+        if (damage >= this.getHealth()) {
+            return false;
+        }
+
         // Vehicle does not respond hurt animation on packets
         // It only respond on vehicle data flags. Such as these
         setRollingAmplitude(10);
-        setRollingDirection(-getRollingAmplitude());
+        setRollingDirection(rollingDirection ? 1 : -1);
+        rollingDirection = !rollingDirection;
         setDamage(getDamage() + damage);
         return true;
     }
