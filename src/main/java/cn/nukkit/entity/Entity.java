@@ -14,9 +14,6 @@ import cn.nukkit.event.entity.EntityPortalEnterEvent.PortalType;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.event.player.PlayerTeleportEvent;
-import cn.nukkit.event.vehicle.EntityEnterVehicleEvent;
-import cn.nukkit.event.vehicle.EntityExitVehicleEvent;
-import cn.nukkit.event.vehicle.VehicleEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
@@ -226,8 +223,8 @@ public abstract class Entity extends Location implements Metadatable {
     public double lastYaw;
     public double lastPitch;
     
-    private double PitchDelta;
-    private double YawDelta;
+    public double PitchDelta;
+    public double YawDelta;
     
     public double entityCollisionReduction = 0; // Higher than 0.9 will result a fast collisions
     public AxisAlignedBB boundingBox;
@@ -1036,6 +1033,9 @@ public abstract class Entity extends Location implements Metadatable {
             Timings.entityBaseTickTimer.stopTiming();
             return false;
         }
+        if (riding != null && !riding.isAlive()) {
+            ((EntityVehicle) riding).mountEntity(this);
+        }
 
         if (!this.effects.isEmpty()) {
             for (Effect effect : this.effects.values()) {
@@ -1187,7 +1187,7 @@ public abstract class Entity extends Location implements Metadatable {
         return hasUpdate;
     }
 
-    public boolean updateRidden() {
+    protected boolean updateRidden() {
         if (this.linkedEntity != null) {
             if (!linkedEntity.isAlive()) {
                 return false;
@@ -1222,11 +1222,11 @@ public abstract class Entity extends Location implements Metadatable {
         return false;
     }
 
-    public void updateRiderPosition() {
+    protected void updateRiderPosition(float offset) {
         // Messy unknown variables
         if (updateRidden()) {
             linkedEntity.setDataProperty(new Vector3fEntityData(DATA_RIDER_SEAT_POSITION,
-                    new Vector3f(0, getMountedYOffset(), 0)));
+                    new Vector3f(0, offset, 0)));
         }
     }
 
@@ -1370,9 +1370,6 @@ public abstract class Entity extends Location implements Metadatable {
                 dz *= 1.0F + entityCollisionReduction;
                 if (this.riding == null) {
                     setMotion(new Vector3(-dx, 0.0D, -dy));
-                }
-                if (entity.riding == null) {
-                    entity.setMotion(new Vector3(dx, 0.0D, dy));
                 }
             }
         }
@@ -1770,9 +1767,9 @@ public abstract class Entity extends Location implements Metadatable {
             }
         }
 
-        this.motionX = motion.x;
-        this.motionY = motion.y;
-        this.motionZ = motion.z;
+        this.motionX += motion.x;
+        this.motionY += motion.y;
+        this.motionZ += motion.z;
 
         if (!this.justCreated) {
             this.updateMovement();
@@ -1839,76 +1836,6 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         return false;
-    }
-
-    /**
-     * Mount or Dismounts an Entity from a vehicle
-     *
-     * @param entity        The target Entity
-     * @return {@code true} if the mounting successful
-     */
-    public boolean mountEntity(Entity entity) {
-        Objects.requireNonNull(entity, "The target of the mounting entity can't be null");
-        if (!(this instanceof EntityVehicle)) {
-            return false;
-        }
-        this.PitchDelta = 0.0D;
-        this.YawDelta = 0.0D;
-        if (entity.riding != null) {
-            VehicleEvent ev = new EntityExitVehicleEvent(entity, (EntityVehicle) this);
-            server.getPluginManager().callEvent(ev);
-            if (ev.isCancelled()) {
-                return false;
-            }
-            SetEntityLinkPacket pk;
-
-            pk = new SetEntityLinkPacket();
-            pk.rider = this.getId();
-            pk.riding = entity.getId();
-            pk.type = 3;
-            Server.broadcastPacket(this.hasSpawned.values(), pk);
-
-            if (entity instanceof Player) {
-                pk = new SetEntityLinkPacket();
-                pk.rider = this.getId();
-                pk.riding = 0;
-                pk.type = 3;
-                ((Player) entity).dataPacket(pk);
-            }
-
-            entity.riding = null;
-            linkedEntity = null;
-            entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
-            return true;
-        }
-        VehicleEvent ev = new EntityEnterVehicleEvent(entity, (EntityVehicle) this);
-        server.getPluginManager().callEvent(ev);
-        if (ev.isCancelled()) {
-            return false;
-        }
-
-        SetEntityLinkPacket pk;
-
-        pk = new SetEntityLinkPacket();
-        pk.rider = this.getId();
-        pk.riding = entity.getId();
-        pk.type = 2;
-        Server.broadcastPacket(this.hasSpawned.values(), pk);
-
-        if (entity instanceof Player) {
-            pk = new SetEntityLinkPacket();
-            pk.rider = this.getId();
-            pk.riding = 0;
-            pk.type = 2;
-            ((Player) entity).dataPacket(pk);
-        }
-
-        entity.riding = this;
-        linkedEntity = entity;
-
-        entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
-        updateRiderPosition();
-        return true;
     }
 
     public long getId() {

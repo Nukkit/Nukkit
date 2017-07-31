@@ -35,41 +35,13 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
         super.initEntity();
 
         this.fuse = namedTag.getInt("TNTFuse");
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_CHARGED, fuse != 0);
-        this.setDataProperty(new IntEntityData(DATA_FUSE_LENGTH, fuse));
-    }
-
-    @Override
-    public boolean onUpdate(int currentDiff) {
-        boolean hasUpdate = super.onUpdate(currentDiff);
-        if (activated) {
-            if (this.fuse > 0) {
-                --this.fuse;
-                this.level.addParticle(new SmokeParticle(new Vector3(this.x, this.y + 0.5D, this.z)));
-            } else if (this.fuse == 0) {
-                this.explode(this.motionX * this.motionX + this.motionZ * this.motionZ);
-            }
-
-            if (this.positionChanged) {
-                double square = this.motionX * this.motionX + this.motionZ * this.motionZ;
-
-                if (square >= 0.009999999776482582D) {
-                    this.explode(square);
-                }
-            }
-        }
-
-        return hasUpdate || !onGround || Math.abs(motionX) > 0.00001 || Math.abs(motionY) > 0.00001 || Math.abs(motionZ) > 0.00001;
-
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_CHARGED, false);
     }
 
     @Override
     public void activate(int i, int j, int k, boolean flag) {
-        this.fuse = 80;
-        this.activated = true;
-
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_CHARGED, true);
-        this.setDataProperty(new IntEntityData(DATA_FUSE_LENGTH, fuse));
+        // TODO: Find out why minecart doesnt have a right TNT fuse length
+        // Could be implemented in the future!
     }
 
     @Override

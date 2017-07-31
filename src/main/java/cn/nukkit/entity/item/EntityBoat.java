@@ -61,6 +61,11 @@ public class EntityBoat extends EntityVehicle {
     }
 
     @Override
+    public float getBaseOffset() {
+        return 0.35F;
+    }
+    
+    @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }

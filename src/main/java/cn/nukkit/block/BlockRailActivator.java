@@ -148,11 +148,11 @@ public class BlockRailActivator extends BlockRail {
     protected boolean canPowered(Vector3 pos, Rail.Orientation state, int power, boolean relative) {
         Block block = level.getBlock(pos);
 
-        if (!(block instanceof BlockRailPowered)) {
+        if (!(block instanceof BlockRailActivator)) {
             return false;
         }
 
-        Rail.Orientation base = ((BlockRailPowered) block).getOrientation();
+        Rail.Orientation base = ((BlockRailActivator) block).getOrientation();
      
         return (state != Rail.Orientation.STRAIGHT_EAST_WEST
                 || base != Rail.Orientation.STRAIGHT_NORTH_SOUTH

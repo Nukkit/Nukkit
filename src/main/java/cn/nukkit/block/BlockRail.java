@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
@@ -232,17 +233,16 @@ public class BlockRail extends BlockFlowable {
         }
     }
 
-    /**
-     * Get the real meta of Rail. Used to get real meta when rail (e.g powered
-     * rail, detector rail, activator rail) is activated. The meta of activated
-     * rail are different (and also unique). You also can use {@code meta & 0x8}
-     * to get if the rail is activated and {@code meta & 0x7} to get real meta
-     *
-     * @return The encoded meta (integer)
-     */
     public int getRealMeta() {
-        // Get the real meta
-        return getDamage() & 0x7;
+        // Check if this can be powered
+        // Avoid modifying the value from meta (The rail orientation may be false)
+        // Reason: When the rail is curved, the meta will return STRAIGHT_NORTH_SOUTH.
+        // OR Null Pointer Exception
+        if (!isAbstract()) {
+            return getDamage() & 0x7;
+        }
+        // Return the default: This meta
+        return getDamage();
     }
 
     public boolean isActive() {
