@@ -46,19 +46,18 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     private String entityName;
     public final int[][][] matrix = new int[][][]{
-        {{0, 0, -1}, {0, 0, 1}},
-        {{-1, 0, 0}, {1, 0, 0}},
-        {{-1, -1, 0}, {1, 0, 0}},
-        {{-1, 0, 0}, {1, -1, 0}},
-        {{0, 0, -1}, {0, -1, 1}},
-        {{0, -1, -1}, {0, 0, 1}},
-        {{0, 0, 1}, {1, 0, 0}},
-        {{0, 0, 1}, {-1, 0, 0}},
-        {{0, 0, -1}, {-1, 0, 0}},
+        {{0, 0, -1}, {0, 0, 1}}, 
+        {{-1, 0, 0}, {1, 0, 0}}, 
+        {{-1, -1, 0}, {1, 0, 0}}, 
+        {{-1, 0, 0}, {1, -1, 0}}, 
+        {{0, 0, -1}, {0, -1, 1}}, 
+        {{0, -1, -1}, {0, 0, 1}}, 
+        {{0, 0, 1}, {1, 0, 0}}, 
+        {{0, 0, 1}, {-1, 0, 0}}, 
+        {{0, 0, -1}, {-1, 0, 0}}, 
         {{0, 0, -1}, {1, 0, 0}}
     };
     private double currentSpeed = 0;
-    private boolean isInReverse = false;
     protected Block blockInside = null;
     // Plugins modifiers
     public boolean slowWhenEmpty = true;
@@ -103,8 +102,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public float getBaseOffset() {
-        // Weird question: Why are these implemented? Why didnt use getLength()
-        //                 instead of making these work harder?
         return 0.35F;
     }
 
@@ -114,8 +111,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     }
 
     @Override
+    public boolean canDoInteraction() {
+        return linkedEntity == null && this.getDisplayBlock() == null;
+    }
+    
+    @Override
     public float getMountedYOffset() {
-        return (getHeight() * 0.5F);
+        return 0.45F; // Real minecart offset
     }
 
     @Override
@@ -181,23 +183,20 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
             // Minecart head
             pitch = 0;
-            if (motionX * motionX + motionZ * motionZ > 0.001D) {
-                yaw = (Math.atan2(motionZ, motionX) * 180 / 3.141592653589793D);
-                if (isInReverse) {
-                    yaw += 180.0F;
-                }
+            double diffX = this.lastX - this.x;
+            double diffZ = this.lastZ - this.z;
+            double yawToChange = yaw;
+            if (diffX * diffX + diffZ * diffZ > 0.001D) {
+                yawToChange = (Math.atan2(diffZ, diffX) * 180 / 3.141592653589793D);
             }
-
-            double direction = wrapAngleTo180(yaw - lastYaw);
-
-            if (direction < -170 || direction >= 170) {
-                yaw += 180.0F;
-                isInReverse = !isInReverse;
+            
+            // Reverse yaw if yaw is below 0
+            if (yawToChange < 0) {
+                // -90-(-90)-(-90) = 90
+                yawToChange -= yawToChange - yawToChange;
             }
-
-            if (lastYaw != yaw) {
-                setRotation(yaw, pitch);
-            }
+            
+            setRotation(yawToChange, pitch);
 
             Location from = new Location(lastX, lastY, lastZ, lastYaw, lastPitch, level);
             Location to = new Location(this.x, this.y, this.z, this.yaw, this.pitch, level);
@@ -412,11 +411,20 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     protected void activate(int x, int y, int z, boolean flag) {
     }
+    
+    protected boolean hasUpdated = false;
 
     protected void setFalling() {
         motionX = NukkitMath.clamp(motionX, -getMaxSpeed(), getMaxSpeed());
         motionZ = NukkitMath.clamp(motionZ, -getMaxSpeed(), getMaxSpeed());
-
+        
+        if(linkedEntity != null && !hasUpdated){
+            updateRiderPosition(getMountedYOffset() + 0.35F);
+            hasUpdated = true;
+        } else {
+            hasUpdated = false;
+        }
+        
         if (onGround) {
             motionX *= derailedX;
             motionY *= derailedY;

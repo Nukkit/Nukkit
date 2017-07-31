@@ -1397,7 +1397,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (diffX != 0 || diffY != 0 || diffZ != 0) {
                 if (this.checkMovement && !server.getAllowFlight() && this.isSurvival()) {
-                    if (!this.isSleeping()) {
+                    // Some say: I cant move my head when riding because the server 
+                    // blocked my movement
+                    if (!this.isSleeping() && this.riding == null) {
                         double diffHorizontalSqr = (diffX * diffX + diffZ * diffZ) / ((double) (tickDiff * tickDiff));
                         if (diffHorizontalSqr > 0.125) {
                             PlayerInvalidMoveEvent ev;
@@ -1718,7 +1720,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private EntityInteractable getEntityAtPosition(Entity[] nearbyEntities, int x, int y, int z) {
         for (Entity nearestEntity : nearbyEntities) {
             if (nearestEntity.getFloorX() == x && nearestEntity.getFloorY() == y && nearestEntity.getFloorZ() == z
-                    && nearestEntity instanceof EntityInteractable) {
+                    && nearestEntity instanceof EntityInteractable
+                    && ((EntityInteractable) nearestEntity).canDoInteraction()) {
                 return (EntityInteractable) nearestEntity;
             }
         }
@@ -2861,7 +2864,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     Entity targetEntity = this.level.getEntity(interactPacket.target);
 
                     if (targetEntity == null || !this.isAlive() || !targetEntity.isAlive()) {
-                        setButtonText(""); // Easy way to avoid this accident
                         break;
                     }
 
@@ -2872,21 +2874,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.getName()));
                         break;
                     }
-
-                    if (targetEntity instanceof EntityInteractable) {
-                        if (canInteract(targetEntity, isCreative() ? 5 : 3)) {
-                            if (((EntityInteractable) targetEntity).canDoInteraction()) {
-                                setButtonText(((EntityInteractable) targetEntity).getInteractButton());
-                            } else {
-                                setButtonText("");
-                            }
-                        } else {
-                            setButtonText("");
-                        }
-                    } else {
-                        setButtonText("");
-                    }
-
+                    
                     item = this.inventory.getItemInHand();
 
                     switch (interactPacket.action) {
@@ -2962,11 +2950,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                             break;
                         case InteractPacket.ACTION_VEHICLE_EXIT:
-                            if (!(targetEntity instanceof EntityVehicle) || this.riding != null) {
+                            if (!(targetEntity instanceof EntityVehicle) || this.riding == null) {
                                 break;
                             }
 
-                            riding.mountEntity(this);
+                            ((EntityVehicle) riding).mountEntity(this);
                             break;
                     }
                     break;
@@ -4939,13 +4927,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void transfer(InetSocketAddress address) {
-        String hostName = address.getHostName();
+        String hostName = address.getAddress().getHostAddress();
         int port = address.getPort();
         TransferPacket pk = new TransferPacket();
         pk.address = hostName;
         pk.port = port;
         this.dataPacket(pk);
-        String message = "Transferred to " + address + ":" + port;
+        String message = "Transferred to " + hostName + ":" + port;
         this.close(message, message, false);
     }
 
