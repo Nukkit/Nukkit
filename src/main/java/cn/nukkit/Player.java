@@ -2264,12 +2264,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.level.sendBlocks(new Player[]{this}, new Block[]{target, block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
                         break;
                     } else if (useItemPacket.face == -1) {
-                        Vector3 aimPos = new Vector3(
-                                -Math.sin(this.yaw / 180d * Math.PI) * Math.cos(this.pitch / 180d * Math.PI),
-                                -Math.sin(this.pitch / 180d * Math.PI),
-                                Math.cos(this.yaw / 180d * Math.PI) * Math.cos(this.pitch / 180d * Math.PI)
-                        );
-
                         if (this.isCreative()) {
                             item = this.inventory.getItemInHand();
                         } else if (!this.inventory.getItemInHand().deepEquals(useItemPacket.item)) {
@@ -2279,12 +2273,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             item = this.inventory.getItemInHand();
                         }
 
+                        Vector3 aimPos = new Vector3(
+                                -Math.sin(this.yaw / 180d * Math.PI) * Math.cos(this.pitch / 180d * Math.PI),
+                                -Math.sin(this.pitch / 180d * Math.PI),
+                                Math.cos(this.yaw / 180d * Math.PI) * Math.cos(this.pitch / 180d * Math.PI)
+                        );
+
                         PlayerInteractEvent playerInteractEvent = new PlayerInteractEvent(this, item, aimPos, null, Action.RIGHT_CLICK_AIR);
 
                         this.server.getPluginManager().callEvent(playerInteractEvent);
 
                         if (playerInteractEvent.isCancelled()) {
                             this.inventory.sendHeldItem(this);
+                            break;
+                        }
+
+                        if (this.getFoodData().getLevel() < 20 && Food.getByRelative(item) != null) {
+                            this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION);
                             break;
                         }
 
@@ -2531,7 +2536,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         case PlayerActionPacket.ACTION_RELEASE_ITEM:
                             if (this.startAction > -1 && this.getDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION)) {
                                 if (this.inventory.getItemInHand().getId() == Item.BOW) {
-
                                     Item bow = this.inventory.getItemInHand();
                                     ItemArrow itemArrow = new ItemArrow();
                                     if (this.isSurvival() && !this.inventory.contains(itemArrow)) {
@@ -2619,6 +2623,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                             //milk removed here, see the section of food
 
+                            this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false);
+                            break;
                         case PlayerActionPacket.ACTION_STOP_SLEEPING:
                             this.stopSleep();
                             break;
@@ -2951,11 +2957,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     this.craftingType = CRAFTING_SMALL;
 
-                    this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false); //TODO: check if this should be true
                     EntityEventPacket entityEventPacket = (EntityEventPacket) packet;
 
                     switch (entityEventPacket.event) {
                         case EntityEventPacket.USE_ITEM: //Eating
+                            this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false);
                             Item itemInHand = this.inventory.getItemInHand();
                             PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
                             this.server.getPluginManager().callEvent(consumeEvent);
@@ -2992,7 +2998,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                 Food food = Food.getByRelative(itemInHand);
                                 if (food != null) if (food.eatenBy(this)) --itemInHand.count;
-
                             }
 
                             this.inventory.setItemInHand(itemInHand);
@@ -3005,8 +3010,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             pk.event = EntityEventPacket.CONSUME_ITEM;
                             pk.itemId = this.inventory.getItemInHand().getId();
 
-                            Server.broadcastPacket(this.getViewers().values(), pk);
-                            this.dataPacket(pk);
+                            if (pk.itemId != Item.POTION) { //idk what's wrong
+                                Server.broadcastPacket(this.getViewers().values(), pk);
+                                this.dataPacket(pk);
+                            }
                             break;
                     }
                     break;
