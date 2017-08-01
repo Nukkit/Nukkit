@@ -4,8 +4,11 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.vehicle.VehicleMoveEvent;
+import cn.nukkit.event.vehicle.VehicleUpdateEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBoat;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.math.Vector3;
@@ -164,6 +167,15 @@ public class EntityBoat extends EntityVehicle {
 
             if (this.onGround) {
                 this.motionY *= -0.5;
+            }
+
+            Location from = new Location(lastX, lastY, lastZ, lastYaw, lastPitch, level);
+            Location to = new Location(this.x, this.y, this.z, this.yaw, this.pitch, level);
+
+            this.getServer().getPluginManager().callEvent(new VehicleUpdateEvent(this));
+
+            if (!from.equals(to)) {
+                this.getServer().getPluginManager().callEvent(new VehicleMoveEvent(this, from, to));
             }
 
             this.updateMovement();
