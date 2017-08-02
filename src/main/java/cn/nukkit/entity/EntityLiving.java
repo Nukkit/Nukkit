@@ -340,9 +340,4 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     public float getMovementSpeed() {
         return this.movementSpeed;
     }
-
-    @Override
-    public boolean doesTriggerPressurePlate() {
-        return true;
-    }
 }
