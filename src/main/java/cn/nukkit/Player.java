@@ -3832,45 +3832,44 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.dataPacket(pk);
     }
 
-    public void sendTitle(String text) {
-        SetTitlePacket pk = new SetTitlePacket();
-        pk.type = SetTitlePacket.TYPE_TITLE;
-        pk.text = text;
-        this.dataPacket(pk);
+    public void sendTitle(String title) {
+        this.sendTitle(title, "", 20, 20, 5);
     }
 
-    /**
-     * Sets a subtitle for the next shown title
-     *
-     * @param text Subtitle text
-     */
-    public void setSubtitle(String text) {
-        SetTitlePacket pk = new SetTitlePacket();
-        pk.type = SetTitlePacket.TYPE_SUBTITLE;
-        pk.text = text;
-        this.dataPacket(pk);
+    public void sendTitle(String title, String subtitle) {
+        this.sendTitle(title, subtitle, 20, 20, 5);
     }
 
-    public void sendActionBarTitle(String text) {
+    public void sendTitle(String title, String subtitle, int fadein, int duration, int fadeout) {
+        if (!subtitle.equals("")) {
+            SetTitlePacket pk = new SetTitlePacket();
+            pk.type = SetTitlePacket.TYPE_SUBTITLE;
+            pk.text = subtitle;
+            pk.fadeInTime = fadein;
+            pk.stayTime = duration;
+            pk.fadeOutTime = fadeout;
+            this.dataPacket(pk);
+        }
+        SetTitlePacket pk2 = new SetTitlePacket();
+        pk2.type = SetTitlePacket.TYPE_TITLE;
+        pk2.text = title;
+        pk2.fadeInTime = fadein;
+        pk2.stayTime = duration;
+        pk2.fadeOutTime = fadeout;
+        this.dataPacket(pk2);
+    }
+
+    public void sendActionBar(String title) {
+        this.sendActionBar(title, 1, 0, 1);
+    }
+
+    public void sendActionBar(String title, int fadein, int duration, int fadeout) {
         SetTitlePacket pk = new SetTitlePacket();
         pk.type = SetTitlePacket.TYPE_ACTION_BAR;
-        pk.text = text;
-        this.dataPacket(pk);
-    }
-
-    /**
-     * Sets times for title animations
-     *
-     * @param fadeInTime  For how long title fades in
-     * @param stayTime    For how long title is shown
-     * @param fadeOutTime For how long title fades out
-     */
-    public void setTitleAnimationTimes(int fadeInTime, int stayTime, int fadeOutTime) {
-        SetTitlePacket pk = new SetTitlePacket();
-        pk.type = SetTitlePacket.TYPE_ANIMATION_TIMES;
-        pk.fadeInTime = fadeInTime;
-        pk.stayTime = stayTime;
-        pk.fadeOutTime = fadeOutTime;
+        pk.text = title;
+        pk.fadeInTime = fadein;
+        pk.stayTime = duration;
+        pk.fadeOutTime = fadeout;
         this.dataPacket(pk);
     }
 
