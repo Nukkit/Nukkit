@@ -7,9 +7,9 @@ import com.google.gson.Gson;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class CommandStepPacket extends DataPacket {
+public class CommandRequestPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.COMMAND_STEP_PACKET;
+    public static final byte NETWORK_ID = ProtocolInfo.COMMAND_REQUEST_PACKET;
 
     /**
      * unknown (string)

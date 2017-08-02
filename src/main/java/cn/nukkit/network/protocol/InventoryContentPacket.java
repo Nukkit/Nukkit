@@ -6,8 +6,8 @@ import cn.nukkit.item.Item;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class ContainerSetContentPacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.CONTAINER_SET_CONTENT_PACKET;
+public class InventoryContentPacket extends DataPacket {
+    public static final byte NETWORK_ID = ProtocolInfo.INVENTORY_CONTENT_PACKET;
 
     @Override
     public byte pid() {
@@ -20,59 +20,39 @@ public class ContainerSetContentPacket extends DataPacket {
     public static final byte SPECIAL_HOTBAR = 0x7a;
     public static final byte SPECIAL_FIXED_INVENTORY = 0x7b;
 
-    public long windowid;
-    public long eid;
+    public int inventoryId;
     public Item[] slots = new Item[0];
-    public int[] hotbar = new int[0];
 
     @Override
     public DataPacket clean() {
         this.slots = new Item[0];
-        this.hotbar = new int[0];
         return super.clean();
     }
 
     @Override
     public void decode() {
-        this.windowid = (int) this.getUnsignedVarInt();
-        this.eid = this.getVarLong();
+        this.inventoryId = this.getVarInt();
         int count = (int) this.getUnsignedVarInt();
         this.slots = new Item[count];
 
         for (int s = 0; s < count && !this.feof(); ++s) {
             this.slots[s] = this.getSlot();
         }
-
-        count = (int) this.getUnsignedVarInt();
-        this.hotbar = new int[count];
-        for (int s = 0; s < count && !this.feof(); ++s) {
-            this.hotbar[s] = this.getVarInt();
-        }
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putUnsignedVarInt(this.windowid);
-        this.putVarLong(this.eid);
+        this.putVarInt(this.inventoryId);
         this.putUnsignedVarInt(this.slots.length);
         for (Item slot : this.slots) {
             this.putSlot(slot);
         }
-
-        if (this.windowid == SPECIAL_INVENTORY && this.hotbar.length > 0) {
-            this.putUnsignedVarInt(this.hotbar.length);
-            for (int slot : this.hotbar) {
-                this.putVarInt(slot);
-            }
-        } else {
-            this.putUnsignedVarInt(0);
-        }
     }
 
     @Override
-    public ContainerSetContentPacket clone() {
-        ContainerSetContentPacket pk = (ContainerSetContentPacket) super.clone();
+    public InventoryContentPacket clone() {
+        InventoryContentPacket pk = (InventoryContentPacket) super.clone();
         pk.slots = this.slots.clone();
         return pk;
     }

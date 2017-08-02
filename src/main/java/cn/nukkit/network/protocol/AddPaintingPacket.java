@@ -25,7 +25,7 @@ public class AddPaintingPacket extends DataPacket {
         this.reset();
         this.putVarLong(this.entityUniqueId);
         this.putVarLong(this.entityRuntimeId);
-        this.putBlockCoords(this.x, this.y, this.z);
+        this.putBlockVector3(this.x, this.y, this.z);
         this.putVarInt(this.direction);
         this.putString(this.title);
     }

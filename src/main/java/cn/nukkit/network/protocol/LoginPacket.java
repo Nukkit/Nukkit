@@ -1,6 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.Server;
 import cn.nukkit.entity.data.Skin;
+import cn.nukkit.utils.Binary;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -21,7 +23,6 @@ public class LoginPacket extends DataPacket {
 
     public String username;
     public int protocol;
-    public byte gameEdition;
     public UUID clientUUID;
     public long clientId;
 
@@ -35,7 +36,6 @@ public class LoginPacket extends DataPacket {
     @Override
     public void decode() {
         this.protocol = this.getInt();
-        this.gameEdition = (byte) this.getByte();
         this.setBuffer(this.getByteArray(), 0);
         decodeChainData();
         decodeSkinData();

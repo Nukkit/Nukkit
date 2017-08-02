@@ -3,7 +3,7 @@ package cn.nukkit.event.inventory;
 import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.HandlerList;
-import cn.nukkit.inventory.TransactionGroup;
+import cn.nukkit.inventory.transaction.TransactionGroup;
 
 /**
  * author: MagicDroidX

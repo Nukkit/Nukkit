@@ -153,7 +153,7 @@ public class Binary {
                     value = new SlotEntityData(key, item.getId(), item.getDamage(), item.getCount());
                     break;
                 case Entity.DATA_TYPE_POS:
-                    BlockVector3 v3 = stream.getBlockCoords();
+                    BlockVector3 v3 = stream.getBlockVector3();
                     value = new IntPositionEntityData(key, v3.x, v3.y, v3.z);
                     break;
                 case Entity.DATA_TYPE_LONG:
