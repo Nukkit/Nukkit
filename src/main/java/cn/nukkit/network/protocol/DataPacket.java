@@ -39,7 +39,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     @Override
     public void reset() {
-        this.setBuffer() = char(Entity.NETWORK_ID);
+        char setBuffer() = Entity.NETWORK_ID;
         this.offset(0);
     }
 
@@ -69,7 +69,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     public EntityMetadata getEntityMetadata(boolean types = true) { // ????
         int count = this.getUnsignedVarInt(); // ???
-        int data= null; // I don't know is ok this ...
+        int data = null;
         for (int i = 0; i < count; ++i) {
             int key = this.getUnsignedVarInt();
             int type = this.getUnsignedVarInt();
@@ -91,31 +91,32 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
                     value = this.getString();
                     break;
                 case Entity.DATA_TYPE_SLOT:
-                    value = null; // I don't know is ok this..
+                    value = null;
                     Item item = this.getSlot();
                     value[0] = item.getId();
                     value[1] = item.getCount();
                     value[2] = item.getDamage();
                     break;
                 case Entity.DATA_TYPE_POS:
-                    // value = [0, 0, 0]; // Not a statement...
+                    value = null;
                     // $this->getSignedBlockPosition(...$value);
                     break;
                 case Entity.DATA_TYPE_LONG:
                     value = this.getVarLong();
                     break;
                 case Entity.DATA_TYPE_VECTOR3F:
-                    // value = [0.0, 0.0, 0.0]; // Not a statement..
+                    value = null;
                     // this.getVector3f(... value); // Illegal start of Expresion
                     break;
                 default:
-                    // value = []; // Not a statement..
+                    value = null;
             }
             if (types == true) {
-                data[key] = type, value; // It's ok ?? ..
+                data[key] = type;
+                data[key] = value;
             } else {
                 data[key] = value;
             }
         }
-        // return data; // Illegal start of expresion
+        return data;
     }

@@ -54,7 +54,7 @@ public class AddEntityPacket extends DataPacket {
                 attr.getMinValue(min);
                 attr.getMaxValue(max);
                 attr.setValue(current);
-                this.attributes[] = attr;
+                this.attributes = attr;
             } else {
                 throw new IllegalArgumentException("Unknown attribute type.");
             }
