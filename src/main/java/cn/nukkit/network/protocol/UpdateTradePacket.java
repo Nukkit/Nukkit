@@ -21,7 +21,7 @@ public class UpdateTradePacket extends DataPacket {
         this.windowId = this.getByte();
         this.windowType = this.getByte();
         this.varint1 = this.getVarInt();
-        this.varint2 - this.getVarInt();
+        this.varint2 = this.getVarInt();
         this.isWilling = this.getBoolean();
         this.traderEid = this.getEntityUniqueId();
         this.playerEid = this.getEntityUniqueId();

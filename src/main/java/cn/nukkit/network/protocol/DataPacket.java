@@ -9,7 +9,7 @@ import cn.nukkit.utils.BinaryStream;
  */
 public abstract class DataPacket extends BinaryStream implements Cloneable {
 
-    public byte NETWORK_ID = 0
+    public byte NETWORK_ID = 0;
     public boolean isEncoded = false;
     private int channel = 0;
 
@@ -39,7 +39,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     @Override
     public void reset() {
-        this.buffer = char(this.NETWORK_ID);
+        this.buffer = this.NETWORK_ID;
         this.offset = 0;
     }
 
