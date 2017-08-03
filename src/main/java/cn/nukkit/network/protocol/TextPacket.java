@@ -27,7 +27,7 @@ public class TextPacket extends DataPacket {
     public String[] parameters = new String[0];
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.type = (byte) getByte();
         switch (type) {
             case TYPE_POPUP:
@@ -52,8 +52,7 @@ public class TextPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putByte(this.type);
         switch (this.type) {
             case TYPE_POPUP:

@@ -28,13 +28,12 @@ public class AddItemEntityPacket extends DataPacket {
     public EntityMetadata metadata = new EntityMetadata();
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarLong(this.entityUniqueId);
         this.putVarLong(this.entityRuntimeId);
         this.putSlot(this.item);

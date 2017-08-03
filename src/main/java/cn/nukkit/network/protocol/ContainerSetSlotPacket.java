@@ -21,7 +21,7 @@ public class ContainerSetSlotPacket extends DataPacket {
     public int selectedSlot;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.windowid = this.getByte();
         this.slot = this.getVarInt();
         this.hotbarSlot = this.getVarInt();
@@ -30,8 +30,7 @@ public class ContainerSetSlotPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putByte((byte) this.windowid);
         this.putVarInt(this.slot);
         this.putVarInt(this.hotbarSlot);

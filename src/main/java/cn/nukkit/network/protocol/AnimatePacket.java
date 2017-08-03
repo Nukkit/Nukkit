@@ -12,7 +12,7 @@ public class AnimatePacket extends DataPacket {
     public float unknown;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.action = (int) this.getUnsignedVarInt();
         this.eid = getVarLong();
         if ((this.action & 0x80) != 0) {
@@ -21,8 +21,7 @@ public class AnimatePacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putUnsignedVarInt(this.action);
         this.putVarLong(this.eid);
         if ((this.action & 0x80) != 0) {

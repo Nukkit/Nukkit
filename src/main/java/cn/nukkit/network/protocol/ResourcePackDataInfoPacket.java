@@ -11,7 +11,7 @@ public class ResourcePackDataInfoPacket extends DataPacket {
     public byte[] sha256;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.packId = this.getString();
         this.maxChunkSize = this.getLInt();
         this.chunkCount = this.getLInt();
@@ -20,8 +20,7 @@ public class ResourcePackDataInfoPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putString(this.packId);
         this.putLInt(this.maxChunkSize);
         this.putLInt(this.chunkCount);

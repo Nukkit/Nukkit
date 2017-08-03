@@ -13,7 +13,7 @@ public class ResourcePackClientResponsePacket extends DataPacket {
     public String[] packIds;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.responseStatus = (byte) this.getByte();
         this.packIds = new String[this.getLShort()];
         for (int i = 0; i < this.packIds.length; i++) {
@@ -22,8 +22,7 @@ public class ResourcePackClientResponsePacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putByte(this.responseStatus);
         this.putLShort(this.packIds.length);
         for (String id : this.packIds) {

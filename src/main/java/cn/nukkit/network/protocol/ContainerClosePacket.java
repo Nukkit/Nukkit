@@ -15,13 +15,12 @@ public class ContainerClosePacket extends DataPacket {
     public int windowid;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.windowid = this.getByte();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putByte((byte) this.windowid);
     }
 }

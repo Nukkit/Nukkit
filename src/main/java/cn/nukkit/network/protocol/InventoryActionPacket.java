@@ -12,13 +12,12 @@ public class InventoryActionPacket extends DataPacket {
     public int enchantmentLevel;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putUnsignedVarInt(this.actionId);
         this.putSlot(this.item);
         this.putVarInt(this.enchantmentId);

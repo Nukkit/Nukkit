@@ -21,7 +21,7 @@ public class MobEquipmentPacket extends DataPacket {
     public int windowId;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.eid = this.getVarLong(); //EntityRuntimeID
         this.item = this.getSlot();
         this.slot = this.getByte();
@@ -30,8 +30,7 @@ public class MobEquipmentPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarLong(this.eid); //EntityRuntimeID
         this.putSlot(this.item);
         this.putByte((byte) this.slot);

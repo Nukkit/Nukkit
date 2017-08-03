@@ -11,13 +11,12 @@ public class ResourcePackStackPacket extends DataPacket {
     public ResourcePack[] resourcePackStack = new ResourcePack[0];
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putBoolean(this.mustAccept);
 
         this.putUnsignedVarInt(this.behaviourPackStack.length);

@@ -34,13 +34,12 @@ public class AddPlayerPacket extends DataPacket {
     public EntityMetadata metadata = new EntityMetadata();
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putUUID(this.uuid);
         this.putString(this.username);
         this.putVarLong(this.entityUniqueId);

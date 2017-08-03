@@ -12,13 +12,12 @@ public class SetCommandsEnabledPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putBoolean(this.enabled);
     }
 }

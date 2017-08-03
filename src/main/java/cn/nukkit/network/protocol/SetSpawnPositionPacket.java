@@ -17,13 +17,12 @@ public class SetSpawnPositionPacket extends DataPacket {
     public boolean spawnForced = false;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarInt(this.spawnType);
         this.putBlockCoords(this.x, this.y, this.z);
         this.putBoolean(this.spawnForced);
