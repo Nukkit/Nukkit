@@ -18,7 +18,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
     public Integer orderIndex = null;
     public Integer orderChannel = null;
 
-    public abstract byte pid() {
+    public byte pid() {
         return this.NETWORK_ID;
     }
 
@@ -26,7 +26,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     public abstract void encodePayload();
 
-    public abstract void decode() {
+    public void decode() {
         this.offset = 1;
         this.decodePayload();
     }
