@@ -5,6 +5,7 @@ import cn.nukkit.raknet.protocol.EncapsulatedPacket;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
+import cn.nukkit.utils.Utils;
 
 /**
  * author: MagicDroidX
@@ -39,7 +40,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     @Override
     public void reset() {
-        char(Entity.NETWORK_ID) = this.setBuffer();
+        char[Entity.NETWORK_ID] = this.setBuffer();
         this.offset(0);
     }
 
@@ -67,13 +68,13 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         }
     }
 
-    public void getEntityMetadata(boolean types = true) { // ????
-        EntityMetadata count = this.getUnsignedVarInt();
-        EntityMetadata data = [];
+    public boolean getEntityMetadata(boolean types) { // Types default is true
+        Entity count = this.getUnsignedVarInt();
+        Utils data = [];
         for (int i = 0; i < count; ++i) {
-            EntityMetadata key = this.getUnsignedVarInt();
-            EntityMetadata type = this.getUnsignedVarInt();
-            EntityMetadata value = null;
+            long key = this.getUnsignedVarInt();
+            long type = this.getUnsignedVarInt();
+            Utils value = null;
             switch (type) {
                 case Entity.DATA_TYPE_BYTE:
                     value = this.getByte();
@@ -91,7 +92,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
                     value = this.getString();
                     break;
                 case Entity.DATA_TYPE_SLOT:
-                    value = [];
+                    Entity value = [];
                     Item item = this.getSlot();
                     value[0] = item.getId();
                     value[1] = item.getCount();
@@ -106,16 +107,16 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
                     break;
                 case Entity.DATA_TYPE_VECTOR3F:
                     value = [];
-                    this.getVector3f(... value); // Illegal start of Expresion
+                    this.getVector3f(.. value); // ??
                     break;
                 default:
                     value = [];
             }
-            if (types == true) {
+            if (types) {
                 data[key] = [type, value]
             } else {
                 data[key] = value;
             }
+            return data;
         }
-        return data;
     }
