@@ -39,7 +39,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     @Override
     public void reset() {
-        char setBuffer() = Entity.NETWORK_ID;
+        char(Entity.NETWORK_ID) = this.setBuffer();
         this.offset(0);
     }
 
@@ -67,13 +67,13 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         }
     }
 
-    public EntityMetadata getEntityMetadata(boolean types = true) { // ????
-        int count = this.getUnsignedVarInt(); // ???
-        int data = null;
+    public void getEntityMetadata(boolean types = true) { // ????
+        EntityMetadata count = this.getUnsignedVarInt();
+        EntityMetadata data = [];
         for (int i = 0; i < count; ++i) {
-            int key = this.getUnsignedVarInt();
-            int type = this.getUnsignedVarInt();
-            int value = null;
+            EntityMetadata key = this.getUnsignedVarInt();
+            EntityMetadata type = this.getUnsignedVarInt();
+            EntityMetadata value = null;
             switch (type) {
                 case Entity.DATA_TYPE_BYTE:
                     value = this.getByte();
@@ -91,29 +91,28 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
                     value = this.getString();
                     break;
                 case Entity.DATA_TYPE_SLOT:
-                    value = null;
+                    value = [];
                     Item item = this.getSlot();
                     value[0] = item.getId();
                     value[1] = item.getCount();
                     value[2] = item.getDamage();
                     break;
                 case Entity.DATA_TYPE_POS:
-                    value = null;
+                    value = [];
                     // $this->getSignedBlockPosition(...$value);
                     break;
                 case Entity.DATA_TYPE_LONG:
                     value = this.getVarLong();
                     break;
                 case Entity.DATA_TYPE_VECTOR3F:
-                    value = null;
-                    // this.getVector3f(... value); // Illegal start of Expresion
+                    value = [];
+                    this.getVector3f(... value); // Illegal start of Expresion
                     break;
                 default:
-                    value = null;
+                    value = [];
             }
             if (types == true) {
-                data[key] = type;
-                data[key] = value;
+                data[key] = [type, value]
             } else {
                 data[key] = value;
             }
