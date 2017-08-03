@@ -16,12 +16,11 @@ public class AvailableCommandsPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putString(this.commands);
         this.putString(this.unknown);
     }

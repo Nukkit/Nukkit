@@ -39,7 +39,7 @@ public class CommandStepPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.command = this.getString();
         this.overload = this.getString();
         this.uvarint1 = this.getUnsignedVarInt();
@@ -56,7 +56,8 @@ public class CommandStepPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
+
     }
 
 }

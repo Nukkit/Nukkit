@@ -37,7 +37,7 @@ public class PlayerActionPacket extends DataPacket {
 
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.entityId = this.getVarLong();
         this.action = this.getVarInt();
         BlockVector3 v = this.getBlockCoords();
@@ -48,8 +48,7 @@ public class PlayerActionPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarLong(this.entityId);
         this.putVarInt(this.action);
         this.putBlockCoords(this.x, this.y, this.z);

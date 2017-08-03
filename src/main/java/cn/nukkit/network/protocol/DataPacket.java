@@ -1,7 +1,10 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.raknet.protocol.EncapsulatedPacket;
 import cn.nukkit.utils.BinaryStream;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.item.Item;
 
 /**
  * author: MagicDroidX
@@ -19,14 +22,25 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     public abstract byte pid();
 
-    public abstract void decode();
+    public abstract void decodePayload();
 
-    public abstract void encode();
+    public abstract void encodePayload();
+
+    public abstract void decode() {
+        this.offset = 1;
+        this.decodePayload();
+    }
+
+    public abstract void encode() {
+        this.reset();
+        this.encodePayload();
+        this.isEncoded = true;
+    }
 
     @Override
     public void reset() {
-        super.reset();
-        this.putByte(this.pid());
+        char this.setBuffer() = char(Entity.NETWORK_ID);
+        this.offset(0);
     }
 
     public void setChannel(int channel) {
@@ -39,8 +53,8 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     public DataPacket clean() {
         this.setBuffer(null);
-        this.setOffset(0);
         this.isEncoded = false;
+        this.setOffset(0);
         return this;
     }
 
@@ -52,4 +66,56 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
             return null;
         }
     }
-}
+
+    public EntityMetadata getEntityMetadata(boolean types = true) {
+        int count = this.getUnsignedVarInt();
+        int data = [];
+        for (int i = 0; i < count; ++i) {
+            int key = this.getUnsignedVarInt();
+            int type = this.getUnsignedVarInt();
+            int value = null;
+            switch (type) {
+                case Entity.DATA_TYPE_BYTE:
+                    value = this.getByte();
+                    break;
+                case Entity.DATA_TYPE_SHORT:
+                    value = this.getLShort(); // getSignedLShort....
+                    break;
+                case Entity.DATA_TYPE_INT:
+                    value = this.getVarInt();
+                    break;
+                case Entity.DATA_TYPE_FLOAT:
+                    value = this.getLFloat();
+                    break;
+                case Entity.DATA_TYPE_STRING:
+                    value = this.getString();
+                    break;
+                case Entity.DATA_TYPE_SLOT:
+                    value = [];
+                    Item item = this.getSlot();
+                    value[0] = item.getId();
+                    value[1] = item.getCount();
+                    value[2] = item.getDamage();
+                    break;
+                case Entity.DATA_TYPE_POS:
+                    value = [0, 0, 0];
+                    // $this->getSignedBlockPosition(...$value);
+                    break;
+                case Entity.DATA_TYPE_LONG:
+                    value = this.getVarLong();
+                    break;
+                case Entity.DATA_TYPE_VECTOR3F:
+                    value = [0.0, 0.0, 0.0];
+                    this.getVector3f(...value);
+                    break;
+                default:
+                    value = [];
+            }
+            if (types == true) {
+                data[key] = [type, value];
+            } else {
+                data[key] = value;
+            }
+        }
+        return data;
+    }

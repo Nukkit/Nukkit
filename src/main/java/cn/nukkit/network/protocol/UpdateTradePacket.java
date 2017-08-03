@@ -20,12 +20,12 @@ public class UpdateTradePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
         this.putByte(unknownByte1);
         this.putByte(unknownByte2);
         this.putVarInt(unknownVarInt1);

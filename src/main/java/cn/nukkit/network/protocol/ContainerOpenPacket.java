@@ -20,13 +20,12 @@ public class ContainerOpenPacket extends DataPacket {
     public final long entityId = -1;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putByte(this.windowid);
         this.putByte(this.type);
         this.putBlockCoords(this.x, this.y, this.z);

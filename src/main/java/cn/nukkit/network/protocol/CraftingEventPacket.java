@@ -20,7 +20,7 @@ public class CraftingEventPacket extends DataPacket {
     public Item[] output;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.windowId = this.getByte();
         this.type = (int) this.getUnsignedVarInt();
         this.id = this.getUUID();
@@ -39,7 +39,7 @@ public class CraftingEventPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
 
     }
 

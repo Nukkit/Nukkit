@@ -125,7 +125,7 @@ public class LevelSoundEventPacket extends DataPacket {
     public boolean disableRelativeVolume;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.sound = this.getByte();
         Vector3f v = this.getVector3f();
         this.x = v.x;
@@ -138,8 +138,7 @@ public class LevelSoundEventPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putByte((byte) this.sound);
         this.putVector3f(this.x, this.y, this.z);
         this.putVarInt(this.extraData);

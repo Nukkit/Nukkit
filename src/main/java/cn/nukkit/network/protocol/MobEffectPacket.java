@@ -25,13 +25,12 @@ public class MobEffectPacket extends DataPacket {
     public int duration = 0;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarLong(this.eid);
         this.putByte((byte) this.eventId);
         this.putVarInt(this.effectId);

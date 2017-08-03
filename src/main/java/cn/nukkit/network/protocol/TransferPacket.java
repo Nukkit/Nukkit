@@ -8,14 +8,13 @@ public class TransferPacket extends DataPacket {
     public int port = 19132; // Server port
     
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.address = this.getString();
         this.port = (short) this.getLShort();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putString(address);
         this.putLShort(port);
     }

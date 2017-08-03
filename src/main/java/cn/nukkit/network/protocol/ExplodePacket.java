@@ -28,13 +28,12 @@ public class ExplodePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVector3f(this.x, this.y, this.z);
         this.putVarInt((int) (this.radius * 32));
         this.putUnsignedVarInt(this.records.length);

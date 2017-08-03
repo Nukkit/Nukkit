@@ -45,13 +45,12 @@ public class StartGamePacket extends DataPacket {
     public long currentTick;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarLong(this.entityUniqueId);
         this.putVarLong(this.entityRuntimeId);
         this.putVarInt(this.playerGamemode);

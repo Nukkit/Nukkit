@@ -14,7 +14,7 @@ public class PlayerInputPacket extends DataPacket {
     public boolean unknownBool2;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.motionX = this.getLFloat();
         this.motionY = this.getLFloat();
         this.unknownBool1 = this.getBoolean();
@@ -22,7 +22,7 @@ public class PlayerInputPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
 
     }
 

@@ -14,7 +14,7 @@ public class RespawnPacket extends DataPacket {
     public float z;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         Vector3f v = this.getVector3f();
         this.x = v.x;
         this.y = v.y;
@@ -22,8 +22,7 @@ public class RespawnPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVector3f(this.x, this.y, this.z);
     }
 

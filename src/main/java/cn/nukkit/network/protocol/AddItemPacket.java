@@ -13,13 +13,12 @@ public class AddItemPacket extends DataPacket {
     public Item item;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putSlot(item);
     }
 }

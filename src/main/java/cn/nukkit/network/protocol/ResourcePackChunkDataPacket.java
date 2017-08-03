@@ -10,7 +10,7 @@ public class ResourcePackChunkDataPacket extends DataPacket {
     public byte[] data;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.packId = this.getString();
         this.chunkIndex = this.getLInt();
         this.progress = this.getLLong();
@@ -18,8 +18,7 @@ public class ResourcePackChunkDataPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putString(this.packId);
         this.putLInt(this.chunkIndex);
         this.putLLong(this.progress);
