@@ -12,7 +12,7 @@ public class ContainerSetDataPacket extends DataPacket {
         return NETWORK_ID;
     }
 
-    public byte windowid;
+    public int windowid;
     public int property;
     public int value;
 
@@ -24,7 +24,7 @@ public class ContainerSetDataPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putByte(this.windowid);
+        this.putByte((byte) this.windowid);
         this.putVarInt(this.property);
         this.putVarInt(this.value);
     }

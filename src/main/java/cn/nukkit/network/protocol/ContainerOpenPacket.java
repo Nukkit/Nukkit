@@ -12,8 +12,8 @@ public class ContainerOpenPacket extends DataPacket {
         return NETWORK_ID;
     }
 
-    public byte windowid;
-    public byte type;
+    public int windowid;
+    public int type;
     public int x;
     public int y;
     public int z;
@@ -27,8 +27,8 @@ public class ContainerOpenPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putByte(this.windowid);
-        this.putByte(this.type);
+        this.putByte((byte) this.windowid);
+        this.putByte((byte) this.type);
         this.putBlockVector3(this.x, this.y, this.z);
         this.putVarLong(this.entityId);
     }

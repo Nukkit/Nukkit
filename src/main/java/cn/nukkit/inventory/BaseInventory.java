@@ -450,7 +450,7 @@ public abstract class BaseInventory implements Inventory {
                 this.close(player);
                 continue;
             }
-            pk.inventoryId = (byte) id;
+            pk.inventoryId = id;
             player.dataPacket(pk);
         }
     }
@@ -525,7 +525,7 @@ public abstract class BaseInventory implements Inventory {
                 this.close(player);
                 continue;
             }
-            pk.inventoryId = (byte) id;
+            pk.inventoryId = id;
             player.dataPacket(pk);
         }
     }

@@ -408,7 +408,7 @@ public class PlayerInventory extends BaseInventory {
                 this.close(player);
                 continue;
             }
-            pk.inventoryId = (byte) id;
+            pk.inventoryId = id;
             player.dataPacket(pk.clone());
         }
     }
@@ -451,7 +451,7 @@ public class PlayerInventory extends BaseInventory {
                     this.close(player);
                     continue;
                 }
-                pk.inventoryId = (byte) id;
+                pk.inventoryId = id;
                 player.dataPacket(pk.clone());
             }
         }

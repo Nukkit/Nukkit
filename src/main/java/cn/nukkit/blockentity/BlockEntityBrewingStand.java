@@ -188,7 +188,7 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
                 int windowId = player.getWindowId(this.inventory);
                 if (windowId > 0) {
                     ContainerSetDataPacket pk = new ContainerSetDataPacket();
-                    pk.windowid = (byte) windowId;
+                    pk.windowid = windowId;
                     pk.property = 0;
                     pk.value = this.brewTime;
                     player.dataPacket(pk);
