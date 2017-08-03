@@ -277,8 +277,6 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
         return buffer
                 .put(blocks)
                 .put(data)
-                .put(skyLight)
-                .put(blockLight)
                 .array();
     }
 

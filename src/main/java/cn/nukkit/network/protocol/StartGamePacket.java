@@ -35,9 +35,16 @@ public class StartGamePacket extends DataPacket {
     public boolean eduMode = false;
     public float rainLevel;
     public float lightningLevel;
+    public boolean multiplayerGame = true;
+    public boolean broadcastToLAN = true;
+    public boolean broadcastToXboxLive = true;
     public boolean commandsEnabled;
     public boolean isTexturePacksRequired = false;
     public RuleData[] ruleDatas = new RuleData[0];
+    public boolean bonusChest = false;
+    public boolean trustPlayers = false;
+    public int permissionLevel = 1;
+    public int gamePublish = 4;
     public String levelId = ""; //base64 string, usually the same as world folder name in vanilla
     public String worldName;
     public String premiumWorldTemplateId = "";
@@ -69,12 +76,19 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.eduMode);
         this.putLFloat(this.rainLevel);
         this.putLFloat(this.lightningLevel);
+        this.putBoolean(this.multiplayerGame);
+        this.putBoolean(this.broadcastToLAN);
+        this.putBoolean(this.broadcastToXboxLive);
         this.putBoolean(this.commandsEnabled);
         this.putBoolean(this.isTexturePacksRequired);
         this.putUnsignedVarInt(this.ruleDatas.length);
         for (RuleData rule : this.ruleDatas) {
             this.putRuleData(rule);
         }
+        this.putBoolean(this.bonusChest);
+        this.putBoolean(this.trustPlayers);
+        this.putVarInt(this.permissionLevel);
+        this.putVarInt(this.gamePublish);
         this.putString(this.levelId);
         this.putString(this.worldName);
         this.putString(this.premiumWorldTemplateId);
