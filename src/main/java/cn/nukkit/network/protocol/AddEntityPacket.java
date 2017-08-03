@@ -54,7 +54,7 @@ public class AddEntityPacket extends DataPacket {
                 attr.getMinValue(min);
                 attr.getMaxValue(max);
                 attr.setValue(current);
-                this.attributes[] =attr;
+                this.attributes[] = attr;
             } else {
                 throw new IllegalArgumentException("Unknown attribute type.");
             }
@@ -71,7 +71,7 @@ public class AddEntityPacket extends DataPacket {
 
     @Override
     public void encodePayload() {
-        this.putVarLong(this.entityUniqueId ? this.entityRuntimeId);
+        this.putVarLong(this.entityUniqueId);
         this.putVarLong(this.entityRuntimeId);
         this.putUnsignedVarInt(this.type);
         this.putVector3f(this.x, this.y, this.z);

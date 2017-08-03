@@ -39,7 +39,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     @Override
     public void reset() {
-        char this.setBuffer() = char(Entity.NETWORK_ID);
+        this.setBuffer() = char(Entity.NETWORK_ID);
         this.offset(0);
     }
 
@@ -67,9 +67,9 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         }
     }
 
-    public EntityMetadata getEntityMetadata(boolean types = true) {
-        int count = this.getUnsignedVarInt();
-        int data = [];
+    public EntityMetadata getEntityMetadata(boolean types = true) { // ????
+        int count = this.getUnsignedVarInt(); // ???
+        int data= null; // I don't know is ok this ...
         for (int i = 0; i < count; ++i) {
             int key = this.getUnsignedVarInt();
             int type = this.getUnsignedVarInt();
@@ -91,31 +91,31 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
                     value = this.getString();
                     break;
                 case Entity.DATA_TYPE_SLOT:
-                    value = [];
+                    value = null; // I don't know is ok this..
                     Item item = this.getSlot();
                     value[0] = item.getId();
                     value[1] = item.getCount();
                     value[2] = item.getDamage();
                     break;
                 case Entity.DATA_TYPE_POS:
-                    value = [0, 0, 0];
+                    // value = [0, 0, 0]; // Not a statement...
                     // $this->getSignedBlockPosition(...$value);
                     break;
                 case Entity.DATA_TYPE_LONG:
                     value = this.getVarLong();
                     break;
                 case Entity.DATA_TYPE_VECTOR3F:
-                    value = [0.0, 0.0, 0.0];
-                    this.getVector3f(...value);
+                    // value = [0.0, 0.0, 0.0]; // Not a statement..
+                    // this.getVector3f(... value); // Illegal start of Expresion
                     break;
                 default:
-                    value = [];
+                    // value = []; // Not a statement..
             }
             if (types == true) {
-                data[key] = [type, value];
+                data[key] = type, value; // It's ok ?? ..
             } else {
                 data[key] = value;
             }
         }
-        return data;
+        // return data; // Illegal start of expresion
     }
