@@ -9,6 +9,7 @@ import cn.nukkit.utils.BinaryStream;
  */
 public abstract class DataPacket extends BinaryStream implements Cloneable {
 
+    public byte NETWORK_ID = 0
     public boolean isEncoded = false;
     private int channel = 0;
 
@@ -17,16 +18,29 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
     public Integer orderIndex = null;
     public Integer orderChannel = null;
 
-    public abstract byte pid();
+    public abstract byte pid() {
+        return this.NETWORK_ID;
+    }
 
-    public abstract void decode();
+    public abstract void decodePayload();
 
-    public abstract void encode();
+    public abstract void encodePayload();
+
+    public abstract void decode() {
+        this.offset = 1;
+        this.decodePayload();
+    }
+
+    public abstract void encode() {
+        super.reset();
+        this.encodePayload();
+        this.isEncoded = true;
+    }
 
     @Override
     public void reset() {
-        super.reset();
-        this.putByte(this.pid());
+        this.buffer = char(this.NETWORK_ID);
+        this.offset = 0;
     }
 
     public void setChannel(int channel) {
@@ -51,5 +65,29 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         } catch (CloneNotSupportedException e) {
             return null;
         }
+    }
+
+    public int getEntityUniqueId() {
+        return this.getVarInt();
+    }
+
+    public int putEntityUniqueId(int eid) {
+        return this.putVarLong(eid);
+    }
+
+    public int getEntityRuntimeId() {
+        return this.getUnsignedVarLong();
+    }
+
+    public int putEntityRuntimeId(int eid) {
+        return this.putUnsignedVarLong(eid);
+    }
+
+    public float getByteRotation() {
+        return (float) (this.getByte() * (360 / 256));
+    }
+
+    public float putByteRotation(float rotation) {
+        this.putByte((int) (rotation / (360 / 256)));
     }
 }

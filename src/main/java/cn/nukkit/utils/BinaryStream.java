@@ -20,39 +20,35 @@ import java.util.UUID;
 public class BinaryStream {
 
     public int offset;
-    private byte[] buffer = new byte[32];
+    public String buffer;
     private int count;
 
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
     public BinaryStream() {
-        this.buffer = new byte[32];
-        this.offset = 0;
-        this.count = 0;
+        this.buffer = buffer;
+        this.offset = offset;
+        this.count = count;
     }
 
-    public BinaryStream(byte[] buffer) {
-        this(buffer, 0);
-    }
-
-    public BinaryStream(byte[] buffer, int offset) {
+    public BinaryStream(String[] buffer, int offset) {
         this.buffer = buffer;
         this.offset = offset;
         this.count = buffer.length;
     }
 
     public void reset() {
-        this.buffer = new byte[32];
+        this.buffer = "";
         this.offset = 0;
         this.count = 0;
     }
 
-    public void setBuffer(byte[] buffer) {
+    public void setBuffer(String[] buffer) {
         this.buffer = buffer;
         this.count = buffer == null ? -1 : buffer.length;
     }
 
-    public void setBuffer(byte[] buffer, int offset) {
+    public void setBuffer(String[] buffer, int offset) {
         this.setBuffer(buffer);
         this.setOffset(offset);
     }

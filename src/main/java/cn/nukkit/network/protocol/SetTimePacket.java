@@ -15,13 +15,12 @@ public class SetTimePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarInt(this.time);
     }
 

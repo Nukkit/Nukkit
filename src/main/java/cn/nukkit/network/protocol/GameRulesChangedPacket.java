@@ -17,12 +17,11 @@ public class GameRulesChangedPacket extends DataPacket {
     public RuleData[] ruleDatas = new RuleData[0];
 
     @Override
-    public void decode() {
+    public void decodePayload() {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putInt(this.ruleDatas.length);
         for (RuleData rule : this.ruleDatas) {
             this.putRuleData(rule);

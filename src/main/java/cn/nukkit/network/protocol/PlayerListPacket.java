@@ -18,13 +18,12 @@ public class PlayerListPacket extends DataPacket {
     public Entry[] entries = new Entry[0];
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putByte(this.type);
         this.putUnsignedVarInt(this.entries.length);
         for (Entry entry : this.entries) {

@@ -14,7 +14,7 @@ public class RemoveBlockPacket extends DataPacket {
     public int z;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         BlockVector3 v = this.getBlockCoords();
         this.x = v.x;
         this.y = v.y;
@@ -22,7 +22,7 @@ public class RemoveBlockPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
     }
 
     @Override

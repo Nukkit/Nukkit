@@ -16,13 +16,12 @@ public class AddPaintingPacket extends DataPacket {
     public String title;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarLong(this.entityUniqueId);
         this.putVarLong(this.entityRuntimeId);
         this.putBlockCoords(this.x, this.y, this.z);

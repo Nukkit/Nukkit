@@ -18,7 +18,7 @@ public class AddHangingEntityPacket extends DataPacket {
     public int unknown;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.entityUniqueId = this.getVarLong();
         this.entityRuntimeId = this.getVarLong();
         BlockVector3 v3 = this.getBlockCoords();
@@ -29,8 +29,7 @@ public class AddHangingEntityPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarLong(this.entityUniqueId);
         this.putVarLong(this.entityRuntimeId);
         this.putBlockCoords(this.x, this.y, this.z);

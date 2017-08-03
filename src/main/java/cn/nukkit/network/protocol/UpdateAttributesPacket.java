@@ -17,13 +17,11 @@ public class UpdateAttributesPacket extends DataPacket {
         return NETWORK_ID;
     }
 
-    public void decode() {
+    public void decodePayload() {
 
     }
 
-    public void encode() {
-        this.reset();
-
+    public void encodePayload() {
         this.putVarLong(this.entityId);
 
         if (this.entries == null) {

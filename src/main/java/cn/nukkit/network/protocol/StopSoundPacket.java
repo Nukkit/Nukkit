@@ -13,12 +13,12 @@ public class StopSoundPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
         this.putString(this.name);
         this.putBoolean(this.stopAll);
     }

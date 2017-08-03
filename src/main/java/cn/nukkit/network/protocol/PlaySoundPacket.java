@@ -17,12 +17,12 @@ public class PlaySoundPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
         this.putString(this.name);
         this.putBlockCoords(this.x, this.y, this.z);
         this.putLFloat(this.volume);

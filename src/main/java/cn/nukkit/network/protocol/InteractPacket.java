@@ -18,14 +18,13 @@ public class InteractPacket extends DataPacket {
     public long target;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.action = (byte) this.getByte();
         this.target = this.getVarLong();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putByte(this.action);
         this.putVarLong(this.target);
     }

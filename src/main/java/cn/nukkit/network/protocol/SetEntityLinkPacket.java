@@ -16,13 +16,12 @@ public class SetEntityLinkPacket extends DataPacket {
     public byte type;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarLong(this.rider);
         this.putVarLong(this.riding);
         this.putByte(this.type);

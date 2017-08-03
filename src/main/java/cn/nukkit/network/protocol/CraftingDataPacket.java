@@ -128,13 +128,12 @@ public class CraftingDataPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putUnsignedVarInt(entries.size());
 
         BinaryStream writer = new BinaryStream();

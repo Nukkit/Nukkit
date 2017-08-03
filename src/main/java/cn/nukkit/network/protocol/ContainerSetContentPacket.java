@@ -33,7 +33,7 @@ public class ContainerSetContentPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.windowid = (int) this.getUnsignedVarInt();
         this.eid = this.getVarLong();
         int count = (int) this.getUnsignedVarInt();
@@ -51,8 +51,7 @@ public class ContainerSetContentPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putUnsignedVarInt(this.windowid);
         this.putVarLong(this.eid);
         this.putUnsignedVarInt(this.slots.length);

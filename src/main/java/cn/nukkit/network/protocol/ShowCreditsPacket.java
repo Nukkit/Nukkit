@@ -16,12 +16,12 @@ public class ShowCreditsPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
         this.putVarLong(this.eid);
         this.putVarInt(this.status);
     }

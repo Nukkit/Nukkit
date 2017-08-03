@@ -8,14 +8,14 @@ public class EntityFallPacket extends DataPacket {
     public boolean unknown;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.eid = this.getVarLong();
         this.fallDistance = this.getLFloat();
         this.unknown = this.getBoolean();
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
 
     }
 

@@ -10,13 +10,12 @@ public class HurtArmorPacket extends DataPacket {
     public int health;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarInt(this.health);
     }
 

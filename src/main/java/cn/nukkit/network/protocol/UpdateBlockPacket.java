@@ -29,13 +29,12 @@ public class UpdateBlockPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putBlockCoords(x, y, z);
         this.putUnsignedVarInt(blockId);
         this.putUnsignedVarInt((0xb << 4) | blockData & 0xf);
