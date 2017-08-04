@@ -1,5 +1,6 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.entity.Entity;
 import cn.nukkit.raknet.protocol.EncapsulatedPacket;
 import cn.nukkit.utils.BinaryStream;
 
@@ -9,7 +10,7 @@ import cn.nukkit.utils.BinaryStream;
  */
 public abstract class DataPacket extends BinaryStream implements Cloneable {
 
-    public byte NETWORK_ID = 0;
+    public int NETWORK_ID = 0;
     public boolean isEncoded = false;
     private int channel = 0;
 
@@ -31,7 +32,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         this.decodePayload();
     }
 
-    public abstract void encode() {
+    public void encode() {
         super.reset();
         this.encodePayload();
         this.isEncoded = true;
@@ -71,20 +72,20 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         return this.getVarInt();
     }
 
-    public int putEntityUniqueId(int eid) {
+    public long putEntityUniqueId(int eid) {
         return this.putVarLong(eid);
     }
 
-    public int getEntityRuntimeId() {
+    public long getEntityRuntimeId() {
         return this.getUnsignedVarLong();
     }
 
-    public int putEntityRuntimeId(int eid) {
+    public long putEntityRuntimeId(int eid) {
         return this.putUnsignedVarLong(eid);
     }
 
     public float getByteRotation() {
-        return (float) (this.getByte() * (360 / 256));
+        return (float) this.getByte();
     }
 
     public float putByteRotation(float rotation) {
