@@ -10,7 +10,7 @@ import cn.nukkit.utils.BinaryStream;
  */
 public abstract class DataPacket extends BinaryStream implements Cloneable {
 
-    public int NETWORK_ID = 0;
+    public byte[] NETWORK_ID = 0;
     public boolean isEncoded = false;
     private int channel = 0;
 
@@ -19,7 +19,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
     public Integer orderIndex = null;
     public Integer orderChannel = null;
 
-    public byte pid() {
+    public byte[] pid() {
         return this.NETWORK_ID;
     }
 
@@ -72,7 +72,8 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         return this.getVarInt();
     }
 
-    public long putEntityUniqueId(int eid) {
+    @Override
+    public void putEntityUniqueId(int eid) {
         return this.putVarLong(eid);
     }
 
@@ -80,11 +81,12 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         return this.getUnsignedVarLong();
     }
 
-    public long putEntityRuntimeId(int eid) {
+    @Override
+    public void putEntityRuntimeId(int eid) {
         return this.putUnsignedVarLong(eid);
     }
 
-    public float getByteRotation() {
+    public byte getByteRotation() {
         return (float) this.getByte();
     }
 
