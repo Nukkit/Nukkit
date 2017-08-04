@@ -36,7 +36,7 @@ public class AdventureSettingsPacket extends DataPacket {
     public int userPermission;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.flags = (int) this.getUnsignedVarInt();
         this.userPermission = (int) this.getUnsignedVarInt();
         this.worldImmutable = (this.flags & 1) != 0;
@@ -53,8 +53,7 @@ public class AdventureSettingsPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         if (this.worldImmutable) this.flags |= 1;
         if (this.noPvp) this.flags |= 1 << 1;
         if (this.noPvm) this.flags |= 1 << 2;

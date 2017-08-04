@@ -33,7 +33,7 @@ public class LoginPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.protocol = this.getInt();
         this.gameEdition = (byte) this.getByte();
         this.setBuffer(this.getByteArray(), 0);
@@ -42,7 +42,7 @@ public class LoginPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
 
     }
 

@@ -13,13 +13,13 @@ public class DropItemPacket extends DataPacket {
     public Item item;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.type = this.getByte();
         this.item = this.getSlot();
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
 
     }
 

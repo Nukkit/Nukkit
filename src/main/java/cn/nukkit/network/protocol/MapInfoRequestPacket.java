@@ -12,12 +12,12 @@ public class MapInfoRequestPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         mapId = this.getVarLong();
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
 
     }
 }

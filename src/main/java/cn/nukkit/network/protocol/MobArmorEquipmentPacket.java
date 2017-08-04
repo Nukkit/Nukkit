@@ -18,7 +18,7 @@ public class MobArmorEquipmentPacket extends DataPacket {
     public Item[] slots = new Item[4];
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.eid = this.getVarLong();
         this.slots = new Item[4];
         this.slots[0] = this.getSlot();
@@ -28,8 +28,7 @@ public class MobArmorEquipmentPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarLong(this.eid);
         this.putSlot(this.slots[0]);
         this.putSlot(this.slots[1]);

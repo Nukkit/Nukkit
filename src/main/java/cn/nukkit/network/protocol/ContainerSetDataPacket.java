@@ -17,13 +17,12 @@ public class ContainerSetDataPacket extends DataPacket {
     public int value;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putByte(this.windowid);
         this.putVarInt(this.property);
         this.putVarInt(this.value);

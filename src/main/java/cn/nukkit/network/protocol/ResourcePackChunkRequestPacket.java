@@ -8,14 +8,13 @@ public class ResourcePackChunkRequestPacket extends DataPacket {
     public int chunkIndex;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.packId = this.getString();
         this.chunkIndex = this.getLInt();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putString(this.packId);
         this.putLInt(this.chunkIndex);
     }

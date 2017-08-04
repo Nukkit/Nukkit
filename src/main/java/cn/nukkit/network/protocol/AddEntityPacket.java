@@ -32,13 +32,12 @@ public class AddEntityPacket extends DataPacket {
     public final Object[][] links = new Object[0][3];
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarLong(this.entityUniqueId);
         this.putVarLong(this.entityRuntimeId);
         this.putUnsignedVarInt(this.type);

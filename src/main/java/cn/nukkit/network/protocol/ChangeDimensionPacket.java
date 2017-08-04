@@ -17,13 +17,12 @@ public class ChangeDimensionPacket extends DataPacket {
     public boolean unknown;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarInt(this.dimension);
         this.putVector3f(this.x, this.y, this.z);
         this.putBoolean(this.unknown);

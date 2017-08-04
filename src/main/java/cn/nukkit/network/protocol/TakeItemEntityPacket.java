@@ -11,12 +11,11 @@ public class TakeItemEntityPacket extends DataPacket {
     public long target;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload() {
         this.putVarLong(this.target);
         this.putVarLong(this.entityId);
     }

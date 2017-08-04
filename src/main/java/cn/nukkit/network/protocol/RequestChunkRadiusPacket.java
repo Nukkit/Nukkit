@@ -11,12 +11,12 @@ public class RequestChunkRadiusPacket extends DataPacket {
     public int radius;
 
     @Override
-    public void decode() {
+    public void decodePayload() {
         this.radius = this.getVarInt();
     }
 
     @Override
-    public void encode() {
+    public void encodePayload() {
 
     }
 
