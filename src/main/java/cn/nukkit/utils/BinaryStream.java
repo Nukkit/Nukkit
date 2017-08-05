@@ -213,18 +213,12 @@ public class BinaryStream {
         long count = this.getUnsignedVarInt();
 
         for(int i = 0; i < count; ++i){
-            float min = this.getLFloat();
-            float max = this.getLFloat();
-            float current = this.getLFloat();
-            float defaultValue = this.getLFloat();
             String name = this.getString();
-
             Attribute attr = Attribute.getAttributeByName(name);
             if(attr != null){
-                attr.setMinValue(min);
-                attr.setMaxValue(max);
-                attr.setValue(current);
-                attr.setDefaultValue(defaultValue);
+                attr.setMinValue(this.getLFloat());
+                attr.setValue(this.getLFloat());
+                attr.setMaxValue(this.getLFloat());
                 list.add(attr);
             }else{
                 throw new Exception("Unknown attribute type \"" + name + "\"");
@@ -239,12 +233,11 @@ public class BinaryStream {
      */
     public void putAttributeList(Attribute[] attributes){
         this.putUnsignedVarInt(attributes.length);
-        for (Attribute attribute: attributes){
-            this.putLFloat(attribute.getMinValue());
-            this.putLFloat(attribute.getMaxValue());
-            this.putLFloat(attribute.getValue());
-            this.putLFloat(attribute.getDefaultValue());
+        for (Attribute attribute: attributes) {
             this.putString(attribute.getName());
+            this.putLFloat(attribute.getMinValue());
+            this.putLFloat(attribute.getValue());
+            this.putLFloat(attribute.getMaxValue());
         }
     }
 

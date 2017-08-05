@@ -2,6 +2,8 @@ package cn.nukkit.network.protocol;
 
 public class AddBehaviorTreePacket extends DataPacket {
 
+    public String unknown;
+
     @Override
     public byte pid() {
         return ProtocolInfo.ADD_BEHAVIOR_TREE_PACKET;
@@ -14,6 +16,7 @@ public class AddBehaviorTreePacket extends DataPacket {
 
     @Override
     public void encode() {
-        //TODO
+        this.reset();
+        this.putString(unknown);
     }
 }
