@@ -47,7 +47,7 @@ public class BlockStone extends BlockSolid {
 
     @Override
     public String getName() {
-        String[] names = new String[]{
+        String[] names = new String[] {
                 "Stone",
                 "Granite",
                 "Polished Granite",

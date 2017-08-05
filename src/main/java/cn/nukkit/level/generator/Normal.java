@@ -14,7 +14,7 @@ import cn.nukkit.math.Vector3;
 import java.util.*;
 
 /**
- * This generator was written by Creeperface and Nycuro
+ * This generator was written by Creeperface and NycuRO
  * <p>
  * The following classes are theirs and are intended for NUKKIT USAGE and should not be copied/translated to other software
  * such as BukkitPE, ClearSky, Genisys , Pocketmine-MP
@@ -29,10 +29,10 @@ import java.util.*;
  * BasicPopulator.java
  * MesaBiome.java
  * JungleBiome.java
- * SavannaBiome.java
+ * SavannahBiome.java
  * RoofedForestBiome.java
  * RoofedForestMBiome.java
- * MushroomIsland.java
+ * MushroomIslandBiom.java
  * TreeGenerator.java
  * HugeTreesGenerator.java
  * <p>
@@ -101,7 +101,7 @@ public class Normal extends Generator {
     private int waterColor = 16777215;
     //private boolean enableSnow; Coming soon
 
-    protected float rainfall = 0.5F;
+    public float rainfall = 0.5F;
     protected float temperature = 0.5F;
     protected int grassColor = 0;
 
