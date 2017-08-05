@@ -4,13 +4,13 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockSand;
 import cn.nukkit.block.BlockSandstone;
 import cn.nukkit.level.generator.biome.SandyBiome;
-import cn.nukkit.level.generator.biome.SnowyBiome;
 
 /**
  * Author: PeratX
  * Nukkit Project
  *
  */
+
 public class BeachBiome extends SandyBiome {
 
     public static final int TYPE_NORMAL = 0;
@@ -26,10 +26,9 @@ public class BeachBiome extends SandyBiome {
     public BeachBiome(int type) {
         super();
         this.type = type;
-
+        this.setElevation(62, 65);
         if (type == TYPE_NORMAL) {
             // TODO: SugerCane Populator
-            this.setElevation(62, 65);
             this.temperature = 0.8f;
             this.rainfall = 0.4f;
 
@@ -43,11 +42,10 @@ public class BeachBiome extends SandyBiome {
         } else if (type == TYPE_COLD) {
             this.temperature = 0.05f;
             this.rainfall = 0.3f;
-            this.setElevation(62, 65);
         } else {
             this.temperature = 0.2f;
             this.rainfall = 0.3f;
-            this.setElevation(62, 65);
+            // Need verify setElevation for Stone Beach
         }
     }
 

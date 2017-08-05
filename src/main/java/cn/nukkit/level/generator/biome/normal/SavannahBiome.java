@@ -38,7 +38,7 @@ public class SavannahBiome extends GrassyBiome {
             this.addPopulator(flower);;
             this.setElevation(62, 68);
         } else {
-            this.setElevation(62, 130);
+            this.setElevation(125, 130); // Need check
         }
     }
 

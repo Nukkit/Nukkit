@@ -1,6 +1,5 @@
 package cn.nukkit.level.generator.biome.normal;
 
-import a.e.P;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFlower;
 import cn.nukkit.level.generator.biome.GrassyBiome;
@@ -26,7 +25,8 @@ public class SwamplandBiome extends GrassyBiome {
     public SwamplandBiome(int type) {
         super();
         this.type = type;
-
+        this.temperature = 0.8f;
+        this.rainfall = 0.9f;
         if (type == TYPE_NORMAL) {
             PopulatorLilyPad lilypad = new PopulatorLilyPad();
             lilypad.setBaseAmount(4);
@@ -43,11 +43,8 @@ public class SwamplandBiome extends GrassyBiome {
             this.addPopulator(lilypad);
 
             this.setElevation(62, 63);
-
-            this.temperature = 0.8f;
-            this.rainfall = 0.9f;
         } else {
-            this.setElevation(62, 63);
+            this.setElevation(63, 74); // Need check
         }
     }
 

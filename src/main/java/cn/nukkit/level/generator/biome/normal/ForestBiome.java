@@ -1,6 +1,5 @@
 package cn.nukkit.level.generator.biome.normal;
 
-import a.e.P;
 import cn.nukkit.block.BlockSapling;
 import cn.nukkit.level.generator.biome.GrassyBiome;
 import cn.nukkit.level.generator.populator.PopulatorGrass;
@@ -56,11 +55,11 @@ public class ForestBiome extends GrassyBiome {
             this.temperature = 0.6f;
             this.rainfall = 0.6f;
         } else if (type == TYPE_BIRCH_M) {
-            this.setElevation(63, 130);
+            this.setElevation(125, 130); // Need check
             this.temperature = 0.6f;
             this.rainfall = 0.6f;
         } else if (type == TYPE_BIRCH_HILLS_M) {
-            this.setElevation(63, 94);
+            this.setElevation(125, 130); // Need check
             this.temperature = 0.6f;
             this.rainfall = 0.6f;
         } else if (type == TYPE_ROOFED) {
@@ -68,7 +67,7 @@ public class ForestBiome extends GrassyBiome {
             this.temperature = 0.7f;
             this.rainfall = 0.8f;
         } else {
-            this.setElevation(63, 130);
+            this.setElevation(125, 130); // Need check
             this.temperature = 0.7f;
             this.rainfall = 0.8f;
         }

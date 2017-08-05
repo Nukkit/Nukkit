@@ -21,6 +21,9 @@ public class MushroomIslandBiome extends NormalBiome implements CaveBiome {
     public MushroomIslandBiome(int type) {
         super();
         this.type = type;
+        this.temperature = 0.9f;
+        this.rainfall = 1.0f;
+        this.setElevation(60, 70);
         if (type == TYPE_NORMAL) {
             this.setGroundCover(new Block[]{
                     new BlockMycelium(),
@@ -32,11 +35,8 @@ public class MushroomIslandBiome extends NormalBiome implements CaveBiome {
             MushroomPopulator mushroomPopulator = new MushroomPopulator();
             mushroomPopulator.setBaseAmount(1);
             addPopulator(mushroomPopulator);
-            setElevation(60, 70);
-            temperature = 0.9f;
-            rainfall = 1.0f;
         } else {
-            this.setElevation(60, 70);
+            // Populators Shore
         }
     }
 

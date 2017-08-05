@@ -2,27 +2,27 @@ package cn.nukkit.level.generator.biome.normal;
 
 import cn.nukkit.level.generator.biome.SmallMountainsBiome;
 
-public class ExtremeHillsPlus extends SmallMountainsBiome {
+public class ExtremeHillsPlusBiome extends SmallMountainsBiome {
 
     public static final int TYPE_NORMAL = 0;
     public static final int TYPE_M = 1;
 
     public final int type;
 
-    public ExtremeHillsPlus() {
+    public ExtremeHillsPlusBiome() {
         this(TYPE_NORMAL);
     }
 
-    public ExtremeHillsPlus(int type) {
+    public ExtremeHillsPlusBiome(int type) {
         super();
         this.type = type;
         this.temperature = 0.2f;
         this.rainfall = 0.3f;
 
         if (type == TYPE_NORMAL) {
-            this.setElevation(63, 100);
+            this.setElevation(63, 100); // Need check
         } else {
-            this.setElevation(63, 130);
+            this.setElevation(125, 130); // Need check
         }
     }
 

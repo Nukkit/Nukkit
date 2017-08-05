@@ -23,7 +23,7 @@ public class MesaBiome extends SandyBiome {
         } else if (type == TYPE_PLATEAU) {
             this.setElevation(63, 74);
         } else {
-            this.setElevation(63, 130);
+            this.setElevation(125, 130); // Need check
         }
     }
 

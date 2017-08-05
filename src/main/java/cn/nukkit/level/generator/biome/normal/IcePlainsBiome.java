@@ -37,9 +37,9 @@ public class IcePlainsBiome extends SnowyBiome {
 
     public IcePlainsBiome(int type) {
         super();
-
         this.type = type;
-        this.setElevation(63, 74);
+        this.temperature = 0.0f;
+        this.rainfall = 0.5f;
         if (type == TYPE_NORMAL) {
             PopulatorTallGrass tallGrass = new PopulatorTallGrass();
             tallGrass.setBaseAmount(5);
@@ -47,15 +47,11 @@ public class IcePlainsBiome extends SnowyBiome {
             PopulatorTree trees = new PopulatorTree(BlockSapling.SPRUCE);
             trees.setBaseAmount(1);
             trees.setRandomAmount(1);
-
             this.addPopulator(tallGrass);
             this.addPopulator(trees);
-
-            this.temperature = 0.0f;
-            this.rainfall = 0.5f;
+            this.setElevation(63, 74);
         } else {
-            this.temperature = 0.0f;
-            this.rainfall = 0.5f;
+            this.setElevation(63, 74);
         }
     }
 

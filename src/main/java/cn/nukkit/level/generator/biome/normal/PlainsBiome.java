@@ -26,7 +26,7 @@ public class PlainsBiome extends GrassyBiome {
 
         this.temperature = 0.8f;
         this.rainfall = 0.4f;
-
+        this.setElevation(63, 68);
         if (type == TYPE_NORMAL) {
             PopulatorSugarcane sugarcane = new PopulatorSugarcane();
             sugarcane.setBaseAmount(6);
@@ -52,11 +52,8 @@ public class PlainsBiome extends GrassyBiome {
             this.addPopulator(grass);
             this.addPopulator(tallGrass);
             this.addPopulator(flower);
-
-            this.setElevation(63, 68);
-
         } else {
-            this.setElevation(63, 68);
+            // Populators
         }
     }
 

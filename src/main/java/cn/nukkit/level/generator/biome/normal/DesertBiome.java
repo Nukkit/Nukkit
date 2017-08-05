@@ -1,6 +1,5 @@
 package cn.nukkit.level.generator.biome.normal;
 
-import a.e.P;
 import cn.nukkit.level.generator.biome.SandyBiome;
 
 /**

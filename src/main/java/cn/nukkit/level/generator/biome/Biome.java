@@ -24,17 +24,17 @@ public abstract class Biome {
     public static final int TAIGA = 5;
     public static final int SWAMPLAND = 6;
     public static final int RIVER = 7;
-    public static final int HELL = 8;
+    //public static final int HELL = 8;
     /**
      * 9
      * 10
-     * 11
      */
+    public static final int FROZEN_RIVER = 11;
     public static final int ICE_FLATS = 12;
     /** 13 **/
     public static final int MUSHROOM_ISLAND = 14;
     public static final int MUSHROOM_ISLAND_SHORE = 15;
-    public static final int BEACH = 16;
+    public static final int BEACHES = 16;
     /**
      * 17
      * 18
@@ -95,9 +95,8 @@ public abstract class Biome {
     public static final int MUTATED_SAVANNA = 163;
     /** 164 */
     public static final int MUTATED_MESA = 165;
-    /**
-     * 166 - 167
-     */
+    /** 166 */
+    public static final int MUTATED_MESA_CLEAR_ROCK = 167;
 
     public static final int MAX_BIOMES = 256;
 
@@ -142,13 +141,13 @@ public abstract class Biome {
         /**
          * 9
          * 10
-         * 11
          */
+        register(FROZEN_RIVER, new FrozenRiverBiome());
         register(ICE_FLATS, new IcePlainsBiome());
         /** 13 **/
         register(MUSHROOM_ISLAND, new MushroomIslandBiome());
         register(MUSHROOM_ISLAND_SHORE, new MushroomIslandBiome(MushroomIslandBiome.TYPE_SHORE));
-        register(BEACH, new BeachBiome());
+        register(BEACHES, new BeachBiome());
         /**
          * 17
          * 18
@@ -164,11 +163,11 @@ public abstract class Biome {
         register(BIRCH_FOREST, new ForestBiome(ForestBiome.TYPE_BIRCH));
         /** 28 */
         register(ROOFED_FOREST, new ForestBiome(ForestBiome.TYPE_ROOFED));
-        register(TAIGA_COLD, new ColdTaiga());
+        register(TAIGA_COLD, new ColdTaigaBiome());
          /** 30 */
         register(MEGA_TAIGA, new TaigaBiome(TaigaBiome.TYPE_MEGA));
          /** 33 */
-        register(EXTREME_HILLS_WITH_TREES, new ExtremeHillsPlus());
+        register(EXTREME_HILLS_WITH_TREES, new ExtremeHillsPlusBiome());
         register(SAVANNA, new SavannahBiome());
         /** 36 */
         register(MESA, new MesaBiome(MesaBiome.TYPE_NORMAL));
@@ -199,17 +198,16 @@ public abstract class Biome {
          * 151 - 156
          */
         register(ROOFED_FOREST_M, new ForestBiome(ForestBiome.TYPE_ROOFED_M));
-        register(MUTATED_TAIGA_COLD, new ColdTaiga(ColdTaiga.TYPE_M));
+        register(MUTATED_TAIGA_COLD, new ColdTaigaBiome(ColdTaigaBiome.TYPE_M));
         /** 159 */
         register(MUTATED_REDWOOD_TAIGA, new TaigaBiome(TaigaBiome.TYPE_SPRUCE));
         /** 161 */
-        register(MUTATED_EXTREME_HILLS_WITH_TREES, new ExtremeHillsPlus(ExtremeHillsPlus.TYPE_M));
+        register(MUTATED_EXTREME_HILLS_WITH_TREES, new ExtremeHillsPlusBiome(ExtremeHillsPlusBiome.TYPE_M));
         register(MUTATED_SAVANNA, new SavannahBiome(SavannahBiome.TYPE_M));
         /** 164 */
         register(MUTATED_MESA, new MesaBiome(MesaBiome.TYPE_BRYCE));
-        /**
-         * 166 - 167
-         */
+        /** 166 */
+        register(MUTATED_MESA_CLEAR_ROCK, new MesaBiome(MesaBiome.TYPE_PLATEAU_M));
     }
 
     public static Biome getBiome(int id) {

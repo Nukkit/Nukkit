@@ -42,7 +42,7 @@ public class JungleBiome extends GrassyBiome {
             this.temperature = 1.2f;
             this.rainfall = 0.9f;
         } else if (type == TYPE_M) {
-            this.setElevation(62, 130);
+            this.setElevation(125, 130); // Need check
             this.temperature = 1.2f;
             this.rainfall = 0.9f;
         } else if (type == TYPE_EDGE) {
@@ -50,7 +50,7 @@ public class JungleBiome extends GrassyBiome {
             this.temperature = 0.95f;
             this.rainfall = 0.8f;
         } else {
-            this.setElevation(62, 130);
+            this.setElevation(125, 130); // Need check
             this.temperature = 0.95f;
             this.rainfall = 0.8f;
         }

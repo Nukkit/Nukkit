@@ -9,6 +9,7 @@ import cn.nukkit.level.generator.populator.PopulatorTallSugarcane;
  * author: MagicDroidX
  * Nukkit Project
  */
+
 public class OceanBiome extends WateryBiome {
 
     public static final int TYPE_NORMAL = 0;
@@ -34,7 +35,7 @@ public class OceanBiome extends WateryBiome {
             this.addPopulator(tallSugarcane);
             this.setElevation(46, 58);
         } else {
-            this.setElevation(46, 58);
+            this.setElevation(30, 58); // Need check
         }
     }
 

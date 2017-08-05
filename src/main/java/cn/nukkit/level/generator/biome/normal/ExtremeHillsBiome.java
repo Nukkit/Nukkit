@@ -19,9 +19,9 @@ public class ExtremeHillsBiome extends MountainsBiome {
         this.temperature = 0.2f;
         this.rainfall = 0.3f;
         if (type == TYPE_NORMAL) {
-            this.setElevation(64, 130);
+            this.setElevation(64, 100); // Need check
         } else {
-            this.setElevation(64, 127);
+            this.setElevation(120, 130); // Need check
         }
     }
 

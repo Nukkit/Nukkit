@@ -7,7 +7,7 @@ public class FrozenRiverBiome extends SnowyBiome {
     public FrozenRiverBiome() {
         super();
         this.setElevation(63, 74);
-        this.temperature = 0.5f;
+        this.temperature = 0.0f;
         this.rainfall = 0.5f;
     }
 

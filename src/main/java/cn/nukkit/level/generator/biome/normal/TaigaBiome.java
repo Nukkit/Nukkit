@@ -1,6 +1,5 @@
 package cn.nukkit.level.generator.biome.normal;
 
-import a.e.P;
 import cn.nukkit.block.BlockSapling;
 import cn.nukkit.level.generator.biome.SnowyBiome;
 import cn.nukkit.level.generator.populator.PopulatorGrass;
@@ -28,9 +27,6 @@ public class TaigaBiome extends SnowyBiome {
         super();
         this.type = type;
 
-        this.temperature = 0.05f;
-        this.rainfall = 0.8f;
-
         if (type == TYPE_NORMAL) {
             PopulatorGrass grass = new PopulatorGrass();
             grass.setBaseAmount(6);
@@ -45,13 +41,21 @@ public class TaigaBiome extends SnowyBiome {
 
             this.addPopulator(tallGrass);
 
+            this.temperature = 0.05f;
+            this.rainfall = 0.8f;
             this.setElevation(63, 81);
         } else if (type == TYPE_M) {
-            this.setElevation(63, 130);
+            this.setElevation(63, 100);
+            this.temperature = 0.05f;
+            this.rainfall = 0.8f;
         } else if (type == TYPE_MEGA) {
             this.setElevation(63, 81);
+            this.temperature = 0.3f;
+            this.rainfall = 0.8f;
         } else {
             this.setElevation(63, 81);
+            this.temperature = 0.25f;
+            this.rainfall = 0.8f;
         }
     }
 
