@@ -2,7 +2,7 @@ package cn.nukkit.level.generator.biome;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.level.ChunkManager;
-import cn.nukkit.level.generator.biome.nether.HellBiome;
+import cn.nukkit.level.generator.biome.nether.*;
 import cn.nukkit.level.generator.biome.normal.*;
 import cn.nukkit.level.generator.populator.Populator;
 import cn.nukkit.math.NukkitRandom;
