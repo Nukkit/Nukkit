@@ -2,6 +2,7 @@ package cn.nukkit.level.generator.biome;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.level.ChunkManager;
+import cn.nukkit.level.generator.biome.nether.HellBiome;
 import cn.nukkit.level.generator.biome.normal.*;
 import cn.nukkit.level.generator.populator.Populator;
 import cn.nukkit.math.NukkitRandom;
@@ -24,7 +25,7 @@ public abstract class Biome {
     public static final int TAIGA = 5;
     public static final int SWAMPLAND = 6;
     public static final int RIVER = 7;
-    //public static final int HELL = 8;
+    public static final int HELL = 8;
     /**
      * 9
      * 10
@@ -137,7 +138,7 @@ public abstract class Biome {
         register(TAIGA, new TaigaBiome());
         register(SWAMPLAND, new SwamplandBiome());
         register(RIVER, new RiverBiome());
-        //register(HELL, new HellBiome());
+        register(HELL, new HellBiome());
         /**
          * 9
          * 10
