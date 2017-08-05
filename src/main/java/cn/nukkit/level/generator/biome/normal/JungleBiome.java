@@ -58,12 +58,14 @@ public class JungleBiome extends GrassyBiome {
 
     @Override
     public String getName() {
-        String names = new String {
-            "Jungle",
-            "Jungle M",
-            "Jungle Edge",
-            "Jungle Edge M"
+        if (type == TYPE_NORMAL) {
+            return "Jungle";
+        } else if (type == TYPE_M) {
+            return "Jungle M";
+        } else if (type == TYPE_EDGE) {
+            return "Jungle Edge";
+        } else {
+            return "Jungle Edge M";
         }
-        return names;
     }
 }

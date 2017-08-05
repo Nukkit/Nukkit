@@ -1,6 +1,6 @@
 package cn.nukkit.level.generator.biome;
 
-public class HellBiome extends Biome {
+public abstract class HellBiome extends Biome {
 
     @Override
     public String getName() {

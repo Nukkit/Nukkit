@@ -12,7 +12,7 @@ public abstract class NormalBiome extends Biome {
     }
 
     @Override
-    public int setWaterColor() {
+    public float setWaterColor() {
         return this.waterColor;
     }
 }

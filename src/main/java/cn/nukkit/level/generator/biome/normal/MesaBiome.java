@@ -29,12 +29,14 @@ public class MesaBiome extends SandyBiome {
 
     @Override
     public String getName() {
-        String names = new String {
-            "Mesa",
-            "Mesa Bryce",
-            "Mesa Plateau",
-            "Mesa Plateau M"
+        if (type == TYPE_NORMAL) {
+            return "Mesa";
+        } else if (type == TYPE_BRYCE) {
+            return "Mesa Bryce";
+        } else if (type == TYPE_PLATEAU) {
+            return "Mesa Plateau";
+        } else {
+            return "Mesa Plateau M";
         }
-        return names;
     }
 }

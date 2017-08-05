@@ -27,10 +27,10 @@ public class BiomeSelector {
 
     public int lookup(double temperature, double rainfall) {
         if (rainfall < 0.25) {
-            return Biome.SWAMP;
+            return Biome.SWAMPLAND;
         } else if (rainfall < 0.60) {
             if (temperature < 0.25) {
-                return Biome.ICE_PLAINS;
+                return Biome.ICE_FLATS;
             } else if (temperature < 0.75) {
                 return Biome.DESERT;
             } else {

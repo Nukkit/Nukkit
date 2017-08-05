@@ -20,7 +20,7 @@ public class BeachBiome extends SandyBiome {
     public final int type;
 
     public BeachBiome() {
-        this(TYPE_NORMAL)
+        this(TYPE_NORMAL);
     }
 
     public BeachBiome(int type) {
@@ -53,11 +53,12 @@ public class BeachBiome extends SandyBiome {
 
     @Override
     public String getName() {
-        String names = new String {
-            "Beach",
-            "Cold Beach",
-            "Stone Beach"
+        if (type == TYPE_NORMAL) {
+            return "Beach";
+        } else if (type == TYPE_COLD) {
+            return "Cold Beach";
+        } else {
+            return "Stone Beach";
         }
-        return names;
     }
 }

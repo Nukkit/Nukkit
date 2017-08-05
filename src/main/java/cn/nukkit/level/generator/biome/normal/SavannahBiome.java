@@ -21,22 +21,22 @@ public class SavannahBiome extends GrassyBiome {
     public SavannahBiome(int type) {
         super();
         this.type = type;
-        this.temperature = 1.2f
+        this.temperature = 1.2f;
         this.rainfall = 0.0f;
         if (type == TYPE_NORMAL) {
-            SavannaTreePopulator tree = new SavannaTreePopulator(BlockSapling.ACACIA)
-            tree.setBaseAmount(1)
-            PopulatorTallGrass tallGrass = new PopulatorTallGrass()
+            SavannaTreePopulator tree = new SavannaTreePopulator(BlockSapling.ACACIA);
+            tree.setBaseAmount(1);
+            PopulatorTallGrass tallGrass = new PopulatorTallGrass();
             tallGrass.setBaseAmount(20);
-            PopulatorGrass grass = new PopulatorGrass()
+            PopulatorGrass grass = new PopulatorGrass();
             grass.setBaseAmount(20);
-            PopulatorFlower flower = new PopulatorFlower()
+            PopulatorFlower flower = new PopulatorFlower();
             flower.setBaseAmount(4);
-            this.addPopulator(tallGrass)
-            this.addPopulator(grass)
-            this.addPopulator(tree)
-            this.addPopulator(flower);
-            this.setElevation(62, 68)
+            this.addPopulator(tallGrass);
+            this.addPopulator(grass);
+            this.addPopulator(tree);
+            this.addPopulator(flower);;
+            this.setElevation(62, 68);
         } else {
             this.setElevation(62, 130);
         }

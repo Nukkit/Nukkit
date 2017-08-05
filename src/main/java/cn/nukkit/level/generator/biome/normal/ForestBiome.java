@@ -76,15 +76,20 @@ public class ForestBiome extends GrassyBiome {
 
     @Override
     public String getName() {
-        String names = new String {
-            "Forest",
-            "Flower Forest",
-            "Birch Forest",
-            "Birch Forest M",
-            "Birch Forest Hills M",
-            "Roofed Forest",
-            "Roofed Forest M"
+        if (type == TYPE_NORMAL) {
+            return "Forest";
+        } else if (type == TYPE_FLOWER) {
+            return "Sunflower Forest";
+        } else if (type == TYPE_BIRCH) {
+            return "Birch Forest";
+        } else if (type == TYPE_BIRCH_M) {
+            return "Birch Forest M";
+        } else if (type == TYPE_BIRCH_HILLS_M) {
+            return "Birch Forest Hills M";
+        } else if (type == TYPE_ROOFED) {
+            return "Roofed Forest";
+        } else {
+            return "Roofed Forest M";
         }
-        return names;
     }
 }

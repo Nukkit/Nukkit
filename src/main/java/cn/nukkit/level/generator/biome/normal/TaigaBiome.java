@@ -1,5 +1,6 @@
 package cn.nukkit.level.generator.biome.normal;
 
+import a.e.P;
 import cn.nukkit.block.BlockSapling;
 import cn.nukkit.level.generator.biome.SnowyBiome;
 import cn.nukkit.level.generator.populator.PopulatorGrass;
@@ -56,12 +57,14 @@ public class TaigaBiome extends SnowyBiome {
 
     @Override
     public String getName() {
-        String names = new String {
-                "Taiga",
-                "Taiga M",
-                "Mega Taiga",
-                "Mega Spruce Taiga"
+        if (type == TYPE_NORMAL) {
+            return "Taiga";
+        } else if (type == TYPE_M) {
+            return "Taiga M";
+        } else if (type == TYPE_MEGA) {
+            return "Mega Taiga";
+        } else {
+            return "Mega Spruce Taiga";
         }
-        return names;
     }
 }

@@ -113,10 +113,10 @@ public abstract class Biome {
 
     private Block[] groundCover;
 
-    protected double rainfall = 0.5f;
-    protected double temperature = 0.5f;
+    public double rainfall = 0.5f;
+    public double temperature = 0.5f;
     protected int grassColor = 0;
-    protected int waterColor = 16777215;
+    protected float waterColor = 16777215;
 
     protected static void register(int id, Biome biome) {
         biome.setId(id);
@@ -124,7 +124,7 @@ public abstract class Biome {
         biomes[id] = biome;
     }
 
-    protected Biome setWaterColor(int waterColorIn) {
+    public Biome setWaterColor(int waterColorIn) {
         this.waterColor = waterColorIn;
         return this;
     }
@@ -138,7 +138,7 @@ public abstract class Biome {
         register(TAIGA, new TaigaBiome());
         register(SWAMPLAND, new SwamplandBiome());
         register(RIVER, new RiverBiome());
-        register(HELL, new HellBiome());
+        //register(HELL, new HellBiome());
         /**
          * 9
          * 10
@@ -194,7 +194,7 @@ public abstract class Biome {
          */
         register(MUTATED_JUNGLE, new JungleBiome(JungleBiome.TYPE_M));
         /** 150 */
-        register(MUTATED_JUNGLE_EDGE, new JungleBiome(JungleBiome.TYPE_EDGE_M);
+        register(MUTATED_JUNGLE_EDGE, new JungleBiome(JungleBiome.TYPE_EDGE_M));
         /**
          * 151 - 156
          */
@@ -203,7 +203,7 @@ public abstract class Biome {
         /** 159 */
         register(MUTATED_REDWOOD_TAIGA, new TaigaBiome(TaigaBiome.TYPE_SPRUCE));
         /** 161 */
-        register(MUTATED_EXTREME_HILLS_WITH_TREES, new ExtremeHillsPlus(ExtremeHillsPlus.TYPE_M);
+        register(MUTATED_EXTREME_HILLS_WITH_TREES, new ExtremeHillsPlus(ExtremeHillsPlus.TYPE_M));
         register(MUTATED_SAVANNA, new SavannahBiome(SavannahBiome.TYPE_M));
         /** 164 */
         register(MUTATED_MESA, new MesaBiome(MesaBiome.TYPE_BRYCE));

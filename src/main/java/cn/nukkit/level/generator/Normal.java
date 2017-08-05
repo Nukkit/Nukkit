@@ -32,7 +32,7 @@ import java.util.*;
  * SavannahBiome.java
  * RoofedForestBiome.java
  * RoofedForestMBiome.java
- * MushroomIslandBiom.java
+ * MushroomIslandBiome.java
  * TreeGenerator.java
  * HugeTreesGenerator.java
  * <p>
@@ -43,22 +43,88 @@ public class Normal extends Generator {
     /**
      * biome IDs
      */
-    public static final int JUNGLE = 21;
-    public static final int SAVANNA = 35;
-    public static final int ROOFED_FOREST = 29;
-    public static final int ROOFED_FOREST_M = 157;
-    public static final int MUSHROOM_ISLAND = 14;
-    public static final int SWAMP = 6;
-
     public static final int OCEAN = 0;
     public static final int PLAINS = 1;
     public static final int DESERT = 2;
+    public static final int EXTREME_HILLS = 3;
     public static final int FOREST = 4;
     public static final int TAIGA = 5;
+    public static final int SWAMPLAND = 6;
     public static final int RIVER = 7;
-    public static final int ICE_PLAINS = 12;
+    public static final int HELL = 8;
+    /**
+     * 9
+     * 10
+     * 11
+     */
+    public static final int ICE_FLATS = 12;
+    /** 13 **/
+    public static final int MUSHROOM_ISLAND = 14;
+    public static final int MUSHROOM_ISLAND_SHORE = 15;
     public static final int BEACH = 16;
+    /**
+     * 17
+     * 18
+     * 19
+     * 20
+     */
+    public static final int JUNGLE = 21;
+    /** 22 */
+    public static final int JUNGLE_EDGE = 23;
+    public static final int DEEP_OCEAN = 24;
+    public static final int STONE_BEACH = 25;
+    public static final int COLD_BEACH = 26;
     public static final int BIRCH_FOREST = 27;
+    /** 28 */
+    public static final int ROOFED_FOREST = 29;
+    public static final int TAIGA_COLD = 30;
+    /** 31 */
+    public static final int MEGA_TAIGA = 32;
+    /** 33 */
+    public static final int EXTREME_HILLS_WITH_TREES = 34;
+    public static final int SAVANNA = 35;
+    /** 36 */
+    public static final int MESA = 37;
+    /** 38 */
+    public static final int MESA_PLATEAU = 39;
+    /**
+     * 40 - 126
+     */
+    public static final int THE_VOID = 127;
+    /** 128 */
+    public static final int MUTATED_PLAINS = 129;
+    public static final int MUTATED_DESERT = 130;
+    public static final int MUTATED_EXTREME_HILLS = 131;
+    public static final int MUTATED_FOREST = 132;
+    public static final int MUTATED_TAIGA = 133;
+    public static final int MUTATED_SWAMPLAND = 134;
+    /**
+     * 135 - 139
+     */
+    public static final int MUTATED_ICE_FLATS = 140;
+    /**
+     * 141 - 148
+     */
+    public static final int MUTATED_JUNGLE = 149;
+    /** 150 */
+    public static final int MUTATED_JUNGLE_EDGE = 151;
+    /**
+     * 152 - 156
+     */
+    public static final int ROOFED_FOREST_M = 157;
+    public static final int MUTATED_TAIGA_COLD = 158;
+    /**
+     * 159
+     */
+    public static final int MUTATED_REDWOOD_TAIGA = 160;
+    /** 161 */
+    public static final int MUTATED_EXTREME_HILLS_WITH_TREES = 162;
+    public static final int MUTATED_SAVANNA = 163;
+    /** 164 */
+    public static final int MUTATED_MESA = 165;
+    /**
+     * 166 - 167
+     */
 
     public static final int MAX_BIOMES = 256;
 
@@ -102,7 +168,7 @@ public class Normal extends Generator {
     //private boolean enableSnow; Coming soon
 
     public float rainfall = 0.5F;
-    protected float temperature = 0.5F;
+    public float temperature = 0.5F;
     protected int grassColor = 0;
 
     public Normal() {
@@ -168,7 +234,7 @@ public class Normal extends Generator {
         this.selector.addBiome(Biome.getBiome(FOREST));
         this.selector.addBiome(Biome.getBiome(TAIGA));
         this.selector.addBiome(Biome.getBiome(RIVER));
-        this.selector.addBiome(Biome.getBiome(ICE_PLAINS));
+        this.selector.addBiome(Biome.getBiome(ICE_FLATS));
         this.selector.addBiome(Biome.getBiome(BIRCH_FOREST));
 
         this.selector.addBiome(Biome.getBiome(JUNGLE));
@@ -176,7 +242,7 @@ public class Normal extends Generator {
         this.selector.addBiome(Biome.getBiome(ROOFED_FOREST));
         this.selector.addBiome(Biome.getBiome(ROOFED_FOREST_M));
         this.selector.addBiome(Biome.getBiome(MUSHROOM_ISLAND));
-        this.selector.addBiome(Biome.getBiome(SWAMP));
+        this.selector.addBiome(Biome.getBiome(SWAMPLAND));
 
         this.selector.recalculate();
 
@@ -314,7 +380,7 @@ public class Normal extends Generator {
                     if (geny <= bedrockDepth && (geny == 0 || nukkitRandom.nextRange(1, 5) == 1)) {
                         chunk.setBlock(genx, geny, genz, Block.BEDROCK);
                     } else if (geny > genyHeight) {
-                        if ((biome.getId() == Biome.ICE_PLAINS || biome.getId() == Biome.TAIGA) && geny == seaHeight) {
+                        if ((biome.getId() == Biome.ICE_FLATS || biome.getId() == Biome.TAIGA) && geny == seaHeight) {
                             chunk.setBlock(genx, geny, genz, Block.ICE);
                         } else {
                             chunk.setBlock(genx, geny, genz, Block.STILL_WATER);
