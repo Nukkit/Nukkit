@@ -27,6 +27,8 @@ public class LoginPacket extends DataPacket {
     public long clientId;
 
     public Skin skin;
+    public String skinGeometryName;
+    public byte[] skinGeometry;
 
     @Override
     public byte pid() {
@@ -73,6 +75,8 @@ public class LoginPacket extends DataPacket {
         if (skinToken.has("ClientRandomId")) this.clientId = skinToken.get("ClientRandomId").getAsLong();
         if (skinToken.has("SkinId")) skinId = skinToken.get("SkinId").getAsString();
         if (skinToken.has("SkinData")) this.skin = new Skin(skinToken.get("SkinData").getAsString(), skinId);
+        if (skinToken.has("SkinGeometryName")) this.skinGeometryName = skinToken.get("SkinGeometryName").getAsString();
+        if (skinToken.has("SkinGeometry")) this.skinGeometry = Base64.getDecoder().decode(skinToken.get("SkinGeometry").getAsString());
     }
 
     private JsonObject decodeToken(String token) {

@@ -83,6 +83,10 @@ public final class ClientChainData {
     return defaultInputMode;
   }
 
+  public String getCapeData() {
+    return capeData;
+  }
+
   public final static int UI_PROFILE_CLASSIC = 0;
   public final static int UI_PROFILE_POCKET = 1;
 
@@ -125,6 +129,8 @@ public final class ClientChainData {
 
   private int UIProfile;
 
+  private String capeData;
+
   private BinaryStream bs = new BinaryStream();
 
   private ClientChainData(byte[] buffer) {
@@ -166,6 +172,7 @@ public final class ClientChainData {
     if (skinToken.has("CurrentInputMode")) this.currentInputMode = skinToken.get("CurrentInputMode").getAsInt();
     if (skinToken.has("DefaultInputMode")) this.defaultInputMode = skinToken.get("DefaultInputMode").getAsInt();
     if (skinToken.has("UIProfile")) this.UIProfile = skinToken.get("UIProfile").getAsInt();
+    if (skinToken.has("CapeData")) this.capeData = skinToken.get("CapeData").getAsString();
   }
 
   private JsonObject decodeToken(String token) {

@@ -507,7 +507,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         if (count > 0) {
             //TODO: structure checking
-            pk.commands = new Gson().toJson(data);
+            pk.commands = data;
             int identifier = this.dataPacket(pk, true); // We *need* ACK so we can be sure that the client received the packet or not
             Thread t = new Thread() {
                 public void run() {
@@ -2689,42 +2689,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     this.craftingType = 0;
                     CommandRequestPacket commandRequestPacket = (CommandRequestPacket) packet;
-                    String commandText = commandRequestPacket.command;
-                    Command command = this.getServer().getCommandMap().getCommand(commandText);
-                    if (command != null) {
-                        if (commandRequestPacket.args != null && commandRequestPacket.args.size() > 0) {
-                            CommandParameter[] pars = command.getCommandParameters(commandRequestPacket.overload);
-                            if (pars != null) {
-                                for (CommandParameter par : pars) {
-                                    JsonElement arg = commandRequestPacket.args.get(par.name);
-                                    if (arg != null) {
-                                        switch (par.type) {
-                                            case CommandParameter.ARG_TYPE_TARGET:
-                                                CommandArg rules = new Gson().fromJson(arg, CommandArg.class);
-                                                commandText += " " + rules.getRules()[0].getValue();
-                                                break;
-                                            case CommandParameter.ARG_TYPE_BLOCK_POS:
-                                                CommandArgBlockVector bv = new Gson().fromJson(arg, CommandArgBlockVector.class);
-                                                commandText += " " + bv.getX() + " " + bv.getY() + " " + bv.getZ();
-                                                break;
-                                            case CommandParameter.ARG_TYPE_STRING:
-                                            case CommandParameter.ARG_TYPE_STRING_ENUM:
-                                            case CommandParameter.ARG_TYPE_RAW_TEXT:
-                                                String string = new Gson().fromJson(arg, String.class);
-                                                commandText += " " + string;
-                                                break;
-                                            default:
-                                                commandText += " " + arg.toString();
-                                                break;
-                                        }
-                                    }
-                                }
-                            } else {
-                                this.sendMessage(this.getServer().getLanguage().translateString(command.getUsage()));
-                            }
-                        }
-                    }
-                    PlayerCommandPreprocessEvent playerCommandPreprocessEvent = new PlayerCommandPreprocessEvent(this, "/" + commandText);
+                    PlayerCommandPreprocessEvent playerCommandPreprocessEvent = new PlayerCommandPreprocessEvent(this, commandRequestPacket.command);
                     this.server.getPluginManager().callEvent(playerCommandPreprocessEvent);
                     if (playerCommandPreprocessEvent.isCancelled()) {
                         break;

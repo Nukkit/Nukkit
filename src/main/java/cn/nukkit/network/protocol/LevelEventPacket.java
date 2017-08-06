@@ -89,7 +89,7 @@ public class LevelEventPacket extends DataPacket {
     public float x = 0;
     public float y = 0;
     public float z = 0;
-    public int data;
+    public int data = 0;
 
     @Override
     public byte pid() {
