@@ -114,7 +114,6 @@ public abstract class Biome {
     public double rainfall = 0.5f;
     public double temperature = 0.5f;
     protected int grassColor = 0;
-    protected float waterColor = 16777215;
 
     protected static void register(int id, Biome biome) {
         biome.setId(id);
@@ -251,8 +250,6 @@ public abstract class Biome {
     }
 
     public abstract String getName();
-
-    public abstract float setWaterColor();
 
     public int getMinElevation() {
         return minElevation;
