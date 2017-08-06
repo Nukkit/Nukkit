@@ -297,6 +297,8 @@ public class Chunk extends BaseChunk {
             s.putByte("Y", section.getY());
             s.putByteArray("Blocks", section.getIdArray());
             s.putByteArray("Data", section.getDataArray());
+            s.putByteArray("BlockLight", section.getLightArray());
+            s.putByteArray("SkyLight", section.getSkyLightArray());
             nbt.getList("Sections", CompoundTag.class).add(s);
         }
 
@@ -377,6 +379,8 @@ public class Chunk extends BaseChunk {
             s.putByte("Y", (section.getY()));
             s.putByteArray("Blocks", section.getIdArray());
             s.putByteArray("Data", section.getDataArray());
+            s.putByteArray("BlockLight", section.getLightArray());
+            s.putByteArray("SkyLight", section.getSkyLightArray());
             sectionList.add(s);
         }
         nbt.putList(sectionList);
@@ -472,6 +476,7 @@ public class Chunk extends BaseChunk {
             chunk.nbt.putLong("InhabitedTime", 0);
             chunk.nbt.putBoolean("TerrainGenerated", false);
             chunk.nbt.putBoolean("TerrainPopulated", false);
+            chunk.nbt.putBoolean("LightPopulated", false);
 
             return chunk;
         } catch (Exception e) {
