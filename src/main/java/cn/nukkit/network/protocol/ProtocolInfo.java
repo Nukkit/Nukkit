@@ -9,9 +9,9 @@ public interface ProtocolInfo {
     /**
      * Actual Minecraft: PE protocol version
      */
-    int CURRENT_PROTOCOL = 130;
-    String MINECRAFT_VERSION = "v1.2.0.2";
-    String MINECRAFT_VERSION_NETWORK = "1.2.0.2";
+    int CURRENT_PROTOCOL = 131;
+    String MINECRAFT_VERSION = "v1.2.0.7 beta";
+    String MINECRAFT_VERSION_NETWORK = "1.2.0.7";
 
     byte LOGIN_PACKET = 0x01;
     byte PLAY_STATUS_PACKET = 0x02;
