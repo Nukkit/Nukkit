@@ -52,9 +52,9 @@ public abstract class Biome {
     /** 28 */
     public static final int ROOFED_FOREST = 29;
     public static final int TAIGA_COLD = 30;
-     /** 31 */
+    /** 31 */
     public static final int MEGA_TAIGA = 32;
-     /** 33 */
+    /** 33 */
     public static final int EXTREME_HILLS_WITH_TREES = 34;
     public static final int SAVANNA = 35;
     /** 36 */
@@ -85,11 +85,9 @@ public abstract class Biome {
     /**
      * 152 - 156
      */
-    public static final int ROOFED_FOREST_M = 157;
+    public static final int MUTATED_ROOFED_FOREST = 157;
     public static final int MUTATED_TAIGA_COLD = 158;
-    /**
-     * 159
-     */
+    /** 159 */
     public static final int MUTATED_REDWOOD_TAIGA = 160;
     /** 161 */
     public static final int MUTATED_EXTREME_HILLS_WITH_TREES = 162;
@@ -198,7 +196,7 @@ public abstract class Biome {
         /**
          * 151 - 156
          */
-        register(ROOFED_FOREST_M, new ForestBiome(ForestBiome.TYPE_ROOFED_M));
+        register(MUTATED_ROOFED_FOREST, new ForestBiome(ForestBiome.TYPE_ROOFED_M));
         register(MUTATED_TAIGA_COLD, new ColdTaigaBiome(ColdTaigaBiome.TYPE_M));
         /** 159 */
         register(MUTATED_REDWOOD_TAIGA, new TaigaBiome(TaigaBiome.TYPE_SPRUCE));

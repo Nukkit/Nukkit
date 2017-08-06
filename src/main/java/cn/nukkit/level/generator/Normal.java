@@ -1,5 +1,6 @@
 package cn.nukkit.level.generator;
 
+import a.c.B;
 import cn.nukkit.block.*;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.format.FullChunk;
@@ -49,7 +50,7 @@ public class Normal extends Generator {
 
     private ChunkManager level;
 
-    private Random random;
+    Random random = new Random();
     private NukkitRandom nukkitRandom;
 
     private long localSeed1;
@@ -76,12 +77,6 @@ public class Normal extends Generator {
     private final int landHeightRange = 18;
     private final int mountainHeight = 13;
     private final int basegroundHeight = 3;
-    private int waterColor = 16777215;
-    //private boolean enableSnow; Coming soon
-
-    public float rainfall = 0.5F;
-    public float temperature = 0.5F;
-    protected int grassColor = 0;
 
     public Normal() {
         this(new HashMap<>());
@@ -137,24 +132,88 @@ public class Normal extends Generator {
         this.noiseBaseGround = new Simplex(this.nukkitRandom, 4F, 1F / 4F, 1F / 64F);
         this.noiseRiver = new Simplex(this.nukkitRandom, 2F, 1F, 1F / 512F);
         this.nukkitRandom.setSeed(this.level.getSeed());
-        this.selector = new BiomeSelector(this.nukkitRandom, Biome.getBiome(Biome.FOREST));
+        this.selector = new BiomeSelector(this.nukkitRandom, Biome.getBiome(Biome.OCEAN));
         this.heightOffset = random.nextRange(-5, 3);
 
         this.selector.addBiome(Biome.getBiome(Biome.OCEAN));
         this.selector.addBiome(Biome.getBiome(Biome.PLAINS));
         this.selector.addBiome(Biome.getBiome(Biome.DESERT));
+        this.selector.addBiome(Biome.getBiome(Biome.EXTREME_HILLS));
         this.selector.addBiome(Biome.getBiome(Biome.FOREST));
         this.selector.addBiome(Biome.getBiome(Biome.TAIGA));
-        this.selector.addBiome(Biome.getBiome(Biome.RIVER));
-        this.selector.addBiome(Biome.getBiome(Biome.ICE_FLATS));
-        this.selector.addBiome(Biome.getBiome(Biome.BIRCH_FOREST));
-
-        this.selector.addBiome(Biome.getBiome(Biome.JUNGLE));
-        this.selector.addBiome(Biome.getBiome(Biome.SAVANNA));
-        this.selector.addBiome(Biome.getBiome(Biome.ROOFED_FOREST));
-        this.selector.addBiome(Biome.getBiome(Biome.ROOFED_FOREST_M));
-        this.selector.addBiome(Biome.getBiome(Biome.MUSHROOM_ISLAND));
         this.selector.addBiome(Biome.getBiome(Biome.SWAMPLAND));
+        this.selector.addBiome(Biome.getBiome(Biome.RIVER));
+        this.selector.addBiome(Biome.getBiome(Biome.HELL));
+        /**
+         * 9
+         * 10
+         */
+        this.selector.addBiome(Biome.getBiome(Biome.FROZEN_RIVER));
+        this.selector.addBiome(Biome.getBiome(Biome.ICE_FLATS));
+        /** 13 **/
+        this.selector.addBiome(Biome.getBiome(Biome.MUSHROOM_ISLAND));
+        this.selector.addBiome(Biome.getBiome(Biome.MUSHROOM_ISLAND_SHORE));
+        this.selector.addBiome(Biome.getBiome(Biome.BEACHES));
+        /**
+         * 17
+         * 18
+         * 19
+         * 20
+         */
+        this.selector.addBiome(Biome.getBiome(Biome.JUNGLE));
+        /** 22 */
+        this.selector.addBiome(Biome.getBiome(Biome.JUNGLE_EDGE));
+        this.selector.addBiome(Biome.getBiome(Biome.DEEP_OCEAN));
+        this.selector.addBiome(Biome.getBiome(Biome.STONE_BEACH));
+        this.selector.addBiome(Biome.getBiome(Biome.COLD_BEACH));
+        this.selector.addBiome(Biome.getBiome(Biome.BIRCH_FOREST));
+        /** 28 */
+        this.selector.addBiome(Biome.getBiome(Biome.ROOFED_FOREST));
+        this.selector.addBiome(Biome.getBiome(Biome.TAIGA_COLD));
+        /** 31 */
+        this.selector.addBiome(Biome.getBiome(Biome.MEGA_TAIGA));
+        /** 33 */
+        this.selector.addBiome(Biome.getBiome(Biome.EXTREME_HILLS_WITH_TREES));
+        this.selector.addBiome(Biome.getBiome(Biome.SAVANNA));
+        /** 36 */
+        this.selector.addBiome(Biome.getBiome(Biome.MESA));
+        /** 38 */
+        this.selector.addBiome(Biome.getBiome(Biome.MESA_PLATEAU));
+        /**
+         * 40 - 126
+         */
+        this.selector.addBiome(Biome.getBiome(Biome.THE_VOID));
+        /** 128 */
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_PLAINS));
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_DESERT));
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_EXTREME_HILLS));
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_FOREST));
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_TAIGA));
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_SWAMPLAND));
+        /**
+         * 135 - 139
+         */
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_ICE_FLATS));
+        /**
+         * 141 - 148
+         */
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_JUNGLE));
+        /** 150 */
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_JUNGLE_EDGE));
+        /**
+         * 152 - 156
+         */
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_ROOFED_FOREST));
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_TAIGA_COLD));
+        /** 159 */
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_REDWOOD_TAIGA));
+        /** 161 */
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_EXTREME_HILLS_WITH_TREES));
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_SAVANNA));
+        /** 164 */
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_MESA));
+        /** 166 */
+        this.selector.addBiome(Biome.getBiome(Biome.MUTATED_MESA_CLEAR_ROCK));
         this.selector.recalculate();
 
 
@@ -244,6 +303,9 @@ public class Normal extends Generator {
                     biome = Biome.getBiome(Biome.BEACHES);
                 } else {
                     biome = this.pickBiome(chunkX * 16 + genx, chunkZ * 16 + genz);
+                    if (biome == Biome.getBiome(Biome.SWAMPLAND)) {
+                        chunk.setBiomeColor(genx, genz, 106,112,57); // Test Color Water if Exist BEACHES biome and instanceof SWAMP
+                    }
                     if (canBaseGround) {
                         int baseGroundHeight = (int) (landHeightRange * landHeightNoise) - landHeightRange;
                         int baseGroundHeight2 = (int) (basegroundHeight * (baseNoise[genx][genz] + 1F));
