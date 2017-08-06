@@ -348,7 +348,7 @@ public class Normal extends Generator {
                     if (geny <= bedrockDepth && (geny == 0 || nukkitRandom.nextRange(1, 5) == 1)) {
                         chunk.setBlock(genx, geny, genz, Block.BEDROCK);
                     } else if (geny > genyHeight) {
-                        if ((biome.getId() == Biome.ICE_FLATS || biome.getId() == Biome.TAIGA) && geny => seaHeight) {
+                        if ((biome.getId() == Biome.ICE_FLATS || biome.getId() == Biome.TAIGA) && geny >= seaHeight) {
                             chunk.setBlock(genx, geny, genz, Block.ICE);
                         } else {
                             chunk.setBlock(genx, geny, genz, Block.STILL_WATER);
