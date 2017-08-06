@@ -97,7 +97,7 @@ public abstract class Biome {
     /** 166 */
     public static final int MUTATED_MESA_CLEAR_ROCK = 167;
 
-    public static final int MAX_BIOMES = 256;
+    private static final int MAX_BIOMES = 256;
 
     private static final Biome[] biomes = new Biome[MAX_BIOMES];
 
@@ -111,9 +111,9 @@ public abstract class Biome {
 
     private Block[] groundCover;
 
-    public double rainfall = 0.5f;
-    public double temperature = 0.5f;
-    protected int grassColor = 0;
+    protected double rainfall = 0.5f;
+    protected double temperature = 0.5f;
+    private int grassColor = 0;
 
     protected static void register(int id, Biome biome) {
         biome.setId(id);

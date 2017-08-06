@@ -15,14 +15,7 @@ import cn.nukkit.level.generator.populator.PopulatorTallSugarcane;
 public class RiverBiome extends WateryBiome {
 
     public RiverBiome() {
-
-        this.setGroundCover(new Block[]{
-                new BlockDirt(),
-                new BlockDirt(),
-                new BlockDirt(),
-                new BlockDirt(),
-                new BlockDirt()
-        });
+        super();
 
         PopulatorSugarcane sugarcane = new PopulatorSugarcane();
         sugarcane.setBaseAmount(6);

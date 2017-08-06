@@ -348,15 +348,14 @@ public class Normal extends Generator {
                     if (geny <= bedrockDepth && (geny == 0 || nukkitRandom.nextRange(1, 5) == 1)) {
                         chunk.setBlock(genx, geny, genz, Block.BEDROCK);
                     } else if (geny > genyHeight) {
-                        if ((biome.getId() == Biome.ICE_FLATS || biome.getId() == Biome.TAIGA) && geny == seaHeight) {
+                        if ((biome.getId() == Biome.ICE_FLATS || biome.getId() == Biome.TAIGA) && geny => seaHeight) {
                             chunk.setBlock(genx, geny, genz, Block.ICE);
                         } else {
                             chunk.setBlock(genx, geny, genz, Block.STILL_WATER);
                         }
-                    } else if (biome.getId() == Biome.getBiome(Biome.RIVER)) {
+                    /*} else if (biome.getId() == Biome.getBiome(Biome.RIVER)) {
                         if (biome.getId() == Biome.getBiome(Biome.SWAMPLAND || biome.getId() == Biome.getBiome(Biome.MUTATED_SWAMPLAND))) {
-                            if (biome.getId() == Biome.getBiome(Biome.SWAMPLAND) =>
-                            biome.getId() == Biome.getBiome(Biome.MUTATED_SWAMPLAND)){
+                            if (biome.getId() == Biome.getBiome(Biome.SWAMPLAND) >= biome.getId() == Biome.getBiome(Biome.MUTATED_SWAMPLAND)){
                                 chunk.setBiomeColor(genx, genz, 106, 112, 57);
                             } else {
                                 // Nothing.
@@ -365,11 +364,9 @@ public class Normal extends Generator {
                             if (biome.getId() == Biome.getBiome(Biome.ICE_FLATS) || biome.getId() == Biome.getBiome(Biome.TAIGA) && geny == seaHeight) {
                                 chunk.setBlock(genx, geny, genz, Block.ICE);
                             }
-                        }
+                        }*/
                     } else {
-                        if (geny < genyHeight) {
                             chunk.setBlock(genx, geny, genz, Block.STONE);
-                        }
                     }
                 }
             }
