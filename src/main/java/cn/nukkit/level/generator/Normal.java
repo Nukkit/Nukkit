@@ -302,9 +302,6 @@ public class Normal extends Generator {
                     biome = Biome.getBiome(Biome.BEACHES);
                 } else {
                     biome = this.pickBiome(chunkX * 16 + genx, chunkZ * 16 + genz);
-                    if (biome == Biome.getBiome(Biome.SWAMPLAND)) {
-                        chunk.setBiomeColor(genx, genz, 106, 112, 57); // Test Color Water if Exist BEACHES biome and instanceof SWAMP
-                    }
                     if (canBaseGround) {
                         int baseGroundHeight = (int) (landHeightRange * landHeightNoise) - landHeightRange;
                         int baseGroundHeight2 = (int) (basegroundHeight * (baseNoise[genx][genz] + 1F));
@@ -333,6 +330,10 @@ public class Normal extends Generator {
                         if (genyHeight < seaHeight) {
                             biome = Biome.getBiome(Biome.RIVER);
                             //to generate river floor
+                            if (biome == Biome.getBiome(Biome.SWAMPLAND)) {
+                                chunk.setBiomeColor(genx, genz, 106, 112, 57); // Test Color Water if Exist BEACHES biome and instanceof SWAMP
+                            }
+
                             if (genyHeight <= seaHeight - 8) {
                                 int genyHeight1 = seaHeight - 9 + (int) (basegroundHeight * (baseNoise[genx][genz] + 1F));
                                 int genyHeight2 = genyHeight < seaHeight - 7 ? seaHeight - 7 : genyHeight;
@@ -352,7 +353,8 @@ public class Normal extends Generator {
                     if (geny <= bedrockDepth && (geny == 0 || nukkitRandom.nextRange(1, 5) == 1)) {
                         chunk.setBlock(genx, geny, genz, Block.BEDROCK);
                     } else if (geny > genyHeight) {
-                        if ((biome.getId() == Biome.ICE_FLATS || biome.getId() == Biome.TAIGA) && geny == seaHeight) {
+                        if ((biome.getId() == Biome.ICE_FLATS || biome.getId() == Biome.TAIGA) && geny == seaHeight && biome.getId() == Biome.BEACHES) {
+                            // Trying fix ungenerated ice in These Biomes
                             chunk.setBlock(genx, geny, genz, Block.ICE);
                         } else {
                             chunk.setBlock(genx, geny, genz, Block.STILL_WATER);
