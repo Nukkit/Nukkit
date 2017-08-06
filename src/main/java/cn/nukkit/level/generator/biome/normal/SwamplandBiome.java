@@ -57,9 +57,4 @@ public class SwamplandBiome extends GrassyBiome {
     public int getColor() {
         return 0x6a7039;
     }
-
-    @Override
-    public float setWaterColor() {
-        return 3764330;
-    }
 }

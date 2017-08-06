@@ -1,6 +1,5 @@
 package cn.nukkit.level.generator;
 
-import a.c.B;
 import cn.nukkit.block.*;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.format.FullChunk;
@@ -304,7 +303,7 @@ public class Normal extends Generator {
                 } else {
                     biome = this.pickBiome(chunkX * 16 + genx, chunkZ * 16 + genz);
                     if (biome == Biome.getBiome(Biome.SWAMPLAND)) {
-                        chunk.setBiomeColor(genx, genz, 106,112,57); // Test Color Water if Exist BEACHES biome and instanceof SWAMP
+                        chunk.setBiomeColor(genx, genz, 106, 112, 57); // Test Color Water if Exist BEACHES biome and instanceof SWAMP
                     }
                     if (canBaseGround) {
                         int baseGroundHeight = (int) (landHeightRange * landHeightNoise) - landHeightRange;

@@ -122,11 +122,6 @@ public abstract class Biome {
         biomes[id] = biome;
     }
 
-    public Biome setWaterColor(int waterColorIn) {
-        this.waterColor = waterColorIn;
-        return this;
-    }
-
     public static void init() {
         register(OCEAN, new OceanBiome());
         register(PLAINS, new PlainsBiome());
