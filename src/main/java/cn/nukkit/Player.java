@@ -1978,7 +1978,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public RuleData[] getGameRules() {
         List<RuleData> rules = new ArrayList<>();
 
-        rules.add(new RuleData<>("doDaylightCycle", !this.level.stopTime, RuleData.BOOLEAN_TYPE));
+        // todo: more game rules
+
+        rules.add(new RuleData<>("dodaylightcycle", !this.level.stopTime, RuleData.BOOLEAN_TYPE));
 
         return rules.toArray(new RuleData[rules.size()]);
     }
