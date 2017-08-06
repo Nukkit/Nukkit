@@ -131,13 +131,7 @@ public class EmptyChunkSection implements ChunkSection {
 
     @Override
     public byte[] getBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(10240);
-        byte[] skyLight = new byte[2048];
-        Arrays.fill(skyLight, (byte) 0xff);
-        buffer.position(6144);
-        return buffer
-                .put(skyLight)
-                .array();
+        return new byte[6144];
     }
 
     @Override
