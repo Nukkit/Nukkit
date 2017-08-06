@@ -1,5 +1,7 @@
 package cn.nukkit.level.generator.biome.normal;
 
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockDirt;
 import cn.nukkit.level.generator.biome.WateryBiome;
 import cn.nukkit.level.generator.populator.PopulatorGrass;
 import cn.nukkit.level.generator.populator.PopulatorSugarcane;
@@ -13,7 +15,14 @@ import cn.nukkit.level.generator.populator.PopulatorTallSugarcane;
 public class RiverBiome extends WateryBiome {
 
     public RiverBiome() {
-        super();
+
+        this.setGroundCover(new Block[]{
+                new BlockDirt(),
+                new BlockDirt(),
+                new BlockDirt(),
+                new BlockDirt(),
+                new BlockDirt()
+        });
 
         PopulatorSugarcane sugarcane = new PopulatorSugarcane();
         sugarcane.setBaseAmount(6);

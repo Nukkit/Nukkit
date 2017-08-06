@@ -67,7 +67,7 @@ public class Normal extends Generator {
 
     private int heightOffset;
 
-    private final int seaHeight = 64;
+    private final int seaHeight = 62;
     private final int seaFloorHeight = 48;
     private final int beathStartHeight = 60;
     private final int beathStopHeight = 64;
@@ -275,16 +275,15 @@ public class Normal extends Generator {
                 //generate mountains
                 double mountainHeightGenerate = mountainNoise[genx][genz] - 0.2F;
                 mountainHeightGenerate = mountainHeightGenerate > 0 ? mountainHeightGenerate : 0;
+                int landHeightGenerate = (int) (landHeightRange * landHeightNoise);
                 int mountainGenerate = (int) (mountainHeight * mountainHeightGenerate);
 
-                int landHeightGenerate = (int) (landHeightRange * landHeightNoise);
                 if (landHeightGenerate > landHeightRange) {
                     if (landHeightGenerate > landHeightRange) {
                         canBaseGround = true;
                     }
                     landHeightGenerate = landHeightRange;
                 }
-
                 int genyHeight = seaFloorHeight + landHeightGenerate;
                 genyHeight += mountainGenerate;
 
@@ -330,10 +329,6 @@ public class Normal extends Generator {
                         if (genyHeight < seaHeight) {
                             biome = Biome.getBiome(Biome.RIVER);
                             //to generate river floor
-                            if (biome == Biome.getBiome(Biome.SWAMPLAND)) {
-                                chunk.setBiomeColor(genx, genz, 106, 112, 57); // Test Color Water if Exist BEACHES biome and instanceof SWAMP
-                            }
-
                             if (genyHeight <= seaHeight - 8) {
                                 int genyHeight1 = seaHeight - 9 + (int) (basegroundHeight * (baseNoise[genx][genz] + 1F));
                                 int genyHeight2 = genyHeight < seaHeight - 7 ? seaHeight - 7 : genyHeight;
@@ -353,14 +348,28 @@ public class Normal extends Generator {
                     if (geny <= bedrockDepth && (geny == 0 || nukkitRandom.nextRange(1, 5) == 1)) {
                         chunk.setBlock(genx, geny, genz, Block.BEDROCK);
                     } else if (geny > genyHeight) {
-                        if ((biome.getId() == Biome.ICE_FLATS || biome.getId() == Biome.TAIGA) && geny == seaHeight && biome.getId() == Biome.RIVER) {
-                            // Trying fix ungenerated ice in These Biomes
+                        if ((biome.getId() == Biome.ICE_FLATS || biome.getId() == Biome.TAIGA) && geny == seaHeight) {
                             chunk.setBlock(genx, geny, genz, Block.ICE);
                         } else {
                             chunk.setBlock(genx, geny, genz, Block.STILL_WATER);
                         }
+                    } else if (biome.getId() == Biome.getBiome(Biome.RIVER)) {
+                        if (biome.getId() == Biome.getBiome(Biome.SWAMPLAND || biome.getId() == Biome.getBiome(Biome.MUTATED_SWAMPLAND))) {
+                            if (biome.getId() == Biome.getBiome(Biome.SWAMPLAND) =>
+                            biome.getId() == Biome.getBiome(Biome.MUTATED_SWAMPLAND)){
+                                chunk.setBiomeColor(genx, genz, 106, 112, 57);
+                            } else {
+                                // Nothing.
+                            }
+                        } else {
+                            if (biome.getId() == Biome.getBiome(Biome.ICE_FLATS) || biome.getId() == Biome.getBiome(Biome.TAIGA) && geny == seaHeight) {
+                                chunk.setBlock(genx, geny, genz, Block.ICE);
+                            }
+                        }
                     } else {
-                        chunk.setBlock(genx, geny, genz, Block.STONE);
+                        if (geny < genyHeight) {
+                            chunk.setBlock(genx, geny, genz, Block.STONE);
+                        }
                     }
                 }
             }
