@@ -113,7 +113,7 @@ public abstract class Biome {
 
     protected double rainfall = 0.5f;
     protected double temperature = 0.5f;
-    private int grassColor = 0;
+    protected int grassColor = 0;
 
     protected static void register(int id, Biome biome) {
         biome.setId(id);
