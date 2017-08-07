@@ -178,7 +178,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private PermissibleBase perm = null;
 
     public Position fromPos;
-    private int portalTime = 0;
     protected boolean shouldSendStatus = false;
     private Position shouldResPos;
 
@@ -616,19 +615,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 int chunkX = Level.getHashX(index);
                 int chunkZ = Level.getHashZ(index);
                 this.unloadChunk(chunkX, chunkZ, oldLevel);
-            }
-
-            if (targetLevel.getDimension() != oldLevel.getDimension()) {
-                ChangeDimensionPacket pk = new ChangeDimensionPacket();
-                pk.dimension = targetLevel.getDimension();
-                pk.x = (float) this.getX();
-                pk.y = (float) this.getY();
-                pk.z = (float) this.getZ();
-                this.dataPacket(pk);
-
-                PlayStatusPacket pk1 = new PlayStatusPacket();
-                pk1.status = PlayStatusPacket.PLAYER_SPAWN;
-                this.dataPacket(pk1);
             }
 
             if (this.spawned) {
@@ -1647,6 +1633,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (this.spawned) {
+
             this.processMovement(tickDiff);
 
             this.entityBaseTick(tickDiff);
@@ -1676,22 +1663,36 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if ((this.isCreative() || this.isSurvival() && this.server.getTick() - this.inPortalTicks >= 80) && this.inPortalTicks > 0) {
                 Level netherLevel = this.server.getLevelByName("nether");
                 if (netherLevel != null) {
-                    if (this.getLevel() != netherLevel) {
+                    if (this.getLevel() == this.server.getDefaultLevel() && this.getLevel().getDimension() == Level.DIMENSION_OVERWORLD) {
                         this.fromPos = this.getPosition();
-                        this.fromPos.x = ((int) this.fromPos.x) + 0.5;
-                        this.fromPos.z = ((int) this.fromPos.z) + 0.5;
-                        this.teleport(this.shouldResPos = netherLevel.getSafeSpawn());
-                    } else if (this.fromPos != null && (this.fromPos.getLevel() == netherLevel)) {
-                        if (!(this.getLevel().isChunkLoaded((int) this.fromPos.x, (int) this.fromPos.z))) {
-                            this.getLevel().loadChunk((int) this.fromPos.x, (int) this.fromPos.z);
-                        } else {
-                            this.fromPos = this.getPosition();
-                            this.fromPos.x = ((int) this.fromPos.x) + 0.5;
-                            this.fromPos.z = ((int) this.fromPos.z) + 0.5;
-                            this.teleport(this.shouldResPos = this.server.getDefaultLevel().getSafeSpawn());
-                        }
+                        this.fromPos.x = ((int) this.fromPos.x);
+                        this.fromPos.z = ((int) this.fromPos.z);
+                        this.teleport(netherLevel.getSafeSpawn());
+                        ChangeDimensionPacket pk = new ChangeDimensionPacket();
+                        pk.dimension = level.getDimension();
+                        pk.x = (float) this.getX();
+                        pk.y = (float) this.getY();
+                        pk.z = (float) this.getZ();
+                        this.dataPacket(pk);
+                        PlayStatusPacket pk1 = new PlayStatusPacket();
+                        pk1.status = PlayStatusPacket.PLAYER_SPAWN;
+                        this.dataPacket(pk1);
                     } else {
-                        this.teleport(this.shouldResPos = this.server.getLevelByName("nether").getSafeSpawn());
+                        if (this.getLevel() == this.server.getLevelByName("nether") && this.getLevel().getDimension() == Level.DIMENSION_NETHER) {
+                            this.fromPos = this.getPosition();
+                            this.fromPos.x = ((int) this.fromPos.x);
+                            this.fromPos.z = ((int) this.fromPos.z);
+                            this.teleport(this.server.getDefaultLevel().getSafeSpawn());
+                            ChangeDimensionPacket pk = new ChangeDimensionPacket();
+                            pk.dimension = level.getDimension();
+                            pk.x = (float) this.getX();
+                            pk.y = (float) this.getY();
+                            pk.z = (float) this.getZ();
+                            this.dataPacket(pk);
+                            PlayStatusPacket pk1 = new PlayStatusPacket();
+                            pk1.status = PlayStatusPacket.PLAYER_SPAWN;
+                            this.dataPacket(pk1);
+                        }
                     }
                     inPortalTicks = 0;
                 }
@@ -4661,7 +4662,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             return true;
         }
-
         return false;
     }
 

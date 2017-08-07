@@ -87,6 +87,7 @@ public class ItemBucket extends Item {
                     if (!(player.getLevel().getDimension() == Level.DIMENSION_NETHER && targetBlock.getId() == Block.WATER)) {
                         player.getLevel().setBlock(block, targetBlock, true, true);
                     }
+
                     // TODO:
                     /*if (target instanceof BlockLava) {
                         target.getLevel().addLevelSoundEvent(LevelSoundEventPacket.SOUND_BUCKET_EMPTY_LAVA);

@@ -148,6 +148,6 @@ public class Nether extends Generator {
     }
 
     public Vector3 getSpawn() {
-        return new Vector3(0, 64, 0);
+        return new Vector3(127.5, 128, 127.5);
     }
 }
