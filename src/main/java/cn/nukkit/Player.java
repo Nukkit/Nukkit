@@ -613,12 +613,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             if (targetLevel.getDimension() != oldLevel.getDimension()) {
-                ChangeDimensionPacket changeDimensionPacket = new ChangeDimensionPacket();
-                changeDimensionPacket.dimension = targetLevel.getDimension();
-                changeDimensionPacket.x = (float) this.getX();
-                changeDimensionPacket.y = (float) this.getY();
-                changeDimensionPacket.z = (float) this.getZ();
-                this.dataPacket(changeDimensionPacket);
+                ChangeDimensionPacket pk = new ChangeDimensionPacket();
+                pk.dimension = targetLevel.getDimension();
+                pk.x = (float) this.getX();
+                pk.y = (float) this.getY();
+                pk.z = (float) this.getZ();
+                this.dataPacket(pk);
+
+                PlayStatusPacket pk1 = new PlayStatusPacket();
+                pk1.status = PlayStatusPacket.PLAYER_SPAWN;
+                this.dataPacket(pk1);
+            }
+
+            if (this.spawned) {
+                this.spawnToAll();
             }
             /*
             if (this.spawned) {
@@ -1445,6 +1453,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.getServer().getPluginManager().callEvent(ev = new PlayerInvalidMoveEvent(this, true));
                             if (!ev.isCancelled()) {
                                 revert = ev.isRevert();
+                                /*if (this.isInsideofPortal) {
+                                    if (this.portalTime = 0) {
+                                        this.portalTime = this.server.getTick();
+                                    }
+                                } else {
+                                    this.portalTime = 0;
+                                }*/
 
                                 if (revert) {
                                     this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidMove", this.getName()));

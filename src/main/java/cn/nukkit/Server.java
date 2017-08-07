@@ -426,10 +426,16 @@ public class Server {
 
         if (this.getDefaultLevel() == null) {
             String defaultName = this.getPropertyString("level-name", "world");
+            String netherName = this.getPropertyString("nether", "nether")
             if (defaultName == null || "".equals(defaultName.trim())) {
                 this.getLogger().warning("level-name cannot be null, using default");
                 defaultName = "world";
                 this.setPropertyString("level-name", defaultName);
+            }
+            if (netherName == null) {
+                this.getLogger().warning("Nether is not created! Created now!");
+                netherName = "nether";
+                this.setPropertyString("nether", "nether");
             }
 
             if (!this.loadLevel(defaultName)) {
@@ -443,7 +449,12 @@ public class Server {
                 this.generateLevel(defaultName, seed == 0 ? System.currentTimeMillis() : seed);
             }
 
+            if (!this.loadLevel(netherName)) {
+                this.generateLevel("nether");
+            }
+
             this.setDefaultLevel(this.getLevelByName(defaultName));
+            this.setDefaultLevel(this.getLevelByName(netherName));
         }
 
         this.properties.save(true);
