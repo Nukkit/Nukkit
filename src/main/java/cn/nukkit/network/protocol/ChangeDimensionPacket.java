@@ -1,5 +1,6 @@
 package cn.nukkit.network.protocol;
 
+
 /**
  * Created on 2016/1/5 by xtypr.
  * Package cn.nukkit.network.protocol in project nukkit .
@@ -19,7 +20,7 @@ public class ChangeDimensionPacket extends DataPacket {
     @Override
     public void decode() {
         this.dimension = this.getVarInt();
-        this.getVector3f(this.x, this.y, this.z);
+        // TODO: this.getVector3f(this.x, this.y, this.z);
         this.respawn = this.getBoolean();
     }
 

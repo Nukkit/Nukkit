@@ -87,12 +87,12 @@ public class ItemBucket extends Item {
                     if (!(player.getLevel().getDimension() == Level.DIMENSION_NETHER && targetBlock.getId() == Block.WATER)) {
                         player.getLevel().setBlock(block, targetBlock, true, true);
                     }
-
-                    if (target instanceof BlockLava) {
+                    // TODO:
+                    /*if (target instanceof BlockLava) {
                         target.getLevel().addLevelSoundEvent(LevelSoundEventPacket.SOUND_BUCKET_EMPTY_LAVA);
                     } else {
                         target.getLevel().addLevelSoundEvent(LevelSoundEventPacket.SOUND_BUCKET_EMPTY_WATER);
-                    }
+                    }*/
 
                     if (player.isSurvival()) {
                         Item clone = this.clone();
