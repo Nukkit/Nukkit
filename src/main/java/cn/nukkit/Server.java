@@ -436,15 +436,10 @@ public class Server {
                     seed = seedString.hashCode();
                 }
                 this.getLogger().warning("Level-Name cannot be null, using DEFAULT");
-                defaultName = "world";
-                this.setPropertyString("level-name", defaultName);
-                this.setPropertyString("level-type", "DEFAULT");
                 this.generateLevel(defaultName, seed == 0 ? System.currentTimeMillis() : seed);
             }
             if (netherName == null || "".equals(netherName.trim())) {
                 this.getLogger().warning("Nether is not created! Created now!");
-                netherName = "nether";
-                this.setPropertyString("level-name", netherName);
                 this.setPropertyString("level-type", "nether");
                 this.generateLevel(netherName, System.currentTimeMillis());
             }
@@ -461,7 +456,6 @@ public class Server {
             }
 
             if (!this.loadLevel(netherName)) {
-                this.setPropertyString("level-name", netherName);
                 this.setPropertyString("level-type", "nether");
                 this.generateLevel(netherName, System.currentTimeMillis());
             }
