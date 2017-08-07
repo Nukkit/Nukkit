@@ -459,7 +459,7 @@ public class Server {
                 }
                 Class generator;
                 generator = Generator.getGenerator(Generator.TYPE_NETHER);
-                this.generateLevel("nether", seed == 0 ? System.currentTimeMillis() : seed, generator);
+                this.generateLevel(netherName, seed == 0 ? System.currentTimeMillis() : seed, generator);
             }
 
             this.setDefaultLevel(this.getLevelByName(defaultName));
