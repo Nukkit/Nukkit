@@ -177,9 +177,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private PermissibleBase perm = null;
 
-    public Vector3 fromPos;
-    private Vector3 portalTime = 0;
-    protected Vector3 shouldSendStatus = false;
+    public Position fromPos;
+    private int portalTime = 0;
+    protected boolean shouldSendStatus = false;
     private Position shouldResPos;
 
     private int exp = 0;
@@ -1681,7 +1681,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.fromPos.x = ((int) this.fromPos.x) + 0.5;
                         this.fromPos.z = ((int) this.fromPos.z) + 0.5;
                         this.teleport(this.shouldResPos = netherLevel.getSafeSpawn());
-                    } else if (this.fromPos instanceof Position && ((Position) this.fromPos).getLevel() == netherLevel) {
+                    } else if (this.fromPos != null && (this.fromPos.getLevel() == netherLevel) {
                         if (!(this.getLevel().isChunkLoaded((int) this.fromPos.x, (int) this.fromPos.z))) {
                             this.getLevel().loadChunk((int) this.fromPos.x, (int) this.fromPos.z);
                         }
@@ -1693,14 +1693,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                         }
                         if (tempos == null) {
-                            tempos = this.fromPos.add(Math.random(-2, 2), 0, Math.random(-2, 2));
+                            int min = -2;
+                            int max = 2;
+                            int range = (max - min) + 1;
+                            double x = (Math.random() * range) + min;
+                            double z = (Math.random() * range) + min;
+                            tempos = this.fromPos.add(x, 0, z);
                         }
                         this.teleport(this.shouldResPos = tempos);
                         //Vector3 add = null;
                         tempos = null;
                         this.fromPos = null;
                     } else {
-                        this.teleport(this.shouldResPos = this.server.getDefaultLevel().getSafeSpawn());
+                        this.teleport(this.shouldResPos = this.server.getLevelByName("nether").getSafeSpawn());
                     }
                     inPortalTicks = 0;
                 }
