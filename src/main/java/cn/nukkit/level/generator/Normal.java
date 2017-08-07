@@ -355,7 +355,8 @@ public class Normal extends Generator {
                         }
                     /*} else if (biome.getId() == Biome.getBiome(Biome.RIVER)) {
                         if (biome.getId() == Biome.getBiome(Biome.SWAMPLAND || biome.getId() == Biome.getBiome(Biome.MUTATED_SWAMPLAND))) {
-                            if (biome.getId() == Biome.getBiome(Biome.SWAMPLAND) >= biome.getId() == Biome.getBiome(Biome.MUTATED_SWAMPLAND)){
+                            if (biome.getId() == Biome.getBiome(Biome.SWAMPLAND) || biome.getId() == Biome.getBiome(Biome.MUTATED_SWAMPLAND >=
+                            biome.getId() == Biome.getBiome(Biome.RIVER))){
                                 chunk.setBiomeColor(genx, genz, 106, 112, 57);
                             } else {
                                 // Nothing.
