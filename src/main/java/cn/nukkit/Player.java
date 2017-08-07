@@ -1680,13 +1680,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.fromPos = this.getPosition();
                         this.fromPos.x = ((int) this.fromPos.x) + 0.5;
                         this.fromPos.z = ((int) this.fromPos.z) + 0.5;
-                        this.teleport(this.shouldResPos = (netherLevel.getSafeSpawn());
+                        this.teleport(this.shouldResPos = netherLevel.getSafeSpawn());
                     } else if (this.fromPos instanceof Position && ((Position) this.fromPos).getLevel() == netherLevel) {
                         if (!(this.getLevel().isChunkLoaded((int) this.fromPos.x, (int) this.fromPos.z))) {
                             this.getLevel().loadChunk((int) this.fromPos.x, (int) this.fromPos.z);
                         }
-                        Position tempos == null;
-                        //Vector3f add = [1, 0, -1, 0, 0, 1, 0, -1];
+                        Position tempos;
+                        //Vector3 add = [1, 0, -1, 0, 0, 1, 0, -1];
                         for (int j = 2; j < 5; j++) {
                             if (tempos != null) {
                                 break;
@@ -1702,7 +1702,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     } else {
                         this.teleport(this.shouldResPos = this.server.getDefaultLevel().getSafeSpawn());
                     }
-                    portalTime = 0;
+                    inPortalTicks = 0;
                 }
             }
 
