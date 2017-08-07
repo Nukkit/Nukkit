@@ -426,7 +426,7 @@ public class Server {
 
         if (this.getDefaultLevel() == null) {
             String defaultName = this.getPropertyString("level-name", "world");
-            String netherName = this.getPropertyString("nether", "nether")
+            String netherName = this.getPropertyString("nether", "nether");
             if (defaultName == null || "".equals(defaultName.trim())) {
                 this.getLogger().warning("level-name cannot be null, using default");
                 defaultName = "world";
