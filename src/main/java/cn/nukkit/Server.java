@@ -457,7 +457,8 @@ public class Server {
                 } catch (NumberFormatException e) {
                     seed = seedString.hashCode();
                 }
-                Class<? extends cn.nukkit.level.generator.Generator> generator = Generator.getGenerator(Generator.TYPE_NETHER);
+                Class generator;
+                generator = Generator.getGenerator(Generator.TYPE_NETHER);
                 this.generateLevel("nether", seed == 0 ? System.currentTimeMillis() : seed, generator);
             }
 
