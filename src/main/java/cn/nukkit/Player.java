@@ -611,47 +611,55 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 int chunkZ = Level.getHashZ(index);
                 this.unloadChunk(chunkX, chunkZ, oldLevel);
             }
+
             if (targetLevel.getDimension() != oldLevel.getDimension()) {
-                if (this.spawned) {
-                    //TODO: remove this in future version
-                    this.isLevelChange = true;
-                    this.nextChunkOrderRun = 10000;
-
-                    ChangeDimensionPacket changeDimensionPacket1 = new ChangeDimensionPacket();
-                    changeDimensionPacket1.dimension = 1;
-                    changeDimensionPacket1.x = (float) this.getX();
-                    changeDimensionPacket1.y = (float) this.getY();
-                    changeDimensionPacket1.z = (float) this.getZ();
-                    this.dataPacket(changeDimensionPacket1);
-
-                    this.forceSendEmptyChunks();
-                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
-                        PlayStatusPacket statusPacket0 = new PlayStatusPacket();
-                        statusPacket0.status = PlayStatusPacket.PLAYER_SPAWN;
-                        dataPacket(statusPacket0);
-                    }, 8);
-
-                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
-                        ChangeDimensionPacket changeDimensionPacket = new ChangeDimensionPacket();
-                        changeDimensionPacket.dimension = 0;
-                        changeDimensionPacket.x = (float) this.getX();
-                        changeDimensionPacket.y = (float) this.getY();
-                        changeDimensionPacket.z = (float) this.getZ();
-                        dataPacket(changeDimensionPacket);
-                        nextChunkOrderRun = 0;
-                    }, 9);
-                }
+                ChangeDimensionPacket changeDimensionPacket = new ChangeDimensionPacket();
+                changeDimensionPacket.dimension = targetLevel.getDimension();
+                changeDimensionPacket.x = (float) this.getX();
+                changeDimensionPacket.y = (float) this.getY();
+                changeDimensionPacket.z = (float) this.getZ();
+                this.dataPacket(changeDimensionPacket);
             }
+            /*
+            if (this.spawned) {
+ +                    //TODO: remove this in future version
+ +                    this.isLevelChange = true;
+ +                    this.nextChunkOrderRun = 10000;
+ +
+ +                    ChangeDimensionPacket changeDimensionPacket1 = new ChangeDimensionPacket();
+ +                    changeDimensionPacket1.dimension = 1;
+ +                    changeDimensionPacket1.x = (float) this.getX();
+ +                    changeDimensionPacket1.y = (float) this.getY();
+ +                    changeDimensionPacket1.z = (float) this.getZ();
+ +                    this.dataPacket(changeDimensionPacket1);
+ +
+ +                    this.forceSendEmptyChunks();
+ +                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
+ +                        PlayStatusPacket statusPacket0 = new PlayStatusPacket();
+ +                        statusPacket0.status = PlayStatusPacket.PLAYER_SPAWN;
+ +                        dataPacket(statusPacket0);
+ +                    }, 8);
+ +
+ +                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
+ +                        ChangeDimensionPacket changeDimensionPacket = new ChangeDimensionPacket();
+ +                        changeDimensionPacket.dimension = 0;
+ +                        changeDimensionPacket.x = (float) this.getX();
+ +                        changeDimensionPacket.y = (float) this.getY();
+ +                        changeDimensionPacket.z = (float) this.getZ();
+ +                        dataPacket(changeDimensionPacket);
+ +                        nextChunkOrderRun = 0;
+ +                    }, 9);
+             */
 
             this.usedChunks = new HashMap<>();
             SetTimePacket pk = new SetTimePacket();
             pk.time = this.level.getTime();
             this.dataPacket(pk);
 
-            // TODO: Remove this hack
+            /* TODO: Remove this hack
             int distance = this.viewDistance * 2 * 16 * 2;
             this.sendPosition(this.add(distance, 0, distance), this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);
-            return true;
+            return true;*/
         }
         return false;
     }
