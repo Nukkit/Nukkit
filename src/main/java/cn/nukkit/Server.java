@@ -428,14 +428,25 @@ public class Server {
             String defaultName = this.getPropertyString("level-name", "world");
             String netherName = this.getPropertyString("level-name", "nether");
             if (defaultName == null || "".equals(defaultName.trim())) {
-                this.getLogger().warning("level-name cannot be null, using default");
+                long seed;
+                String seedString = String.valueOf(this.getProperty("level-seed", System.currentTimeMillis()));
+                try {
+                    seed = Long.valueOf(seedString);
+                } catch (NumberFormatException e) {
+                    seed = seedString.hashCode();
+                }
+                this.getLogger().warning("Level-Name cannot be null, using DEFAULT");
                 defaultName = "world";
                 this.setPropertyString("level-name", defaultName);
+                this.setPropertyString("level-type", "DEFAULT");
+                this.generateLevel(defaultName, seed == 0 ? System.currentTimeMillis() : seed);
             }
-            if (netherName == null) {
+            if (netherName == null || "".equals(netherName.trim())) {
                 this.getLogger().warning("Nether is not created! Created now!");
                 netherName = "nether";
                 this.setPropertyString("level-name", netherName);
+                this.setPropertyString("level-type", "nether");
+                this.generateLevel(netherName, System.currentTimeMillis());
             }
 
             if (!this.loadLevel(defaultName)) {
@@ -450,16 +461,9 @@ public class Server {
             }
 
             if (!this.loadLevel(netherName)) {
-                long seed;
-                String seedString = String.valueOf(this.getProperty("level-seed", System.currentTimeMillis()));
-                try {
-                    seed = Long.valueOf(seedString);
-                } catch (NumberFormatException e) {
-                    seed = seedString.hashCode();
-                }
-                Class generator;
-                generator = Generator.getGenerator(Generator.TYPE_NETHER);
-                this.generateLevel(netherName, seed == 0 ? System.currentTimeMillis() : seed, generator);
+                this.setPropertyString("level-name", netherName);
+                this.setPropertyString("level-type", "nether");
+                this.generateLevel(netherName, System.currentTimeMillis());
             }
 
             this.setDefaultLevel(this.getLevelByName(defaultName));
