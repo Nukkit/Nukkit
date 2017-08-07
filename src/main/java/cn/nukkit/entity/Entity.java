@@ -206,8 +206,8 @@ public abstract class Entity extends Location implements Metadatable {
 
     protected EntityDamageEvent lastDamageCause = null;
 
-    protected List<Block> blocksAround = new ArrayList<>();
-    protected List<Block> collisionBlocks = new ArrayList<>();
+    public List<Block> blocksAround = new ArrayList<>();
+    public List<Block> collisionBlocks = new ArrayList<>();
 
     public double lastX;
     public double lastY;
