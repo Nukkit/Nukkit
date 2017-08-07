@@ -1684,26 +1684,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     } else if (this.fromPos != null && (this.fromPos.getLevel() == netherLevel)) {
                         if (!(this.getLevel().isChunkLoaded((int) this.fromPos.x, (int) this.fromPos.z))) {
                             this.getLevel().loadChunk((int) this.fromPos.x, (int) this.fromPos.z);
+                        } else {
+                            this.fromPos = this.getPosition();
+                            this.fromPos.x = ((int) this.fromPos.x) + 0.5;
+                            this.fromPos.z = ((int) this.fromPos.z) + 0.5;
+                            this.teleport(this.shouldResPos = this.server.getDefaultLevel().getSafeSpawn());
                         }
-                        Position tempos = null;
-                        //Vector3 add = [1, 0, -1, 0, 0, 1, 0, -1];
-                        for (int j = 2; j < 5; j++) {
-                            if (tempos != null) {
-                                break;
-                            }
-                        }
-                        if (tempos == null) {
-                            int min = -2;
-                            int max = 2;
-                            int range = (max - min) + 1;
-                            double x = (Math.random() * range) + min;
-                            double z = (Math.random() * range) + min;
-                            tempos = this.fromPos.add(x, 0, z);
-                            this.teleport(this.shouldResPos = tempos);
-                        }
-                        //Vector3 add = null;
-                        tempos = null;
-                        this.fromPos = null;
                     } else {
                         this.teleport(this.shouldResPos = this.server.getLevelByName("nether").getSafeSpawn());
                     }

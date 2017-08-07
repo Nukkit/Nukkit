@@ -450,7 +450,15 @@ public class Server {
             }
 
             if (!this.loadLevel(netherName)) {
-                this.generateLevel("nether", 0, Generator.getGenerator(Generator.TYPE_NETHER));
+                long seed;
+                String seedString = String.valueOf(this.getProperty("level-seed", System.currentTimeMillis()));
+                try {
+                    seed = Long.valueOf(seedString);
+                } catch (NumberFormatException e) {
+                    seed = seedString.hashCode();
+                }
+                Class<? extends cn.nukkit.level.generator.Generator> generator = Generator.getGenerator(Generator.TYPE_NETHER);
+                this.generateLevel("nether", seed == 0 ? System.currentTimeMillis() : seed, generator);
             }
 
             this.setDefaultLevel(this.getLevelByName(defaultName));
