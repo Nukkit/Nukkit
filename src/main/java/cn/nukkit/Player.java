@@ -1685,7 +1685,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (!(this.getLevel().isChunkLoaded((int) this.fromPos.x, (int) this.fromPos.z))) {
                             this.getLevel().loadChunk((int) this.fromPos.x, (int) this.fromPos.z);
                         }
-                        Position tempos;
+                        Position tempos = null;
                         //Vector3 add = [1, 0, -1, 0, 0, 1, 0, -1];
                         for (int j = 2; j < 5; j++) {
                             if (tempos != null) {
@@ -1699,8 +1699,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             double x = (Math.random() * range) + min;
                             double z = (Math.random() * range) + min;
                             tempos = this.fromPos.add(x, 0, z);
+                            this.teleport(this.shouldResPos = tempos);
                         }
-                        this.teleport(this.shouldResPos = tempos);
                         //Vector3 add = null;
                         tempos = null;
                         this.fromPos = null;
