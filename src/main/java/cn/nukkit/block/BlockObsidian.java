@@ -11,17 +11,12 @@ import cn.nukkit.math.Vector3;
  */
 public class BlockObsidian extends BlockSolid {
 
-    private Vector3 temporalVector;
-
     public BlockObsidian() {
         this(0);
     }
 
     public BlockObsidian(int meta) {
         super(0);
-        if (boolean temporalVector == null) {
-            this.temporalVector = new Vector3(0, 0, 0);
-        }
     }
 
     @Override
