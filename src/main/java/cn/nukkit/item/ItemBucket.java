@@ -89,9 +89,9 @@ public class ItemBucket extends Item {
                     }
 
                     if (target instanceof BlockLava) {
-                        target.getLevel().addSound(LevelSoundEventPacket.SOUND_BUCKET_EMPTY_LAVA);
+                        target.getLevel().addLevelSoundEvent(LevelSoundEventPacket.SOUND_BUCKET_EMPTY_LAVA);
                     } else {
-                        target.getLevel().addSound(LevelSoundEventPacket.SOUND_BUCKET_EMPTY_WATER);
+                        target.getLevel().addLevelSoundEvent(LevelSoundEventPacket.SOUND_BUCKET_EMPTY_WATER);
                     }
 
                     if (player.isSurvival()) {

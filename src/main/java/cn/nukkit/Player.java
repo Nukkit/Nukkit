@@ -612,15 +612,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.unloadChunk(chunkX, chunkZ, oldLevel);
             }
 
-            // TEST
-            if (targetLevel.getDimension() != oldLevel.getDimension()) {
-                ChangeDimensionPacket pk = new ChangeDimensionPacket();
-                pk.dimension = targetLevel.getDimension();
-                pk.x = this.x;
-                pk.y = this.y;
-                pk.z = this.z;
-                this.dataPacket(pk);
-            }
             this.usedChunks = new HashMap<>();
             SetTimePacket pk = new SetTimePacket();
             pk.time = this.level.getTime();
