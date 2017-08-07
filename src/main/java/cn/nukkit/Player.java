@@ -658,8 +658,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             /* TODO: Remove this hack
             int distance = this.viewDistance * 2 * 16 * 2;
-            this.sendPosition(this.add(distance, 0, distance), this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);
-            return true;*/
+            this.sendPosition(this.add(distance, 0, distance), this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);*/
+            return true;
         }
         return false;
     }
