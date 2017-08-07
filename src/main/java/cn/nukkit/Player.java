@@ -39,6 +39,7 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
+import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.level.particle.PunchBlockParticle;
 import cn.nukkit.level.sound.ExperienceOrbSound;
@@ -175,6 +176,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();
 
     private PermissibleBase perm = null;
+
+    public Vector3 fromPos;
+    private Vector3 portalTime = 0;
+    protected Vector3 shouldSendStatus = false;
+    private Position shouldResPos;
 
     private int exp = 0;
     private int expLevel = 0;
@@ -1664,6 +1670,39 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (this.getLevel().canBlockSeeSky(this)) {
                         this.extinguish();
                     }
+                }
+            }
+
+            if ((this.isCreative() || this.isSurvival() && this.server.getTick() - this.inPortalTicks >= 80) && this.inPortalTicks > 0) {
+                Level netherLevel = this.server.getLevelByName("nether");
+                if (netherLevel != null) {
+                    if (this.getLevel() != netherLevel) {
+                        this.fromPos = this.getPosition();
+                        this.fromPos.x = ((int) this.fromPos.x) + 0.5;
+                        this.fromPos.z = ((int) this.fromPos.z) + 0.5;
+                        this.teleport(this.shouldResPos = (netherLevel.getSafeSpawn());
+                    } else if (this.fromPos instanceof Position && ((Position) this.fromPos).getLevel() == netherLevel) {
+                        if (!(this.getLevel().isChunkLoaded((int) this.fromPos.x, (int) this.fromPos.z))) {
+                            this.getLevel().loadChunk((int) this.fromPos.x, (int) this.fromPos.z);
+                        }
+                        Position tempos == null;
+                        //Vector3f add = [1, 0, -1, 0, 0, 1, 0, -1];
+                        for (int j = 2; j < 5; j++) {
+                            if (tempos != null) {
+                                break;
+                            }
+                        }
+                        if (tempos == null) {
+                            tempos = this.fromPos.add(Math.random(-2, 2), 0, Math.random(-2, 2));
+                        }
+                        this.teleport(this.shouldResPos = tempos);
+                        //Vector3 add = null;
+                        tempos = null;
+                        this.fromPos = null;
+                    } else {
+                        this.teleport(this.shouldResPos = this.server.getDefaultLevel().getSafeSpawn());
+                    }
+                    portalTime = 0;
                 }
             }
 
