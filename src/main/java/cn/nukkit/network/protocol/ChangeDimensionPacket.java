@@ -15,7 +15,7 @@ public class ChangeDimensionPacket extends DataPacket {
     public float y;
     public float z;
 
-    public boolean respawn = true;
+    public boolean respawn;
 
     @Override
     public void decode() {
@@ -29,7 +29,7 @@ public class ChangeDimensionPacket extends DataPacket {
         this.reset();
         this.putVarInt(this.dimension);
         this.putVector3f(this.x, this.y, this.z);
-        this.putBoolean(this.respawn);
+        this.putBoolean(true);
     }
 
     @Override
