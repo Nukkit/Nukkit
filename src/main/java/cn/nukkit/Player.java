@@ -26,6 +26,7 @@ import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.event.server.DataPacketSendEvent;
+import cn.nukkit.form.window.FormWindow;
 import cn.nukkit.inventory.*;
 import cn.nukkit.inventory.transaction.*;
 import cn.nukkit.item.*;
@@ -196,6 +197,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected int lastEnderPearl = -1;
 
     private ClientChainData loginChainData;
+
+    private int formWindowCount = 0;
+    private HashMap<Integer, FormWindow> formWindows = new HashMap<>();
 
     public int getStartActionTick() {
         return startAction;
@@ -2488,6 +2492,25 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case ProtocolInfo.MOB_ARMOR_EQUIPMENT_PACKET:
                     break;
 
+                case ProtocolInfo.MODAL_FORM_RESPONSE_PACKET:
+                    if (!this.spawned || !this.isAlive()) {
+                        break;
+                    }
+
+                    ModalFormResponsePacket modalFormPacket = (ModalFormResponsePacket) packet;
+
+                    if (formWindows.containsKey(modalFormPacket.formId)) {
+                        FormWindow window = formWindows.get(modalFormPacket.formId);
+                        window.setResponse(modalFormPacket.data.trim());
+
+                        PlayerFormRespondedEvent event = new PlayerFormRespondedEvent(this, modalFormPacket.formId, window);
+                        getServer().getPluginManager().callEvent(event);
+
+                        formWindows.remove(modalFormPacket.formId);
+                    }
+
+                    break;
+
                 case ProtocolInfo.INTERACT_PACKET:
                     if (!this.spawned || !this.isAlive()) {
                         break;
@@ -4248,6 +4271,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             //Update time
             this.getLevel().sendTime(this);
         }
+    }
+
+    /**
+     * Shows a new FormWindow to the player
+     * You can find out FormWindow result by listening to PlayerFormRespondedEvent
+     */
+    public void showFormWindow(FormWindow window){
+        ModalFormRequestPacket packet = new ModalFormRequestPacket();
+        packet.formId = this.formWindowCount++;
+        packet.data = window.getJSONData();
+        this.formWindows.put(packet.formId, window);
+
+        this.dataPacket(packet);
     }
 
     /**
