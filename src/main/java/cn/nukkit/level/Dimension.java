@@ -37,6 +37,10 @@ public enum Dimension {
         return this.suffix;
     }
 
+    public Class<? extends Generator> getGenerator() {
+        return generator;
+    }
+
     public static Dimension getById(int id) {
         for (Dimension dimension : values()) {
             if (dimension.getId() == id) {

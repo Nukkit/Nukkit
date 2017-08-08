@@ -1657,41 +1657,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             if ((this.isCreative() || this.isSurvival() && this.server.getTick() - this.inPortalTicks >= 80) && this.inPortalTicks > 0) {
-                Level netherLevel = this.server.getLevelByName("nether");
-                if (netherLevel != null) {
-                    if (this.getLevel() == this.server.getDefaultLevel() && this.getLevel().getDimension() == Dimension.OVERWORLD) {
-                        this.fromPos = this.getPosition();
-                        this.fromPos.x = ((int) this.fromPos.x);
-                        this.fromPos.z = ((int) this.fromPos.z);
-                        this.teleport(netherLevel.getSafeSpawn());
-                        ChangeDimensionPacket pk = new ChangeDimensionPacket();
-                        pk.dimension = level.getDimension().getId();
-                        pk.x = (float) this.getX();
-                        pk.y = (float) this.getY();
-                        pk.z = (float) this.getZ();
-                        this.dataPacket(pk);
-                        PlayStatusPacket pk1 = new PlayStatusPacket();
-                        pk1.status = PlayStatusPacket.PLAYER_SPAWN;
-                        this.dataPacket(pk1);
-                    } else {
-                        if (this.getLevel() == this.server.getLevelByName("nether") && this.getLevel().getDimension() == Dimension.NETHER) {
-                            this.fromPos = this.getPosition();
-                            this.fromPos.x = ((int) this.fromPos.x);
-                            this.fromPos.z = ((int) this.fromPos.z);
-                            this.teleport(this.server.getDefaultLevel().getSafeSpawn());
-                            ChangeDimensionPacket pk = new ChangeDimensionPacket();
-                            pk.dimension = level.getDimension().getId();
-                            pk.x = (float) this.getX();
-                            pk.y = (float) this.getY();
-                            pk.z = (float) this.getZ();
-                            this.dataPacket(pk);
-                            PlayStatusPacket pk1 = new PlayStatusPacket();
-                            pk1.status = PlayStatusPacket.PLAYER_SPAWN;
-                            this.dataPacket(pk1);
-                        }
-                    }
-                    inPortalTicks = 0;
-                }
+
             }
 
             if (!this.isSpectator() && this.speed != null) {
@@ -4950,9 +4916,43 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     //todo a lot on dimension
 
     public void setDimension(Dimension dimension) {
+        String levelName = this.level.getFolderName() + dimension.getSuffix();
+
+        Level dimensionLevel = null;
+        if (this.server.getLevelByName(levelName) == null) {
+            if (!this.server.isLevelGenerated(levelName)) {
+                this.server.generateLevel(levelName, new Random().nextLong(), dimension.getGenerator());
+            } else {
+                this.server.loadLevel(levelName);
+            }
+
+            dimensionLevel = this.server.getLevelByName(levelName);
+        }
+
+        if (dimensionLevel == null) {
+            //throw new LevelException("Could not find or generate level "+levelName);
+            return;
+        }
+
+        this.fromPos = this.getPosition();
+        this.fromPos.x = ((int) this.fromPos.x);
+        this.fromPos.z = ((int) this.fromPos.z);
+        Vector3 pos = new Teleporter(this.level).findPortalPosition(this.floor(), dimension);
+
+        if (pos == null) {
+            pos = this; //idk
+        }
+
+        this.teleport(pos);
         ChangeDimensionPacket pk = new ChangeDimensionPacket();
-        pk.dimension = getLevel().getDimension().getId();
+        pk.dimension = level.getDimension().getId();
+        pk.x = (float) this.getX();
+        pk.y = (float) this.getY();
+        pk.z = (float) this.getZ();
         this.dataPacket(pk);
+        PlayStatusPacket pk1 = new PlayStatusPacket();
+        pk1.status = PlayStatusPacket.PLAYER_SPAWN;
+        this.dataPacket(pk1);
     }
 
     public void setCheckMovement(boolean checkMovement) {
