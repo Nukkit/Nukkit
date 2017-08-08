@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.block.BlockFromToEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Dimension;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.level.sound.FizzSound;
@@ -194,7 +195,7 @@ public abstract class BlockLiquid extends BlockTransparent {
         if (this instanceof BlockWater) {
             return 5;
         } else if (this instanceof BlockLava) {
-            if (this.getLevel().getDimension() == Level.DIMENSION_NETHER) {
+            if (this.getLevel().getDimension() == Dimension.NETHER) {
                 return 5;
             }
             return 30;
