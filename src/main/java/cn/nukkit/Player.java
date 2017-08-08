@@ -2722,16 +2722,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
                 case ProtocolInfo.CONTAINER_CLOSE_PACKET:
                     ContainerClosePacket containerClosePacket = (ContainerClosePacket) packet;
-                    if (!this.spawned || containerClosePacket.windowid == 0) {
+                    if (!this.spawned || containerClosePacket.windowId == 0) {
                         break;
                     }
                     this.craftingType = CRAFTING_SMALL;
                     this.currentTransaction = null;
-                    if (this.windowIndex.containsKey(containerClosePacket.windowid)) {
-                        this.server.getPluginManager().callEvent(new InventoryCloseEvent(this.windowIndex.get(containerClosePacket.windowid), this));
-                        this.removeWindow(this.windowIndex.get(containerClosePacket.windowid));
+                    if (this.windowIndex.containsKey(containerClosePacket.windowId)) {
+                        this.server.getPluginManager().callEvent(new InventoryCloseEvent(this.windowIndex.get(containerClosePacket.windowId), this));
+                        this.removeWindow(this.windowIndex.get(containerClosePacket.windowId));
                     } else {
-                        this.windowIndex.remove(containerClosePacket.windowid);
+                        this.windowIndex.remove(containerClosePacket.windowId);
                     }
                     break;
 
@@ -2779,7 +2779,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     } else if (!this.windowIndex.containsKey(craftingEventPacket.windowId)) {
                         this.inventory.sendContents(this);
                         containerClosePacket = new ContainerClosePacket();
-                        containerClosePacket.windowid = craftingEventPacket.windowId;
+                        containerClosePacket.windowId = craftingEventPacket.windowId;
                         this.dataPacket(containerClosePacket);
                         break;
                     }
