@@ -61,4 +61,3 @@ public abstract class Zlib {
     }
 
 }
-

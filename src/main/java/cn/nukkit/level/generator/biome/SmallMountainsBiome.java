@@ -4,12 +4,12 @@ package cn.nukkit.level.generator.biome;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class SmallMountainsBiome extends MountainsBiome {
+
+public abstract class SmallMountainsBiome extends MountainsBiome {
 
     public SmallMountainsBiome() {
         super();
-
-        this.setElevation(63, 97);
+        this.setElevation(63, 100);
 
     }
 

@@ -2786,6 +2786,10 @@ public class Level implements ChunkManager, Metadatable {
         return this.provider.getName();
     }
 
+    public int getDimension() {
+        return dimension;
+    }
+
     public String getFolderName() {
         return this.folderName;
     }
@@ -3114,10 +3118,6 @@ public class Level implements ChunkManager, Metadatable {
             players = this.getPlayers().values();
         }
         this.sendWeather(players.stream().toArray(Player[]::new));
-    }
-
-    public int getDimension() {
-        return dimension;
     }
 
     public boolean canBlockSeeSky(Vector3 pos) {

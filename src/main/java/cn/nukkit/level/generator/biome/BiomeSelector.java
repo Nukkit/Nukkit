@@ -19,31 +19,31 @@ public class BiomeSelector {
 
     private int[] map = new int[64 * 64];
 
-    public BiomeSelector(NukkitRandom random, Biome fallback) {
+    public BiomeSelector(NukkitRandom nukkitRandom, Biome fallback) {
         this.fallback = fallback;
-        this.temperature = new Simplex(random, 2F, 1F / 8F, 1F / 1024F);
-        this.rainfall = new Simplex(random, 2F, 1F / 8F, 1F / 1024F);
+        this.temperature = new Simplex(nukkitRandom, 2F, 1F / 8F, 1F / 1024F);
+        this.rainfall = new Simplex(nukkitRandom, 2F, 1F / 8F, 1F / 1024F);
     }
 
     public int lookup(double temperature, double rainfall) {
-        if (rainfall < 0.25) {
-            return Biome.SWAMP;
-        } else if (rainfall < 0.60) {
-            if (temperature < 0.25) {
-                return Biome.ICE_PLAINS;
-            } else if (temperature < 0.75) {
+        if (rainfall < 0.25f) {
+            return Biome.SWAMPLAND;
+        } else if (rainfall < 0.60f) {
+            if (temperature < 0.25f) {
+                return Biome.ICE_FLATS;
+            } else if (temperature < 0.75f) {
                 return Biome.DESERT;
             } else {
                 return Biome.SAVANNA;
             }
-        } else if (rainfall < 0.80) {
-            if (temperature < 0.25) {
+        } else if (rainfall < 0.80f) {
+            if (temperature < 0.25f) {
                 return Biome.TAIGA;
             } else {
                 return Biome.FOREST;
             }
         } else {
-            if (rainfall < 1.0) {
+            if (rainfall < 1.0f) {
                 return Biome.JUNGLE;
             }
         }
@@ -60,7 +60,7 @@ public class BiomeSelector {
     }
 
     public void addBiome(Biome biome) {
-        this.biomes.put(Integer.valueOf(biome.getId()), biome);
+        this.biomes.put(biome.getId(), biome);
     }
 
     public double getTemperature(double x, double z) {

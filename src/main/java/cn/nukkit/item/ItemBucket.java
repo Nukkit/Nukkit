@@ -1,15 +1,13 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockAir;
-import cn.nukkit.block.BlockLiquid;
-import cn.nukkit.block.BlockWater;
+import cn.nukkit.block.*;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerBucketFillEvent;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 /**
  * author: MagicDroidX
@@ -85,6 +83,17 @@ public class ItemBucket extends Item {
                             level.setBlock(b, new BlockWater());
                         }
                     }
+
+                    if (!(player.getLevel().getDimension() == Level.DIMENSION_NETHER && targetBlock.getId() == Block.WATER)) {
+                        player.getLevel().setBlock(block, targetBlock, true, true);
+                    }
+
+                    // TODO:
+                    /*if (target instanceof BlockLava) {
+                        target.getLevel().addLevelSoundEvent(LevelSoundEventPacket.SOUND_BUCKET_EMPTY_LAVA);
+                    } else {
+                        target.getLevel().addLevelSoundEvent(LevelSoundEventPacket.SOUND_BUCKET_EMPTY_WATER);
+                    }*/
 
                     if (player.isSurvival()) {
                         Item clone = this.clone();

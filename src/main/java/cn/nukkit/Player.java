@@ -11,10 +11,7 @@ import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.command.data.args.CommandArg;
 import cn.nukkit.command.data.args.CommandArgBlockVector;
-import cn.nukkit.entity.Attribute;
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityHuman;
-import cn.nukkit.entity.EntityLiving;
+import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.EntityCreeper;
@@ -42,6 +39,7 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
+import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.level.particle.PunchBlockParticle;
 import cn.nukkit.level.sound.ExperienceOrbSound;
@@ -61,10 +59,7 @@ import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePack;
-import cn.nukkit.utils.Binary;
-import cn.nukkit.utils.ClientChainData;
-import cn.nukkit.utils.TextFormat;
-import cn.nukkit.utils.Zlib;
+import cn.nukkit.utils.*;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
 import com.google.gson.Gson;
@@ -181,6 +176,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();
 
     private PermissibleBase perm = null;
+
+    public Position fromPos;
+    protected boolean shouldSendStatus = false;
+    private Position shouldResPos;
 
     private int exp = 0;
     private int expLevel = 0;
@@ -618,14 +617,48 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.unloadChunk(chunkX, chunkZ, oldLevel);
             }
 
+            if (this.spawned) {
+                this.spawnToAll();
+            }
+            /*
+            if (this.spawned) {
+ +                    //TODO: remove this in future version
+ +                    this.isLevelChange = true;
+ +                    this.nextChunkOrderRun = 10000;
+ +
+ +                    ChangeDimensionPacket changeDimensionPacket1 = new ChangeDimensionPacket();
+ +                    changeDimensionPacket1.dimension = 1;
+ +                    changeDimensionPacket1.x = (float) this.getX();
+ +                    changeDimensionPacket1.y = (float) this.getY();
+ +                    changeDimensionPacket1.z = (float) this.getZ();
+ +                    this.dataPacket(changeDimensionPacket1);
+ +
+ +                    this.forceSendEmptyChunks();
+ +                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
+ +                        PlayStatusPacket statusPacket0 = new PlayStatusPacket();
+ +                        statusPacket0.status = PlayStatusPacket.PLAYER_SPAWN;
+ +                        dataPacket(statusPacket0);
+ +                    }, 8);
+ +
+ +                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
+ +                        ChangeDimensionPacket changeDimensionPacket = new ChangeDimensionPacket();
+ +                        changeDimensionPacket.dimension = 0;
+ +                        changeDimensionPacket.x = (float) this.getX();
+ +                        changeDimensionPacket.y = (float) this.getY();
+ +                        changeDimensionPacket.z = (float) this.getZ();
+ +                        dataPacket(changeDimensionPacket);
+ +                        nextChunkOrderRun = 0;
+ +                    }, 9);
+             */
+
             this.usedChunks = new HashMap<>();
             SetTimePacket pk = new SetTimePacket();
             pk.time = this.level.getTime();
             this.dataPacket(pk);
 
-            // TODO: Remove this hack
+            /* TODO: Remove this hack
             int distance = this.viewDistance * 2 * 16 * 2;
-            this.sendPosition(this.add(distance, 0, distance), this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);
+            this.sendPosition(this.add(distance, 0, distance), this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);*/
             return true;
         }
         return false;
@@ -1403,13 +1436,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (diffX != 0 || diffY != 0 || diffZ != 0) {
                 if (this.checkMovement && !server.getAllowFlight() && this.isSurvival()) {
-                    if (!this.isSleeping()) {
+                    // Some say: I cant move my head when riding because the server 
+                    // blocked my movement
+                    if (!this.isSleeping() && this.riding == null) {
                         double diffHorizontalSqr = (diffX * diffX + diffZ * diffZ) / ((double) (tickDiff * tickDiff));
                         if (diffHorizontalSqr > 0.125) {
                             PlayerInvalidMoveEvent ev;
                             this.getServer().getPluginManager().callEvent(ev = new PlayerInvalidMoveEvent(this, true));
                             if (!ev.isCancelled()) {
                                 revert = ev.isRevert();
+                                /*if (this.isInsideofPortal) {
+                                    if (this.portalTime = 0) {
+                                        this.portalTime = this.server.getTick();
+                                    }
+                                } else {
+                                    this.portalTime = 0;
+                                }*/
 
                                 if (revert) {
                                     this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidMove", this.getName()));
@@ -1591,6 +1633,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (this.spawned) {
+
             this.processMovement(tickDiff);
 
             this.entityBaseTick(tickDiff);
@@ -1614,6 +1657,44 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (this.getLevel().canBlockSeeSky(this)) {
                         this.extinguish();
                     }
+                }
+            }
+
+            if ((this.isCreative() || this.isSurvival() && this.server.getTick() - this.inPortalTicks >= 80) && this.inPortalTicks > 0) {
+                Level netherLevel = this.server.getLevelByName("nether");
+                if (netherLevel != null) {
+                    if (this.getLevel() == this.server.getDefaultLevel() && this.getLevel().getDimension() == Level.DIMENSION_OVERWORLD) {
+                        this.fromPos = this.getPosition();
+                        this.fromPos.x = ((int) this.fromPos.x);
+                        this.fromPos.z = ((int) this.fromPos.z);
+                        this.teleport(netherLevel.getSafeSpawn());
+                        ChangeDimensionPacket pk = new ChangeDimensionPacket();
+                        pk.dimension = level.getDimension();
+                        pk.x = (float) this.getX();
+                        pk.y = (float) this.getY();
+                        pk.z = (float) this.getZ();
+                        this.dataPacket(pk);
+                        PlayStatusPacket pk1 = new PlayStatusPacket();
+                        pk1.status = PlayStatusPacket.PLAYER_SPAWN;
+                        this.dataPacket(pk1);
+                    } else {
+                        if (this.getLevel() == this.server.getLevelByName("nether") && this.getLevel().getDimension() == Level.DIMENSION_NETHER) {
+                            this.fromPos = this.getPosition();
+                            this.fromPos.x = ((int) this.fromPos.x);
+                            this.fromPos.z = ((int) this.fromPos.z);
+                            this.teleport(this.server.getDefaultLevel().getSafeSpawn());
+                            ChangeDimensionPacket pk = new ChangeDimensionPacket();
+                            pk.dimension = level.getDimension();
+                            pk.x = (float) this.getX();
+                            pk.y = (float) this.getY();
+                            pk.z = (float) this.getZ();
+                            this.dataPacket(pk);
+                            PlayStatusPacket pk1 = new PlayStatusPacket();
+                            pk1.status = PlayStatusPacket.PLAYER_SPAWN;
+                            this.dataPacket(pk1);
+                        }
+                    }
+                    inPortalTicks = 0;
                 }
             }
 
@@ -1656,6 +1737,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.checkTeleportPosition();
+        this.checkInteractNearby();
 
         // TODO: remove this workaround (broken client MCPE 1.0.0)
         if (!messageQueue.isEmpty()) {
@@ -1667,7 +1749,70 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         return true;
     }
+    
+    public void checkInteractNearby(){
+        int interactDistance = isCreative() ? 5 : 3;
+        if(canInteract(this, interactDistance)){
+            if(getEntityPlayerLookingAt(interactDistance) != null){
+                EntityInteractable onInteract = getEntityPlayerLookingAt(interactDistance);
+                setButtonText(onInteract.getInteractButtonText());
+            } else {
+                setButtonText("");
+            }
+        } else {
+            setButtonText("");
+        }
+    }
 
+     /**
+     * Returns the Entity the player is looking at currently
+     *
+     * @param maxDistance the maximum distance to check for entities
+     * @return Entity|null    either NULL if no entity is found or an instance of the entity
+     */
+    public EntityInteractable getEntityPlayerLookingAt(int maxDistance) {
+        timing.startTiming();
+        
+        EntityInteractable entity = null;
+
+        // just a fix because player MAY not be fully initialized
+        if (temporalVector != null) {
+            Entity[] nearbyEntities = level.getNearbyEntities(boundingBox.grow(maxDistance, maxDistance, maxDistance), this);
+
+            // get all blocks in looking direction until the max interact distance is reached (it's possible that startblock isn't found!)
+            try {
+                BlockIterator itr = new BlockIterator(level, getPosition(), getDirectionVector(), getEyeHeight(), maxDistance);
+                if (itr.hasNext()) {
+                    Block block;
+                    while (itr.hasNext()) {
+                        block = itr.next();
+                        entity = getEntityAtPosition(nearbyEntities, block.getFloorX(), block.getFloorY(), block.getFloorZ());
+                        if (entity != null) {
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                // nothing to log here!
+            }
+        }
+
+        timing.stopTiming();
+
+        return entity;
+    }
+    
+    private EntityInteractable getEntityAtPosition(Entity[] nearbyEntities, int x, int y, int z) {
+        for (Entity nearestEntity : nearbyEntities) {
+            if (nearestEntity.getFloorX() == x && nearestEntity.getFloorY() == y && nearestEntity.getFloorZ() == z
+                    && nearestEntity instanceof EntityInteractable
+                    && ((EntityInteractable) nearestEntity).canDoInteraction()) {
+                return (EntityInteractable) nearestEntity;
+            }
+        }
+        return null;
+    }
+    
     private ArrayList<String> messageQueue = new ArrayList<>();
 
     public void checkNetwork() {
@@ -2076,6 +2221,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     dataPacket.data = resourcePack.getPackChunk(1048576 * requestPacket.chunkIndex, 1048576);
                     dataPacket.progress = 1048576 * requestPacket.chunkIndex;
                     this.dataPacket(dataPacket);
+                    break;
+                case ProtocolInfo.PLAYER_INPUT_PACKET:
+                    if(!this.isAlive() || !this.spawned){
+                        break;
+                    }
+                    PlayerInputPacket ipk = (PlayerInputPacket) packet;
+                    if(riding instanceof EntityMinecartAbstract){
+                        ((EntityMinecartEmpty) riding).setCurrentSpeed(ipk.motionY);
+                    }
                     break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:
                     if (this.teleportPosition != null) {
@@ -2620,7 +2774,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.stopSleep();
                             break;
 
+                        case PlayerActionPacket.ACTION_ABORT_DIMENSION_CHANGE:
+                            break;
+
                         case PlayerActionPacket.ACTION_RESPAWN:
+                        case PlayerActionPacket.ACTION_DIMENSION_CHANGE:
                             if (!this.spawned || this.isAlive() || !this.isOnline()) {
                                 break;
                             }
@@ -2805,7 +2963,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.getName()));
                         break;
                     }
-
+                    
                     item = this.inventory.getItemInHand();
 
                     switch (interactPacket.action) {
@@ -2881,27 +3039,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                             break;
                         case InteractPacket.ACTION_VEHICLE_EXIT:
-                            if (!(targetEntity instanceof EntityVehicle)) {
+                            if (!(targetEntity instanceof EntityVehicle) || this.riding == null) {
                                 break;
                             }
 
-                            SetEntityLinkPacket pk;
-
-                            pk = new SetEntityLinkPacket();
-                            pk.rider = targetEntity.getId();
-                            pk.riding = this.id;
-                            pk.type = 3;
-                            Server.broadcastPacket(this.hasSpawned.values(), pk);
-
-                            pk = new SetEntityLinkPacket();
-                            pk.rider = targetEntity.getId();
-                            pk.riding = this.getId();
-                            pk.type = 3;
-                            dataPacket(pk);
-
-                            riding = null;
-                            ((EntityVehicle) targetEntity).linkedEntity = null;
-                            this.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
+                            ((EntityVehicle) riding).mountEntity(this);
                             break;
                     }
                     break;
@@ -4518,40 +4660,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             //Update time
             this.getLevel().sendTime(this);
 
-            if (from.getLevel().getId() != to.level.getId()) {
-                if (this.spawned) {
-                    //TODO: remove this in future version
-                    this.isLevelChange = true;
-                    this.nextChunkOrderRun = 10000;
-
-                    ChangeDimensionPacket changeDimensionPacket1 = new ChangeDimensionPacket();
-                    changeDimensionPacket1.dimension = 1;
-                    changeDimensionPacket1.x = (float) this.getX();
-                    changeDimensionPacket1.y = (float) this.getY();
-                    changeDimensionPacket1.z = (float) this.getZ();
-                    this.dataPacket(changeDimensionPacket1);
-
-                    this.forceSendEmptyChunks();
-                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
-                        PlayStatusPacket statusPacket0 = new PlayStatusPacket();
-                        statusPacket0.status = PlayStatusPacket.PLAYER_SPAWN;
-                        dataPacket(statusPacket0);
-                    }, 8);
-
-                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
-                        ChangeDimensionPacket changeDimensionPacket = new ChangeDimensionPacket();
-                        changeDimensionPacket.dimension = 0;
-                        changeDimensionPacket.x = (float) this.getX();
-                        changeDimensionPacket.y = (float) this.getY();
-                        changeDimensionPacket.z = (float) this.getZ();
-                        dataPacket(changeDimensionPacket);
-                        nextChunkOrderRun = 0;
-                    }, 9);
-                }
-            }
             return true;
         }
-
         return false;
     }
 
@@ -4874,13 +4984,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void transfer(InetSocketAddress address) {
-        String hostName = address.getHostName();
+        String hostName = address.getAddress().getHostAddress();
         int port = address.getPort();
         TransferPacket pk = new TransferPacket();
         pk.address = hostName;
         pk.port = port;
         this.dataPacket(pk);
-        String message = "Transferred to " + address + ":" + port;
+        String message = "Transferred to " + hostName + ":" + port;
         this.close(message, message, false);
     }
 

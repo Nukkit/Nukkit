@@ -6,9 +6,13 @@ import cn.nukkit.block.BlockGrass;
 
 /**
  * author: MagicDroidX
+ * Modificated by NycuRO on 05.08.2017
  * Nukkit Project
+ *
  */
+
 public abstract class GrassyBiome extends NormalBiome implements CaveBiome {
+
     public GrassyBiome() {
         this.setGroundCover(new Block[]{
                 new BlockGrass(),

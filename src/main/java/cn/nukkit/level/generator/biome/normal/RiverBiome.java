@@ -1,5 +1,8 @@
-package cn.nukkit.level.generator.biome;
+package cn.nukkit.level.generator.biome.normal;
 
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockDirt;
+import cn.nukkit.level.generator.biome.WateryBiome;
 import cn.nukkit.level.generator.populator.PopulatorGrass;
 import cn.nukkit.level.generator.populator.PopulatorSugarcane;
 import cn.nukkit.level.generator.populator.PopulatorTallGrass;
@@ -32,8 +35,8 @@ public class RiverBiome extends WateryBiome {
 
         this.setElevation(58, 62);
 
-        this.temperature = 0.5;
-        this.rainfall = 0.7;
+        this.temperature = 0.5f;
+        this.rainfall = 0.5f;
     }
 
     @Override
