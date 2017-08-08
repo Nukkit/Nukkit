@@ -104,9 +104,13 @@ public class EntityBoat extends EntityVehicle {
             // Event stop
             performHurtAnimation((int) event.getDamage());
 
-            Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
-            boolean instantKill = damager instanceof Player
-                    ? ((Player) damager).isCreative() : false;
+            boolean instantKill = false;
+
+            if (source instanceof EntityDamageByEntityEvent) {
+                Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
+                instantKill = damager instanceof Player && ((Player) damager).isCreative();
+            }
+
             if (instantKill || getDamage() > 40) {
                 // Event start
                 VehicleDestroyEvent event2 = new VehicleDestroyEvent(this, source.getEntity());
