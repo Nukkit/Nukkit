@@ -33,13 +33,9 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.food.Food;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.lang.TranslationContainer;
-import cn.nukkit.level.ChunkLoader;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.Location;
-import cn.nukkit.level.Position;
+import cn.nukkit.level.*;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
-import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.level.particle.PunchBlockParticle;
 import cn.nukkit.level.sound.ExperienceOrbSound;
@@ -1663,13 +1659,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if ((this.isCreative() || this.isSurvival() && this.server.getTick() - this.inPortalTicks >= 80) && this.inPortalTicks > 0) {
                 Level netherLevel = this.server.getLevelByName("nether");
                 if (netherLevel != null) {
-                    if (this.getLevel() == this.server.getDefaultLevel() && this.getLevel().getDimension() == Level.DIMENSION_OVERWORLD) {
+                    if (this.getLevel() == this.server.getDefaultLevel() && this.getLevel().getDimension() == Dimension.OVERWORLD) {
                         this.fromPos = this.getPosition();
                         this.fromPos.x = ((int) this.fromPos.x);
                         this.fromPos.z = ((int) this.fromPos.z);
                         this.teleport(netherLevel.getSafeSpawn());
                         ChangeDimensionPacket pk = new ChangeDimensionPacket();
-                        pk.dimension = level.getDimension();
+                        pk.dimension = level.getDimension().getId();
                         pk.x = (float) this.getX();
                         pk.y = (float) this.getY();
                         pk.z = (float) this.getZ();
@@ -1678,13 +1674,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         pk1.status = PlayStatusPacket.PLAYER_SPAWN;
                         this.dataPacket(pk1);
                     } else {
-                        if (this.getLevel() == this.server.getLevelByName("nether") && this.getLevel().getDimension() == Level.DIMENSION_NETHER) {
+                        if (this.getLevel() == this.server.getLevelByName("nether") && this.getLevel().getDimension() == Dimension.NETHER) {
                             this.fromPos = this.getPosition();
                             this.fromPos.x = ((int) this.fromPos.x);
                             this.fromPos.z = ((int) this.fromPos.z);
                             this.teleport(this.server.getDefaultLevel().getSafeSpawn());
                             ChangeDimensionPacket pk = new ChangeDimensionPacket();
-                            pk.dimension = level.getDimension();
+                            pk.dimension = level.getDimension().getId();
                             pk.x = (float) this.getX();
                             pk.y = (float) this.getY();
                             pk.z = (float) this.getZ();
@@ -1996,7 +1992,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.yaw = (float) this.yaw;
         startGamePacket.pitch = (float) this.pitch;
         startGamePacket.seed = -1;
-        startGamePacket.dimension = (byte) (this.level.getDimension() & 0xff);
+        startGamePacket.dimension = (byte) (this.level.getDimension().getId() & 0xff);
         startGamePacket.gamemode = getClientFriendlyGamemode(this.gamemode);
         startGamePacket.difficulty = this.server.getDifficulty();
         startGamePacket.spawnX = (int) spawnPosition.x;
@@ -4953,9 +4949,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     //todo a lot on dimension
 
-    public void setDimension(int dimension) {
+    public void setDimension(Dimension dimension) {
         ChangeDimensionPacket pk = new ChangeDimensionPacket();
-        pk.dimension = getLevel().getDimension();
+        pk.dimension = getLevel().getDimension().getId();
         this.dataPacket(pk);
     }
 

@@ -240,7 +240,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private long levelCurrentTick = 0;
 
-    private int dimension;
+    private Dimension dimension;
 
     public GameRules gameRules;
 
@@ -2786,8 +2786,8 @@ public class Level implements ChunkManager, Metadatable {
         return this.provider.getName();
     }
 
-    public int getDimension() {
-        return dimension;
+    public Dimension getDimension() {
+        return this.dimension;
     }
 
     public String getFolderName() {
