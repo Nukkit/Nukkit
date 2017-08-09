@@ -376,12 +376,12 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         motionZ = motZ - motiveZ;
                         mine.motionX *= 0.20000000298023224D;
                         mine.motionZ *= 0.20000000298023224D;
-                        mine.motionX = motX + motiveX;
-                        mine.motionZ = motZ + motiveZ;
+                        mine.motionX += motX + motiveX;
+                        mine.motionZ += motZ + motiveZ;
                     }
                 } else {
-                    motionX = -motiveX;
-                    motionZ = -motiveZ;
+                    motionX += -motiveX;
+                    motionZ += -motiveZ;
                     setMotion(new Vector3(-motiveX, 0, -motiveZ));
                 }
             }
