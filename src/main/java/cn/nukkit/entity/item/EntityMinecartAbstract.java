@@ -382,8 +382,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 } else {
                     motionX += -motiveX;
                     motionZ += -motiveZ;
-                    setMotion(new Vector3(-motiveX, 0, -motiveZ));
-                }
+                }                
             }
         }
     }
