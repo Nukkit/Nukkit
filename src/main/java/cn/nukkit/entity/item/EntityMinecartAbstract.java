@@ -372,8 +372,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         motZ /= 2;
                         motionX *= 0.20000000298023224D;
                         motionZ *= 0.20000000298023224D;
-                        motionX = motX - motiveX;
-                        motionZ = motZ - motiveZ;
+                        motionX += motX - motiveX;
+                        motionZ += motZ - motiveZ;
                         mine.motionX *= 0.20000000298023224D;
                         mine.motionZ *= 0.20000000298023224D;
                         mine.motionX += motX + motiveX;
