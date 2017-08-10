@@ -281,39 +281,37 @@ public abstract class BlockLiquid extends BlockTransparent {
                 this.getLevel().setBlock(bottomBlock, Block.get(this.getId(), decay | 0x08), true, false);
                 this.getLevel().scheduleUpdate(bottomBlock, this.tickRate());
 
-                if (decay >= 0 && ((decay == 0 && this.getDamage() == 0) || (!bottomBlock.canBeFlowedInto() && !(bottomBlock instanceof BlockLiquid)))) {
-                    boolean[] flags = this.getOptimalFlowDirections();
+            } else if (decay >= 0 && ((decay == 0 && this.getDamage() == 0) || (!bottomBlock.canBeFlowedInto() && !(bottomBlock instanceof BlockLiquid)))) {
+                boolean[] flags = this.getOptimalFlowDirections();
 
-                    int l = decay + multiplier;
+                int l = decay + multiplier;
 
-                    if (decay >= 8) {
+                if (decay >= 8) {
                         l = 1;
                     }
 
-                    if (l >= 8) {
-                        this.checkForHarden();
-                        return 0;
-                    }
-
-                    if (flags[0]) {
-                        this.flowIntoBlock(this.level.getBlock(this.temporalVector.setComponents(this.x - 1, this.y, this.z)), l);
-                    }
-
-                    if (flags[1]) {
-                        this.flowIntoBlock(this.level.getBlock(this.temporalVector.setComponents(this.x + 1, this.y, this.z)), l);
-                    }
-
-                    if (flags[2]) {
-                        this.flowIntoBlock(this.level.getBlock(this.temporalVector.setComponents(this.x, this.y, this.z - 1)), l);
-                    }
-
-                    if (flags[3]) {
-                        this.flowIntoBlock(this.level.getBlock(this.temporalVector.setComponents(this.x, this.y, this.z + 1)), l);
-                    }
+                if (l >= 8) {
+                    this.checkForHarden();
+                    return 0;
                 }
 
-                this.checkForHarden();
+                if (flags[0]) {
+                    this.flowIntoBlock(this.level.getBlock(this.temporalVector.setComponents(this.x - 1, this.y, this.z)), l);
+                }
+
+                if (flags[1]) {
+                    this.flowIntoBlock(this.level.getBlock(this.temporalVector.setComponents(this.x + 1, this.y, this.z)), l);
+                }
+
+                if (flags[2]) {
+                    this.flowIntoBlock(this.level.getBlock(this.temporalVector.setComponents(this.x, this.y, this.z - 1)), l);
+                }
+
+                if (flags[3]) {
+                    this.flowIntoBlock(this.level.getBlock(this.temporalVector.setComponents(this.x, this.y, this.z + 1)), l);
+                }
             }
+            this.checkForHarden();
         }
         return 0;
     }
