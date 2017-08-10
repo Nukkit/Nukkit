@@ -16,6 +16,7 @@ import cn.nukkit.level.particle.HugeExplodeSeedParticle;
 import cn.nukkit.level.sound.ExplodeSound;
 import cn.nukkit.math.*;
 import cn.nukkit.network.protocol.ExplodePacket;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class Explosion {
     private final double size;
 
     private List<Block> affectedBlocks = new ArrayList<>();
-    private final double stepLen = 0.3d;
+    private final double stepLen = 0.3;
 
     private final Object what;
 
@@ -72,14 +73,14 @@ public class Explosion {
             for (int j = 0; j < this.rays; ++j) {
                 for (int k = 0; k < this.rays; ++k) {
                     if (i == 0 || i == mRays || j == 0 || j == mRays || k == 0 || k == mRays) {
-                        vector.setComponents((double) i / (double) mRays * 2d - 1, (double) j / (double) mRays * 2d - 1, (double) k / (double) mRays * 2d - 1);
+                        vector.setComponents(i / mRays * 2d - 1, j / mRays * 2d - 1, k / mRays * 2d - 1);
                         double len = vector.length();
                         vector.setComponents((vector.x / len) * this.stepLen, (vector.y / len) * this.stepLen, (vector.z / len) * this.stepLen);
                         double pointerX = this.source.x;
                         double pointerY = this.source.y;
                         double pointerZ = this.source.z;
 
-                        for (double blastForce = this.size * (ThreadLocalRandom.current().nextInt(700, 1301)) / 1000d; blastForce > 0; blastForce -= this.stepLen * 0.75d) {
+                        for (double blastForce = this.size * (ThreadLocalRandom.current().nextInt(700, 1300)) / 1000; blastForce > 0; blastForce -= this.stepLen * 0.75) {
                             int x = (int) pointerX;
                             int y = (int) pointerY;
                             int z = (int) pointerZ;
@@ -130,7 +131,7 @@ public class Explosion {
             }
         }
 
-        double explosionSize = this.size * 2d;
+        double explosionSize = this.size * 2;
         double minX = NukkitMath.floorDouble(this.source.x - explosionSize - 1);
         double maxX = NukkitMath.ceilDouble(this.source.x + explosionSize + 1);
         double minY = NukkitMath.floorDouble(this.source.y - explosionSize - 1);
@@ -200,8 +201,8 @@ public class Explosion {
         pk.z = (float) this.source.z;
         pk.radius = (float) this.size;
         pk.records = send.stream().toArray(Vector3[]::new);
-
         this.level.addChunkPacket((int) source.x >> 4, (int) source.z >> 4, pk);
+
         this.level.addParticle(new HugeExplodeSeedParticle(this.source));
         this.level.addSound(new ExplodeSound(new Vector3(this.source.x, this.source.y, this.source.z)));
 

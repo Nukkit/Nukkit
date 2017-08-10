@@ -1532,7 +1532,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void updateBlockSkyLight(int x, int y, int z) {
-        //TODO: sky light
+        // TODO: SkyLight
     }
 
     public void updateBlockLight(int x, int y, int z) {

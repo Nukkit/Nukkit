@@ -245,7 +245,7 @@ public abstract class BlockLiquid extends BlockTransparent {
 
 
                 if (this.adjacentSources >= 2 && this instanceof BlockWater) {
-                    Block bottomBlock = this.level.getBlock(this.temporalVector.setComponents(this.x, this.y - 1, this.z));
+                    Block bottomBlock = this.level.getBlock(this.level.getBlock(this.temporalVector.setComponents(this.x, this.y - 1, this.z)));
                     if (bottomBlock.isSolid()) {
                         k = 0;
                     } else if (bottomBlock instanceof BlockWater && bottomBlock.getDamage() == 0) {
@@ -261,10 +261,9 @@ public abstract class BlockLiquid extends BlockTransparent {
                 if (k != decay) {
                     decay = k;
                     if (decay < 0) {
-                        this.getLevel().setBlock(this, new BlockAir(), true, true);
+                        this.getLevel().setBlock(this, new BlockAir(), true);
                     } else {
-                        this.getLevel().setBlock(this, Block.get(this.getId(), decay), true, true);
-                        this.getLevel().scheduleUpdate(this, this.tickRate());
+                        this.getLevel().setBlock(this, this.getBlock(decay), true);
                     }
                 } else if (flag) {
                     //this.getLevel().scheduleUpdate(this, this.tickRate());
@@ -276,20 +275,36 @@ public abstract class BlockLiquid extends BlockTransparent {
 
             Block bottomBlock = this.level.getBlock(this.temporalVector.setComponents(this.x, this.y - 1, this.z));
 
-            if (this instanceof BlockLava && bottomBlock instanceof BlockWater) {
-                this.getLevel().setBlock(bottomBlock, Block.get(Block.STONE), true, true);
-            } else if (bottomBlock.canBeFlowedInto() || (bottomBlock instanceof BlockLiquid && (bottomBlock.getDamage() & 0x07) != 0)) {
-                this.getLevel().setBlock(bottomBlock, Block.get(this.getId(), decay | 0x08), true, false);
-                this.getLevel().scheduleUpdate(bottomBlock, this.tickRate());
+            if (bottomBlock.canBeFlowedInto() || bottomBlock instanceof BlockLiquid) {
+                if (this instanceof BlockLava && bottomBlock instanceof BlockWater) {
+                    Block to = new BlockStone();
+                    to.setComponents(bottomBlock.getX(), bottomBlock.getY(), bottomBlock.getZ());
+                    to.setLevel(bottomBlock.getLevel());
+                    BlockFromToEvent ev = new BlockFromToEvent(bottomBlock, to);
+                    this.getLevel().getServer().getPluginManager().callEvent(ev);
 
-            } else if (decay >= 0 && ((decay == 0 && this.getDamage() == 0) || (!bottomBlock.canBeFlowedInto() && !(bottomBlock instanceof BlockLiquid)))) {
+                    if (!ev.isCancelled()) {
+                        this.getLevel().setBlock(bottomBlock, ev.getTo(), true);
+                        this.triggerLavaMixEffects(bottomBlock);
+                        return 0;
+                    }
+                }
+
+                if (decay >= 8) {
+                    this.flowIntoBlock(bottomBlock, decay);
+                } else {
+                    this.flowIntoBlock(bottomBlock, decay | 0x08);
+                }
+            }
+
+            if (decay >= 0 && ((decay == 0 && this.getDamage() == 0) || (!bottomBlock.canBeFlowedInto() && !(bottomBlock instanceof BlockLiquid)))) {
                 boolean[] flags = this.getOptimalFlowDirections();
 
                 int l = decay + multiplier;
 
                 if (decay >= 8) {
-                        l = 1;
-                    }
+                    l = 1;
+                }
 
                 if (l >= 8) {
                     this.checkForHarden();
@@ -312,8 +327,11 @@ public abstract class BlockLiquid extends BlockTransparent {
                     this.flowIntoBlock(this.level.getBlock(this.temporalVector.setComponents(this.x, this.y, this.z + 1)), l);
                 }
             }
+
             this.checkForHarden();
+
         }
+
         return 0;
     }
 
@@ -326,8 +344,7 @@ public abstract class BlockLiquid extends BlockTransparent {
                 this.getLevel().useBreakOn(block);
             }
 
-            this.getLevel().setBlock(block, Block.get(this.getId(), newFlowDecay), true, false);
-            this.getLevel().scheduleUpdate(block, this.tickRate());
+            this.getLevel().setBlock(block, this.getBlock(newFlowDecay), true);
         }
     }
 
