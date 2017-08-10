@@ -1621,7 +1621,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.lastUpdate = currentTick;
 
         if (!this.isAlive() && this.spawned) {
-            ++this.deadTicks;
+            this.deadTicks += tickDiff;
             if (this.deadTicks >= 10) {
                 this.despawnFromAll();
             }
@@ -1688,7 +1688,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     if (this.isGliding()) this.resetFallDistance();
 
-                    ++this.inAirTicks;
+                    this.inAirTicks += tickDiff;
 
                 }
 
@@ -4937,9 +4937,48 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.fromPos = this.getPosition();
         this.fromPos.x = ((int) this.fromPos.x);
         this.fromPos.z = ((int) this.fromPos.z);
-        Vector3 pos = new Teleporter(this.level).findPortalPosition(this.floor(), dimension);
+        if (dimension == Dimension.OVERWORLD) {
+            double x = this.getFloorX();
+            double y = this.getFloorY();
+            double z = this.getFloorZ();
+            Vector3 realPosition = new Vector3(x, y, z);
+            Dimension realDimension = Dimension.OVERWORLD;
+            Vector3 pos = new Teleporter(this.level).findPortalPosition(realPosition, realDimension);
+            this.teleport(pos);
+            ChangeDimensionPacket pk = new ChangeDimensionPacket();
+            pk.dimension = level.getDimension().getId();
+            pk.x = (float) this.getX();
+            pk.y = (float) this.getY();
+            pk.z = (float) this.getZ();
+            this.dataPacket(pk);
+            PlayStatusPacket pk1 = new PlayStatusPacket();
+            pk1.status = PlayStatusPacket.PLAYER_SPAWN;
+            this.dataPacket(pk1);
+        } else if (dimension == Dimension.NETHER) {
+            double x = this.getFloorX();
+            double y = this.getFloorY();
+            double z = this.getFloorZ();
+            Vector3 realPosition = new Vector3(x, y, z);
+            Dimension realDimension = Dimension.NETHER;
+            Vector3 pos = new Teleporter(this.level).findPortalPosition(realPosition, realDimension);
+            this.teleport(pos);
+            ChangeDimensionPacket pk = new ChangeDimensionPacket();
+            pk.dimension = level.getDimension().getId();
+            pk.x = (float) this.getX();
+            pk.y = (float) this.getY();
+            pk.z = (float) this.getZ();
+            this.dataPacket(pk);
+            PlayStatusPacket pk1 = new PlayStatusPacket();
+            pk1.status = PlayStatusPacket.PLAYER_SPAWN;
+            this.dataPacket(pk1);
+        } else {
+            /*if (dimension == Dimension.END) {
+                Dimension realDimension = Dimension.END;
+                Vector3 pos = new Teleporter(this.level).findPortalPosition(this.floor(), dimension);
+            }*/
+        }
 
-        if (pos == null) {
+        /*if (pos == null) {
             pos = this; //idk
         }
 
@@ -4952,7 +4991,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.dataPacket(pk);
         PlayStatusPacket pk1 = new PlayStatusPacket();
         pk1.status = PlayStatusPacket.PLAYER_SPAWN;
-        this.dataPacket(pk1);
+        this.dataPacket(pk1);*/
     }
 
     public void setCheckMovement(boolean checkMovement) {

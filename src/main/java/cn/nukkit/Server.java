@@ -449,28 +449,6 @@ public class Server {
                 this.generateLevel(defaultName, seed == 0 ? System.currentTimeMillis() : seed);
             }
 
-            String netherName = "nether";
-            if (this.getLevelByName("nether") == null) {
-                long seed;
-                String seedString = String.valueOf(this.getProperty("level-seed", System.currentTimeMillis()));
-                try {
-                    seed = Long.valueOf(seedString);
-                } catch (NumberFormatException e) {
-                    seed = seedString.hashCode();
-                }
-                this.generateLevel("nether", seed == 0 ? System.currentTimeMillis() : seed, Generator.getGenerator(Generator.TYPE_NETHER));
-            }
-            if (!this.loadLevel(netherName)) {
-                long seed;
-                String seedString = String.valueOf(this.getProperty("level-seed", System.currentTimeMillis()));
-                try {
-                    seed = Long.valueOf(seedString);
-                } catch (NumberFormatException e) {
-                    seed = seedString.hashCode();
-                }
-                this.generateLevel("nether", seed == 0 ? System.currentTimeMillis() : seed, Generator.getGenerator(Generator.TYPE_NETHER));
-            }
-
             this.setDefaultLevel(this.getLevelByName(defaultName));
         }
 

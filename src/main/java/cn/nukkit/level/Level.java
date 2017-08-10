@@ -411,14 +411,14 @@ public class Level implements ChunkManager, Metadatable {
     public void registerGenerator() {
         int size = this.server.getScheduler().getAsyncTaskPoolSize();
         for (int i = 0; i < size; ++i) {
-            this.server.getScheduler().scheduleAsyncTask(new GeneratorRegisterTask(this, this.generatorInstance));
+            this.server.getScheduler().scheduleAsyncTaskToWorker(new GeneratorRegisterTask(this, this.generatorInstance), i);
         }
     }
 
     public void unregisterGenerator() {
         int size = this.server.getScheduler().getAsyncTaskPoolSize();
         for (int i = 0; i < size; ++i) {
-            this.server.getScheduler().scheduleAsyncTask(new GeneratorUnregisterTask(this));
+            this.server.getScheduler().scheduleAsyncTaskToWorker(new GeneratorUnregisterTask(this), i);
         }
     }
 

@@ -1169,8 +1169,14 @@ public abstract class Entity extends Location implements Metadatable {
             return false;
         }
 
+        int tickDiff = currentTick - this.lastUpdate;
+        if (tickDiff <= 0) {
+            this.server.getLogger().debug("Expected tick difference of at least 1 ($tickDiff) in entity/Entity");
+            return false;
+        }
+
         if (!this.isAlive()) {
-            ++this.deadTicks;
+            this.deadTicks += tickDiff;
             if (this.deadTicks >= 10) {
                 this.despawnFromAll();
                 if (!this.isPlayer) {
@@ -1178,12 +1184,6 @@ public abstract class Entity extends Location implements Metadatable {
                 }
             }
             return this.deadTicks < 10;
-        }
-
-        int tickDiff = currentTick - this.lastUpdate;
-
-        if (tickDiff <= 0) {
-            return false;
         }
 
         this.lastUpdate = currentTick;
