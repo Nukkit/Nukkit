@@ -245,7 +245,7 @@ public abstract class BlockLiquid extends BlockTransparent {
 
 
                 if (this.adjacentSources >= 2 && this instanceof BlockWater) {
-                    Block bottomBlock = this.level.getBlock(this.level.getBlock(this.temporalVector.setComponents(this.x, this.y - 1, this.z)));
+                    Block bottomBlock = this.level.getBlock(this.temporalVector.setComponents(this.x, this.y - 1, this.z));
                     if (bottomBlock.isSolid()) {
                         k = 0;
                     } else if (bottomBlock instanceof BlockWater && bottomBlock.getDamage() == 0) {
@@ -263,7 +263,8 @@ public abstract class BlockLiquid extends BlockTransparent {
                     if (decay < 0) {
                         this.getLevel().setBlock(this, new BlockAir(), true, true);
                     } else {
-                        this.getLevel().setBlock(this, this.getBlock(decay), true, true);
+                        this.getLevel().setBlock(this, Block.get(this.getId(), decay), true, true);
+                        this.getLevel().scheduleUpdate(this, this.tickRate());
                     }
                 } else if (flag) {
                     //this.getLevel().scheduleUpdate(this, this.tickRate());
