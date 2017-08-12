@@ -1369,8 +1369,8 @@ public abstract class Entity extends Location implements Metadatable {
                 dx *= 1.0F + entityCollisionReduction;
                 dz *= 1.0F + entityCollisionReduction;
                 if (this.riding == null) {
-                    motionX += -dx;
-                    motionZ += -dy;
+                    motionX -= dx;
+                    motionZ -= dy;
                 }
             }
         }

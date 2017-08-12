@@ -380,8 +380,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         mine.motionZ += motZ + motiveZ;
                     }
                 } else {
-                    motionX += -motiveX;
-                    motionZ += -motiveZ;
+                    motionX -= motiveX;
+                    motionZ -= motiveZ;
                 }                
             }
         }
