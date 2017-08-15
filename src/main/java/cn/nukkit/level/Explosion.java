@@ -90,8 +90,8 @@ public class Explosion {
                                 break;
                             }
                             Block block = this.level.getBlock(vBlock);
-
-                            if (block.getId() != 0) {
+                            int id = block.getId();
+                            if (id != 0 && id != Block.OBSIDIAN && id != Block.BEDROCK) {
                                 blastForce -= (block.getResistance() / 5 + 0.3d) * this.stepLen;
                                 if (blastForce > 0) {
                                     if (!this.affectedBlocks.contains(block)) {
