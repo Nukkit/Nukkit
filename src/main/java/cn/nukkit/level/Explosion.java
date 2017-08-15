@@ -16,7 +16,6 @@ import cn.nukkit.level.particle.HugeExplodeSeedParticle;
 import cn.nukkit.level.sound.ExplodeSound;
 import cn.nukkit.math.*;
 import cn.nukkit.network.protocol.ExplodePacket;
-import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ public class Explosion {
     private final double size;
 
     private List<Block> affectedBlocks = new ArrayList<>();
-    private final double stepLen = 0.3;
+    private final double stepLen = 0.3D;
 
     private final Object what;
 
@@ -73,14 +72,14 @@ public class Explosion {
             for (int j = 0; j < this.rays; ++j) {
                 for (int k = 0; k < this.rays; ++k) {
                     if (i == 0 || i == mRays || j == 0 || j == mRays || k == 0 || k == mRays) {
-                        vector.setComponents(i / mRays * 2d - 1, j / mRays * 2d - 1, k / mRays * 2d - 1);
+                        vector.setComponents((double) i / (double) mRays * 2d - 1, (double) j / (double) mRays * 2d - 1, (double) k / (double) mRays * 2d - 1);
                         double len = vector.length();
                         vector.setComponents((vector.x / len) * this.stepLen, (vector.y / len) * this.stepLen, (vector.z / len) * this.stepLen);
                         double pointerX = this.source.x;
                         double pointerY = this.source.y;
                         double pointerZ = this.source.z;
 
-                        for (double blastForce = this.size * (ThreadLocalRandom.current().nextInt(700, 1300)) / 1000; blastForce > 0; blastForce -= this.stepLen * 0.75) {
+                        for (double blastForce = this.size * (ThreadLocalRandom.current().nextInt(700, 1300)) / 1000; blastForce > 0; blastForce -= this.stepLen * 0.75D) {
                             int x = (int) pointerX;
                             int y = (int) pointerY;
                             int z = (int) pointerZ;
@@ -118,7 +117,7 @@ public class Explosion {
         List<Vector3> send = new ArrayList<>();
 
         Vector3 source = (new Vector3(this.source.x, this.source.y, this.source.z)).floor();
-        double yield = (1d / this.size) * 100d;
+        double yield = (1D / this.size) * 100D;
 
         if (this.what instanceof Entity) {
             EntityExplodeEvent ev = new EntityExplodeEvent((Entity) this.what, this.source, this.affectedBlocks, yield);
@@ -131,7 +130,7 @@ public class Explosion {
             }
         }
 
-        double explosionSize = this.size * 2;
+        double explosionSize = this.size * 2D;
         double minX = NukkitMath.floorDouble(this.source.x - explosionSize - 1);
         double maxX = NukkitMath.ceilDouble(this.source.x + explosionSize + 1);
         double minY = NukkitMath.floorDouble(this.source.y - explosionSize - 1);

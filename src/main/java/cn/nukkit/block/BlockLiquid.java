@@ -261,7 +261,7 @@ public abstract class BlockLiquid extends BlockTransparent {
                 if (k != decay) {
                     decay = k;
                     if (decay < 0) {
-                        this.getLevel().setBlock(this, new BlockAir(), true);
+                        this.getLevel().setBlock(this, new BlockAir(), true, true);
                     } else {
                         this.getLevel().setBlock(this, this.getBlock(decay), true);
                     }
