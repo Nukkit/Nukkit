@@ -55,6 +55,8 @@ public abstract class BaseFullChunk implements FullChunk {
 
     protected boolean hasChanged = false;
 
+    protected ChunkCoordinate vector2 = new ChunkCoordinate();
+
     protected boolean isInit = false;
 
     @Override
@@ -482,5 +484,4 @@ public abstract class BaseFullChunk implements FullChunk {
     public void setLightPopulated(boolean value) {
 
     }
-
 }
