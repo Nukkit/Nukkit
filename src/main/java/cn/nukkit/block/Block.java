@@ -822,16 +822,22 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
     private static double toolBreakTimeBonus0(
             int toolType, int toolTier, boolean isWoolBlock, boolean isCobweb) {
-        if(toolType == ItemTool.TYPE_SWORD) return isCobweb ? 15.0: 1.0;
-        if(toolType == ItemTool.TYPE_SHEARS) return isWoolBlock ? 5.0: 15.0;
-        if(toolType == ItemTool.TYPE_NONE) return 1.0;
+        if (toolType == ItemTool.TYPE_SWORD) return isCobweb ? 15.0 : 1.0;
+        if (toolType == ItemTool.TYPE_SHEARS) return isWoolBlock ? 5.0 : 15.0;
+        if (toolType == ItemTool.TYPE_NONE) return 1.0;
         switch (toolTier) {
-            case ItemTool.TIER_WOODEN: return 2.0;
-            case ItemTool.TIER_STONE: return 4.0;
-            case ItemTool.TIER_IRON: return 6.0;
-            case ItemTool.TIER_DIAMOND: return 8.0;
-            case ItemTool.TIER_GOLD: return 12.0;
-            default: return 1.0;
+            case ItemTool.TIER_WOODEN:
+                return 2.0;
+            case ItemTool.TIER_STONE:
+                return 4.0;
+            case ItemTool.TIER_IRON:
+                return 6.0;
+            case ItemTool.TIER_DIAMOND:
+                return 8.0;
+            case ItemTool.TIER_GOLD:
+                return 12.0;
+            default:
+                return 1.0;
         }
     }
 
