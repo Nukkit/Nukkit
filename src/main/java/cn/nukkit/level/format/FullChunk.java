@@ -2,6 +2,7 @@ package cn.nukkit.level.format;
 
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.level.ChunkManager;
 
 import java.io.IOException;
 import java.util.Map;
@@ -62,7 +63,7 @@ public interface FullChunk extends Cloneable {
 
     void recalculateHeightMap();
 
-    void populateSkyLight();
+    void populateSkyLight(ChunkManager level);
 
     int getBiomeId(int x, int z);
 

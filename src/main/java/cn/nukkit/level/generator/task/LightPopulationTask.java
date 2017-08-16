@@ -27,7 +27,7 @@ public class LightPopulationTask extends AsyncTask {
         }
 
         chunk.recalculateHeightMap();
-        chunk.populateSkyLight();
+        chunk.populateSkyLight(GeneratorPool.get(this.levelId).getChunkManager());
         chunk.setLightPopulated();
 
         this.chunk = chunk.clone();

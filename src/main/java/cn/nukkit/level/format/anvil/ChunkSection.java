@@ -240,8 +240,18 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     }
 
     @Override
+    public void setSkyLightArray(byte[] data) {
+        this.skyLight = data;
+    }
+
+    @Override
     public byte[] getLightArray() {
         return this.blockLight;
+    }
+
+    @Override
+    public void setLightArray(byte[] data) {
+        this.blockLight = data;
     }
 
     @Override

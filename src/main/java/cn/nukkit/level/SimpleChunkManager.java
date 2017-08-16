@@ -55,6 +55,41 @@ public class SimpleChunkManager implements ChunkManager {
     }
 
     @Override
+    public void setBlockLightAt(int x, int y, int z, int level) {
+        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            chunk.setBlockLight(x & 0xf, y & 0xff, z & 0xf, level);
+        }
+    }
+
+    @Override
+    public int getBlockLightAt(int x, int y, int z) {
+        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            return chunk.getBlockLight(x & 0xf, y & 0xff, z & 0xf);
+        }
+
+        return 0;
+    }
+
+    @Override
+    public void setBlockSkyLightAt(int x, int y, int z, int level) {
+        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            chunk.setBlockSkyLight(x & 0xf, y & 0xff, z & 0xf, level);
+        }
+    }
+
+    @Override
+    public int getBlockSkyLightAt(int x, int y, int z) {
+        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            return chunk.getBlockSkyLight(x & 0xf, y & 0xff, z & 0xf);
+        }
+        return 0;
+    }
+
+    @Override
     public BaseFullChunk getChunk(int chunkX, int chunkZ) {
         long index = Level.chunkHash(chunkX, chunkZ);
         return this.chunks.containsKey(index) ? (BaseFullChunk) this.chunks.get(index) : null;
@@ -72,6 +107,24 @@ public class SimpleChunkManager implements ChunkManager {
             return;
         }
         this.chunks.put(Level.chunkHash(chunkX, chunkZ), chunk);
+    }
+
+    public int getHeightMap(int x, int z) {
+        BaseFullChunk chunk;
+
+        if ((chunk = this.getChunk(x >> 4, z >> 4)) != null) {
+            return chunk.getHeightMap(x & 0x0f, z & 0x0f);
+        }
+
+        return 0;
+    }
+
+    public void setHeightMap(int x, int z, int value) {
+        BaseFullChunk chunk;
+
+        if ((chunk = this.getChunk(x >> 4, z >> 4)) != null) {
+            chunk.setHeightMap(x & 0x0f, z & 0x0f, value);
+        }
     }
 
     public void cleanChunks() {

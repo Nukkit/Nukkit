@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
@@ -222,15 +223,6 @@ public abstract class BaseFullChunk implements FullChunk {
     }
 
     @Override
-    public void recalculateHeightMap() {
-        for (int z = 0; z < 16; ++z) {
-            for (int x = 0; x < 16; ++x) {
-                this.setHeightMap(x, z, this.getHighestBlockAt(x, z, false));
-            }
-        }
-    }
-
-    @Override
     public int getBlockExtraData(int x, int y, int z) {
         int index = Level.chunkBlockHash(x, y, z);
         if (this.extraData.containsKey(index)) {
@@ -252,7 +244,7 @@ public abstract class BaseFullChunk implements FullChunk {
     }
 
     @Override
-    public void populateSkyLight() {
+    public void populateSkyLight(ChunkManager level) {
         for (int z = 0; z < 16; ++z) {
             for (int x = 0; x < 16; ++x) {
                 int top = this.getHeightMap(x, z);
@@ -483,4 +475,33 @@ public abstract class BaseFullChunk implements FullChunk {
 
     }
 
+    /**
+     * Recalculates the heightmap for the whole chunk.
+     */
+    public void recalculateHeightMap() {
+        for (int z = 0; z < 16; ++z) {
+            for (int x = 0; x < 16; ++x) {
+                this.recalculateHeightMapColumn(x, z);
+            }
+        }
+    }
+
+    /**
+     * @return int New calculated heightmap value (0-256 inclusive)
+     */
+    public int recalculateHeightMapColumn(int x, int z) {
+        int max = this.getHighestBlockAt(x, z);
+
+        int y;
+        for (y = max; y >= 0; --y) {
+            int id;
+
+            if (Block.lightFilter[id = this.getBlockId(x, y, z)] > 1 || Block.diffusesSkyLight[id]) {
+                break;
+            }
+        }
+
+        this.setHeightMap(x, z, y + 1);
+        return y + 1;
+    }
 }

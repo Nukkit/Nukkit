@@ -92,7 +92,10 @@ public class BlockMushroomBrown extends BlockFlowable {
 
     public boolean canStay() {
         Block block = this.down();
-        return block.getId() == MYCELIUM || block.getId() == PODZOL || (!block.isTransparent() && this.level.getFullLight(this) < 13);
+
+        int light = this.level.getFullLight(this);
+
+        return block.getId() == MYCELIUM || block.getId() == PODZOL || (!block.isTransparent() && light < 13);
     }
 
     @Override
