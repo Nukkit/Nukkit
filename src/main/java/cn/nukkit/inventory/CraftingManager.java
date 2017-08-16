@@ -49,7 +49,13 @@ public class CraftingManager {
                     for (Map<String, Object> ingredient : ((List<Map>) recipe.get("input"))) {
                         result.addIngredient(Item.get(Utils.toInt(ingredient.get("id")), Utils.toInt(ingredient.get("damage")), Utils.toInt(ingredient.get("count")), ingredient.get("nbt").toString().getBytes()));
                     }
-                    this.registerRecipe(result);
+
+                    String id = (String) recipe.get("uuid");
+                    if (id != null && !id.isEmpty()) {
+                        UUID uuid = UUID.fromString(id);
+                        result.setId(uuid);
+                        this.recipes.put(uuid, result);
+                    }
                     break;
                 case 1:
                     // TODO: handle multiple result items
@@ -69,13 +75,20 @@ public class CraftingManager {
                             }
                         }
                     }
-                    this.registerRecipe(shapedRecipe);
+
+                    id = (String) recipe.get("uuid");
+
+                    if (id != null && !id.isEmpty()) {
+                        UUID uuid = UUID.fromString(id);
+                        shapedRecipe.setId(uuid);
+                        this.recipes.put(uuid, shapedRecipe);
+                    }
                     break;
                 case 2:
                 case 3:
                     Map<String, Object> resultMap = (Map) recipe.get("output");
                     Item resultItem = Item.get(Utils.toInt(resultMap.get("id")), Utils.toInt(resultMap.get("damage")), Utils.toInt(resultMap.get("count")), ((String) resultMap.get("nbt")).getBytes());
-                    this.registerRecipe(new FurnaceRecipe(resultItem, Item.get(Utils.toInt(recipe.get("inputId")), recipe.containsKey("inputDamage") ? Utils.toInt(recipe.get("inputDamage")) : -1, 1)));
+                    this.registerRecipe(new FurnaceRecipe(resultItem, Item.get(Utils.toInt(recipe.get("inputId")), recipe.containsKey("inputDamage") ? Utils.toInt(recipe.get("inputDamage")) : 0, 1)));
                     break;
                 default:
                     break;
@@ -302,7 +315,7 @@ public class CraftingManager {
     }
 
     public void registerRecipe(Recipe recipe) {
-        recipe.setId(Utils.dataToUUID(String.valueOf(++RECIPE_COUNT), String.valueOf(recipe.getResult().getId()), String.valueOf(recipe.getResult().getDamage()), String.valueOf(recipe.getResult().getCount()), Arrays.toString(recipe.getResult().getCompoundTag())));
+        //recipe.setId(Utils.dataToUUID(String.valueOf(++RECIPE_COUNT), String.valueOf(recipe.getResult().getId()), String.valueOf(recipe.getResult().getDamage()), String.valueOf(recipe.getResult().getCount()), Arrays.toString(recipe.getResult().getCompoundTag())));
 
         if (recipe instanceof ShapedRecipe) {
             this.registerShapedRecipe((ShapedRecipe) recipe);
@@ -314,7 +327,13 @@ public class CraftingManager {
     }
 
     public Recipe[] getRecipesByResult(Item result) {
-        return recipeLookup.get(result.getId() + ":" + result.getDamage()).values().stream().toArray(Recipe[]::new);
+        Map<String, Recipe> recipes = recipeLookup.get(result.getId() + ":" + result.getDamage());
+
+        if (recipes == null) {
+            recipes = recipeLookup.get(result.getId() + ":");
+        }
+
+        return recipes == null ? null : recipes.values().stream().toArray(Recipe[]::new);
     }
 
     public static class Entry {
