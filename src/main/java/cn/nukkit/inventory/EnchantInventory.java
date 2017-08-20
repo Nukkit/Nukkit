@@ -1,7 +1,11 @@
 package cn.nukkit.inventory;
 
+import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
+
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBookEnchanted;
 import cn.nukkit.item.enchantment.Enchantment;
@@ -12,27 +16,23 @@ import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.network.protocol.CraftingDataPacket;
 import cn.nukkit.utils.DyeColor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-
 /**
  * author: MagicDroidX
  * Nukkit Project
  */
 public class EnchantInventory extends ContainerInventory {
 
-    private final Random random = new Random();
-
     private int bookshelfAmount = 0;
 
+    private Position position;
+    
     private int[] levels = null;
     private EnchantmentEntry[] entries = null;
 
     public EnchantInventory(Position position) {
         super(null, InventoryType.ENCHANT_TABLE);
         this.holder = new FakeBlockMenu(this, position);
+        this.position = position;
     }
 
     @Override
@@ -124,23 +124,26 @@ public class EnchantInventory extends ContainerInventory {
                             }
                         }
                         key--;
-
-                        Enchantment enchantment = possible.get(key);
-                        result.add(enchantment);
-                        possible.remove(key);
-
+                        
+                        Enchantment enchantment = null;
+                        if(key >= 0){
+	                        enchantment = possible.get(key);
+	                        result.add(enchantment);
+	                        possible.remove(key);
+                        }
+                        
                         //Extra enchantment
-                        while (!possible.isEmpty()) {
+                        while (!possible.isEmpty() && enchantment != null) {
                             modifiedLevel = Math.round(modifiedLevel / 2f);
                             v = ThreadLocalRandom.current().nextInt(0, 51);
                             if (v <= (modifiedLevel + 1)) {
 
                                 for (Enchantment e : new ArrayList<>(possible)) {
-                                    if (!e.isCompatibleWith(enchantment)) {
+                                    if (e.getName().equals(enchantment.getName())) {
                                         possible.remove(e);
                                     }
                                 }
-
+                                
                                 weights = new int[possible.size()];
                                 total = 0;
 
@@ -161,9 +164,11 @@ public class EnchantInventory extends ContainerInventory {
                                 }
                                 key--;
 
-                                enchantment = possible.get(key);
-                                result.add(enchantment);
-                                possible.remove(key);
+                                if(key >= 0){
+	                                enchantment = possible.get(key);
+	                                result.add(enchantment);
+	                                possible.remove(key);
+                                }
                             } else {
                                 break;
                             }
@@ -199,7 +204,7 @@ public class EnchantInventory extends ContainerInventory {
         if (!before.hasEnchantments() && after.hasEnchantments() && after.getId() == result.getId() && this.levels != null && this.entries != null) {
             Enchantment[] enchantments = after.getEnchantments();
             for (int i = 0; i < 3; i++) {
-                if (Arrays.equals(enchantments, this.entries[i].getEnchantments())) {
+                if (enchantsCheck(enchantments, this.entries[i].getEnchantments())) {
                     Item lapis = this.getItem(1);
                     int level = who.getExperienceLevel();
                     int exp = who.getExperience();
@@ -216,10 +221,30 @@ public class EnchantInventory extends ContainerInventory {
             }
         }
     }
+    
+    public boolean enchantsCheck(Enchantment[] ench, Enchantment[] ench2){
+    	if(ench.length != ench2.length)
+    		return false;
+    	for(int i = 0; i < ench.length; i++){
+    		if(!ench[i].getName().equals(ench2[i].getName()) || ench[i].getLevel() != ench2[i].getLevel())
+    			return false;
+    	}
+    	return true;
+    }
 
     public int countBookshelf() {
-        return 15;
-        //todo calculate bookshelf
+    	int count = 0;
+    	
+    	for(int x = -2; x < 3; x++){
+    		for(int y = 0; y < 2; y++){
+    			for(int z = -2; z < 3; z++){
+    				if(position.clone().add(x, y, z).getLevelBlock().getId() == Block.BOOKSHELF)
+    					count++;
+    			}
+    		}
+    	}
+    	
+        return count;
     }
 
     public void sendEnchantmentList() {
