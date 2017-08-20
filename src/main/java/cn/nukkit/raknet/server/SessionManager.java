@@ -387,6 +387,7 @@ public class SessionManager {
                     len = packet[offset++];
                     address = new String(Binary.subBytes(packet, offset, len), StandardCharsets.UTF_8);
                     this.unblockAddress(address);
+                    break;
                 case RakNet.PACKET_SHUTDOWN:
                     for (Session session : new ArrayList<>(this.sessions.values())) {
                         this.removeSession(session);
