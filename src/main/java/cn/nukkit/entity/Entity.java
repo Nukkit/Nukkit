@@ -7,6 +7,7 @@ import cn.nukkit.block.BlockDirt;
 import cn.nukkit.block.BlockFire;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.data.*;
+import cn.nukkit.event.Event;
 import cn.nukkit.entity.item.EntityVehicle;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -1307,13 +1308,17 @@ public abstract class Entity extends Location implements Metadatable {
             Block down = this.level.getBlock(this.floor().down());
 
             if (down.getId() == Item.FARMLAND) {
+                Event ev;
+
                 if (this instanceof Player) {
-                    Player p = (Player) this;
-                    PlayerInteractEvent ev = new PlayerInteractEvent(p, p.getInventory().getItemInHand(), down, null, Action.PHYSICAL);
-                    this.server.getPluginManager().callEvent(ev);
-                    if (ev.isCancelled()) {
-                        return;
-                    }
+                    ev = new PlayerInteractEvent((Player) this, null, down, null, Action.PHYSICAL);
+                } else {
+                    ev = new EntityInteractEvent(this, down);
+                }
+
+                this.server.getPluginManager().callEvent(ev);
+                if (ev.isCancelled()) {
+                    return;
                 }
                 this.level.setBlock(down, new BlockDirt(), true, true);
             }
@@ -1697,7 +1702,7 @@ public abstract class Entity extends Location implements Metadatable {
      * used for bat only
      */
     public boolean doesTriggerPressurePlate() {
-        return false;
+        return true;
     }
 
     protected void checkChunks() {
