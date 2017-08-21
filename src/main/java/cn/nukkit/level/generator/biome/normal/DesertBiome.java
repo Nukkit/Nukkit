@@ -2,6 +2,7 @@ package cn.nukkit.level.generator.biome.normal;
 
 import cn.nukkit.level.generator.biome.SandyBiome;
 import cn.nukkit.level.generator.populator.PopulatorCactus;
+import cn.nukkit.level.generator.populator.PopulatorDeadBush;
 
 /**
  * author: MagicDroidX
@@ -26,8 +27,11 @@ public class DesertBiome extends SandyBiome {
         if (type == TYPE_NORMAL) {
             this.setElevation(63, 69);
             PopulatorCactus populatorCactus = new PopulatorCactus();
-            populatorCactus.setBaseAmount(10);
+            populatorCactus.setBaseAmount(1);
             this.addPopulator(populatorCactus);
+            PopulatorDeadBush populatorDeadBush = new PopulatorDeadBush();
+            populatorDeadBush.setBaseAmount(1);
+            this.addPopulator(populatorDeadBush);
         } else {
             this.setElevation(63, 130);
         }

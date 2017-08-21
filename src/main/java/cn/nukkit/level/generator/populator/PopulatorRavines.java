@@ -18,7 +18,7 @@ public class PopulatorRavines extends Populator {
 
     private int ravineRarity = 2;
     private int ravineMinAltitude = 20;
-    private int ravineMaxAltitude = 67;
+    private int ravineMaxAltitude = 60; // // 67 Official. Normaly is 60 for fix Cave Generation shitty. ( 60 - minimal height of biomes )
     private int ravineMinLength = 84;
     private int ravineMaxLength = 111;
 

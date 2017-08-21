@@ -2,7 +2,6 @@ package cn.nukkit.level.generator.populator;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.level.ChunkManager;
-import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 
@@ -30,19 +29,12 @@ public class PopulatorCactus extends Populator {
     public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random) {
         this.level = level;
         int amount = random.nextBoundedInt(this.randomAmount + 1) + this.baseAmount;
-        Random javaRandom = new Random();
-        BlockVector3 v = new BlockVector3();
         for (int i = 0; i < amount; ++i) {
-            int sourceX = (v.getX() << 4) + javaRandom.nextInt(16);
-            int sourceZ = (v.getZ() << 4) + javaRandom.nextInt(16);
-            int x = sourceX + javaRandom.nextInt(8) - javaRandom.nextInt(8);
-            int z = sourceZ + javaRandom.nextInt(8) - javaRandom.nextInt(8);
+            int x = NukkitMath.randomRange(random, chunkX * 16, chunkX * 16 + 15);
+            int z = NukkitMath.randomRange(random, chunkZ * 16, chunkZ * 16 + 15);
+            int y = this.getHighestWorkableBlock(x, z);
 
-            int originalX = NukkitMath.randomRange(random, chunkX * 16, chunkX * 16 + 15);
-            int originalZ = NukkitMath.randomRange(random, chunkZ * 16, chunkZ * 16 + 15);
-            int y = this.getHighestWorkableBlock(originalX, originalZ);
-
-            if (y != -1 && this.canCactusStay(originalX, y, originalZ)) {
+            if (y != -1 && this.canCactusStay(x, y, z)) {
                 this.level.setBlockIdAt(x, y, z, Block.CACTUS);
                 this.level.setBlockDataAt(x, y, z, 1);
             }
