@@ -8,5 +8,5 @@ import cn.nukkit.math.NukkitRandom;
  * Nukkit Project
  */
 public abstract class Populator {
-    public abstract void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random);
+    public abstract void populate(ChunkManager level, int ChunkX, int ChunkZ, NukkitRandom random);
 }

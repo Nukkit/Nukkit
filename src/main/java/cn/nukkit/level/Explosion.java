@@ -12,6 +12,8 @@ import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.level.format.Chunk;
+import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.particle.HugeExplodeSeedParticle;
 import cn.nukkit.level.sound.ExplodeSound;
 import cn.nukkit.math.*;
@@ -66,7 +68,6 @@ public class Explosion {
 
         Vector3 vector = new Vector3(0, 0, 0);
         Vector3 vBlock = new Vector3(0, 0, 0);
-
         int mRays = this.rays - 1;
         for (int i = 0; i < this.rays; ++i) {
             for (int j = 0; j < this.rays; ++j) {
@@ -86,16 +87,17 @@ public class Explosion {
                             vBlock.x = pointerX >= x ? x : x - 1;
                             vBlock.y = pointerY >= y ? y : y - 1;
                             vBlock.z = pointerZ >= z ? z : z - 1;
+
                             if (vBlock.y < 0 || vBlock.y > 255) {
                                 break;
                             }
-                            Block block = this.level.getBlock(vBlock);
 
-                            if (block.getId() != 0) {
-                                blastForce -= (block.getResistance() / 5 + 0.3d) * this.stepLen;
+                            int blockId = this.level.getBlockIdAt((int) vBlock.x, (int) vBlock.y, (int) vBlock.z);
+                            if (blockId != 0) {
+                                blastForce -= (Block.blastResistance[blockId] / 5 + 0.3) * this.stepLen;
                                 if (blastForce > 0) {
-                                    if (!this.affectedBlocks.contains(block)) {
-                                        this.affectedBlocks.add(block);
+                                    if (!this.affectedBlocks.contains(vBlock)) {
+                                        this.affectedBlocks.add(this.level.getBlock(vBlock));
                                     }
                                 }
                             }

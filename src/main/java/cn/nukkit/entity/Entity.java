@@ -15,10 +15,7 @@ import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.Dimension;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.Location;
-import cn.nukkit.level.Position;
+import cn.nukkit.level.*;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.*;
 import cn.nukkit.metadata.MetadataValue;
@@ -27,10 +24,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.protocol.MobEffectPacket;
-import cn.nukkit.network.protocol.RemoveEntityPacket;
-import cn.nukkit.network.protocol.SetEntityDataPacket;
-import cn.nukkit.network.protocol.SetEntityMotionPacket;
+import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.ChunkException;
@@ -188,6 +182,8 @@ public abstract class Entity extends Location implements Metadatable {
 
     protected final Map<Integer, Effect> effects = new ConcurrentHashMap<>();
 
+    public Position fromPos;
+
     protected long id;
 
     protected final EntityMetadata dataProperties = new EntityMetadata()
@@ -203,6 +199,8 @@ public abstract class Entity extends Location implements Metadatable {
     public Entity riding = null;
 
     public FullChunk chunk;
+
+    private Dimension dimension;
 
     protected EntityDamageEvent lastDamageCause = null;
 
@@ -1090,12 +1088,13 @@ public abstract class Entity extends Location implements Metadatable {
             }
         }
 
-        if (this.inPortalTicks > 80) {
-            EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, PortalType.NETHER);
-            getServer().getPluginManager().callEvent(ev);
+        if (this.inPortalTicks == 80) {
+            EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
+            this.getServer().getPluginManager().callEvent(ev);
 
-            this.setDimension(this.level.getDimension() == Dimension.OVERWORLD ? Dimension.NETHER : Dimension.OVERWORLD);
-            this.inPortalTicks = 0;
+            // TODO: Remove this for work nether. (When is fixed).
+            //this.setDimension(this.level.getDimension() == Dimension.OVERWORLD ? Dimension.NETHER : Dimension.OVERWORLD);
+            //this.inPortalTicks = 0;
         }
 
         this.age += tickDiff;
@@ -1107,7 +1106,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setDimension(Dimension dimension) {
-
+        // Nothing
     }
 
     protected void updateMovement() {
@@ -1674,6 +1673,8 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (portal) {
             inPortalTicks++;
+        } else {
+            inPortalTicks = 0;
         }
 
         if (vector.lengthSquared() > 0) {

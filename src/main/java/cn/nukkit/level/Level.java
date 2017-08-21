@@ -238,9 +238,9 @@ public class Level implements ChunkManager, Metadatable {
     private boolean thundering = false;
     private int thunderTime = 0;
 
-    private long levelCurrentTick = 0;
+    public Dimension dimension;
 
-    private Dimension dimension;
+    private long levelCurrentTick = 0;
 
     public GameRules gameRules;
 

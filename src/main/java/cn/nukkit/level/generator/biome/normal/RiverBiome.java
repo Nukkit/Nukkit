@@ -1,7 +1,5 @@
 package cn.nukkit.level.generator.biome.normal;
 
-import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockDirt;
 import cn.nukkit.level.generator.biome.WateryBiome;
 import cn.nukkit.level.generator.populator.PopulatorGrass;
 import cn.nukkit.level.generator.populator.PopulatorSugarcane;

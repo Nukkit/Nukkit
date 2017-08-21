@@ -332,8 +332,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static int[] light = null;
     public static int[] lightFilter = null;
     public static boolean[] solid = null;
-    public static double[] hardness = null;
+    public static double[] hardness = null; // Float, not double
     public static boolean[] transparent = null;
+    public static double[] blastResistance = null;
     public AxisAlignedBB boundingBox = null;
     public AxisAlignedBB collisionBoundingBox = null;
     protected int meta = 0;
@@ -352,6 +353,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             solid = new boolean[256];
             hardness = new double[256];
             transparent = new boolean[256];
+            blastResistance = new double[256];
 
             list[AIR] = BlockAir.class; //0
             list[STONE] = BlockStone.class; //1
@@ -612,6 +614,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
                     transparent[id] = block.isTransparent();
                     hardness[id] = block.getHardness();
                     light[id] = block.getLightLevel();
+                    blastResistance[id] = block.getResistance();
 
                     if (block.isSolid()) {
                         if (block.isTransparent()) {

@@ -174,8 +174,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private PermissibleBase perm = null;
 
     public Position fromPos;
-    protected boolean shouldSendStatus = false;
-    private Position shouldResPos;
+    // TODO: Unused now.
+    //protected boolean shouldSendStatus = false;
+    // private Position shouldResPos;
 
     private int exp = 0;
     private int expLevel = 0;
@@ -1283,6 +1284,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (portal) {
             inPortalTicks++;
+        } else {
+            inPortalTicks = 0;
         }
     }
 
@@ -1656,11 +1659,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
 
-            if ((this.isCreative() || this.isSurvival() && this.server.getTick() - this.inPortalTicks >= 80) && this.inPortalTicks > 0) {
+            /*if ((this.isCreative() || this.isSurvival() && this.server.getTick() - this.inPortalTicks == 80) && this.inPortalTicks > 0) {
 
-            }
+            }*/
 
-            if (!this.isSpectator() && this.speed != null) {
+            if (!this.isSpectator() && this.speed != null && this.isAlive()) { // Don't check entity movement or in-air ticks if player dies due to movement (FIXED)
                 if (this.onGround) {
                     if (this.inAirTicks != 0) {
                         this.startAirTicks = 5;
@@ -4937,49 +4940,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.fromPos = this.getPosition();
         this.fromPos.x = ((int) this.fromPos.x);
         this.fromPos.z = ((int) this.fromPos.z);
-        if (dimension == Dimension.OVERWORLD) {
-            double x = this.getFloorX();
-            double y = this.getFloorY();
-            double z = this.getFloorZ();
-            Vector3 realPosition = new Vector3(x, y, z);
-            Dimension realDimension = Dimension.OVERWORLD;
-            Vector3 pos = new Teleporter(this.level).findPortalPosition(realPosition, realDimension);
-            this.teleport(pos);
-            ChangeDimensionPacket pk = new ChangeDimensionPacket();
-            pk.dimension = level.getDimension().getId();
-            pk.x = (float) this.getX();
-            pk.y = (float) this.getY();
-            pk.z = (float) this.getZ();
-            this.dataPacket(pk);
-            PlayStatusPacket pk1 = new PlayStatusPacket();
-            pk1.status = PlayStatusPacket.PLAYER_SPAWN;
-            this.dataPacket(pk1);
-        } else if (dimension == Dimension.NETHER) {
-            double x = this.getFloorX();
-            double y = this.getFloorY();
-            double z = this.getFloorZ();
-            Vector3 realPosition = new Vector3(x, y, z);
-            Dimension realDimension = Dimension.NETHER;
-            Vector3 pos = new Teleporter(this.level).findPortalPosition(realPosition, realDimension);
-            this.teleport(pos);
-            ChangeDimensionPacket pk = new ChangeDimensionPacket();
-            pk.dimension = level.getDimension().getId();
-            pk.x = (float) this.getX();
-            pk.y = (float) this.getY();
-            pk.z = (float) this.getZ();
-            this.dataPacket(pk);
-            PlayStatusPacket pk1 = new PlayStatusPacket();
-            pk1.status = PlayStatusPacket.PLAYER_SPAWN;
-            this.dataPacket(pk1);
-        } else {
-            /*if (dimension == Dimension.END) {
-                Dimension realDimension = Dimension.END;
-                Vector3 pos = new Teleporter(this.level).findPortalPosition(this.floor(), dimension);
-            }*/
-        }
+        Vector3 pos = new Teleporter(this.level).findPortalPosition(this.floor(), dimension);
 
-        /*if (pos == null) {
-            pos = this; //idk
+        if (pos == null) {
+            pos = this;
+            // This is again and again get. Pos on null. @Creeperface01.
         }
 
         this.teleport(pos);
@@ -4991,7 +4956,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.dataPacket(pk);
         PlayStatusPacket pk1 = new PlayStatusPacket();
         pk1.status = PlayStatusPacket.PLAYER_SPAWN;
-        this.dataPacket(pk1);*/
+        this.dataPacket(pk1);
     }
 
     public void setCheckMovement(boolean checkMovement) {

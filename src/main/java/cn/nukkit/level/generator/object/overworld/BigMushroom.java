@@ -1,4 +1,4 @@
-package cn.nukkit.level.generator.object.mushroom;
+package cn.nukkit.level.generator.object.overworld;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockHugeMushroomBrown;

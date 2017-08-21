@@ -1,7 +1,6 @@
 package cn.nukkit.level.generator.biome.normal;
 
 import cn.nukkit.block.BlockSapling;
-import cn.nukkit.item.enchantment.protection.EnchantmentProtection;
 import cn.nukkit.level.generator.biome.SnowyBiome;
 import cn.nukkit.level.generator.populator.PopulatorTallGrass;
 import cn.nukkit.level.generator.populator.PopulatorTree;

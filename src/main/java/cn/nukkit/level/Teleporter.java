@@ -17,14 +17,17 @@ public class Teleporter {
 
     public Vector3 findPortalPosition(Vector3 pos, Dimension to) { //TODO: a lot more complex portal finding
         Vector3 target = to == Dimension.NETHER ? pos.divide(8) : pos.multiply(8);
-        Vector3 position = level.getSafeSpawn(target);
+        target = level.getSafeSpawn(target);
 
         if (level.getBlockIdAt(target.getFloorX(), target.getFloorY(), target.getFloorZ()) == Block.NETHER_PORTAL) {
-            return position;
-        } else if (BlockNetherPortal.trySpawnPortal(level, pos, to == Dimension.NETHER)) {
-            return position;
-        } else {
-            return null;
+            return target;
         }
+        if (BlockNetherPortal.trySpawnPortal(level, pos, to == Dimension.NETHER)) {
+            return pos;
+        }
+
+        //System.out.println("I don't found a good position for teleport in Teleporter! :(");
+        // Again this is always NULL. @Creeperface01.
+        return null;
     }
 }

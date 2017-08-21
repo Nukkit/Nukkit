@@ -1,6 +1,7 @@
 package cn.nukkit.level.generator.biome.normal;
 
 import cn.nukkit.level.generator.biome.SandyBiome;
+import cn.nukkit.level.generator.populator.PopulatorCactus;
 
 /**
  * author: MagicDroidX
@@ -24,6 +25,9 @@ public class DesertBiome extends SandyBiome {
         this.rainfall = 0.0f;
         if (type == TYPE_NORMAL) {
             this.setElevation(63, 69);
+            PopulatorCactus populatorCactus = new PopulatorCactus();
+            populatorCactus.setBaseAmount(10);
+            this.addPopulator(populatorCactus);
         } else {
             this.setElevation(63, 130);
         }

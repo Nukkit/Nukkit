@@ -88,7 +88,7 @@ public class BlockNetherPortal extends BlockFlowable {
     }
 
     @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
+    protected AxisAlignedBB recalculateCollisionBoundingBox() {
         return new AxisAlignedBB(
                 this.x,
                 this.y,
@@ -149,7 +149,7 @@ public class BlockNetherPortal extends BlockFlowable {
 
 
             for (Vector3 blockpos = pos; pos.getY() > blockpos.getY() - 21 && pos.getY() > 0 && this.isEmptyBlock(getBlockId(pos.down())); pos = pos.down()) {
-                ;
+                // Nothing
             }
 
             int i = this.getDistanceUntilEdge(pos, this.leftDir) - 1;
