@@ -11,17 +11,18 @@ import java.util.Set;
 public interface TransactionGroup {
 
     int TYPE_NORMAL = 0;
-    int TYPE_INVENTORY_MISMATCH = 1;
-    int TYPE_ITEM_USE = 2;
+    int TYPE_ITEM_USE = 1; //This is surely 1
+    int TYPE_INVENTORY_MISMATCH = 2; //I do not know this
     int TYPE_ITEM_USE_ON_ENTITY = 3;
     int TYPE_ITEM_RELEASE = 4;
 
     int ITEM_RELEASE_ACTION_RELEASE = 0; //Drop item
     int ITEM_RELEASE_ACTION_USE = 1; //Shoot arrows, etc.
 
-    int ITEM_USE_ACTION_PLACE = 0;
-    int ITEM_USE_ACTION_USE = 1;
-    int ITEM_USE_ACTION_DESTROY = 2;
+    //Checked, this values should be like this
+    int ITEM_USE_ACTION_PLACE = 1;
+    int ITEM_USE_ACTION_USE = 0;
+    int ITEM_USE_ACTION_DESTROY = -1;
 
     int ITEM_USE_ON_ENTITY_ACTION_INTERACT = 0; //TODO: Check the use of these actions
     int ITEM_USE_ON_ENTITY_ACTION_ATTACK = 1;
