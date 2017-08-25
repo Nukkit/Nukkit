@@ -160,7 +160,7 @@ public class Item implements Cloneable {
     public static final int CLAY_BLOCK = 82;
     public static final int REEDS = 83;
     public static final int SUGARCANE_BLOCK = 83;
-
+    public static final int JUKEBOX = 84;
     public static final int FENCE = 85;
     public static final int PUMPKIN = 86;
     public static final int NETHERRACK = 87;
@@ -561,6 +561,19 @@ public class Item implements Cloneable {
     public static final int COOKED_SALMON = 463;
 
     public static final int GOLDEN_APPLE_ENCHANTED = 466;
+
+    public static final int RECORD_13 = 500;
+    public static final int RECORD_CAT = 501;
+    public static final int RECORD_BLOCKS = 502;
+    public static final int RECORD_CHIRP = 503;
+    public static final int RECORD_FAR = 504;
+    public static final int RECORD_MALL = 505;
+    public static final int RECORD_MELLOHI = 506;
+    public static final int RECORD_STAL = 507;
+    public static final int RECORD_STRAD = 508;
+    public static final int RECORD_WARD = 509;
+    public static final int RECORD_11 = 510;
+    public static final int RECORD_WAIT = 511;
 
     public static Class[] list = null;
 

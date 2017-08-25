@@ -9,10 +9,10 @@ public class MovePlayerPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.MOVE_PLAYER_PACKET;
 
-    public static final byte MODE_NORMAL = 0;
-    public static final byte MODE_RESET = 1;
-    public static final byte MODE_TELEPORT = 2;
-    public static final byte MODE_PITCH = 3; //facepalm Mojang
+    public static final int MODE_NORMAL = 0;
+    public static final int MODE_RESET = 1;
+    public static final int MODE_TELEPORT = 2;
+    public static final int MODE_PITCH = 3; //facepalm Mojang
 
     public long eid;
     public float x;
@@ -21,7 +21,7 @@ public class MovePlayerPacket extends DataPacket {
     public float yaw;
     public float headYaw;
     public float pitch;
-    public byte mode = MODE_NORMAL;
+    public int mode = MODE_NORMAL;
     public boolean onGround;
     public long ridingEid;
     public int int1 = 0;
@@ -37,7 +37,7 @@ public class MovePlayerPacket extends DataPacket {
         this.pitch = this.getLFloat();
         this.headYaw = this.getLFloat();
         this.yaw = this.getLFloat();
-        this.mode = (byte) this.getByte();
+        this.mode = this.getByte();
         this.onGround = this.getBoolean();
         this.ridingEid = this.getVarLong();
         if (this.mode == MODE_TELEPORT){
@@ -54,7 +54,7 @@ public class MovePlayerPacket extends DataPacket {
         this.putLFloat(this.pitch);
         this.putLFloat(this.yaw);
         this.putLFloat(this.headYaw);
-        this.putByte(this.mode);
+        this.putByte((byte) this.mode);
         this.putBoolean(this.onGround);
         this.putVarLong(this.ridingEid);
         if (this.mode == MODE_TELEPORT){

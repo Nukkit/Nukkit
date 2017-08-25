@@ -1,4 +1,4 @@
-package cn.nukkit.inventory;
+package cn.nukkit.inventory.transaction;
 
 import cn.nukkit.item.Item;
 
@@ -6,9 +6,7 @@ import cn.nukkit.item.Item;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class BaseTransaction implements Transaction {
-
-    protected final Inventory inventory;
+public abstract class BaseTransaction implements Transaction {
 
     protected final int slot;
 
@@ -16,24 +14,17 @@ public class BaseTransaction implements Transaction {
 
     protected final Item targetItem;
 
-    protected final long creationTime;
+    protected final long creationTime = System.currentTimeMillis();
 
-    public BaseTransaction(Inventory inventory, int slot, Item sourceItem, Item targetItem) {
-        this.inventory = inventory;
+    BaseTransaction(int slot, Item sourceItem, Item targetItem) {
         this.slot = slot;
         this.sourceItem = sourceItem.clone();
         this.targetItem = targetItem.clone();
-        this.creationTime = System.currentTimeMillis();
     }
 
     @Override
     public long getCreationTime() {
         return creationTime;
-    }
-
-    @Override
-    public Inventory getInventory() {
-        return inventory;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package cn.nukkit.inventory;
+package cn.nukkit.inventory.transaction;
 
 import cn.nukkit.item.Item;
 
@@ -8,7 +8,11 @@ import cn.nukkit.item.Item;
  */
 public interface Transaction {
 
-    Inventory getInventory();
+    int TYPE_CONTAINER = 0;
+    int TYPE_GLOBAL = 1;
+    int TYPE_WORLD_INTERACTON = 2;
+    int TYPE_CREATIVE = 3;
+    int TYPE_CRAFT = 99999;
 
     int getSlot();
 
@@ -17,4 +21,6 @@ public interface Transaction {
     Item getTargetItem();
 
     long getCreationTime();
+
+    int getType();
 }

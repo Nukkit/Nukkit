@@ -1,6 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.Server;
 import cn.nukkit.entity.data.Skin;
+import cn.nukkit.utils.Binary;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -21,11 +23,12 @@ public class LoginPacket extends DataPacket {
 
     public String username;
     public int protocol;
-    public byte gameEdition;
     public UUID clientUUID;
     public long clientId;
 
     public Skin skin;
+    public String skinGeometryName;
+    public byte[] skinGeometry;
 
     @Override
     public byte pid() {
@@ -35,7 +38,6 @@ public class LoginPacket extends DataPacket {
     @Override
     public void decode() {
         this.protocol = this.getInt();
-        this.gameEdition = (byte) this.getByte();
         this.setBuffer(this.getByteArray(), 0);
         decodeChainData();
         decodeSkinData();
@@ -73,6 +75,8 @@ public class LoginPacket extends DataPacket {
         if (skinToken.has("ClientRandomId")) this.clientId = skinToken.get("ClientRandomId").getAsLong();
         if (skinToken.has("SkinId")) skinId = skinToken.get("SkinId").getAsString();
         if (skinToken.has("SkinData")) this.skin = new Skin(skinToken.get("SkinData").getAsString(), skinId);
+        if (skinToken.has("SkinGeometryName")) this.skinGeometryName = skinToken.get("SkinGeometryName").getAsString();
+        if (skinToken.has("SkinGeometry")) this.skinGeometry = Base64.getDecoder().decode(skinToken.get("SkinGeometry").getAsString());
     }
 
     private JsonObject decodeToken(String token) {
