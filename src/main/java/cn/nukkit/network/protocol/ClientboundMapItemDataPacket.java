@@ -1,6 +1,5 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
 
 import java.awt.*;
@@ -71,11 +70,12 @@ public class ClientboundMapItemDataPacket extends DataPacket {
             this.putUnsignedVarInt(decorators.length);
 
             for (MapDecorator decorator : decorators) {
-                this.putVarInt((decorator.rotation & 0x0f) | (decorator.icon << 4));
+                this.putByte(decorator.icon);
+                this.putByte(decorator.rotation);
                 this.putByte(decorator.offsetX);
                 this.putByte(decorator.offsetZ);
                 this.putString(decorator.label);
-                this.putLInt(decorator.color.getRGB());
+                this.putVarInt(decorator.color.getRGB());
             }
         }
 
@@ -84,6 +84,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
             this.putVarInt(height);
             this.putVarInt(offsetX);
             this.putVarInt(offsetZ);
+            this.putVarInt(width * height);
 
             if (image != null) {
                 for (int y = 0; y < width; y++) {

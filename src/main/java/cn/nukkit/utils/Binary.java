@@ -55,7 +55,7 @@ public class Binary {
     }
 
     public static UUID readUUID(byte[] bytes) {
-        return new UUID(readLong(bytes), readLong(new byte[]{
+        return new UUID(readLLong(bytes), readLLong(new byte[]{
                 bytes[8],
                 bytes[9],
                 bytes[10],
@@ -68,7 +68,7 @@ public class Binary {
     }
 
     public static byte[] writeUUID(UUID uuid) {
-        return appendBytes(writeLong(uuid.getMostSignificantBits()), writeLong(uuid.getLeastSignificantBits()));
+        return appendBytes(writeLLong(uuid.getMostSignificantBits()), writeLLong(uuid.getLeastSignificantBits()));
     }
 
     public static byte[] writeMetadata(EntityMetadata metadata) {
@@ -153,7 +153,7 @@ public class Binary {
                     value = new SlotEntityData(key, item.getId(), item.getDamage(), item.getCount());
                     break;
                 case Entity.DATA_TYPE_POS:
-                    BlockVector3 v3 = stream.getBlockCoords();
+                    BlockVector3 v3 = stream.getBlockVector3();
                     value = new IntPositionEntityData(key, v3.x, v3.y, v3.z);
                     break;
                 case Entity.DATA_TYPE_LONG:

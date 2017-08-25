@@ -1,9 +1,11 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockVector3;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.math.Vector3f;
 
 import java.math.BigInteger;
@@ -211,18 +213,12 @@ public class BinaryStream {
         long count = this.getUnsignedVarInt();
 
         for(int i = 0; i < count; ++i){
-            float min = this.getLFloat();
-            float max = this.getLFloat();
-            float current = this.getLFloat();
-            float defaultValue = this.getLFloat();
             String name = this.getString();
-
             Attribute attr = Attribute.getAttributeByName(name);
             if(attr != null){
-                attr.setMinValue(min);
-                attr.setMaxValue(max);
-                attr.setValue(current);
-                attr.setDefaultValue(defaultValue);
+                attr.setMinValue(this.getLFloat());
+                attr.setValue(this.getLFloat());
+                attr.setMaxValue(this.getLFloat());
                 list.add(attr);
             }else{
                 throw new Exception("Unknown attribute type \"" + name + "\"");
@@ -237,12 +233,11 @@ public class BinaryStream {
      */
     public void putAttributeList(Attribute[] attributes){
         this.putUnsignedVarInt(attributes.length);
-        for (Attribute attribute: attributes){
-            this.putLFloat(attribute.getMinValue());
-            this.putLFloat(attribute.getMaxValue());
-            this.putLFloat(attribute.getValue());
-            this.putLFloat(attribute.getDefaultValue());
+        for (Attribute attribute: attributes) {
             this.putString(attribute.getName());
+            this.putLFloat(attribute.getMinValue());
+            this.putLFloat(attribute.getValue());
+            this.putLFloat(attribute.getMaxValue());
         }
     }
 
@@ -371,11 +366,15 @@ public class BinaryStream {
         VarInt.writeUnsignedVarLong(this, v);
     }
 
-    public BlockVector3 getBlockCoords() {
+    public BlockVector3 getBlockVector3() {
         return new BlockVector3(this.getVarInt(), (int) this.getUnsignedVarInt(), this.getVarInt());
     }
 
-    public void putBlockCoords(int x, int y, int z) {
+    public void putBlockVector3(BlockVector3 v) {
+        this.putBlockVector3(v.x, v.y, v.z);
+    }
+
+    public void putBlockVector3(int x, int y, int z) {
         this.putVarInt(x);
         this.putUnsignedVarInt(y);
         this.putVarInt(z);
@@ -383,6 +382,10 @@ public class BinaryStream {
 
     public Vector3f getVector3f() {
         return new Vector3f(this.getLFloat(4), this.getLFloat(4), this.getLFloat(4));
+    }
+
+    public void putVector3f(Vector3f v) {
+        this.putVector3f(v.x, v.y, v.z);
     }
 
     public void putVector3f(float x, float y, float z) {

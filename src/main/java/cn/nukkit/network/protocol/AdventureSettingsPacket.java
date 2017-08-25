@@ -6,6 +6,22 @@ package cn.nukkit.network.protocol;
 public class AdventureSettingsPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.ADVENTURE_SETTINGS_PACKET;
 
+    public static final int ACTION_FLAG_PROHIBIT_ALL = 0;
+    public static final int ACTION_FLAG_BUILD_AND_MINE = 1;
+    public static final int ACTION_FLAG_DOORS_AND_SWITCHES = 2;
+    public static final int ACTION_FLAG_OPEN_CONTAINERS = 4;
+    public static final int ACTION_FLAG_ATTACK_PLAYERS = 8;
+    public static final int ACTION_FLAG_ATTACK_MOBS = 16;
+    public static final int ACTION_FLAG_OP = 32;
+    public static final int ACTION_FLAG_TELEPORT = 64;
+    public static final int ACTION_FLAG_DEFAULT_LEVEL_PERMISSIONS = 128;
+    public static final int ACTION_FLAG_ALLOW_ALL = 511;
+
+    public static final int PERMISSION_LEVEL_VISITOR = 0;
+    public static final int PERMISSION_LEVEL_MEMBER = 1;
+    public static final int PERMISSION_LEVEL_OPERATOR = 2;
+    public static final int PERMISSION_LEVEL_CUSTOM = 3;
+
     public boolean worldImmutable;
     public boolean noPvp;
     public boolean noPvm;
@@ -34,6 +50,9 @@ public class AdventureSettingsPacket extends DataPacket {
 
     public int flags = 0;
     public int userPermission;
+    public int actionPermissions = ACTION_FLAG_DEFAULT_LEVEL_PERMISSIONS;
+	public int permissionLevel = PERMISSION_LEVEL_MEMBER;
+	public long userId = 0;
 
     @Override
     public void decode() {
@@ -68,6 +87,13 @@ public class AdventureSettingsPacket extends DataPacket {
         if (this.muted) this.flags |= 1 << 10;
         this.putUnsignedVarInt(this.flags);
         this.putUnsignedVarInt(this.userPermission);
+        this.putUnsignedVarInt(this.actionPermissions);
+        this.putUnsignedVarInt(this.permissionLevel);
+        if ((this.userId & 0x01) != 0) {
+            this.putLLong(-1 * ((this.userId + 1) >> 1));
+        } else {
+            this.putLLong(this.userId >> 1);
+        }
     }
 
     @Override
