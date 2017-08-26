@@ -392,7 +392,7 @@ public class PlayerInventory extends BaseInventory {
     @Override
     public void sendContents(Player[] players) {
         InventoryContentPacket pk = new InventoryContentPacket();
-        pk.slots = new Item[this.getSize()];
+        pk.slots = new Item[this.getSize() + this.getHotbarSize()];
         for (int i = 0; i < this.getSize(); ++i) {
             pk.slots[i] = this.getItem(i);
         }
