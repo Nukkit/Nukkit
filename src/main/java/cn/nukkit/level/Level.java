@@ -1999,8 +1999,6 @@ public class Level implements ChunkManager, Metadatable {
                         return item;
                     }
                 }
-            } else {
-                return null;
             }
         } else if (target.canBeActivated() && target.onActivate(item, null)) {
             return item;
