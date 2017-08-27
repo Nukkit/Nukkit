@@ -3153,41 +3153,70 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         ArrayList<Item> ingredientz = new ArrayList<>();
 
-                        for (Recipe r : recipes) {
-                            if (r instanceof ShapedRecipe) {
-                                Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) r).getIngredientMap();
+                        for (Recipe rec : recipes) {
+                            ingredientz.clear();
+
+                            if (rec instanceof ShapedRecipe) {
+                                Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) rec).getIngredientMap();
                                 for (Map<Integer, Item> map : ingredients.values()) {
                                     for (Item ingredient : map.values()) {
                                         if (ingredient != null && ingredient.getId() != Item.AIR) {
-                                            if (!this.inventory.contains(ingredient)) {
-                                                canCraft = false;
-                                                break;
-                                            }
-
                                             ingredientz.add(ingredient);
-                                            this.inventory.removeItem(ingredient); //TODO: improve this, or wait for mojang's fix :D
                                         }
                                     }
                                 }
+                            } else if (rec instanceof ShapelessRecipe) {
+                                ShapelessRecipe recipe0 = (ShapelessRecipe) rec;
 
-                                if (canCraft) {
-                                    recipe = r;
+                                for (Item ingredient : recipe0.getIngredientList()) {
+                                    if (ingredient != null && ingredient.getId() != Item.AIR) {
+                                        ingredientz.add(ingredient);
+                                    }
+                                }
+                            }
+
+                            Map<String, Item> serialized = new HashMap<>();
+
+                            for (Item ingredient : ingredientz) {
+                                String hash = ingredient.getId() + ":" + ingredient.getDamage();
+                                Item r = serialized.get(hash);
+
+                                if (r != null) {
+                                    r.count += ingredient.getCount();
+                                    continue;
+                                }
+
+                                serialized.put(hash, ingredient);
+                            }
+
+                            for (Item ingredient : serialized.values()) {
+                                if (!this.inventory.contains(ingredient)) {
+                                    canCraft = false;
                                     break;
                                 }
                             }
-                        }
 
-                        if (recipe != null) {
-                            CraftItemEvent craftItemEvent = new CraftItemEvent(this, ingredientz.stream().toArray(Item[]::new), recipe);
-                            getServer().getPluginManager().callEvent(craftItemEvent);
+                            if (canCraft) {
+                                recipe = rec;
 
-                            if (craftItemEvent.isCancelled()) {
-                                this.inventory.sendContents(this);
+                                CraftItemEvent craftItemEvent = new CraftItemEvent(this, serialized.values().stream().toArray(Item[]::new), recipe);
+                                getServer().getPluginManager().callEvent(craftItemEvent);
+
+                                if (craftItemEvent.isCancelled()) {
+                                    this.inventory.sendContents(this);
+                                    break packetswitch;
+                                }
+
+                                for (Item ingredient : serialized.values()) {
+                                    this.inventory.removeItem(ingredient);
+                                }
+
+                                this.inventory.addItem(recipe.getResult());
                                 break;
                             }
+                        }
 
-                            this.inventory.addItem(recipe.getResult());
-                        } else {
+                        if (recipe == null) {
                             this.server.getLogger().debug("(1) Unmatched desktop recipe " + craftingEventPacket.id + " from player " + this.getName());
                             this.inventory.sendContents(this);
                         }
@@ -3239,7 +3268,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             return;
                         }
 
-                        System.out.println("craft");
                         CraftItemEvent craftItemEvent = new CraftItemEvent(this, serialized.values().stream().toArray(Item[]::new), recipe);
                         getServer().getPluginManager().callEvent(craftItemEvent);
 
@@ -3453,41 +3481,43 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }*/
                     }
 
-                    switch (recipe.getResult().getId()) {
-                        case Item.WORKBENCH:
-                            this.awardAchievement("buildWorkBench");
-                            break;
-                        case Item.WOODEN_PICKAXE:
-                            this.awardAchievement("buildPickaxe");
-                            break;
-                        case Item.FURNACE:
-                            this.awardAchievement("buildFurnace");
-                            break;
-                        case Item.WOODEN_HOE:
-                            this.awardAchievement("buildHoe");
-                            break;
-                        case Item.BREAD:
-                            this.awardAchievement("makeBread");
-                            break;
-                        case Item.CAKE:
-                            //TODO: detect complex recipes like cake that leave remains
-                            this.awardAchievement("bakeCake");
-                            this.inventory.addItem(new ItemBucket(0, 3));
-                            break;
-                        case Item.STONE_PICKAXE:
-                        case Item.GOLD_PICKAXE:
-                        case Item.IRON_PICKAXE:
-                        case Item.DIAMOND_PICKAXE:
-                            this.awardAchievement("buildBetterPickaxe");
-                            break;
-                        case Item.WOODEN_SWORD:
-                            this.awardAchievement("buildSword");
-                            break;
-                        case Item.DIAMOND:
-                            this.awardAchievement("diamond");
-                            break;
-                        default:
-                            break;
+                    if (recipe != null) {
+                        switch (recipe.getResult().getId()) {
+                            case Item.WORKBENCH:
+                                this.awardAchievement("buildWorkBench");
+                                break;
+                            case Item.WOODEN_PICKAXE:
+                                this.awardAchievement("buildPickaxe");
+                                break;
+                            case Item.FURNACE:
+                                this.awardAchievement("buildFurnace");
+                                break;
+                            case Item.WOODEN_HOE:
+                                this.awardAchievement("buildHoe");
+                                break;
+                            case Item.BREAD:
+                                this.awardAchievement("makeBread");
+                                break;
+                            case Item.CAKE:
+                                //TODO: detect complex recipes like cake that leave remains
+                                this.awardAchievement("bakeCake");
+                                this.inventory.addItem(new ItemBucket(0, 3));
+                                break;
+                            case Item.STONE_PICKAXE:
+                            case Item.GOLD_PICKAXE:
+                            case Item.IRON_PICKAXE:
+                            case Item.DIAMOND_PICKAXE:
+                                this.awardAchievement("buildBetterPickaxe");
+                                break;
+                            case Item.WOODEN_SWORD:
+                                this.awardAchievement("buildSword");
+                                break;
+                            case Item.DIAMOND:
+                                this.awardAchievement("diamond");
+                                break;
+                            default:
+                                break;
+                        }
                     }
 
                     break;
