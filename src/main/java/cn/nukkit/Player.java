@@ -199,8 +199,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public int pickedXPOrb = 0;
 
-    private int formWindowCount = 0;
-    private HashMap<Integer, FormWindow> formWindows = new HashMap<>();
+    protected int formWindowCount = 0;
+    protected HashMap<Integer, FormWindow> formWindows = new HashMap<>();
 
     public int getStartActionTick() {
         return startAction;
