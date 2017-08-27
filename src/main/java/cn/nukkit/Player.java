@@ -3153,6 +3153,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         ArrayList<Item> ingredientz = new ArrayList<>();
 
+                        recipeloop:
                         for (Recipe rec : recipes) {
                             ingredientz.clear();
 
@@ -3191,29 +3192,26 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             for (Item ingredient : serialized.values()) {
                                 if (!this.inventory.contains(ingredient)) {
-                                    canCraft = false;
-                                    break;
+                                    continue recipeloop;
                                 }
                             }
 
-                            if (canCraft) {
-                                recipe = rec;
+                            recipe = rec;
 
-                                CraftItemEvent craftItemEvent = new CraftItemEvent(this, serialized.values().stream().toArray(Item[]::new), recipe);
-                                getServer().getPluginManager().callEvent(craftItemEvent);
+                            CraftItemEvent craftItemEvent = new CraftItemEvent(this, serialized.values().stream().toArray(Item[]::new), recipe);
+                            getServer().getPluginManager().callEvent(craftItemEvent);
 
-                                if (craftItemEvent.isCancelled()) {
-                                    this.inventory.sendContents(this);
-                                    break packetswitch;
-                                }
-
-                                for (Item ingredient : serialized.values()) {
-                                    this.inventory.removeItem(ingredient);
-                                }
-
-                                this.inventory.addItem(recipe.getResult());
-                                break;
+                            if (craftItemEvent.isCancelled()) {
+                                this.inventory.sendContents(this);
+                                break packetswitch;
                             }
+
+                            for (Item ingredient : serialized.values()) {
+                                this.inventory.removeItem(ingredient);
+                            }
+
+                            this.inventory.addItem(recipe.getResult());
+                            break;
                         }
 
                         if (recipe == null) {
@@ -3224,6 +3222,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         ArrayList<Item> ingredientz = new ArrayList<>();
 
                         if (recipe instanceof ShapedRecipe) {
+
                             Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) recipe).getIngredientMap();
                             for (Map<Integer, Item> map : ingredients.values()) {
                                 for (Item ingredient : map.values()) {
