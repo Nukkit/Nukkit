@@ -1,9 +1,9 @@
 package cn.nukkit.form.window;
 
-import com.google.gson.Gson;
 import cn.nukkit.form.element.*;
-import cn.nukkit.form.response.FormResponseData;
 import cn.nukkit.form.response.FormResponseCustom;
+import cn.nukkit.form.response.FormResponseData;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,6 +65,10 @@ public class FormWindowCustom extends FormWindow {
         HashMap<Integer, Object> responses = new HashMap<>();
 
         for (String elementData : elementResponses){
+            if (i >= content.size()) {
+                break;
+            }
+
             Element e = content.get(i);
             if (e == null) break;
             if (e instanceof ElementLabel) {
@@ -77,7 +81,7 @@ public class FormWindowCustom extends FormWindow {
                 responses.put(i, answer);
             }
             else if (e instanceof ElementInput){
-                String answer = elementData.substring(0, elementData.length()-1);
+                String answer = elementData.substring(1, elementData.length() - 1);
                 inputResponses.put(i, answer);
                 responses.put(i, answer);
             }
