@@ -4,9 +4,11 @@ import cn.nukkit.form.element.*;
 import cn.nukkit.form.response.FormResponseCustom;
 import cn.nukkit.form.response.FormResponseData;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class FormWindowCustom extends FormWindow {
 
@@ -53,8 +55,11 @@ public class FormWindowCustom extends FormWindow {
             this.closed = true;
             return;
         }
-        String[] elementResponses = data.replace("[", "").replace("]",
-                "").split(",");
+
+        List<String> elementResponses = new Gson().fromJson(data, new TypeToken<List<String>>() {
+        }.getType());
+        elementResponses.remove(elementResponses.size() - 1); //submit button
+
         int i = 0;
 
         HashMap<Integer, FormResponseData> dropdownResponses = new HashMap<>();
@@ -81,9 +86,8 @@ public class FormWindowCustom extends FormWindow {
                 responses.put(i, answer);
             }
             else if (e instanceof ElementInput){
-                String answer = elementData.substring(1, elementData.length() - 1);
-                inputResponses.put(i, answer);
-                responses.put(i, answer);
+                inputResponses.put(i, elementData);
+                responses.put(i, elementData);
             }
             else if (e instanceof ElementSlider){
                 Float answer = Float.parseFloat(elementData);
