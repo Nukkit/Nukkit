@@ -2719,7 +2719,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     } else if (!this.windowIndex.containsKey(craftingEventPacket.windowId)) {
                         this.inventory.sendContents(this);
                         containerClosePacket = new ContainerClosePacket();
-                        containerClosePacket.windowid = craftingEventPacket.windowId;
+                        containerClosePacket.windowId = craftingEventPacket.windowId;
                         this.dataPacket(containerClosePacket);
                         break;
                     }
