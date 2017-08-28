@@ -2719,7 +2719,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     } else if (!this.windowIndex.containsKey(craftingEventPacket.windowId)) {
                         this.inventory.sendContents(this);
                         containerClosePacket = new ContainerClosePacket();
-                        containerClosePacket.windowId = craftingEventPacket.windowId;
+                        containerClosePacket.windowid = craftingEventPacket.windowId;
                         this.dataPacket(containerClosePacket);
                         break;
                     }
@@ -2742,62 +2742,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     boolean canCraft = true;
 
-                    if (true) {
-                        //System.out.println("output: "+craftingEventPacket.output[0]);
-                        //Recipe[] recipes = getServer().getCraftingManager().getRecipesByResult(craftingEventPacket.output[0]);
+                    if (craftingEventPacket.input.length == 0) {
+                        Recipe[] recipes = getServer().getCraftingManager().getRecipesByResult(craftingEventPacket.output[0]);
 
-                        recipe = this.getServer().getCraftingManager().getRecipe(craftingEventPacket.id);
+                        recipe = null;
 
-                        /*ArrayList<Item> ingredientz = new ArrayList<>();
+                        ArrayList<Item> ingredientz = new ArrayList<>();
 
-                        for (Recipe r : recipes) {
-                            if (r instanceof ShapedRecipe) {
-                                Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) r).getIngredientMap();
-                                for (Map<Integer, Item> map : ingredients.values()) {
-                                    for (Item ingredient : map.values()) {
-                                        if (ingredient != null && ingredient.getId() != Item.AIR) {
-                                            if (!this.inventory.contains(ingredient)) {
-                                                canCraft = false;
-                                                break;
-                                            }
+                        recipeloop:
+                        for (Recipe rec : recipes) {
+                            ingredientz.clear();
 
-                                            ingredientz.add(ingredient);
-                                            this.inventory.removeItem(ingredient);
-                                        }
-                                    }
-                                }
-
-                                if (canCraft) {
-                                    recipe = r;
-                                    break;
-                                }
-                            } else if(r instanceof ShapelessRecipe) {
-                                ShapelessRecipe recipe0 = (ShapelessRecipe) r;
-
-                                for(Item ingredient : recipe0.getIngredientList()){
-                                    if (ingredient != null && ingredient.getId() != Item.AIR) {
-                                        if (!this.inventory.contains(ingredient)) {
-                                            canCraft = false;
-                                            break;
-                                        }
-
-                                        ingredientz.add(ingredient);
-                                        this.inventory.removeItem(ingredient);
-                                    }
-                                }
-
-                                if (canCraft) {
-                                    recipe = r;
-                                    break;
-                                }
-                            }
-                        }*/
-
-                        if (recipe != null) {
-                            ArrayList<Item> ingredientz = new ArrayList<>();
-
-                            if (recipe instanceof ShapedRecipe) {
-                                Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) recipe).getIngredientMap();
+                            if (rec instanceof ShapedRecipe) {
+                                Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) rec).getIngredientMap();
                                 for (Map<Integer, Item> map : ingredients.values()) {
                                     for (Item ingredient : map.values()) {
                                         if (ingredient != null && ingredient.getId() != Item.AIR) {
@@ -2805,8 +2762,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         }
                                     }
                                 }
-                            } else if (recipe instanceof ShapelessRecipe) {
-                                ShapelessRecipe recipe0 = (ShapelessRecipe) recipe;
+                            } else if (rec instanceof ShapelessRecipe) {
+                                ShapelessRecipe recipe0 = (ShapelessRecipe) rec;
 
                                 for (Item ingredient : recipe0.getIngredientList()) {
                                     if (ingredient != null && ingredient.getId() != Item.AIR) {
@@ -2822,6 +2779,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 Item r = serialized.get(hash);
 
                                 if (r != null) {
+                                    r.count += ingredient.getCount();
                                     continue;
                                 }
 
@@ -2830,22 +2788,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             for (Item ingredient : serialized.values()) {
                                 if (!this.inventory.contains(ingredient)) {
-                                    canCraft = false;
-                                    break;
+                                    continue recipeloop;
                                 }
                             }
 
-                            if (!canCraft) {
-                                this.server.getLogger().debug("(1) Unmatched recipe " + craftingEventPacket.id + " from player " + this.getName() + "  not anough ingredients");
-                                return;
-                            }
+                            recipe = rec;
 
                             CraftItemEvent craftItemEvent = new CraftItemEvent(this, serialized.values().stream().toArray(Item[]::new), recipe);
                             getServer().getPluginManager().callEvent(craftItemEvent);
 
                             if (craftItemEvent.isCancelled()) {
                                 this.inventory.sendContents(this);
-                                break;
+                                break packetswitch;
                             }
 
                             for (Item ingredient : serialized.values()) {
@@ -2853,13 +2807,77 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
 
                             this.inventory.addItem(recipe.getResult());
-                        } else {
-                            this.server.getLogger().debug("(1) Unmatched recipe " + craftingEventPacket.id + " from player " + this.getName());
+                            break;
+                        }
+
+                        if (recipe == null) {
+                            this.server.getLogger().debug("(1) Unmatched desktop recipe " + craftingEventPacket.id + " from player " + this.getName());
                             this.inventory.sendContents(this);
                         }
                     } else {
+                        ArrayList<Item> ingredientz = new ArrayList<>();
 
                         if (recipe instanceof ShapedRecipe) {
+
+                            Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) recipe).getIngredientMap();
+                            for (Map<Integer, Item> map : ingredients.values()) {
+                                for (Item ingredient : map.values()) {
+                                    if (ingredient != null && ingredient.getId() != Item.AIR) {
+                                        ingredientz.add(ingredient);
+                                    }
+                                }
+                            }
+                        } else if (recipe instanceof ShapelessRecipe) {
+                            ShapelessRecipe recipe0 = (ShapelessRecipe) recipe;
+
+                            for (Item ingredient : recipe0.getIngredientList()) {
+                                if (ingredient != null && ingredient.getId() != Item.AIR) {
+                                    ingredientz.add(ingredient);
+                                }
+                            }
+                        }
+
+                        Map<String, Item> serialized = new HashMap<>();
+
+                        for (Item ingredient : ingredientz) {
+                            String hash = ingredient.getId() + ":" + ingredient.getDamage();
+                            Item r = serialized.get(hash);
+
+                            if (r != null) {
+                                r.count += ingredient.getCount();
+                                continue;
+                            }
+
+                            serialized.put(hash, ingredient);
+                        }
+
+                        for (Item ingredient : serialized.values()) {
+                            if (!this.inventory.contains(ingredient)) {
+                                canCraft = false;
+                                break;
+                            }
+                        }
+
+                        if (!canCraft) {
+                            this.server.getLogger().debug("(1) Unmatched recipe " + craftingEventPacket.id + " from player " + this.getName() + "  not anough ingredients");
+                            return;
+                        }
+
+                        CraftItemEvent craftItemEvent = new CraftItemEvent(this, serialized.values().stream().toArray(Item[]::new), recipe);
+                        getServer().getPluginManager().callEvent(craftItemEvent);
+
+                        if (craftItemEvent.isCancelled()) {
+                            this.inventory.sendContents(this);
+                            break;
+                        }
+
+                        for (Item ingredient : serialized.values()) {
+                            this.inventory.removeItem(ingredient);
+                        }
+
+                        this.inventory.addItem(recipe.getResult());
+
+                        /*if (recipe instanceof ShapedRecipe) {
                             int offsetX = 0;
                             int offsetY = 0;
 
@@ -3055,7 +3073,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             for (Item i : extraItem) {
                                 this.level.dropItem(this, i);
                             }
-                        }
+                        }*/
                     }
 
                     if (recipe != null) {
@@ -3096,7 +3114,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 break;
                         }
                     }
-
                     break;
                 case ProtocolInfo.INVENTORY_SLOT_PACKET:
                     if (!this.spawned || !this.isAlive()) {
