@@ -59,6 +59,10 @@ public class PlayerQuitEvent extends PlayerEvent {
     }
 
     public void setQuitMessage(String quitMessage) {
+        if (quitMessage == null) {
+            this.quitMessage = null;
+            return;
+        }
         this.setQuitMessage(new TextContainer(quitMessage));
     }
 

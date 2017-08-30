@@ -32,6 +32,10 @@ public class PlayerJoinEvent extends PlayerEvent {
     }
 
     public void setJoinMessage(String joinMessage) {
+        if (joinMessage == null) {
+            this.joinMessage = null;
+            return;
+        }
         this.setJoinMessage(new TextContainer(joinMessage));
     }
 }
