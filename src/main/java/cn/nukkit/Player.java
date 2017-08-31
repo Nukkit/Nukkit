@@ -1570,6 +1570,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.newPosition = null;
     }
 
+    protected void updateMovement() {
+        // Nothing
+    }
+
+    protected void tryChangeMovement() {
+        // Nothing
+    }
+
     @Override
     public boolean setMotion(Vector3 motion) {
         if (super.setMotion(motion)) {

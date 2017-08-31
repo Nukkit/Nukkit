@@ -114,56 +114,29 @@ public class EntityItem extends Entity {
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
+    public boolean entityBaseTick(int tickDiff) {
+        tickDiff = 1;
         if (this.closed) {
             return false;
         }
 
-        int tickDiff = currentTick - this.lastUpdate;
-
-        if (tickDiff <= 0 && !this.justCreated) {
-            return true;
-        }
-
-        this.lastUpdate = currentTick;
-
-        this.timing.startTiming();
-
-
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
         if (this.isAlive()) {
-
             if (this.pickupDelay > 0 && this.pickupDelay < 32767) {
                 this.pickupDelay -= tickDiff;
                 if (this.pickupDelay < 0) {
                     this.pickupDelay = 0;
                 }
+            } else {
+                for (Entity entity : this.level.getNearbyEntities(this.boundingBox.grow(1, 0.5, 1), this)) {
+                    if (entity instanceof Player) {
+                        if (((Player) entity).pickupEntity(this, true)) {
+                            return true;
+                        }
+                    }
+                }
             }
-
-            this.motionY -= this.getGravity();
-
-            if (this.checkObstruction(this.x, this.y, this.z)) {
-                hasUpdate = true;
-            }
-
-            this.move(this.motionX, this.motionY, this.motionZ);
-
-            double friction = 1 - this.getDrag();
-
-            if (this.onGround && (Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionZ) > 0.00001)) {
-                friction *= this.getLevel().getBlock(this.temporalVector.setComponents((int) Math.floor(this.x), (int) Math.floor(this.y - 1), (int) Math.floor(this.z) - 1)).getFrictionFactor();
-            }
-
-            this.motionX *= friction;
-            this.motionY *= 1 - this.getDrag();
-            this.motionZ *= friction;
-
-            if (this.onGround) {
-                this.motionY *= -0.5;
-            }
-
-            this.updateMovement();
 
             if (this.age > 6000) {
                 ItemDespawnEvent ev = new ItemDespawnEvent(this);
@@ -177,9 +150,16 @@ public class EntityItem extends Entity {
             }
         }
 
-        this.timing.stopTiming();
+        return hasUpdate;
+    }
 
-        return hasUpdate || !this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001;
+    protected void tryChangeMovement() {
+        this.checkObstruction(this.x, this.y, this.z);
+        this.tryChangeMovement();
+    }
+
+    protected boolean applyGravityBeforeDrag() {
+        return true;
     }
 
     @Override

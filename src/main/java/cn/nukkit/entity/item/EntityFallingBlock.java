@@ -98,33 +98,16 @@ public class EntityFallingBlock extends Entity {
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
+    public boolean entityBaseTick(int currentTick) {
+        currentTick = 1;
 
         if (closed) {
             return false;
         }
 
-        this.timing.startTiming();
-
-        int tickDiff = currentTick - lastUpdate;
-        if (tickDiff <= 0 && !justCreated) {
-            return true;
-        }
-
-        lastUpdate = currentTick;
-
-        boolean hasUpdate = entityBaseTick(tickDiff);
+        boolean hasUpdate = entityBaseTick(currentTick);
 
         if (isAlive()) {
-            motionY -= getGravity();
-
-            move(motionX, motionY, motionZ);
-
-            float friction = 1 - getDrag();
-
-            motionX *= friction;
-            motionY *= 1 - getDrag();
-            motionZ *= friction;
 
             Vector3 pos = (new Vector3(x - 0.5, y, z - 0.5)).round();
 
@@ -149,12 +132,9 @@ public class EntityFallingBlock extends Entity {
                 hasUpdate = true;
             }
 
-            updateMovement();
         }
 
-        this.timing.stopTiming();
-
-        return hasUpdate || !onGround || Math.abs(motionX) > 0.00001 || Math.abs(motionY) > 0.00001 || Math.abs(motionZ) > 0.00001;
+        return hasUpdate;
     }
 
     public int getBlock() {
