@@ -128,14 +128,6 @@ public class EntityItem extends Entity {
                 if (this.pickupDelay < 0) {
                     this.pickupDelay = 0;
                 }
-            } else {
-                for (Entity entity : this.level.getNearbyEntities(this.boundingBox.grow(1, 0.5, 1), this)) {
-                    if (entity instanceof Player) {
-                        if (((Player) entity).pickupEntity(this, true)) {
-                            return true;
-                        }
-                    }
-                }
             }
 
             if (this.age > 6000) {
