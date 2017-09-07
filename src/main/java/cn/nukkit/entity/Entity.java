@@ -42,6 +42,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class Entity extends Location implements Metadatable {
 
+    public static final double MOTION_THRESHOLD = 0.00001;
+
     public static final int NETWORK_ID = -1;
 
     public abstract int getNetworkId();
@@ -221,6 +223,8 @@ public abstract class Entity extends Location implements Metadatable {
     public double lastMotionX;
     public double lastMotionY;
     public double lastMotionZ;
+
+    protected boolean forceMovementUpdate = false;
 
     public double lastYaw;
     public double lastPitch;
@@ -1135,6 +1139,35 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
+    protected boolean applyDragBeforeGravity() {
+        return false;
+    }
+
+    protected void applyGravity() {
+        this.motionY -= this.getGravity();
+    }
+
+    protected void tryChangeMovement() {
+        float friction = 1 - this.getDrag();
+
+        if (!this.onGround) {
+            if (this.applyDragBeforeGravity()) {
+                this.motionY *= friction;
+            }
+
+            this.applyGravity();
+
+            if (!this.applyDragBeforeGravity()) {
+                this.motionY *= friction;
+            }
+        } else {
+            friction *= this.level.getBlock(this.floor().subtract(0, 1, 0)).getFrictionFactor();
+        }
+
+        this.motionX *= friction;
+        this.motionZ *= friction;
+    }
+
     public void addMovement(double x, double y, double z, double yaw, double pitch, double headYaw) {
         this.level.addEntityMovement(this.chunk.getX(), this.chunk.getZ(), this.id, x, y, z, yaw, pitch, headYaw);
     }
@@ -1169,8 +1202,9 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         int tickDiff = currentTick - this.lastUpdate;
+
         if (tickDiff <= 0) {
-            this.server.getLogger().debug("Expected tick difference of at least 1 ($tickDiff) in entity/Entity");
+            this.server.getLogger().debug("Expected tick difference of at least 1, got $tickDiff in Entity!");
             return false;
         }
 
@@ -1187,11 +1221,31 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.lastUpdate = currentTick;
 
-        boolean hasUpdate = this.entityBaseTick(tickDiff);
+        this.timing.startTiming();
+
+        if (this.hasMovementUpdate()) {
+            this.tryChangeMovement();
+            this.move(this.motionX, this.motionY, this.motionZ);
+
+            if (Math.abs(this.motionX) <= MOTION_THRESHOLD) {
+                this.motionX = 0;
+            }
+            if (Math.abs(this.motionY) <= MOTION_THRESHOLD) {
+                this.motionY = 0;
+            }
+            if (Math.abs(this.motionZ) <= MOTION_THRESHOLD) {
+                this.motionZ = 0;
+            }
+        }
 
         this.updateMovement();
+        this.forceMovementUpdate = false;
 
-        return hasUpdate;
+        boolean hasUpdate = this.entityBaseTick(tickDiff);
+
+        this.timing.stopTiming();
+
+        return (hasUpdate || this.hasMovementUpdate());
     }
 
     protected boolean updateRidden() {
@@ -1243,6 +1297,22 @@ public abstract class Entity extends Location implements Metadatable {
 
     public final void scheduleUpdate() {
         this.level.updateEntities.put(this.id, this);
+    }
+
+    public final void setForceMovementUpdate() {
+        boolean value = true;
+        this.forceMovementUpdate = value;
+        this.onGround = false;
+    }
+
+    public final boolean hasMovementUpdate() {
+        return (
+                this.forceMovementUpdate ||
+                        Math.abs(this.motionX) > MOTION_THRESHOLD ||
+                        Math.abs(this.motionY) > MOTION_THRESHOLD ||
+                        Math.abs(this.motionZ) > MOTION_THRESHOLD ||
+                        !this.onGround
+        );
     }
 
     public boolean isOnFire() {

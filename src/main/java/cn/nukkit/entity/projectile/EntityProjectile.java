@@ -99,27 +99,22 @@ public abstract class EntityProjectile extends Entity {
         this.namedTag.putShort("Age", this.age);
     }
 
+    protected boolean applyDragBeforeGravity() {
+        return true;
+    }
+
     @Override
-    public boolean onUpdate(int currentTick) {
+    public boolean entityBaseTick(int tickDiff) {
+        tickDiff = 1;
         if (this.closed) {
             return false;
         }
-
-        int tickDiff = currentTick - this.lastUpdate;
-        if (tickDiff <= 0 && !this.justCreated) {
-            return true;
-        }
-        this.lastUpdate = currentTick;
 
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
         if (this.isAlive()) {
 
             MovingObjectPosition movingObjectPosition = null;
-
-            if (!this.isCollided) {
-                this.motionY -= this.getGravity();
-            }
 
             Vector3 moveVector = new Vector3(this.x + this.motionX, this.y + this.motionY, this.z + this.motionZ);
 
@@ -161,9 +156,7 @@ public abstract class EntityProjectile extends Entity {
                 }
             }
 
-            this.move(this.motionX, this.motionY, this.motionZ);
-
-            if (this.isCollided && !this.hadCollision) { //collide with block
+            if (this.isCollided && !this.hadCollision) {
                 this.hadCollision = true;
 
                 this.motionX = 0;
@@ -172,18 +165,16 @@ public abstract class EntityProjectile extends Entity {
 
                 this.server.getPluginManager().callEvent(new ProjectileHitEvent(this, MovingObjectPosition.fromBlock(this.getFloorX(), this.getFloorY(), this.getFloorZ(), -1, this)));
                 return false;
-            } else if (!this.isCollided && this.hadCollision) {
+            } else if (!this.isCollided && this.hadCollision) { //Previously collided with block, but block later removed
                 this.hadCollision = false;
             }
 
-            if (!this.hadCollision || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001) {
+            if (!this.hadCollision || Math.abs(this.motionX) > MOTION_THRESHOLD || Math.abs(this.motionY) > MOTION_THRESHOLD || Math.abs(this.motionZ) > MOTION_THRESHOLD) {
                 double f = Math.sqrt((this.motionX * this.motionX) + (this.motionZ * this.motionZ));
                 this.yaw = Math.atan2(this.motionX, this.motionZ) * 180 / Math.PI;
                 this.pitch = Math.atan2(this.motionY, f) * 180 / Math.PI;
                 hasUpdate = true;
             }
-
-            this.updateMovement();
 
         }
 
