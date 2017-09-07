@@ -1,13 +1,15 @@
 package cn.nukkit.block;
 
-import cn.nukkit.Player;
+import cn.nukkit.block.redstoneBehavior.FlowableRedstoneComponent;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.Player;
 
 /**
  * Created by CreeperFace on 10.4.2017.
+ * Edited by NycuRO on 07.08.2017.
  */
-public class BlockRedstoneTorchUnlit extends BlockTorch {
+public class BlockRedstoneTorchUnlit extends FlowableRedstoneComponent {
 
     public BlockRedstoneTorchUnlit() {
         this(0);
