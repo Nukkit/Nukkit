@@ -1143,24 +1143,24 @@ public abstract class Entity extends Location implements Metadatable {
         return false;
     }
 
-    protected void applyGravity() {
+    public void applyGravity() {
         this.motionY -= this.getGravity();
     }
 
     public void tryChangeMovement() {
         float friction = 1 - this.getDrag();
 
-        if (!this.onGround) {
-            if (this.applyDragBeforeGravity()) {
-                this.motionY *= friction;
-            }
+        if (this.applyDragBeforeGravity()) {
+            this.motionY *= friction;
+        }
 
-            this.applyGravity();
+        this.applyGravity();
 
-            if (!this.applyDragBeforeGravity()) {
-                this.motionY *= friction;
-            }
-        } else {
+        if (!this.applyDragBeforeGravity()) {
+            this.motionY *= friction;
+        }
+
+        if (this.onGround) {
             friction *= this.level.getBlock(this.floor().subtract(0, 1, 0)).getFrictionFactor();
         }
 

@@ -52,6 +52,7 @@ public class EntitySquid extends EntityAnimal {
     private int switchDirectionTicker = 0;
 
     private Random random;
+    protected Entity entity;
 
     @Override
     public void initEntity() {
@@ -128,9 +129,10 @@ public class EntitySquid extends EntityAnimal {
         return hasUpdate;
     }
 
-    protected void applyGravity() {
-        if (!(this.isInsideOfWater())) {
-            this.applyGravity();
+    @Override
+    public void applyGravity() {
+        if (!this.isInsideOfWater()) {
+            entity.applyGravity();
         }
     }
 
