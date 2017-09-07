@@ -99,7 +99,7 @@ public class EntityBoat extends EntityVehicle {
                 boolean instantKill = damager instanceof Player && ((Player) damager).isCreative();
                 if (instantKill || getDamage() > 40) {
                     if (linkedEntity != null) {
-                        mountEntity(linkedEntity);
+                        this.mountEntity(linkedEntity);
                     }
 
                     if (instantKill && (!hasCustomName())) {
