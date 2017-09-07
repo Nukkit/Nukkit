@@ -1570,11 +1570,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.newPosition = null;
     }
 
-    protected void updateMovement() {
+    public void updateMovement() {
         // Nothing
     }
 
-    protected void tryChangeMovement() {
+    public void tryChangeMovement() {
         // Nothing
     }
 

@@ -33,6 +33,7 @@ public class EntityItem extends Entity {
     protected String thrower = null;
 
     protected Item item;
+    protected Entity entity;
 
     protected int pickupDelay = 0;
 
@@ -145,9 +146,10 @@ public class EntityItem extends Entity {
         return hasUpdate;
     }
 
-    protected void tryChangeMovement() {
+    @Override
+    public void tryChangeMovement() {
         this.checkObstruction(this.x, this.y, this.z);
-        this.tryChangeMovement();
+        entity.tryChangeMovement();
     }
 
     protected boolean applyGravityBeforeDrag() {

@@ -1147,7 +1147,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.motionY -= this.getGravity();
     }
 
-    protected void tryChangeMovement() {
+    public void tryChangeMovement() {
         float friction = 1 - this.getDrag();
 
         if (!this.onGround) {
