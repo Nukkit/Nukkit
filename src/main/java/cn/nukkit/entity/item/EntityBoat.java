@@ -94,23 +94,29 @@ public class EntityBoat extends EntityVehicle {
             return false;
         } else {
             performHurtAnimation((int) source.getFinalDamage());
-
-            Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
-            boolean instantKill = damager instanceof Player && ((Player) damager).isCreative();
-            if (instantKill || getDamage() > 40) {
-                if (linkedEntity != null) {
-                    mountEntity(linkedEntity);
-                }
-
-                if (instantKill && (!hasCustomName())) {
-                    kill();
-                } else {
-                    if (level.getGameRules().getBoolean("doEntityDrops")) {
-                        this.level.dropItem(this, new ItemBoat());
+            if(source instanceof EntityDamageByEntityEvent) {
+                Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
+                boolean instantKill = damager instanceof Player && ((Player) damager).isCreative();
+                if (instantKill || getDamage() > 40) {
+                    if (linkedEntity != null) {
+                        this.mountEntity(linkedEntity);
                     }
-                    close();
+
+                    if (instantKill && (!hasCustomName())) {
+                        kill();
+                    } else {
+                        if (level.getGameRules().getBoolean("doEntityDrops")) {
+                            this.level.dropItem(this, new ItemBoat());
+                        }
+                        close();
+                    }
                 }
-            }
+            }else{
+		if (level.getGameRules().getBoolean("doEntityDrops")) {
+                    this.level.dropItem(this, new ItemBoat());
+                }
+                close();
+			}
         }
 
         return true;
