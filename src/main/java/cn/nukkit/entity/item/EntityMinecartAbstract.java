@@ -44,19 +44,19 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     private String entityName;
     private static final int[][][] matrix = new int[][][]{
-        {{0, 0, -1}, {0, 0, 1}}, 
-        {{-1, 0, 0}, {1, 0, 0}}, 
-        {{-1, -1, 0}, {1, 0, 0}}, 
-        {{-1, 0, 0}, {1, -1, 0}}, 
-        {{0, 0, -1}, {0, -1, 1}}, 
-        {{0, -1, -1}, {0, 0, 1}}, 
-        {{0, 0, 1}, {1, 0, 0}}, 
-        {{0, 0, 1}, {-1, 0, 0}}, 
-        {{0, 0, -1}, {-1, 0, 0}}, 
-        {{0, 0, -1}, {1, 0, 0}}
+            {{0, 0, -1}, {0, 0, 1}},
+            {{-1, 0, 0}, {1, 0, 0}},
+            {{-1, -1, 0}, {1, 0, 0}},
+            {{-1, 0, 0}, {1, -1, 0}},
+            {{0, 0, -1}, {0, -1, 1}},
+            {{0, -1, -1}, {0, 0, 1}},
+            {{0, 0, 1}, {1, 0, 0}},
+            {{0, 0, 1}, {-1, 0, 0}},
+            {{0, 0, -1}, {-1, 0, 0}},
+            {{0, 0, -1}, {1, 0, 0}}
     };
     private double currentSpeed = 0;
-    private Block blockInside = null;
+    private Block blockInside;
     // Plugins modifiers
     private boolean slowWhenEmpty = true;
     private double derailedX = 0.5;
@@ -112,7 +112,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     public boolean canDoInteraction() {
         return linkedEntity == null && this.getDisplayBlock() == null;
     }
-    
+
     @Override
     public float getMountedYOffset() {
         return 0.45F; // Real minecart offset
@@ -187,13 +187,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             if (diffX * diffX + diffZ * diffZ > 0.001D) {
                 yawToChange = (Math.atan2(diffZ, diffX) * 180 / 3.141592653589793D);
             }
-            
+
             // Reverse yaw if yaw is below 0
             if (yawToChange < 0) {
                 // -90-(-90)-(-90) = 90
                 yawToChange -= yawToChange - yawToChange;
             }
-            
+
             setRotation(yawToChange, pitch);
 
             Location from = new Location(lastX, lastY, lastZ, lastYaw, lastPitch, level);
@@ -249,7 +249,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 }
             }
         }
-        
+
         return true;
     }
 
@@ -356,13 +356,15 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                     if (mine.getType().getId() == 2 && getType().getId() != 2) {
                         motionX *= 0.20000000298023224D;
                         motionZ *= 0.20000000298023224D;
-                        setMotion(new Vector3(mine.motionX - motiveX, 0, mine.motionZ - motiveZ));
+                        motionX += mine.motionX - motiveX;
+                        motionZ += mine.motionZ - motiveZ;
                         mine.motionX *= 0.949999988079071D;
                         mine.motionZ *= 0.949999988079071D;
                     } else if (mine.getType().getId() != 2 && getType().getId() == 2) {
                         mine.motionX *= 0.20000000298023224D;
                         mine.motionZ *= 0.20000000298023224D;
-                        mine.setMotion(new Vector3(motionX + motiveX, 0, motionZ + motiveZ));
+                        motionX += mine.motionX + motiveX;
+                        motionZ += mine.motionZ + motiveZ;
                         motionX *= 0.949999988079071D;
                         motionZ *= 0.949999988079071D;
                     } else {
@@ -370,14 +372,17 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                         motZ /= 2;
                         motionX *= 0.20000000298023224D;
                         motionZ *= 0.20000000298023224D;
-                        setMotion(new Vector3(motX - motiveX, 0, motZ - motiveZ));
+                        motionX += motX - motiveX;
+                        motionZ += motZ - motiveZ;
                         mine.motionX *= 0.20000000298023224D;
                         mine.motionZ *= 0.20000000298023224D;
-                        mine.setMotion(new Vector3(motX + motiveX, 0, motZ + motiveZ));
+                        mine.motionX += motX + motiveX;
+                        mine.motionZ += motZ + motiveZ;
                     }
                 } else {
-                    setMotion(new Vector3(-motiveX, 0, -motiveZ));
-                }
+                    motionX -= motiveX;
+                    motionZ -= motiveZ;
+                }                
             }
         }
     }
@@ -401,14 +406,14 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     private void setFalling() {
         motionX = NukkitMath.clamp(motionX, -getMaxSpeed(), getMaxSpeed());
         motionZ = NukkitMath.clamp(motionZ, -getMaxSpeed(), getMaxSpeed());
-        
-        if(linkedEntity != null && !hasUpdated){
+
+        if (linkedEntity != null && !hasUpdated) {
             updateRiderPosition(getMountedYOffset() + 0.35F);
             hasUpdated = true;
         } else {
             hasUpdated = false;
         }
-        
+
         if (onGround) {
             motionX *= derailedX;
             motionY *= derailedY;
@@ -424,7 +429,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     }
 
     private void processMovement(int dx, int dy, int dz, BlockRail block) {
-        fallDistance = 0.0F; 
+        fallDistance = 0.0F;
         Vector3 vector = getNextRail(x, y, z);
 
         y = (double) dy;

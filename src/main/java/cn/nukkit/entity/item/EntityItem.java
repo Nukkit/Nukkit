@@ -29,13 +29,13 @@ public class EntityItem extends Entity {
         return NETWORK_ID;
     }
 
-    protected String owner = null;
-    protected String thrower = null;
+    protected String owner;
+    protected String thrower;
 
     protected Item item;
     protected Entity entity;
 
-    protected int pickupDelay = 0;
+    protected int pickupDelay;
 
     @Override
     public float getWidth() {
@@ -128,6 +128,14 @@ public class EntityItem extends Entity {
                 this.pickupDelay -= tickDiff;
                 if (this.pickupDelay < 0) {
                     this.pickupDelay = 0;
+                }
+            } else {
+                for (Entity entity : this.level.getNearbyEntities(this.boundingBox.grow(1, 0.5, 1), this)) {
+                    if (entity instanceof Player) {
+                        if (((Player) entity).pickupEntity(this, true)) {
+                            return true;
+                        }
+                    }
                 }
             }
 

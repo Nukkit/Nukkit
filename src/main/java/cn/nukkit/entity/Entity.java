@@ -24,7 +24,10 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.protocol.*;
+import cn.nukkit.network.protocol.MobEffectPacket;
+import cn.nukkit.network.protocol.RemoveEntityPacket;
+import cn.nukkit.network.protocol.SetEntityDataPacket;
+import cn.nukkit.network.protocol.SetEntityMotionPacket;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.ChunkException;
@@ -228,10 +231,10 @@ public abstract class Entity extends Location implements Metadatable {
 
     public double lastYaw;
     public double lastPitch;
-    
+
     public double PitchDelta;
     public double YawDelta;
-    
+
     public double entityCollisionReduction = 0; // Higher than 0.9 will result a fast collisions
     public AxisAlignedBB boundingBox;
     public boolean onGround;
@@ -551,7 +554,7 @@ public abstract class Entity extends Location implements Metadatable {
     public float getScale() {
         return this.scale;
     }
-    
+
     public Entity getLinkedEntity() {
         return linkedEntity;
     }
@@ -1093,7 +1096,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         if (this.inPortalTicks == 80) {
-            EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
+            EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER); // FIX
             this.getServer().getPluginManager().callEvent(ev);
 
             // TODO: Remove this for work nether. (When is fixed).
@@ -1446,7 +1449,8 @@ public abstract class Entity extends Location implements Metadatable {
                 dx *= 1.0F + entityCollisionReduction;
                 dz *= 1.0F + entityCollisionReduction;
                 if (this.riding == null) {
-                    setMotion(new Vector3(-dx, 0.0D, -dy));
+                    motionX -= dx;
+                    motionZ -= dy;
                 }
             }
         }
@@ -1534,7 +1538,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         return false;
     }
-    
+
     public boolean fastMove(double dx, double dy, double dz) {
         if (dx == 0 && dy == 0 && dz == 0) {
             return true;
@@ -1565,7 +1569,7 @@ public abstract class Entity extends Location implements Metadatable {
         Timings.entityMoveTimer.stopTiming();
         return true;
     }
-        
+
     public boolean move(double dx, double dy, double dz) {
         if (dx == 0 && dz == 0 && dy == 0) {
             return true;
@@ -1744,7 +1748,7 @@ public abstract class Entity extends Location implements Metadatable {
         if (portal) {
             inPortalTicks++;
         } else {
-            inPortalTicks = 0;
+            this.inPortalTicks = 0;
         }
 
         if (vector.lengthSquared() > 0) {
@@ -1846,9 +1850,9 @@ public abstract class Entity extends Location implements Metadatable {
             }
         }
 
-        this.motionX += motion.x;
-        this.motionY += motion.y;
-        this.motionZ += motion.z;
+        this.motionX = motion.x;
+        this.motionY = motion.y;
+        this.motionZ = motion.z;
 
         if (!this.justCreated) {
             this.updateMovement();

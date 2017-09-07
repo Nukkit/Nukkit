@@ -199,6 +199,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private ClientChainData loginChainData;
 
+    public int pickedXPOrb = 0;
+
     public BlockEnderChest getViewingEnderChest() {
         return viewingEnderChest;
     }
@@ -1285,7 +1287,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (portal) {
             inPortalTicks++;
         } else {
-            inPortalTicks = 0;
+            this.inPortalTicks = 0;
         }
     }
 
@@ -1297,95 +1299,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 continue;
             }
 
-            if (entity instanceof EntityArrow && ((EntityArrow) entity).hadCollision) {
-                ItemArrow item = new ItemArrow();
-                if (this.isSurvival() && !this.inventory.canAddItem(item)) {
-                    continue;
-                }
-
-                InventoryPickupArrowEvent ev;
-                this.server.getPluginManager().callEvent(ev = new InventoryPickupArrowEvent(this.inventory, (EntityArrow) entity));
-                if (ev.isCancelled()) {
-                    continue;
-                }
-
-                TakeItemEntityPacket pk = new TakeItemEntityPacket();
-                pk.entityId = this.getId();
-                pk.target = entity.getId();
-                Server.broadcastPacket(entity.getViewers().values(), pk);
-
-                pk = new TakeItemEntityPacket();
-                pk.entityId = this.id;
-                pk.target = entity.getId();
-                this.dataPacket(pk);
-
-                this.inventory.addItem(item.clone());
-                entity.kill();
-            } else if (entity instanceof EntityItem) {
-                if (((EntityItem) entity).getPickupDelay() <= 0) {
-                    Item item = ((EntityItem) entity).getItem();
-
-                    if (item != null) {
-                        if (this.isSurvival() && !this.inventory.canAddItem(item)) {
-                            continue;
-                        }
-
-                        InventoryPickupItemEvent ev;
-                        this.server.getPluginManager().callEvent(ev = new InventoryPickupItemEvent(this.inventory, (EntityItem) entity));
-                        if (ev.isCancelled()) {
-                            continue;
-                        }
-
-                        switch (item.getId()) {
-                            case Item.WOOD:
-                            case Item.WOOD2:
-                                this.awardAchievement("mineWood");
-                                break;
-                            case Item.DIAMOND:
-                                this.awardAchievement("diamond");
-                                break;
-                        }
-                        /*switch (item.getId()) {
-                            case Item.WOOD:
-                                this.awardAchievement("mineWood");
-                                break;
-                            case Item.DIAMOND:
-                                this.awardAchievement("diamond");
-                                break;
-                        }*/
-
-                        TakeItemEntityPacket pk = new TakeItemEntityPacket();
-                        pk.entityId = this.getId();
-                        pk.target = entity.getId();
-                        Server.broadcastPacket(entity.getViewers().values(), pk);
-
-                        pk = new TakeItemEntityPacket();
-                        pk.entityId = this.id;
-                        pk.target = entity.getId();
-                        this.dataPacket(pk);
-
-                        this.inventory.addItem(item.clone());
-                        entity.kill();
-                    }
-                }
-            }
-        }
-        for (Entity entity : this.level.getNearbyEntities(this.boundingBox.grow(3.5, 2, 3.5), this)) {
-            entity.scheduleUpdate();
-
-            if (!entity.isAlive() || !this.isAlive()) {
-                continue;
-            }
-            if (entity instanceof EntityXPOrb) {
-                EntityXPOrb xpOrb = (EntityXPOrb) entity;
-                if (xpOrb.getPickupDelay() <= 0) {
-                    int exp = xpOrb.getExp();
-                    this.addExperience(exp);
-                    entity.kill();
-                    this.getLevel().addSound(new ExperienceOrbSound(this));
-                    break;
-                }
-            }
+            this.pickupEntity(entity, true);
         }
     }
 
@@ -3299,47 +3213,135 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         ArrayList<Item> ingredientz = new ArrayList<>();
 
-                        for (Recipe r : recipes) {
-                            if (r instanceof ShapedRecipe) {
-                                Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) r).getIngredientMap();
+                        recipeloop:
+                        for (Recipe rec : recipes) {
+                            ingredientz.clear();
+
+                            if (rec instanceof ShapedRecipe) {
+                                Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) rec).getIngredientMap();
                                 for (Map<Integer, Item> map : ingredients.values()) {
                                     for (Item ingredient : map.values()) {
                                         if (ingredient != null && ingredient.getId() != Item.AIR) {
-                                            if (!this.inventory.contains(ingredient)) {
-                                                canCraft = false;
-                                                break;
-                                            }
-
                                             ingredientz.add(ingredient);
-                                            this.inventory.removeItem(ingredient);
                                         }
                                     }
                                 }
+                            } else if (rec instanceof ShapelessRecipe) {
+                                ShapelessRecipe recipe0 = (ShapelessRecipe) rec;
 
-                                if (canCraft) {
-                                    recipe = r;
-                                    break;
+                                for (Item ingredient : recipe0.getIngredientList()) {
+                                    if (ingredient != null && ingredient.getId() != Item.AIR) {
+                                        ingredientz.add(ingredient);
+                                    }
                                 }
                             }
-                        }
 
-                        if (recipe != null) {
-                            CraftItemEvent craftItemEvent = new CraftItemEvent(this, ingredientz.stream().toArray(Item[]::new), recipe);
+                            Map<String, Item> serialized = new HashMap<>();
+
+                            for (Item ingredient : ingredientz) {
+                                String hash = ingredient.getId() + ":" + ingredient.getDamage();
+                                Item r = serialized.get(hash);
+
+                                if (r != null) {
+                                    r.count += ingredient.getCount();
+                                    continue;
+                                }
+
+                                serialized.put(hash, ingredient);
+                            }
+
+                            for (Item ingredient : serialized.values()) {
+                                if (!this.inventory.contains(ingredient)) {
+                                    continue recipeloop;
+                                }
+                            }
+
+                            recipe = rec;
+
+                            CraftItemEvent craftItemEvent = new CraftItemEvent(this, serialized.values().stream().toArray(Item[]::new), recipe);
                             getServer().getPluginManager().callEvent(craftItemEvent);
 
                             if (craftItemEvent.isCancelled()) {
                                 this.inventory.sendContents(this);
-                                break;
+                                break packetswitch;
+                            }
+
+                            for (Item ingredient : serialized.values()) {
+                                this.inventory.removeItem(ingredient);
                             }
 
                             this.inventory.addItem(recipe.getResult());
-                        } else {
+                            break;
+                        }
+
+                        if (recipe == null) {
                             this.server.getLogger().debug("(1) Unmatched desktop recipe " + craftingEventPacket.id + " from player " + this.getName());
                             this.inventory.sendContents(this);
                         }
                     } else {
+                        ArrayList<Item> ingredientz = new ArrayList<>();
 
                         if (recipe instanceof ShapedRecipe) {
+
+                            Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) recipe).getIngredientMap();
+                            for (Map<Integer, Item> map : ingredients.values()) {
+                                for (Item ingredient : map.values()) {
+                                    if (ingredient != null && ingredient.getId() != Item.AIR) {
+                                        ingredientz.add(ingredient);
+                                    }
+                                }
+                            }
+                        } else if (recipe instanceof ShapelessRecipe) {
+                            ShapelessRecipe recipe0 = (ShapelessRecipe) recipe;
+
+                            for (Item ingredient : recipe0.getIngredientList()) {
+                                if (ingredient != null && ingredient.getId() != Item.AIR) {
+                                    ingredientz.add(ingredient);
+                                }
+                            }
+                        }
+
+                        Map<String, Item> serialized = new HashMap<>();
+
+                        for (Item ingredient : ingredientz) {
+                            String hash = ingredient.getId() + ":" + ingredient.getDamage();
+                            Item r = serialized.get(hash);
+
+                            if (r != null) {
+                                r.count += ingredient.getCount();
+                                continue;
+                            }
+
+                            serialized.put(hash, ingredient);
+                        }
+
+                        for (Item ingredient : serialized.values()) {
+                            if (!this.inventory.contains(ingredient)) {
+                                canCraft = false;
+                                break;
+                            }
+                        }
+
+                        if (!canCraft) {
+                            this.server.getLogger().debug("(1) Unmatched recipe " + craftingEventPacket.id + " from player " + this.getName() + "  not anough ingredients");
+                            return;
+                        }
+
+                        CraftItemEvent craftItemEvent = new CraftItemEvent(this, serialized.values().stream().toArray(Item[]::new), recipe);
+                        getServer().getPluginManager().callEvent(craftItemEvent);
+
+                        if (craftItemEvent.isCancelled()) {
+                            this.inventory.sendContents(this);
+                            break;
+                        }
+
+                        for (Item ingredient : serialized.values()) {
+                            this.inventory.removeItem(ingredient);
+                        }
+
+                        this.inventory.addItem(recipe.getResult());
+
+                        /*if (recipe instanceof ShapedRecipe) {
                             int offsetX = 0;
                             int offsetY = 0;
 
@@ -3535,44 +3537,46 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             for (Item i : extraItem) {
                                 this.level.dropItem(this, i);
                             }
-                        }
+                        }*/
                     }
 
-                    switch (recipe.getResult().getId()) {
-                        case Item.WORKBENCH:
-                            this.awardAchievement("buildWorkBench");
-                            break;
-                        case Item.WOODEN_PICKAXE:
-                            this.awardAchievement("buildPickaxe");
-                            break;
-                        case Item.FURNACE:
-                            this.awardAchievement("buildFurnace");
-                            break;
-                        case Item.WOODEN_HOE:
-                            this.awardAchievement("buildHoe");
-                            break;
-                        case Item.BREAD:
-                            this.awardAchievement("makeBread");
-                            break;
-                        case Item.CAKE:
-                            //TODO: detect complex recipes like cake that leave remains
-                            this.awardAchievement("bakeCake");
-                            this.inventory.addItem(new ItemBucket(0, 3));
-                            break;
-                        case Item.STONE_PICKAXE:
-                        case Item.GOLD_PICKAXE:
-                        case Item.IRON_PICKAXE:
-                        case Item.DIAMOND_PICKAXE:
-                            this.awardAchievement("buildBetterPickaxe");
-                            break;
-                        case Item.WOODEN_SWORD:
-                            this.awardAchievement("buildSword");
-                            break;
-                        case Item.DIAMOND:
-                            this.awardAchievement("diamond");
-                            break;
-                        default:
-                            break;
+                    if (recipe != null) {
+                        switch (recipe.getResult().getId()) {
+                            case Item.WORKBENCH:
+                                this.awardAchievement("buildWorkBench");
+                                break;
+                            case Item.WOODEN_PICKAXE:
+                                this.awardAchievement("buildPickaxe");
+                                break;
+                            case Item.FURNACE:
+                                this.awardAchievement("buildFurnace");
+                                break;
+                            case Item.WOODEN_HOE:
+                                this.awardAchievement("buildHoe");
+                                break;
+                            case Item.BREAD:
+                                this.awardAchievement("makeBread");
+                                break;
+                            case Item.CAKE:
+                                //TODO: detect complex recipes like cake that leave remains
+                                this.awardAchievement("bakeCake");
+                                this.inventory.addItem(new ItemBucket(0, 3));
+                                break;
+                            case Item.STONE_PICKAXE:
+                            case Item.GOLD_PICKAXE:
+                            case Item.IRON_PICKAXE:
+                            case Item.DIAMOND_PICKAXE:
+                                this.awardAchievement("buildBetterPickaxe");
+                                break;
+                            case Item.WOODEN_SWORD:
+                                this.awardAchievement("buildSword");
+                                break;
+                            case Item.DIAMOND:
+                                this.awardAchievement("diamond");
+                                break;
+                            default:
+                                break;
+                        }
                     }
 
                     break;
@@ -4558,7 +4562,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
 
-            if (this.isLevelChange) { //TODO: remove this
+            /*if (this.isLevelChange) { //TODO: remove this
                 PlayStatusPacket statusPacket0 = new PlayStatusPacket();//Weather
                 this.getLevel().sendWeather(this);
                 //Update time
@@ -4570,7 +4574,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.getLevel().sendWeather(this);
                 //Update time
                 this.getLevel().sendTime(this);
-            }
+            }*/
 
             this.spawnToAll();
             this.isLevelChange = false;
@@ -4633,6 +4637,37 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             //Update time
             this.getLevel().sendTime(this);
 
+            /*if (from.getLevel().getId() != to.level.getId()) {
+                if (this.spawned) { //broken
+                    //TODO: remove this in future version
+                    this.isLevelChange = true;
+                    this.nextChunkOrderRun = 10000;
+
+                    ChangeDimensionPacket changeDimensionPacket1 = new ChangeDimensionPacket();
+                    changeDimensionPacket1.dimension = 1;
+                    changeDimensionPacket1.x = (float) this.getX();
+                    changeDimensionPacket1.y = (float) this.getY();
+                    changeDimensionPacket1.z = (float) this.getZ();
+                    this.dataPacket(changeDimensionPacket1);
+
+                    this.forceSendEmptyChunks();
+                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
+                        PlayStatusPacket statusPacket0 = new PlayStatusPacket();
+                        statusPacket0.status = PlayStatusPacket.PLAYER_SPAWN;
+                        dataPacket(statusPacket0);
+                    }, 8);
+
+                    this.getServer().getScheduler().scheduleDelayedTask(() -> {
+                        ChangeDimensionPacket changeDimensionPacket = new ChangeDimensionPacket();
+                        changeDimensionPacket.dimension = 0;
+                        changeDimensionPacket.x = (float) this.getX();
+                        changeDimensionPacket.y = (float) this.getY();
+                        changeDimensionPacket.z = (float) this.getZ();
+                        dataPacket(changeDimensionPacket);
+                        nextChunkOrderRun = 0;
+                    }, 9);
+                }
+            }*/
             return true;
         }
         return false;
@@ -5004,6 +5039,104 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public ClientChainData getLoginChainData() {
         return this.loginChainData;
+    }
+
+    public boolean pickupEntity(Entity entity, boolean near) {
+        if (!this.spawned || !this.isAlive() || !this.isOnline()) {
+            return false;
+        }
+
+        if (near) {
+            if (entity instanceof EntityArrow && ((EntityArrow) entity).hadCollision) {
+                ItemArrow item = new ItemArrow();
+                if (this.isSurvival() && !this.inventory.canAddItem(item)) {
+                    return false;
+                }
+
+                InventoryPickupArrowEvent ev;
+                this.server.getPluginManager().callEvent(ev = new InventoryPickupArrowEvent(this.inventory, (EntityArrow) entity));
+                if (ev.isCancelled()) {
+                    return false;
+                }
+
+                TakeItemEntityPacket pk = new TakeItemEntityPacket();
+                pk.entityId = this.getId();
+                pk.target = entity.getId();
+                Server.broadcastPacket(entity.getViewers().values(), pk);
+
+                pk = new TakeItemEntityPacket();
+                pk.entityId = this.id;
+                pk.target = entity.getId();
+                this.dataPacket(pk);
+
+                this.inventory.addItem(item.clone());
+                entity.kill();
+                return true;
+            } else if (entity instanceof EntityItem) {
+                if (((EntityItem) entity).getPickupDelay() <= 0) {
+                    Item item = ((EntityItem) entity).getItem();
+
+                    if (item != null) {
+                        if (this.isSurvival() && !this.inventory.canAddItem(item)) {
+                            return false;
+                        }
+
+                        InventoryPickupItemEvent ev;
+                        this.server.getPluginManager().callEvent(ev = new InventoryPickupItemEvent(this.inventory, (EntityItem) entity));
+                        if (ev.isCancelled()) {
+                            return false;
+                        }
+
+                        switch (item.getId()) {
+                            case Item.WOOD:
+                            case Item.WOOD2:
+                                this.awardAchievement("mineWood");
+                                break;
+                            case Item.DIAMOND:
+                                this.awardAchievement("diamond");
+                                break;
+                        }
+                        /*switch (item.getId()) {
+                            case Item.WOOD:
+                                this.awardAchievement("mineWood");
+                                break;
+                            case Item.DIAMOND:
+                                this.awardAchievement("diamond");
+                                break;
+                        }*/
+
+                        TakeItemEntityPacket pk = new TakeItemEntityPacket();
+                        pk.entityId = this.getId();
+                        pk.target = entity.getId();
+                        Server.broadcastPacket(entity.getViewers().values(), pk);
+
+                        pk = new TakeItemEntityPacket();
+                        pk.entityId = this.id;
+                        pk.target = entity.getId();
+                        this.dataPacket(pk);
+
+                        this.inventory.addItem(item.clone());
+                        entity.kill();
+                        return true;
+                    }
+                }
+            }
+        }
+
+        int tick = this.getServer().getTick();
+        if (pickedXPOrb < tick && entity instanceof EntityXPOrb && this.boundingBox.isVectorInside(entity)) {
+            EntityXPOrb xpOrb = (EntityXPOrb) entity;
+            if (xpOrb.getPickupDelay() <= 0) {
+                int exp = xpOrb.getExp();
+                this.addExperience(exp);
+                entity.kill();
+                this.getLevel().addSound(new ExperienceOrbSound(this));
+                pickedXPOrb = tick;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
