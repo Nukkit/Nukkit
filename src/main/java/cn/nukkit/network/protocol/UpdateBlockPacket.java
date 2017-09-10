@@ -1,5 +1,6 @@
 package cn.nukkit.network.protocol;
 
+
 /**
  * author: MagicDroidX
  * Nukkit Project
@@ -16,7 +17,14 @@ public class UpdateBlockPacket extends DataPacket {
     public static final int FLAG_ALL = (FLAG_NEIGHBORS | FLAG_NETWORK);
     public static final int FLAG_ALL_PRIORITY = (FLAG_ALL | FLAG_PRIORITY);
 
-    public Entry[] entries = new Entry[0];
+    public int x;
+    public int y;
+    public int z;
+
+    public int blockId;
+    public int blockData;
+
+    public int flags;
 
     @Override
     public byte pid() {
@@ -31,12 +39,10 @@ public class UpdateBlockPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putUnsignedVarInt(entries.length); //TODO: Check if this is correct
-        for (Entry entry : entries) {
-            this.putBlockVector3(entry.x, entry.y, entry.z);
-            this.putUnsignedVarInt(entry.blockId);
-            this.putUnsignedVarInt((0xb << 4) | entry.blockData & 0xf);
-        }
+        this.putBlockVector3(this.x, this.y, this.z);
+
+        this.putUnsignedVarInt(this.blockId);
+        this.putUnsignedVarInt((this.flags << 4) | this.blockData);
     }
 
     public static class Entry {

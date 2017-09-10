@@ -1014,7 +1014,7 @@ public class Level implements ChunkManager, Metadatable {
                 if (b == null) {
                     continue;
                 }
-                UpdateBlockPacket packet = new UpdateBlockPacket();
+
                 if (b instanceof Block) {
                     UpdateBlockPacket.Entry entry = new UpdateBlockPacket.Entry(
                             (int) b.x,
@@ -1039,10 +1039,19 @@ public class Level implements ChunkManager, Metadatable {
                 }
             }
         }
-        UpdateBlockPacket packet = new UpdateBlockPacket();
-        packet.entries = entries.stream().toArray(UpdateBlockPacket.Entry[]::new);
-        for (Player player : target) {
-            player.dataPacket(packet);
+
+        for (UpdateBlockPacket.Entry entry : entries) {
+            UpdateBlockPacket packet = new UpdateBlockPacket();
+            packet.x = entry.x;
+            packet.y = entry.y;
+            packet.z = entry.z;
+
+            packet.blockId = entry.blockId;
+            packet.blockData = entry.blockData;
+
+            packet.flags = entry.flags;
+
+            Server.broadcastPacket(target, packet);
         }
     }
 

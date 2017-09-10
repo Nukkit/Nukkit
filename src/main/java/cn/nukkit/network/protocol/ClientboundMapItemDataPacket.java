@@ -51,9 +51,11 @@ public class ClientboundMapItemDataPacket extends DataPacket {
         if (decorators.length > 0) {
             update |= DECORATIONS_UPDATE;
         }
+
         if (image != null || colors.length > 0) {
             update |= TEXTURE_UPDATE;
         }
+
         this.putUnsignedVarInt(update);
 
         if ((update & 0x08) != 0) { //TODO: find out what these are for
@@ -70,8 +72,8 @@ public class ClientboundMapItemDataPacket extends DataPacket {
             this.putUnsignedVarInt(decorators.length);
 
             for (MapDecorator decorator : decorators) {
-                this.putByte(decorator.icon);
                 this.putByte(decorator.rotation);
+                this.putByte(decorator.icon);
                 this.putByte(decorator.offsetX);
                 this.putByte(decorator.offsetZ);
                 this.putString(decorator.label);
@@ -84,7 +86,8 @@ public class ClientboundMapItemDataPacket extends DataPacket {
             this.putVarInt(height);
             this.putVarInt(offsetX);
             this.putVarInt(offsetZ);
-            this.putVarInt(width * height);
+
+            this.putUnsignedVarInt(width * height);
 
             if (image != null) {
                 for (int y = 0; y < width; y++) {
