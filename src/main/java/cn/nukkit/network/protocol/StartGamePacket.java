@@ -51,6 +51,8 @@ public class StartGamePacket extends DataPacket {
     public boolean unknown = false;
     public long currentTick;
 
+    public int enchantmentSeed;
+
     @Override
     public void decode() {
 
@@ -94,6 +96,7 @@ public class StartGamePacket extends DataPacket {
         this.putString(this.premiumWorldTemplateId);
         this.putBoolean(this.unknown);
         this.putLLong(this.currentTick);
+        this.putVarInt(this.enchantmentSeed);
     }
 
 }

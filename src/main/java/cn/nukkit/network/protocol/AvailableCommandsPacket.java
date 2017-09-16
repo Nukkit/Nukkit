@@ -7,8 +7,6 @@ import cn.nukkit.utils.BinaryStream;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,10 +23,18 @@ public class AvailableCommandsPacket extends DataPacket {
     public static final int ARG_TYPE_FLOAT     = 0x02;
     public static final int ARG_TYPE_VALUE     = 0x03;
     public static final int ARG_TYPE_TARGET    = 0x04;
+
     public static final int ARG_TYPE_STRING    = 0x0c;
     public static final int ARG_TYPE_POSITION  = 0x0d;
+
     public static final int ARG_TYPE_RAWTEXT   = 0x10;
     public static final int ARG_TYPE_TEXT      = 0x12;
+
+    public static final int ARG_TYPE_JSON = 0x15;
+    public static final int ARG_TYPE_COMMAND = 0x1c;
+
+    public static final int ARG_FLAG_ENUM = 0x200000;
+    public static final int ARG_FLAG_TEMPLATE = 0x01000000;
 
     @Override
     public byte pid() {

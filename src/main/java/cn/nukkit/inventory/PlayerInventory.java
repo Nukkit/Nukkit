@@ -392,15 +392,15 @@ public class PlayerInventory extends BaseInventory {
     @Override
     public void sendContents(Player[] players) {
         InventoryContentPacket pk = new InventoryContentPacket();
-        pk.slots = new Item[this.getSize() + this.getHotbarSize()];
+        pk.slots = new Item[this.getSize()];
         for (int i = 0; i < this.getSize(); ++i) {
             pk.slots[i] = this.getItem(i);
         }
 
-        //Because PE is stupid and shows 9 less slots than you send it, give it 9 dummy slots so it shows all the REAL slots.
+        /*//Because PE is stupid and shows 9 less slots than you send it, give it 9 dummy slots so it shows all the REAL slots.
         for(int i = this.getSize(); i < this.getSize() + this.getHotbarSize(); ++i){
             pk.slots[i] = new ItemBlock(new BlockAir());
-        }
+        }*/
 
         for (Player player : players) {
             int id = player.getWindowId(this);
@@ -410,6 +410,10 @@ public class PlayerInventory extends BaseInventory {
             }
             pk.inventoryId = id;
             player.dataPacket(pk.clone());
+
+            if (player.getId() == this.getHolder().getId()) {
+                this.sendHotbarContents();
+            }
         }
     }
 

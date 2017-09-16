@@ -121,17 +121,18 @@ public class AdventureSettings implements Cloneable {
 
     public void update() {
         AdventureSettingsPacket pk = new AdventureSettingsPacket();
-        pk.flags = 0;
-        pk.worldImmutable = !canDestroyBlock;
-        pk.autoJump = autoJump;
-        pk.allowFlight = canFly;
-        pk.noClip = noclip;
-        pk.isFlying = flying;
-        pk.noPvp = noPvp;
-        pk.noPvm = noPvm;
-        pk.noMvp = noMvp;
-        pk.muted = muted;
-        pk.userPermission = (this.player.isOp() ? PERMISSION_OPERATOR : PERMISSION_NORMAL);
+        pk.setFlag(AdventureSettingsPacket.WORLD_IMMUTABLE, !canDestroyBlock);
+        pk.setFlag(AdventureSettingsPacket.AUTO_JUMP, autoJump);
+        pk.setFlag(AdventureSettingsPacket.ALLOW_FLIGHT, canFly);
+        pk.setFlag(AdventureSettingsPacket.NO_CLIP, noclip);
+        pk.setFlag(AdventureSettingsPacket.FLYING, flying);
+        pk.setFlag(AdventureSettingsPacket.NO_PVP, noPvp);
+        pk.setFlag(AdventureSettingsPacket.MUTED, muted);
+
+        pk.commandPermission = (player.isOp() ? AdventureSettingsPacket.PERMISSION_OPERATOR : AdventureSettingsPacket.PERMISSION_NORMAL);
+        pk.playerPermission = (player.isOp() ? Player.PERMISSION_OPERATOR : Player.PERMISSION_MEMBER);
+        pk.entityUniqueId = player.getId();
+
         player.dataPacket(pk);
 
         player.resetInAirTicks();

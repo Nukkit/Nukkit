@@ -1040,6 +1040,8 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
+        List<DataPacket> packets = new ArrayList<>();
+
         for (UpdateBlockPacket.Entry entry : entries) {
             UpdateBlockPacket packet = new UpdateBlockPacket();
             packet.x = entry.x;
@@ -1051,8 +1053,10 @@ public class Level implements ChunkManager, Metadatable {
 
             packet.flags = entry.flags;
 
-            Server.broadcastPacket(target, packet);
+            packets.add(packet);
         }
+
+        this.getServer().batchPackets(target, packets.stream().toArray(DataPacket[]::new));
     }
 
     public void clearCache() {
@@ -1969,6 +1973,11 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public Item useItemOn(Vector3 vector, Item item, BlockFace face, float fx, float fy, float fz, Player player) {
+        return this.useItemOn(vector, item, face, fx, fy, fz, player, false);
+    }
+
+
+    public Item useItemOn(Vector3 vector, Item item, BlockFace face, float fx, float fy, float fz, Player player, boolean playSound) {
         Block target = this.getBlock(vector);
         Block block = target.getSide(face);
 
@@ -2014,32 +2023,10 @@ public class Level implements ChunkManager, Metadatable {
             } else {
                 return null;
             }
+
         } else if (target.canBeActivated() && target.onActivate(item, null)) {
             return item;
         }
-        return null;
-    }
-
-    public Item usePlaceOn(Vector3 vector, Item item, BlockFace face, float fx, float fy, float fz) {
-        return this.usePlaceOn(vector, item, face, fx, fy, fz, null);
-    }
-
-    public Item usePlaceOn(Vector3 vector, Item item, BlockFace face, float fx, float fy, float fz, Player player) {
-        return this.usePlaceOn(vector, item, face, fx, fy, fz, player, false);
-    }
-
-    public Item usePlaceOn(Vector3 vector, Item item, BlockFace face, float fx, float fy, float fz, Player player, boolean playSound) {
-        Block target = this.getBlock(vector);
-        Block block = target.getSide(face);
-
-        if (block.y > 255 || block.y < 0) {
-            return null;
-        }
-
-        if (target.getId() == Item.AIR) {
-            return null;
-        }
-
         Block hand;
         if (item.canBePlaced()) {
             hand = item.getBlock();

@@ -92,6 +92,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final float DEFAULT_SPEED = 0.1f;
     public static final float MAXIMUM_SPEED = 0.5f;
 
+    public static final int PERMISSION_CUSTOM = 3;
+    public static final int PERMISSION_OPERATOR = 2;
+    public static final int PERMISSION_MEMBER = 1;
+    public static final int PERMISSION_VISITOR = 0;
+
     protected final SourceInterface interfaz;
 
     public boolean playedBefore;
@@ -2125,11 +2130,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case ProtocolInfo.ADVENTURE_SETTINGS_PACKET:
                     //TODO: player abilities, check for other changes
                     AdventureSettingsPacket adventureSettingsPacket = (AdventureSettingsPacket) packet;
-                    if (adventureSettingsPacket.isFlying && !this.getAdventureSettings().canFly()) {
+                    if (adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) && !this.getAdventureSettings().canFly()) {
                         this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server");
                         break;
                     }
-                    PlayerToggleFlightEvent playerToggleFlightEvent = new PlayerToggleFlightEvent(this, adventureSettingsPacket.isFlying);
+                    PlayerToggleFlightEvent playerToggleFlightEvent = new PlayerToggleFlightEvent(this, adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT));
                     this.server.getPluginManager().callEvent(playerToggleFlightEvent);
                     if (playerToggleFlightEvent.isCancelled()) {
                         this.getAdventureSettings().update();
@@ -2207,7 +2212,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
                 case ProtocolInfo.PLAYER_ACTION_PACKET:
                     PlayerActionPacket playerActionPacket = (PlayerActionPacket) packet;
-                    if (!this.spawned || (!this.isAlive() && playerActionPacket.action != PlayerActionPacket.ACTION_RESPAWN && playerActionPacket.action != PlayerActionPacket.ACTION_DIMENSION_CHANGE)) {
+                    if (!this.spawned || (!this.isAlive() && playerActionPacket.action != PlayerActionPacket.ACTION_RESPAWN && playerActionPacket.action != PlayerActionPacket.ACTION_DIMENSION_CHANGE_REQUEST)) {
                         break;
                     }
 
@@ -2381,16 +2386,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.setGliding(false);
                             }
                             break packetswitch;
-                        case PlayerActionPacket.ACTION_WORLD_IMMUTABLE:
-                            break; //TODO
                         case PlayerActionPacket.ACTION_CONTINUE_BREAK:
                             if (this.isBreakingBlock()) {
                                 block = this.level.getBlock(pos);
                                 this.level.addParticle(new PunchBlockParticle(pos, block, face));
                             }
                             break;
-                        case PlayerActionPacket.ACTION_CHANGE_SKIN:
-                            break; //TODO
                     }
 
                     this.startAction = -1;

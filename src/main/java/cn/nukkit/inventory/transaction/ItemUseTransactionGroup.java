@@ -15,6 +15,7 @@ import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.entity.projectile.EntitySnowball;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
+import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.sound.LaunchSound;
@@ -46,6 +47,8 @@ public class ItemUseTransactionGroup extends BaseTransactionGroup {
         this.item = item;
         this.playerPos = playerPos;
         this.clickPos = clickPos;
+
+        System.out.println("action: " + action);
     }
 
     @Override
@@ -63,30 +66,30 @@ public class ItemUseTransactionGroup extends BaseTransactionGroup {
         BlockFace face;
 
         switch (this.action) {
-            case ITEM_USE_ACTION_PLACE:
+            case ITEM_USE_CLICK_AIR:
                 face = BlockFace.fromIndex(this.face);
-                if (player.canInteract(blockVector.add(0.5, 0.5, 0.5), player.isCreative() ? 13 : 7)) {
-                    if (player.isCreative()) {
-                        Item i = inventory.getItemInHand();
-                        if (player.level.usePlaceOn(blockVector, i, face, clickPos.x, clickPos.y, clickPos.z, player) != null) {
-                            return true;
-                        }
-                    } else if (inventory.getItemInHand().deepEquals(item)) {
-                        Item i = inventory.getItemInHand();
-                        Item oldItem = i.clone();
-                        //TODO: Implement adventure mode checks
-                        if ((i = player.level.usePlaceOn(blockVector, i, face, clickPos.x, clickPos.y, clickPos.z, player)) != null) {
-                            if (!i.deepEquals(oldItem) || i.getCount() != oldItem.getCount()) {
-                                inventory.setItemInHand(i);
-                                inventory.sendHeldItem(player.getViewers().values());
-                            }
-                            return true;
-                        }
-                    }
-                }
-                return false;
+                Item item;
 
-            case ITEM_USE_ACTION_USE:
+                if (player.isCreative()) {
+                    item = player.getInventory().getItemInHand();
+                } else if (!player.getInventory().getItemInHand().equals(this.item)) {
+                    player.getInventory().sendHeldItem(player);
+                    return true;
+                } else {
+                    item = player.getInventory().getItemInHand();
+                }
+                PlayerInteractEvent ev = new PlayerInteractEvent(player, item, player.getDirectionVector(), face, Action.RIGHT_CLICK_AIR);
+                player.getServer().getPluginManager().callEvent(ev);
+                if (ev.isCancelled()) {
+                    player.getInventory().sendHeldItem(player);
+                    return true;
+                }
+
+                //TODO: handle air click
+                player.setDataFlag(Entity.DATA_FLAGS, Entity.DATA_FLAG_ACTION, true);
+                player.startAction();
+                return false;
+            case ITEM_USE_CLICK_BLOCK:
                 if (this.face >= 0 && this.face <= 5) {
                     face = BlockFace.fromIndex(this.face);
                     if (player.canInteract(blockVector.add(0.5, 0.5, 0.5), player.isCreative() ? 13 : 7)) {
@@ -95,7 +98,7 @@ public class ItemUseTransactionGroup extends BaseTransactionGroup {
                             if (player.level.useItemOn(blockVector, i, face, clickPos.x, clickPos.y, clickPos.z, player) != null) {
                                 return true;
                             }
-                        } else if (inventory.getItemInHand().deepEquals(item)) {
+                        } else if (inventory.getItemInHand().deepEquals(this.item)) {
                             Item i = inventory.getItemInHand();
                             Item oldItem = i.clone();
                             //TODO: Implement adventure mode checks
@@ -118,6 +121,8 @@ public class ItemUseTransactionGroup extends BaseTransactionGroup {
                     Block target = player.level.getBlock(blockVector);
                     Block block = target.getSide(face);
 
+                    player.level.sendBlocks(new Player[]{player}, new Block[]{target, block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+
                     if (target instanceof BlockDoor) {
                         BlockDoor door = (BlockDoor) target;
 
@@ -128,9 +133,10 @@ public class ItemUseTransactionGroup extends BaseTransactionGroup {
 
                             if (part.getId() == target.getId()) {
                                 target = part;
+
+                                player.level.sendBlocks(new Player[]{player}, new Block[]{target}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
                             }
                         }
-                        player.level.sendBlocks(new Player[]{player}, new Block[]{target, block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
                     }
                 } else if (this.face == -1) {
                     Vector3 aimPos = new Vector3(
@@ -140,7 +146,7 @@ public class ItemUseTransactionGroup extends BaseTransactionGroup {
                     );
 
                     Item i;
-                    if (player.isCreative() || inventory.getItemInHand().deepEquals(item)) {
+                    if (player.isCreative() || inventory.getItemInHand().deepEquals(this.item)) {
                         i = inventory.getItemInHand();
                     } else {
                         inventory.sendHeldItem(player);
@@ -313,7 +319,7 @@ public class ItemUseTransactionGroup extends BaseTransactionGroup {
                 }
                 break;
 
-            case ITEM_USE_ACTION_DESTROY:
+            case ITEM_USE_BREAK_BLOCK:
                 Item i = player.getInventory().getItemInHand();
 
                 Item oldItem = i.clone();

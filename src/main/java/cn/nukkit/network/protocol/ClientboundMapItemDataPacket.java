@@ -20,6 +20,8 @@ public class ClientboundMapItemDataPacket extends DataPacket {
     public int offsetX;
     public int offsetZ;
 
+    public byte dimensionId;
+
     public MapDecorator[] decorators = new MapDecorator[0];
     public int[] colors = new int[0];
     public BufferedImage image = null;
@@ -57,6 +59,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
         }
 
         this.putUnsignedVarInt(update);
+        this.putByte(this.dimensionId);
 
         if ((update & 0x08) != 0) { //TODO: find out what these are for
             this.putUnsignedVarInt(eids.length);

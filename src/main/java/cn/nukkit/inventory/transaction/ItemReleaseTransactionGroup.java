@@ -68,7 +68,7 @@ public class ItemReleaseTransactionGroup extends BaseTransactionGroup {
 
                 player.setDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION, false);
                 break;
-            case ITEM_RELEASE_ACTION_USE:
+            case ITEM_RELEASE_ACTION_CONSUME:
                 if (player.getStartActionTick() > -1 && player.getDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION)) {
                     if (inventory.getItemInHand().getId() == Item.BOW) {
 

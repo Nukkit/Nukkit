@@ -105,6 +105,7 @@ public abstract class Entity extends Location implements Metadatable {
     /* 45 (byte) container stuff
      * 46 (int) container stuff
      * 47 (int) container stuff */
+    public static final int DATA_FLAG_FIRE_IMMUNE = 47;
     public static final int DATA_BLOCK_TARGET = 48; //block coords (ender crystal)
     public static final int DATA_WITHER_INVULNERABLE_TICKS = 49; //int
     public static final int DATA_WITHER_TARGET_1 = 50; //long
@@ -177,7 +178,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_IDLING = 39;
     public static final int DATA_FLAG_EVOKER_SPELL = 40;
     public static final int DATA_FLAG_CHARGE_ATTACK = 41;
-    public static final int DATA_FLAG_IS_WASD_CONTROLLED = 43;
+    public static final int DATA_FLAG_WASD_CONTROLLED = 43;
     public static final int DATA_FLAG_CAN_POWER_JUMP = 44;
     public static final int DATA_FLAG_LINGER = 45;
     public static final int DATA_FLAG_GRAVITY = 46;

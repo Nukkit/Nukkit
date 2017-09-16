@@ -1,7 +1,6 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.inventory.transaction.*;
-import cn.nukkit.math.BlockFace;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +91,7 @@ public class InventoryTransactionPacket extends DataPacket {
             }
             list.add(ts);
         }
+
         switch (type) {
             case TransactionGroup.TYPE_NORMAL:
                 transaction = new NormalTransactionGroup();
@@ -109,6 +109,7 @@ public class InventoryTransactionPacket extends DataPacket {
                         this.getVector3f(),
                         this.getVector3f()
                 );
+
                 break;
             case TransactionGroup.TYPE_ITEM_USE_ON_ENTITY:
                 transaction = new ItemUseOnEntityTransactionGroup(
