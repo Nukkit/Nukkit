@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.inventory.BigCraftingGrid;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
@@ -9,12 +10,12 @@ import cn.nukkit.utils.BlockColor;
  * Created on 2015/12/5 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockWorkbench extends BlockSolid {
-    public BlockWorkbench() {
+public class BlockCraftingTable extends BlockSolid {
+    public BlockCraftingTable() {
         this(0);
     }
 
-    public BlockWorkbench(int meta) {
+    public BlockCraftingTable(int meta) {
         super(meta);
     }
 
@@ -51,6 +52,7 @@ public class BlockWorkbench extends BlockSolid {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (player != null) {
+            player.setCraftingGrid(new BigCraftingGrid(player));
             player.craftingType = Player.CRAFTING_BIG;
         }
         return true;

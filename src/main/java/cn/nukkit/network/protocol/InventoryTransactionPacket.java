@@ -1,13 +1,39 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.inventory.transaction.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import cn.nukkit.inventory.transaction.data.ReleaseItemData;
+import cn.nukkit.inventory.transaction.data.TransactionData;
+import cn.nukkit.inventory.transaction.data.UseItemData;
+import cn.nukkit.inventory.transaction.data.UseItemOnEntityData;
+import cn.nukkit.network.protocol.types.NetworkInventoryAction;
 
 public class InventoryTransactionPacket extends DataPacket {
 
-    public TransactionGroup transaction;
+    public static final int TYPE_NORMAL = 0;
+    public static final int TYPE_MISMATCH = 1;
+    public static final int TYPE_USE_ITEM = 2;
+    public static final int TYPE_USE_ITEM_ON_ENTITY = 3;
+    public static final int TYPE_RELEASE_ITEM = 4;
+
+    public static final int USE_ITEM_ACTION_CLICK_BLOCK = 0;
+    public static final int USE_ITEM_ACTION_CLICK_AIR = 1;
+    public static final int USE_ITEM_ACTION_BREAK_BLOCK = 2;
+
+    public static final int RELEASE_ITEM_ACTION_RELEASE = 0; //bow shoot
+    public static final int RELEASE_ITEM_ACTION_CONSUME = 1; //eat food, drink potion
+
+    public static final int USE_ITEM_ON_ENTITY_ACTION_INTERACT = 0;
+    public static final int USE_ITEM_ON_ENTITY_ACTION_ATTACK = 1;
+
+
+    public static final int ACTION_MAGIC_SLOT_DROP_ITEM = 0;
+    public static final int ACTION_MAGIC_SLOT_PICKUP_ITEM = 1;
+
+    public static final int ACTION_MAGIC_SLOT_CREATIVE_DELETE_ITEM = 0;
+    public static final int ACTION_MAGIC_SLOT_CREATIVE_CREATE_ITEM = 1;
+
+    public int transactionType;
+    public NetworkInventoryAction[] actions;
+    public TransactionData transactionData;
 
     @Override
     public byte pid() {
@@ -16,121 +42,102 @@ public class InventoryTransactionPacket extends DataPacket {
 
     @Override
     public void encode() {
-        this.putVarInt(transaction.getType());
-        this.putVarInt(transaction.getTransactions().size());
-        for (Transaction ts : transaction.getTransactions()) {
-            this.putVarInt(ts.getType());
-            switch (ts.getType()) {
-                case Transaction.TYPE_CONTAINER:
-                    this.putVarInt(((ContainerTransaction) ts).getInventoryId());
-                    break;
-                case Transaction.TYPE_WORLD_INTERACTON:
-                    this.putVarInt(((WorldInteractionTransaction) ts).getFlags());
-                    break;
-                case Transaction.TYPE_CRAFT:
-                    this.putVarInt(((CraftTransaction) ts).getAction());
-                    break;
-            }
-            this.putVarInt(ts.getSlot());
-            this.putSlot(ts.getSourceItem());
-            this.putSlot(ts.getTargetItem());
+        this.putUnsignedVarInt(this.transactionType);
+
+        this.putUnsignedVarInt(this.actions.length);
+        for (NetworkInventoryAction action : this.actions) {
+            action.write(this);
         }
-        switch (transaction.getType()) {
-            case TransactionGroup.TYPE_ITEM_USE:
-                ItemUseTransactionGroup iu = (ItemUseTransactionGroup) transaction;
-                this.putVarInt(iu.getAction());
-                this.putBlockVector3(iu.getBlockPos());
-                this.putVarInt(iu.getFace());
-                this.putVarInt(iu.getSlot());
-                this.putSlot(iu.getItem());
-                this.putVector3f(iu.getPlayerPos());
-                this.putVector3f(iu.getClickPos());
+
+        switch (this.transactionType) {
+            case TYPE_NORMAL:
+            case TYPE_MISMATCH:
                 break;
-            case TransactionGroup.TYPE_ITEM_USE_ON_ENTITY:
-                ItemUseOnEntityTransactionGroup oe = (ItemUseOnEntityTransactionGroup) transaction;
-                this.putVarLong(oe.getEntityId());
-                this.putVarInt(oe.getAction());
-                this.putVarInt(oe.getSlot());
-                this.putSlot(oe.getItem());
-                this.putVector3f(oe.getPlayerPos());
+            case TYPE_USE_ITEM:
+                UseItemData useItemData = (UseItemData) this.transactionData;
+
+                this.putUnsignedVarInt(useItemData.actionType);
+                this.putBlockVector3(useItemData.blockPos);
+                this.putBlockFace(useItemData.face);
+                this.putVarInt(useItemData.hotbarSlot);
+                this.putSlot(useItemData.itemInHand);
+                this.putVector3f(useItemData.playerPos.asVector3f());
+                this.putVector3f(useItemData.clickPos);
                 break;
-            case TransactionGroup.TYPE_ITEM_RELEASE:
-                ItemReleaseTransactionGroup ir = (ItemReleaseTransactionGroup) transaction;
-                this.putVarInt(ir.getAction());
-                this.putVarInt(ir.getSlot());
-                this.putSlot(ir.getItem());
-                this.putVector3f(ir.getPlayerPos());
+            case TYPE_USE_ITEM_ON_ENTITY:
+                UseItemOnEntityData useItemOnEntityData = (UseItemOnEntityData) this.transactionData;
+
+                this.putUnsignedVarInt(useItemOnEntityData.entityRuntimeId);
+                this.putUnsignedVarInt(useItemOnEntityData.actionType);
+                this.putVarInt(useItemOnEntityData.hotbarSlot);
+                this.putSlot(useItemOnEntityData.itemInHand);
+                this.putVector3f(useItemOnEntityData.vector1.asVector3f());
+                this.putVector3f(useItemOnEntityData.vector2.asVector3f());
+                break;
+            case TYPE_RELEASE_ITEM:
+                ReleaseItemData releaseItemData = (ReleaseItemData) this.transactionData;
+
+                this.putUnsignedVarInt(releaseItemData.actionType);
+                this.putVarInt(releaseItemData.hotbarSlot);
+                this.putSlot(releaseItemData.itemInHand);
+                this.putVector3f(releaseItemData.headRot.asVector3f());
+                break;
+            default:
+                throw new RuntimeException("Unknown transaction type $this->transactionType");
         }
     }
 
     @Override
     public void decode() {
-        int type = this.getVarInt();
-        int count = this.getVarInt();
-        List<Transaction> list = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            Transaction ts;
-            switch (this.getVarInt()) {
-                case Transaction.TYPE_CONTAINER:
-                    ts = new ContainerTransaction(this.getVarInt(), this.getVarInt(), this.getSlot(), this.getSlot());
-                    break;
-                case Transaction.TYPE_GLOBAL:
-                    ts = new GlobalTransaction(this.getVarInt(), this.getSlot(), this.getSlot());
-                    break;
-                case Transaction.TYPE_WORLD_INTERACTON:
-                    ts = new WorldInteractionTransaction(this.getVarInt(), this.getVarInt(), this.getSlot(), this.getSlot());
-                    break;
-                case Transaction.TYPE_CREATIVE:
-                    ts = new CreativeTransaction(this.getVarInt(), this.getSlot(), this.getSlot());
-                    break;
-                case Transaction.TYPE_CRAFT:
-                    ts = new CraftTransaction(this.getVarInt(), this.getVarInt(), this.getSlot(), this.getSlot());
-                    break;
-                default:
-                    continue;
-            }
-            list.add(ts);
+        this.transactionType = (int) this.getUnsignedVarInt();
+
+        this.actions = new NetworkInventoryAction[(int) this.getUnsignedVarInt()];
+        for (int i = 0; i < this.actions.length; i++) {
+            this.actions[i] = new NetworkInventoryAction().read(this);
         }
 
-        switch (type) {
-            case TransactionGroup.TYPE_NORMAL:
-                transaction = new NormalTransactionGroup();
+        switch (this.transactionType) {
+            case TYPE_NORMAL:
+            case TYPE_MISMATCH:
+                //Regular ComplexInventoryTransaction doesn't read any extra data
                 break;
-            case TransactionGroup.TYPE_INVENTORY_MISMATCH:
-                transaction = new InventoryMismatchTransactionGroup();
-                break;
-            case TransactionGroup.TYPE_ITEM_USE:
-                transaction = new ItemUseTransactionGroup(
-                        this.getVarInt(),
-                        this.getBlockVector3(),
-                        this.getVarInt(),
-                        this.getVarInt(),
-                        this.getSlot(),
-                        this.getVector3f(),
-                        this.getVector3f()
-                );
+            case TYPE_USE_ITEM:
+                UseItemData itemData = new UseItemData();
 
+                itemData.actionType = (int) this.getUnsignedVarInt();
+                itemData.blockPos = this.getBlockVector3();
+                itemData.face = this.getBlockFace();
+                itemData.hotbarSlot = this.getVarInt();
+                itemData.itemInHand = this.getSlot();
+                itemData.playerPos = this.getVector3f().asVector3();
+                itemData.clickPos = this.getVector3f();
+
+                this.transactionData = itemData;
                 break;
-            case TransactionGroup.TYPE_ITEM_USE_ON_ENTITY:
-                transaction = new ItemUseOnEntityTransactionGroup(
-                        this.getVarLong(),
-                        this.getVarInt(),
-                        this.getVarInt(),
-                        this.getSlot(),
-                        this.getVector3f()
-                );
+            case TYPE_USE_ITEM_ON_ENTITY:
+                UseItemOnEntityData useItemOnEntityData = new UseItemOnEntityData();
+
+                useItemOnEntityData.entityRuntimeId = this.getUnsignedVarLong();
+                useItemOnEntityData.actionType = (int) this.getUnsignedVarInt();
+                useItemOnEntityData.hotbarSlot = this.getVarInt();
+                useItemOnEntityData.itemInHand = this.getSlot();
+                useItemOnEntityData.vector1 = this.getVector3f().asVector3();
+                useItemOnEntityData.vector2 = this.getVector3f().asVector3();
+
+                this.transactionData = useItemOnEntityData;
                 break;
-            case TransactionGroup.TYPE_ITEM_RELEASE:
-                transaction = new ItemReleaseTransactionGroup(
-                        this.getVarInt(),
-                        this.getVarInt(),
-                        this.getSlot(),
-                        this.getVector3f()
-                );
+            case TYPE_RELEASE_ITEM:
+                ReleaseItemData releaseItemData = new ReleaseItemData();
+
+                releaseItemData.actionType = (int) getUnsignedVarInt();
+                releaseItemData.hotbarSlot = getVarInt();
+                releaseItemData.itemInHand = getSlot();
+                releaseItemData.headRot = this.getVector3f().asVector3();
+
+                this.transactionData = releaseItemData;
                 break;
             default:
-                return;
+                throw new RuntimeException("Unknown transaction type $this->transactionType");
         }
-        list.forEach(transaction::addTransaction);
     }
 }

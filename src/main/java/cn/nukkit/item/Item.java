@@ -10,6 +10,7 @@ import cn.nukkit.inventory.Fuel;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
@@ -1912,6 +1913,10 @@ public class Item implements Cloneable {
         this.count = count;
     }
 
+    public boolean isNull() {
+        return this.count <= 0 || this.id == AIR;
+    }
+
     final public String getName() {
         return this.hasCustomName() ? this.getCustomName() : this.name;
     }
@@ -2055,6 +2060,22 @@ public class Item implements Cloneable {
         return false;
     }
 
+    /**
+     * Called when a player uses the item on air, for example throwing a projectile.
+     * Returns whether the item was changed, for example count decrease or durability change.
+     */
+    public boolean onClickAir(Player player, Vector3 directionVector) {
+        return false;
+    }
+
+    /**
+     * Called when a player is using this item and releases it. Used to handle bow shoot actions.
+     * Returns whether the item was changed, for example count decrease or durability change.
+     */
+    public boolean onReleaseUsing(Player player) {
+        return false;
+    }
+
     @Override
     public final boolean equals(Object item) {
         return item instanceof Item && this.equals((Item) item, true);
@@ -2066,6 +2087,13 @@ public class Item implements Cloneable {
 
     public final boolean equals(Item item, boolean checkDamage, boolean checkCompound) {
         return this.getId() == item.getId() && (!checkDamage || this.getDamage() == item.getDamage()) && (!checkCompound || Arrays.equals(this.getCompoundTag(), item.getCompoundTag()));
+    }
+
+    /**
+     * Returns whether the specified item stack has the same ID, damage, NBT and count as this item stack.
+     */
+    public final boolean equalsExact(Item other) {
+        return this.equals(other, true, true) && this.count == other.count;
     }
 
     public final boolean deepEquals(Item item) {

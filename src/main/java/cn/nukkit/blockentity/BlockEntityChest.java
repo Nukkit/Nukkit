@@ -116,7 +116,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
             // If it is less than i, then it is a new item, so we are going to add it at the end of the list
             (this.namedTag.getList("Items", CompoundTag.class)).add(d);
         } else {
-            // If it is more than i, then it is an update on a slot, so we are going to overwrite the item in the list
+            // If it is more than i, then it is an update on a inventorySlot, so we are going to overwrite the item in the list
             (this.namedTag.getList("Items", CompoundTag.class)).add(i, d);
         }
     }
