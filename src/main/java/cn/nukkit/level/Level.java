@@ -971,7 +971,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void sendBlocks(Player[] target, Vector3[] blocks, int flags, boolean optimizeRebuilds) {
-        List<UpdateBlockPacket.Entry> entries = new ArrayList<>();
+        List<UpdateBlockPacket> packets = new ArrayList<>();
         if (optimizeRebuilds) {
             Map<Long, Boolean> chunks = new HashMap<>();
             for (Vector3 b : blocks) {
@@ -987,26 +987,24 @@ public class Level implements ChunkManager, Metadatable {
                 }
 
                 if (b instanceof Block) {
-                    UpdateBlockPacket.Entry entry = new UpdateBlockPacket.Entry(
-                            (int) b.x,
-                            (int) b.y,
-                            (int) b.z,
-                            ((Block) b).getId(),
-                            ((Block) b).getDamage(),
-                            first ? flags : UpdateBlockPacket.FLAG_NONE
-                    );
-                    entries.add(entry);
+                    UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
+                    updateBlockPacket.x = (int) ((Block) b).x;
+                    updateBlockPacket.y = (int) ((Block) b).y;
+                    updateBlockPacket.z = (int) ((Block) b).z;
+                    updateBlockPacket.blockId = ((Block) b).getId();
+                    updateBlockPacket.blockData = ((Block) b).getDamage();
+                    updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
+                    packets.add(updateBlockPacket);
                 } else {
                     int fullBlock = this.getFullBlock((int) b.x, (int) b.y, (int) b.z);
-                    UpdateBlockPacket.Entry entry = new UpdateBlockPacket.Entry(
-                            (int) b.x,
-                            (int) b.y,
-                            (int) b.z,
-                            fullBlock >> 4,
-                            fullBlock & 0xf,
-                            first ? flags : UpdateBlockPacket.FLAG_NONE
-                    );
-                    entries.add(entry);
+                    UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
+                    updateBlockPacket.x = (int) b.x;
+                    updateBlockPacket.y = (int) b.y;
+                    updateBlockPacket.z = (int) b.z;
+                    updateBlockPacket.blockId = fullBlock >> 4;
+                    updateBlockPacket.blockData = fullBlock & 0xf;
+                    updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
+                    packets.add(updateBlockPacket);
                 }
             }
         } else {
@@ -1014,49 +1012,31 @@ public class Level implements ChunkManager, Metadatable {
                 if (b == null) {
                     continue;
                 }
-
+                UpdateBlockPacket packet = new UpdateBlockPacket();
                 if (b instanceof Block) {
-                    UpdateBlockPacket.Entry entry = new UpdateBlockPacket.Entry(
-                            (int) b.x,
-                            (int) b.y,
-                            (int) b.z,
-                            ((Block) b).getId(),
-                            ((Block) b).getDamage(),
-                            flags
-                    );
-                    entries.add(entry);
+                    UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
+                    updateBlockPacket.x = (int) ((Block) b).x;
+                    updateBlockPacket.y = (int) ((Block) b).y;
+                    updateBlockPacket.z = (int) ((Block) b).z;
+                    updateBlockPacket.blockId = ((Block) b).getId();
+                    updateBlockPacket.blockData = ((Block) b).getDamage();
+                    updateBlockPacket.flags = flags;
+                    packets.add(updateBlockPacket);
                 } else {
                     int fullBlock = this.getFullBlock((int) b.x, (int) b.y, (int) b.z);
-                    UpdateBlockPacket.Entry entry = new UpdateBlockPacket.Entry(
-                            (int) b.x,
-                            (int) b.y,
-                            (int) b.z,
-                            fullBlock >> 4,
-                            fullBlock & 0xf,
-                            flags
-                    );
-                    entries.add(entry);
+                    UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
+                    updateBlockPacket.x = (int) b.x;
+                    updateBlockPacket.y = (int) b.y;
+                    updateBlockPacket.z = (int) b.z;
+                    updateBlockPacket.blockId = fullBlock >> 4;
+                    updateBlockPacket.blockData = fullBlock & 0xf;
+                    updateBlockPacket.flags = flags;
+                    packets.add(updateBlockPacket);
                 }
+                packets.add(packet);
             }
         }
-
-        List<DataPacket> packets = new ArrayList<>();
-
-        for (UpdateBlockPacket.Entry entry : entries) {
-            UpdateBlockPacket packet = new UpdateBlockPacket();
-            packet.x = entry.x;
-            packet.y = entry.y;
-            packet.z = entry.z;
-
-            packet.blockId = entry.blockId;
-            packet.blockData = entry.blockData;
-
-            packet.flags = entry.flags;
-
-            packets.add(packet);
-        }
-
-        this.getServer().batchPackets(target, packets.stream().toArray(DataPacket[]::new));
+        this.server.batchPackets(target, packets.toArray(new DataPacket[packets.size()]));
     }
 
     public void clearCache() {

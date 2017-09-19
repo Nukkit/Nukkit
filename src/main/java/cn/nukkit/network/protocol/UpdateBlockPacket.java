@@ -18,12 +18,10 @@ public class UpdateBlockPacket extends DataPacket {
     public static final int FLAG_ALL_PRIORITY = (FLAG_ALL | FLAG_PRIORITY);
 
     public int x;
-    public int y;
     public int z;
-
+    public int y;
     public int blockId;
     public int blockData;
-
     public int flags;
 
     @Override
@@ -39,10 +37,9 @@ public class UpdateBlockPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putBlockVector3(this.x, this.y, this.z);
-
-        this.putUnsignedVarInt(this.blockId);
-        this.putUnsignedVarInt((this.flags << 4) | this.blockData);
+        this.putBlockVector3(x, y, z);
+        this.putUnsignedVarInt(blockId);
+        this.putUnsignedVarInt((0xb << 4) | blockData & 0xf);
     }
 
     public static class Entry {
