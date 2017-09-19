@@ -32,7 +32,7 @@ public class InventoryContentPacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.inventoryId = this.getVarInt();
+        this.inventoryId = (int) this.getUnsignedVarInt();
         int count = (int) this.getUnsignedVarInt();
         this.slots = new Item[count];
 
@@ -44,7 +44,7 @@ public class InventoryContentPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putVarInt(this.inventoryId);
+        this.putUnsignedVarInt(this.inventoryId);
         this.putUnsignedVarInt(this.slots.length);
         for (Item slot : this.slots) {
             this.putSlot(slot);

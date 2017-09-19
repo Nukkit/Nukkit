@@ -70,7 +70,6 @@ import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
-import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -585,6 +584,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     @Override
     protected void initEntity() {
         super.initEntity();
+
         this.addDefaultWindows();
     }
 
@@ -3223,7 +3223,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     }
                                 }
 
-                                MainLogger.getLogger().debug("Failed to execute inventory transaction from " + this.getName() + " with actions: " + new Gson().toJson(transactionPacket.actions));
+                                MainLogger.getLogger().debug("Failed to execute inventory transaction from " + this.getName() + " with actions: " + Arrays.toString(transactionPacket.actions));
 
                                 //TODO: check more stuff that might need reversion
                                 break packetswitch; //oops!
@@ -3234,7 +3234,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break packetswitch;
                         case InventoryTransactionPacket.TYPE_MISMATCH:
                             if (transactionPacket.actions.length > 0) {
-                                this.server.getLogger().debug("Expected 0 actions for mismatch, got " + transactionPacket.actions.length + ", " + new Gson().toJson(transactionPacket.actions));
+                                this.server.getLogger().debug("Expected 0 actions for mismatch, got " + transactionPacket.actions.length + ", " + Arrays.toString(transactionPacket.actions));
                             }
                             this.sendAllInventories();
 

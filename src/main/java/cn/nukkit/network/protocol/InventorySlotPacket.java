@@ -20,16 +20,16 @@ public class InventorySlotPacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.inventoryId = this.getVarInt();
-        this.slot = this.getVarInt();
+        this.inventoryId = (int) this.getUnsignedVarInt();
+        this.slot = (int) this.getUnsignedVarInt();
         this.item = this.getSlot();
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putVarInt((byte) this.inventoryId);
-        this.putVarInt(this.slot);
+        this.putUnsignedVarInt((byte) this.inventoryId);
+        this.putUnsignedVarInt(this.slot);
         this.putSlot(this.item);
     }
 }

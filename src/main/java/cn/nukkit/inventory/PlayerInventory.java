@@ -94,10 +94,10 @@ public class PlayerInventory extends BaseInventory {
         return (index >= 0 && index < this.getHotbarSize()) ? this.hotbar[index] : -1;
     }
 
-    public void setHotbarSlotIndex(int index, int slot) {
-        if (index >= 0 && index < this.getHotbarSize() && slot >= -1 && slot < this.getSize()) {
+    public void setHotbarSlotIndex(int index, int slot) { //all slots are now linked to its ID
+        /*if (index >= 0 && index < this.getHotbarSize() && slot >= -1 && slot < this.getSize()) {
             this.hotbar[index] = slot;
-        }
+        }*/
     }
 
     public int getHeldItemIndex() {
@@ -201,11 +201,11 @@ public class PlayerInventory extends BaseInventory {
             return;
         }
 
-        super.onSlotChange(index, before, send);
-
         if (index >= this.getSize()) {
             this.sendArmorSlot(index, this.getViewers());
             this.sendArmorSlot(index, this.getHolder().getViewers().values());
+        } else {
+            super.onSlotChange(index, before, send);
         }
     }
 
@@ -259,7 +259,7 @@ public class PlayerInventory extends BaseInventory {
 
     @Override
     public boolean setItem(int index, Item item) {
-        return setItem(index, item, false, true);
+        return setItem(index, item, true, false);
     }
 
     private boolean setItem(int index, Item item, boolean send, boolean ignoreArmorEvents) {
@@ -287,11 +287,9 @@ public class PlayerInventory extends BaseInventory {
             }
             item = ev.getNewItem();
         }
-
         Item old = this.getItem(index);
         this.slots.put(index, item.clone());
         this.onSlotChange(index, old, send);
-
         return true;
     }
 
@@ -478,6 +476,7 @@ public class PlayerInventory extends BaseInventory {
             pk.windowId = ContainerIds.INVENTORY;
             pk.selectedHotbarSlot = this.getHeldItemIndex();
             pk.slots = new int[this.getHotbarSize()];
+            //pk.slots = this.hotbar;
 
             System.arraycopy(this.hotbar, 0, pk.slots, 0, pk.slots.length);
 
@@ -508,8 +507,12 @@ public class PlayerInventory extends BaseInventory {
 
         for (Player player : players) {
             if (player.equals(this.getHolder())) {
-                pk.inventoryId = 0;
+                pk.inventoryId = ContainerIds.INVENTORY;
                 player.dataPacket(pk);
+
+                if (index >= 0 && index <= 9) { //send hotbar always
+                    this.sendHotbarContents();
+                }
             } else {
                 int id = player.getWindowId(this);
                 if (id == -1) {
