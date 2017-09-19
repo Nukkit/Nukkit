@@ -22,7 +22,7 @@ public class ContainerOpenPacket extends DataPacket {
     @Override
     public void decode() {
         this.windowId = this.getByte();
-  	this.type = this.getByte();
+        this.type = this.getByte();
     }
 
     @Override

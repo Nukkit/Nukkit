@@ -1,8 +1,6 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.Server;
 import cn.nukkit.entity.data.Skin;
-import cn.nukkit.utils.Binary;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -76,7 +74,8 @@ public class LoginPacket extends DataPacket {
         if (skinToken.has("SkinId")) skinId = skinToken.get("SkinId").getAsString();
         if (skinToken.has("SkinData")) this.skin = new Skin(skinToken.get("SkinData").getAsString(), skinId);
         if (skinToken.has("SkinGeometryName")) this.skinGeometryName = skinToken.get("SkinGeometryName").getAsString();
-        if (skinToken.has("SkinGeometry")) this.skinGeometry = Base64.getDecoder().decode(skinToken.get("SkinGeometry").getAsString());
+        if (skinToken.has("SkinGeometry"))
+            this.skinGeometry = Base64.getDecoder().decode(skinToken.get("SkinGeometry").getAsString());
     }
 
     private JsonObject decodeToken(String token) {

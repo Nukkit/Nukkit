@@ -1160,7 +1160,7 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.IRON_HORSE_ARMOR, 0));
         addCreativeItem(Item.get(Item.GOLD_HORSE_ARMOR, 0));
         addCreativeItem(Item.get(Item.DIAMOND_HORSE_ARMOR, 0));
-        
+
         addCreativeItem(Item.get(Item.SPAWN_EGG, 10)); //Chicken
         addCreativeItem(Item.get(Item.SPAWN_EGG, 11)); //Cow
         addCreativeItem(Item.get(Item.SPAWN_EGG, 12)); //Pig
@@ -1169,7 +1169,7 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.SPAWN_EGG, 16)); //Mooshroom
         addCreativeItem(Item.get(Item.SPAWN_EGG, 17)); //Squid
         addCreativeItem(Item.get(Item.SPAWN_EGG, 19)); //Bat 
-		//addCreativeItem(Item.get(Item.SPAWN_EGG, 20)); //Iron Golem
+        //addCreativeItem(Item.get(Item.SPAWN_EGG, 20)); //Iron Golem
         //addCreativeItem(Item.get(Item.SPAWN_EGG, 21)); //Snow Golem
         addCreativeItem(Item.get(Item.SPAWN_EGG, 22)); //Ocelot
         addCreativeItem(Item.get(Item.SPAWN_EGG, 23)); //Horse
@@ -1197,7 +1197,7 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.SPAWN_EGG, 49)); //Guardian
         addCreativeItem(Item.get(Item.SPAWN_EGG, 50)); //ElderGuardian
         addCreativeItem(Item.get(Item.SPAWN_EGG, 54)); //Shulker
-        
+
         addCreativeItem(Item.get(Item.FIRE_CHARGE, 0));
         addCreativeItem(Item.get(Item.WOODEN_SWORD));
         addCreativeItem(Item.get(Item.WOODEN_HOE));

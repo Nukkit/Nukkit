@@ -1,54 +1,55 @@
 package cn.nukkit.form.window;
 
-import com.google.gson.Gson;
 import cn.nukkit.form.element.ElementButton;
-import cn.nukkit.form.response.FormResponse;
 import cn.nukkit.form.response.FormResponseSimple;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FormWindowSimple extends FormWindow {
 
     public String type = "form";
     public String title = "";
     public String content = "";
-    public ArrayList<ElementButton> buttons;
+    public List<ElementButton> buttons;
 
     private FormResponseSimple response = null;
 
-    public FormWindowSimple(String title, String content){
-        this (title, content, new ArrayList<>());
+    public FormWindowSimple(String title, String content) {
+        this(title, content, new ArrayList<>());
     }
-    public FormWindowSimple(String title, String content, ArrayList<ElementButton> buttons){
+
+    public FormWindowSimple(String title, String content, List<ElementButton> buttons) {
         this.title = title;
         this.content = content;
         this.buttons = buttons;
     }
 
-    public void addButton(ElementButton button){
+    public void addButton(ElementButton button) {
         this.buttons.add(button);
     }
 
-    public String getJSONData(){
+    public String getJSONData() {
         return new Gson().toJson(this);
     }
 
     public FormResponseSimple getResponse() {
         return response;
     }
+
     public void setResponse(String data) {
-        if (data.equals("null")){
+        if (data.equals("null")) {
             this.closed = true;
             return;
         }
         int buttonID;
         try {
             buttonID = Integer.parseInt(data);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return;
         }
-        if (buttonID >= this.buttons.size()){
+        if (buttonID >= this.buttons.size()) {
             this.response = new FormResponseSimple(buttonID, null);
             return;
         }

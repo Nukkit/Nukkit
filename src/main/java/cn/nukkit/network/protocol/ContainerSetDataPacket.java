@@ -6,7 +6,7 @@ package cn.nukkit.network.protocol;
  */
 public class ContainerSetDataPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.CONTAINER_SET_DATA_PACKET;
-    
+
     public static final int PROPERTY_FURNACE_TICK_COUNT = 0;
     public static final int PROPERTY_FURNACE_LIT_TIME = 1;
     public static final int PROPERTY_FURNACE_LIT_DURATION = 2;

@@ -15,30 +15,33 @@ public class FormWindowCustom extends FormWindow {
     public String type = "custom_form";
     public String title = "";
     public ElementButtonImageData icon;
-    public ArrayList<Element> content;
+    public List<Element> content;
 
     private FormResponseCustom response;
 
-    public FormWindowCustom(String title){
-        this (title, new ArrayList<>());
+    public FormWindowCustom(String title) {
+        this(title, new ArrayList<>());
     }
-    public FormWindowCustom(String title, ArrayList<Element> contents){
-        this (title, contents, "");
+
+    public FormWindowCustom(String title, List<Element> contents) {
+        this(title, contents, "");
     }
-    public FormWindowCustom(String title, ArrayList<Element> contents, String icon){
+
+    public FormWindowCustom(String title, List<Element> contents, String icon) {
         this.title = title;
         this.content = contents;
         if (!icon.isEmpty()) this.icon = new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_URL, icon);
     }
 
-    public void addElement(Element element){
+    public void addElement(Element element) {
         content.add(element);
     }
-    public void setIcon(String icon){
+
+    public void setIcon(String icon) {
         if (!icon.isEmpty()) this.icon = new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_URL, icon);
     }
 
-    public String getJSONData(){
+    public String getJSONData() {
         String toModify = new Gson().toJson(this);
         //We need to replace this due to Java not supporting declaring class field 'default'
         return toModify.replace("defaultOptionIndex", "default")
@@ -47,11 +50,12 @@ public class FormWindowCustom extends FormWindow {
                 .replace("defaultStepIndex", "default");
     }
 
-    public FormResponseCustom getResponse(){
+    public FormResponseCustom getResponse() {
         return response;
     }
+
     public void setResponse(String data) {
-        if (data.equals("null")){
+        if (data.equals("null")) {
             this.closed = true;
             return;
         }
@@ -69,7 +73,7 @@ public class FormWindowCustom extends FormWindow {
         HashMap<Integer, Boolean> toggleResponses = new HashMap<>();
         HashMap<Integer, Object> responses = new HashMap<>();
 
-        for (String elementData : elementResponses){
+        for (String elementData : elementResponses) {
             if (i >= content.size()) {
                 break;
             }
@@ -80,26 +84,22 @@ public class FormWindowCustom extends FormWindow {
                 i++;
                 continue;
             }
-            if (e instanceof ElementDropdown){
+            if (e instanceof ElementDropdown) {
                 String answer = ((ElementDropdown) e).options.get(Integer.parseInt(elementData));
                 dropdownResponses.put(i, new FormResponseData(Integer.parseInt(elementData), answer));
                 responses.put(i, answer);
-            }
-            else if (e instanceof ElementInput){
+            } else if (e instanceof ElementInput) {
                 inputResponses.put(i, elementData);
                 responses.put(i, elementData);
-            }
-            else if (e instanceof ElementSlider){
+            } else if (e instanceof ElementSlider) {
                 Float answer = Float.parseFloat(elementData);
                 sliderResponses.put(i, answer);
                 responses.put(i, answer);
-            }
-            else if (e instanceof ElementStepSlider){
+            } else if (e instanceof ElementStepSlider) {
                 String answer = ((ElementStepSlider) e).steps.get(Integer.parseInt(elementData));
                 stepSliderResponses.put(i, new FormResponseData(Integer.parseInt(elementData), answer));
                 responses.put(i, answer);
-            }
-            else if (e instanceof ElementToggle){
+            } else if (e instanceof ElementToggle) {
                 Boolean answer = Boolean.parseBoolean(elementData);
                 toggleResponses.put(i, answer);
                 responses.put(i, answer);

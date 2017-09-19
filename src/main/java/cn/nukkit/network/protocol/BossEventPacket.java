@@ -32,7 +32,7 @@ public class BossEventPacket extends DataPacket {
     public short unknown;
     public int color;
     public int overlay;
-    
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -61,7 +61,7 @@ public class BossEventPacket extends DataPacket {
                 break;
             case TYPE_TITLE:
                 this.title = this.getString();
-                break; 
+                break;
         }
     }
 

@@ -1,7 +1,7 @@
 package cn.nukkit.form.window;
 
-import com.google.gson.Gson;
 import cn.nukkit.form.response.FormResponseModal;
+import com.google.gson.Gson;
 
 public class FormWindowModal extends FormWindow {
 
@@ -13,22 +13,23 @@ public class FormWindowModal extends FormWindow {
 
     private FormResponseModal response = null;
 
-    public FormWindowModal(String title, String content, String trueButonText, String falseButtonText){
+    public FormWindowModal(String title, String content, String trueButonText, String falseButtonText) {
         this.title = title;
         this.content = content;
         this.button1 = trueButonText;
         this.button2 = falseButtonText;
     }
 
-    public String getJSONData(){
+    public String getJSONData() {
         return new Gson().toJson(this);
     }
 
     public FormResponseModal getResponse() {
         return response;
     }
-    public void setResponse(String data){
-        if (data.equals("null")){
+
+    public void setResponse(String data) {
+        if (data.equals("null")) {
             closed = true;
             return;
         }

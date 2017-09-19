@@ -7,9 +7,10 @@ public class ElementToggle extends Element {
     public boolean defaultValue = false;
 
     public ElementToggle(String text) {
-        this (text, false);
+        this(text, false);
     }
-    public ElementToggle(String text, boolean defaultValue){
+
+    public ElementToggle(String text, boolean defaultValue) {
         this.text = text;
         this.defaultValue = defaultValue;
     }

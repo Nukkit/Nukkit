@@ -78,7 +78,7 @@ public class TitleCommand extends VanillaCommand {
                     sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
                     return false;
             }
-        } else if (args.length == 3){
+        } else if (args.length == 3) {
             switch (args[1].toLowerCase()) {
                 case "title":
                     player.sendTitle(args[2]);

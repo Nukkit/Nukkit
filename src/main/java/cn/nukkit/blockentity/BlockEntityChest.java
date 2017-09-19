@@ -38,7 +38,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
         /* for (int i = 0; i < this.getSize(); i++) {
             this.inventory.setItem(i, this.getItem(i));
         } */
-        
+
         ListTag<CompoundTag> list = (ListTag<CompoundTag>) this.namedTag.getList("Items");
         for (CompoundTag compound : list.getAll()) {
             Item item = NBTIO.getItemHelper(compound);
@@ -104,7 +104,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
     @Override
     public void setItem(int index, Item item) {
         int i = this.getSlotIndex(index);
-        
+
         CompoundTag d = NBTIO.putItemHelper(item, index);
 
         // If item is air or count less than 0, remove the item from the "Items" list

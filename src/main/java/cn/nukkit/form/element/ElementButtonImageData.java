@@ -8,7 +8,7 @@ public class ElementButtonImageData {
     public String type;
     public String data;
 
-    public ElementButtonImageData(String type, String data){
+    public ElementButtonImageData(String type, String data) {
         if (type != IMAGE_DATA_TYPE_URL && type != IMAGE_DATA_TYPE_PATH) return;
         this.type = type;
         this.data = data;

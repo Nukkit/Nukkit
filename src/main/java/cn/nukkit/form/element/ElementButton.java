@@ -3,18 +3,19 @@ package cn.nukkit.form.element;
 public class ElementButton {
 
     public String text = "";
-    public ElementButtonImageData data;
+    public ElementButtonImageData image;
 
-    public ElementButton(String text){
+    public ElementButton(String text) {
         this.text = text;
     }
-    public ElementButton(String text, ElementButtonImageData data){
+
+    public ElementButton(String text, ElementButtonImageData image) {
         this.text = text;
-        if (!data.data.isEmpty() && !data.type.isEmpty()) this.data = data;
+        if (!image.data.isEmpty() && !image.type.isEmpty()) this.image = image;
     }
 
-    public void addImage(ElementButtonImageData data){
-        if (!data.data.isEmpty() && !data.type.isEmpty()) this.data = data;
+    public void addImage(ElementButtonImageData image) {
+        if (!image.data.isEmpty() && !image.type.isEmpty()) this.image = image;
     }
 
 }

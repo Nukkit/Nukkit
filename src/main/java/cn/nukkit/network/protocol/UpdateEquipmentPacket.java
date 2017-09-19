@@ -9,7 +9,6 @@ public class UpdateEquipmentPacket extends DataPacket {
     public byte[] namedtag;
 
 
-
     @Override
     public byte pid() {
         return ProtocolInfo.UPDATE_EQUIPMENT_PACKET;

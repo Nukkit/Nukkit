@@ -14,7 +14,7 @@ public class BlockGlassPaneStained extends BlockGlassPane {
     public BlockGlassPaneStained(int meta) {
         super(meta);
     }
-    
+
     @Override
     public int getId() {
         return STAINED_GLASS_PANE;

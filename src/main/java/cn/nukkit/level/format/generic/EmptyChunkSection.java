@@ -3,7 +3,6 @@ package cn.nukkit.level.format.generic;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.utils.ChunkException;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**

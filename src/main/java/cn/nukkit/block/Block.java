@@ -843,7 +843,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     private static double speedBonusByEfficiencyLore0(int efficiencyLoreLevel) {
-        if(efficiencyLoreLevel == 0) return 0;
+        if (efficiencyLoreLevel == 0) return 0;
         return efficiencyLoreLevel * efficiencyLoreLevel + 1;
     }
 
@@ -852,20 +852,20 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     private static int toolType0(Item item) {
-        if(item.isSword())      return ItemTool.TYPE_SWORD      ;
-        if(item.isShovel())     return ItemTool.TYPE_SHOVEL     ;
-        if(item.isPickaxe())    return ItemTool.TYPE_PICKAXE    ;
-        if(item.isAxe())        return ItemTool.TYPE_AXE        ;
-        if(item.isShears())     return ItemTool.TYPE_SHEARS     ;
+        if (item.isSword()) return ItemTool.TYPE_SWORD;
+        if (item.isShovel()) return ItemTool.TYPE_SHOVEL;
+        if (item.isPickaxe()) return ItemTool.TYPE_PICKAXE;
+        if (item.isAxe()) return ItemTool.TYPE_AXE;
+        if (item.isShears()) return ItemTool.TYPE_SHEARS;
         return ItemTool.TYPE_NONE;
     }
 
     private static boolean correctTool0(int blockToolType, Item item) {
-        return (blockToolType == ItemTool.TYPE_SWORD    && item.isSword()   ) ||
-                (blockToolType == ItemTool.TYPE_SHOVEL  && item.isShovel()  ) ||
-                (blockToolType == ItemTool.TYPE_PICKAXE && item.isPickaxe() ) ||
-                (blockToolType == ItemTool.TYPE_AXE     && item.isAxe()     ) ||
-                (blockToolType == ItemTool.TYPE_SHEARS  && item.isShears()  ) ||
+        return (blockToolType == ItemTool.TYPE_SWORD && item.isSword()) ||
+                (blockToolType == ItemTool.TYPE_SHOVEL && item.isShovel()) ||
+                (blockToolType == ItemTool.TYPE_PICKAXE && item.isPickaxe()) ||
+                (blockToolType == ItemTool.TYPE_AXE && item.isAxe()) ||
+                (blockToolType == ItemTool.TYPE_SHEARS && item.isShears()) ||
                 blockToolType == ItemTool.TYPE_NONE;
     }
 
@@ -876,11 +876,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         double baseTime = ((correctTool || canHarvestWithHand) ? 1.5 : 5.0) * blockHardness;
         double speed = 1.0 / baseTime;
         boolean isWoolBlock = blockId == Block.WOOL, isCobweb = blockId == Block.COBWEB;
-        if(correctTool) speed *= toolBreakTimeBonus0(toolType, toolTier, isWoolBlock, isCobweb);
+        if (correctTool) speed *= toolBreakTimeBonus0(toolType, toolTier, isWoolBlock, isCobweb);
         speed += speedBonusByEfficiencyLore0(efficiencyLoreLevel);
         speed *= speedRateByHasteLore0(hasteEffectLevel);
-        if(insideOfWaterWithoutAquaAffinity) speed *= 0.2;
-        if(outOfWaterButNotOnGround) speed *= 0.2;
+        if (insideOfWaterWithoutAquaAffinity) speed *= 0.2;
+        if (outOfWaterButNotOnGround) speed *= 0.2;
         return 1.0 / speed;
     }
 

@@ -40,7 +40,7 @@ public class MovePlayerPacket extends DataPacket {
         this.mode = this.getByte();
         this.onGround = this.getBoolean();
         this.ridingEid = this.getVarLong();
-        if (this.mode == MODE_TELEPORT){
+        if (this.mode == MODE_TELEPORT) {
             this.int1 = this.getLInt();
             this.int2 = this.getLInt();
         }
@@ -57,7 +57,7 @@ public class MovePlayerPacket extends DataPacket {
         this.putByte((byte) this.mode);
         this.putBoolean(this.onGround);
         this.putVarLong(this.ridingEid);
-        if (this.mode == MODE_TELEPORT){
+        if (this.mode == MODE_TELEPORT) {
             this.putLInt(this.int1);
             this.putLInt(this.int2);
         }

@@ -5,7 +5,7 @@ public class FormResponseModal extends FormResponse {
     private int clickedButtonId;
     private String clickedButtonText;
 
-    public FormResponseModal (int clickedButtonId, String clickedButtonText){
+    public FormResponseModal(int clickedButtonId, String clickedButtonText) {
         this.clickedButtonId = clickedButtonId;
         this.clickedButtonText = clickedButtonText;
     }
@@ -13,6 +13,7 @@ public class FormResponseModal extends FormResponse {
     public int getClickedButtonId() {
         return clickedButtonId;
     }
+
     public String getClickedButtonText() {
         return clickedButtonText;
     }

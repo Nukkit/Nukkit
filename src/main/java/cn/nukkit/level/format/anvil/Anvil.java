@@ -342,7 +342,7 @@ public class Anvil extends BaseLevelProvider {
         nbt.putByteArray("Data", new byte[2048]);
         byte[] sl = new byte[2048];
         Arrays.fill(sl, (byte) 0xff);
-        nbt.putByteArray("SkyLight", sl);    
+        nbt.putByteArray("SkyLight", sl);
         nbt.putByteArray("BlockLight", new byte[2048]);
         return new ChunkSection(nbt);
     }

@@ -64,7 +64,7 @@ public class EntityBoat extends EntityVehicle {
     public float getBaseOffset() {
         return 0.35F;
     }
-    
+
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
@@ -133,7 +133,7 @@ public class EntityBoat extends EntityVehicle {
                 }
             }
         }
-        
+
         return true;
     }
 
@@ -167,7 +167,7 @@ public class EntityBoat extends EntityVehicle {
 
         if (this.isAlive()) {
             super.onUpdate(currentTick);
-            
+
             this.motionY = (this.level.getBlock(new Vector3(this.x, this.y, this.z)).getBoundingBox() != null || this.isInsideOfWater()) ? getGravity() : -0.08;
 
             if (this.checkObstruction(this.x, this.y, this.z)) {

@@ -17,18 +17,18 @@ public class AvailableCommandsPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.AVAILABLE_COMMANDS_PACKET;
     public Map<String, CommandDataVersions> commands;
-    
+
     public static final int ARG_FLAG_VALID = 0x100000;
-    public static final int ARG_TYPE_INT       = 0x01;
-    public static final int ARG_TYPE_FLOAT     = 0x02;
-    public static final int ARG_TYPE_VALUE     = 0x03;
-    public static final int ARG_TYPE_TARGET    = 0x04;
+    public static final int ARG_TYPE_INT = 0x01;
+    public static final int ARG_TYPE_FLOAT = 0x02;
+    public static final int ARG_TYPE_VALUE = 0x03;
+    public static final int ARG_TYPE_TARGET = 0x04;
 
-    public static final int ARG_TYPE_STRING    = 0x0c;
-    public static final int ARG_TYPE_POSITION  = 0x0d;
+    public static final int ARG_TYPE_STRING = 0x0c;
+    public static final int ARG_TYPE_POSITION = 0x0d;
 
-    public static final int ARG_TYPE_RAWTEXT   = 0x10;
-    public static final int ARG_TYPE_TEXT      = 0x12;
+    public static final int ARG_TYPE_RAWTEXT = 0x10;
+    public static final int ARG_TYPE_TEXT = 0x12;
 
     public static final int ARG_TYPE_JSON = 0x15;
     public static final int ARG_TYPE_COMMAND = 0x1c;
@@ -46,6 +46,7 @@ public class AvailableCommandsPacket extends DataPacket {
     }
 
     int aliasCommands = 0;
+
     @Override
     public void encode() {
         this.reset();
@@ -55,34 +56,34 @@ public class AvailableCommandsPacket extends DataPacket {
             ArrayList<String> aliases = new ArrayList<>();
             aliases.addAll(Arrays.asList(versions.versions.get(0).aliases));
             aliases.add(name);
-            for (String alias : aliases){
+            for (String alias : aliases) {
                 commandsStream.putString(alias);
                 commandsStream.putString(versions.versions.get(0).description);
                 commandsStream.putByte((byte) 0);
                 commandsStream.putByte((byte) 0);
                 commandsStream.putLInt(-1);
                 commandsStream.putUnsignedVarInt(versions.versions.get(0).overloads.size());
-                for (CommandOverload overload : versions.versions.get(0).overloads.values()){
+                for (CommandOverload overload : versions.versions.get(0).overloads.values()) {
                     commandsStream.putUnsignedVarInt(overload.input.parameters.length);
-                    for (CommandParameter parameter : overload.input.parameters){
+                    for (CommandParameter parameter : overload.input.parameters) {
                         commandsStream.putString(parameter.name);
                         commandsStream.putLInt(ARG_FLAG_VALID | getFlag(parameter.type));
                         commandsStream.putBoolean(parameter.optional);
                     }
                 }
             }
-            aliasCommands += (aliases.size()-1);
+            aliasCommands += (aliases.size() - 1);
         });
 
         this.putUnsignedVarInt(0);
         this.putUnsignedVarInt(0);
         this.putUnsignedVarInt(0);
-        this.putUnsignedVarInt(this.commands.size()+aliasCommands);
+        this.putUnsignedVarInt(this.commands.size() + aliasCommands);
         this.put(commandsStream.getBuffer());
     }
 
-    int getFlag(String type){
-        switch (type){
+    int getFlag(String type) {
+        switch (type) {
             case CommandParameter.ARG_TYPE_BLOCK_POS:
                 return ARG_TYPE_POSITION;
             case CommandParameter.ARG_TYPE_INT:

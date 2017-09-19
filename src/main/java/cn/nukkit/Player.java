@@ -1640,11 +1640,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         return true;
     }
-    
-    public void checkInteractNearby(){
+
+    public void checkInteractNearby() {
         int interactDistance = isCreative() ? 5 : 3;
-        if(canInteract(this, interactDistance)){
-            if(getEntityPlayerLookingAt(interactDistance) != null){
+        if (canInteract(this, interactDistance)) {
+            if (getEntityPlayerLookingAt(interactDistance) != null) {
                 EntityInteractable onInteract = getEntityPlayerLookingAt(interactDistance);
                 setButtonText(onInteract.getInteractButtonText());
             } else {
@@ -1655,7 +1655,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
-     /**
+    /**
      * Returns the Entity the player is looking at currently
      *
      * @param maxDistance the maximum distance to check for entities
@@ -1663,7 +1663,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      */
     public EntityInteractable getEntityPlayerLookingAt(int maxDistance) {
         timing.startTiming();
-        
+
         EntityInteractable entity = null;
 
         // just a fix because player MAY not be fully initialized
@@ -1692,7 +1692,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         return entity;
     }
-    
+
     private EntityInteractable getEntityAtPosition(Entity[] nearbyEntities, int x, int y, int z) {
         for (Entity nearestEntity : nearbyEntities) {
             if (nearestEntity.getFloorX() == x && nearestEntity.getFloorY() == y && nearestEntity.getFloorZ() == z
@@ -1703,7 +1703,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         return null;
     }
-    
+
     private ArrayList<String> messageQueue = new ArrayList<>();
 
     public void checkNetwork() {
@@ -2112,11 +2112,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.dataPacket(dataPacket);
                     break;
                 case ProtocolInfo.PLAYER_INPUT_PACKET:
-                    if(!this.isAlive() || !this.spawned){
+                    if (!this.isAlive() || !this.spawned) {
                         break;
                     }
                     PlayerInputPacket ipk = (PlayerInputPacket) packet;
-                    if(riding instanceof EntityMinecartAbstract){
+                    if (riding instanceof EntityMinecartAbstract) {
                         ((EntityMinecartEmpty) riding).setCurrentSpeed(ipk.motionY);
                     }
                     break;

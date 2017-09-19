@@ -7,13 +7,15 @@ public class ElementInput extends Element {
     public String placeholder = "";
     public String defaultText = "";
 
-    public ElementInput (String text){
-        this (text, "");
+    public ElementInput(String text) {
+        this(text, "");
     }
-    public ElementInput (String text, String placeholder){
-        this (text, placeholder, "");
+
+    public ElementInput(String text, String placeholder) {
+        this(text, placeholder, "");
     }
-    public ElementInput (String text, String placeholder, String defaultText){
+
+    public ElementInput(String text, String placeholder, String defaultText) {
         this.text = text;
         this.placeholder = placeholder;
         this.defaultText = defaultText;

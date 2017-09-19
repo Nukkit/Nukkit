@@ -8,6 +8,7 @@ import cn.nukkit.form.window.FormWindow;
 public class PlayerFormRespondedEvent extends PlayerEvent {
 
     private static final HandlerList handlers = new HandlerList();
+
     public static HandlerList getHandlers() {
         return handlers;
     }
@@ -23,7 +24,7 @@ public class PlayerFormRespondedEvent extends PlayerEvent {
         this.window = window;
     }
 
-    public int getFormID(){
+    public int getFormID() {
         return this.formID;
     }
 
@@ -41,7 +42,7 @@ public class PlayerFormRespondedEvent extends PlayerEvent {
     /**
      * Defines if player closed the window or submitted it
      */
-    public boolean wasClosed(){
+    public boolean wasClosed() {
         return window.wasClosed();
     }
 

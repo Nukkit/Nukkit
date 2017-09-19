@@ -9,13 +9,15 @@ public class ElementSlider extends Element {
     public float step;
     public float defaultValue;
 
-    public ElementSlider (String text, float min, float max){
-        this (text, min, max, -1f);
+    public ElementSlider(String text, float min, float max) {
+        this(text, min, max, -1f);
     }
-    public ElementSlider (String text, float min, float max, float step){
-        this (text, min, max, step, -1f);
+
+    public ElementSlider(String text, float min, float max, float step) {
+        this(text, min, max, step, -1f);
     }
-    public ElementSlider (String text, float min, float max, float step, float defaultValue){
+
+    public ElementSlider(String text, float min, float max, float step, float defaultValue) {
         this.text = text;
         if (min < 0f) this.min = 0f;
         else this.min = min;

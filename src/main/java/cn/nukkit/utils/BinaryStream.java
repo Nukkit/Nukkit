@@ -204,21 +204,22 @@ public class BinaryStream {
 
     /**
      * Reads a list of Attributes from the stream.
+     *
      * @return Attribute[]
      */
     public Attribute[] getAttributeList() throws Exception {
         List<Attribute> list = new ArrayList<>();
         long count = this.getUnsignedVarInt();
 
-        for(int i = 0; i < count; ++i){
+        for (int i = 0; i < count; ++i) {
             String name = this.getString();
             Attribute attr = Attribute.getAttributeByName(name);
-            if(attr != null){
+            if (attr != null) {
                 attr.setMinValue(this.getLFloat());
                 attr.setValue(this.getLFloat());
                 attr.setMaxValue(this.getLFloat());
                 list.add(attr);
-            }else{
+            } else {
                 throw new Exception("Unknown attribute type \"" + name + "\"");
             }
         }
@@ -229,9 +230,9 @@ public class BinaryStream {
     /**
      * Writes a list of Attributes to the packet buffer using the standard format.
      */
-    public void putAttributeList(Attribute[] attributes){
+    public void putAttributeList(Attribute[] attributes) {
         this.putUnsignedVarInt(attributes.length);
-        for (Attribute attribute: attributes) {
+        for (Attribute attribute : attributes) {
             this.putString(attribute.getName());
             this.putLFloat(attribute.getMinValue());
             this.putLFloat(attribute.getValue());
@@ -279,16 +280,16 @@ public class BinaryStream {
 
         //TODO
         int canPlaceOn = this.getVarInt();
-        if(canPlaceOn > 0){
-            for(int i = 0; i < canPlaceOn; ++i){
+        if (canPlaceOn > 0) {
+            for (int i = 0; i < canPlaceOn; ++i) {
                 this.getString();
             }
         }
 
         //TODO
         int canDestroy = this.getVarInt();
-        if(canDestroy > 0){
-            for(int i = 0; i < canDestroy; ++i){
+        if (canDestroy > 0) {
+            for (int i = 0; i < canDestroy; ++i) {
                 this.getString();
             }
         }

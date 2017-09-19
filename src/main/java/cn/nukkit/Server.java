@@ -1891,8 +1891,9 @@ public class Server {
 
     /**
      * Checks the current thread against the expected primary thread for the server.
-     *
+     * <p>
      * <b>Note:</b> this method should not be used to indicate the current synchronized state of the runtime. A current thread matching the main thread indicates that it is synchronized, but a mismatch does not preclude the same assumption.
+     *
      * @return true if the current thread matches the expected primary thread, false otherwise
      */
     public boolean isPrimaryThread() {

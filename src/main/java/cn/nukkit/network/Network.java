@@ -140,7 +140,7 @@ public class Network {
                 DataPacket pk;
 
                 if ((pk = this.getPacket(buf[0])) != null) {
-                    pk.setBuffer(buf,  3); //skip 2 more bytes
+                    pk.setBuffer(buf, 3); //skip 2 more bytes
 
                     pk.decode();
 
