@@ -4211,7 +4211,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return bool if the item was dropped or if the item was null
      */
     public boolean dropItem(Item item) {
-        if (!this.spawned || this.isAlive()) {
+        if (!this.spawned || !this.isAlive()) {
             return false;
         }
 
