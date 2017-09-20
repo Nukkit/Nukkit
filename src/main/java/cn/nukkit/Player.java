@@ -2680,6 +2680,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         if (recipes == null || recipes.length == 0) {
                             this.getServer().getLogger().debug("Uknown recipe for output (" + craftingEventPacket.output[0] + ")");
+                            return;
                         }
 
                         recipe = null;
@@ -3223,7 +3224,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     }
                                 }
 
-                                MainLogger.getLogger().debug("Failed to execute inventory transaction from " + this.getName() + " with actions: " + Arrays.toString(transactionPacket.actions));
+                                MainLogger.getLogger().debug("Failed to execute inventory transaction from " + this.getName() + " with actions: " + Arrays.toString(actions.stream().toArray()));
 
                                 //TODO: check more stuff that might need reversion
                                 break packetswitch; //oops!
@@ -4218,12 +4219,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (item.isNull()) {
             this.server.getLogger().debug(this.getName() + " attempted to drop a null item (" + item + ")");
             return true;
-        }
-
-        PlayerDropItemEvent ev;
-        this.server.getPluginManager().callEvent(ev = new PlayerDropItemEvent(this, item));
-        if (ev.isCancelled()) {
-            return false;
         }
 
         Vector3 motion = this.getDirectionVector().multiply(0.4);

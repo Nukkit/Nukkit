@@ -151,9 +151,18 @@ public class NetworkInventoryAction {
                 switch (this.windowId) {
                     case SOURCE_TYPE_CRAFTING_ADD_INGREDIENT:
                     case SOURCE_TYPE_CRAFTING_REMOVE_INGREDIENT:
+                        System.out.println("crafting change ingredient, old: " + this.oldItem + "   new: " + this.newItem + "    slot: " + this.inventorySlot);
                         window = player.getCraftingGrid();
                         return new SlotChangeAction(window, this.inventorySlot, this.oldItem, this.newItem);
+                    case SOURCE_TYPE_CRAFTING_RESULT:
+                        window = player.getCraftingGrid();
+                        //return new SlotChangeAction(window, this.inventorySlot, this.);
 
+                        System.out.println("crafting result, old: " + this.oldItem + "   new: " + this.newItem + "    slot: " + this.inventorySlot);
+                        break;
+                    case SOURCE_TYPE_CRAFTING_USE_INGREDIENT:
+                        System.out.println("crafting use ingredient, old: " + this.oldItem + "   new: " + this.newItem + "    slot: " + this.inventorySlot);
+                        break;
                     case SOURCE_TYPE_CONTAINER_DROP_CONTENTS:
                         //TODO: this type applies to all fake windows, not just crafting
                         window = player.getCraftingGrid();
@@ -161,15 +170,15 @@ public class NetworkInventoryAction {
                         //DROP_CONTENTS doesn't bother telling us what inventorySlot the item is in, so we find it ourselves
                         inventorySlot = window.first(this.oldItem, true);
                         if (inventorySlot == -1) {
-                            throw new RuntimeException("Fake container " + window.getClass().getName() + " for " + player.getName() + " does not contain $this->oldItem");
+                            throw new RuntimeException("Fake container " + window.getClass().getName() + " for " + player.getName() + " does not contain " + this.oldItem);
                         }
                         return new SlotChangeAction(window, inventorySlot, this.oldItem, this.newItem);
                 }
 
                 //TODO: more stuff
-                throw new RuntimeException("Player " + player.getName() + " has no open container with window ID $this->windowId");
+                throw new RuntimeException("Player " + player.getName() + " has no open container with window ID " + this.windowId);
             default:
-                throw new RuntimeException("Unknown inventory source type $this->sourceType");
+                throw new RuntimeException("Unknown inventory source type " + this.sourceType);
         }
     }
 }

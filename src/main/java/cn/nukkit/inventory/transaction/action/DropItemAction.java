@@ -1,6 +1,7 @@
 package cn.nukkit.inventory.transaction.action;
 
 import cn.nukkit.Player;
+import cn.nukkit.event.player.PlayerDropItemEvent;
 import cn.nukkit.item.Item;
 
 /**
@@ -18,6 +19,17 @@ public class DropItemAction extends InventoryAction {
      */
     public boolean isValid(Player source) {
         return this.sourceItem.isNull();
+    }
+
+    @Override
+    public boolean onPreExecute(Player source) {
+        PlayerDropItemEvent ev;
+        source.getServer().getPluginManager().callEvent(ev = new PlayerDropItemEvent(source, this.targetItem));
+        if (ev.isCancelled()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

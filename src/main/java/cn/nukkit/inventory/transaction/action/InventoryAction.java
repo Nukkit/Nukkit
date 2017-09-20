@@ -43,6 +43,14 @@ public abstract class InventoryAction {
     }
 
     /**
+     * Called by inventory transactions before any actions are processed. If this returns false, the transaction will
+     * be cancelled.
+     */
+    public boolean onPreExecute(Player source) {
+        return true;
+    }
+
+    /**
      * Returns whether this action is currently valid. This should perform any necessary sanity checks.
      */
     abstract public boolean isValid(Player source);

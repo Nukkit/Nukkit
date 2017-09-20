@@ -212,7 +212,15 @@ public class SimpleInventoryTransaction implements InventoryTransaction {
         InventoryTransactionEvent ev = new InventoryTransactionEvent(this);
         Server.getInstance().getPluginManager().callEvent(ev);
         if (ev.isCancelled()) {
-            return false;
+            this.handleFailed();
+            return true;
+        }
+
+        for (InventoryAction action : this.actions) {
+            if (!action.onPreExecute(this.source)) {
+                this.handleFailed();
+                return true;
+            }
         }
 
         for (InventoryAction action : this.actions) {
@@ -225,6 +233,12 @@ public class SimpleInventoryTransaction implements InventoryTransaction {
 
         this.hasExecuted = true;
         return true;
+    }
+
+    protected void handleFailed() {
+        for (InventoryAction action : this.actions) {
+            action.onExecuteFail(this.source);
+        }
     }
 
     public boolean hasExecuted() {

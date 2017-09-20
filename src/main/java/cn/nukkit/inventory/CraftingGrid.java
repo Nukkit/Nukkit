@@ -12,7 +12,8 @@ public class CraftingGrid extends BaseInventory {
         super(holder, InventoryType.CRAFTING);
     }
 
-    public int getDefaultSize() {
+    @Override
+    public int getSize() {
         return 4;
     }
 
