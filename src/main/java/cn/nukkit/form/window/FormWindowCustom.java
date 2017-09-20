@@ -62,7 +62,7 @@ public class FormWindowCustom extends FormWindow {
 
         List<String> elementResponses = new Gson().fromJson(data, new TypeToken<List<String>>() {
         }.getType());
-        elementResponses.remove(elementResponses.size() - 1); //submit button
+        //elementResponses.remove(elementResponses.size() - 1); //submit button //maybe mojang removed that?
 
         int i = 0;
 
