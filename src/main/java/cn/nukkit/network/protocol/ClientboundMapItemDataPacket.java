@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 /**
  * Created by CreeperFace on 5.3.2017.
  */
-public class ClientboundMapItemDataPacket extends DataPacket {
+public class ClientboundMapItemDataPacket extends DataPacket { //TODO: update to 1.2
 
     public int[] eids = new int[0];
 
@@ -44,7 +44,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putVarLong(mapId);
+        this.putEntityUniqueId(mapId);
 
         int update = 0;
         if (eids.length > 0) {
@@ -64,7 +64,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
         if ((update & 0x08) != 0) { //TODO: find out what these are for
             this.putUnsignedVarInt(eids.length);
             for (int eid : eids) {
-                this.putVarInt(eid);
+                this.putEntityUniqueId(eid);
             }
         }
         if ((update & (TEXTURE_UPDATE | DECORATIONS_UPDATE)) != 0) {

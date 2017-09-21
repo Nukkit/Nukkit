@@ -40,12 +40,12 @@ public class BossEventPacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.bossEid = this.getVarLong();
+        this.bossEid = this.getEntityUniqueId();
         this.type = (int) this.getUnsignedVarInt();
         switch (this.type) {
             case TYPE_REGISTER_PLAYER:
             case TYPE_UNREGISTER_PLAYER:
-                this.playerEid = this.getLong();
+                this.playerEid = this.getEntityUniqueId();
                 break;
             case TYPE_SHOW:
                 this.title = this.getString();
@@ -68,12 +68,12 @@ public class BossEventPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putVarLong(this.bossEid);
+        this.putEntityUniqueId(this.bossEid);
         this.putUnsignedVarInt(this.type);
         switch (this.type) {
             case TYPE_REGISTER_PLAYER:
             case TYPE_UNREGISTER_PLAYER:
-                this.putLong(this.playerEid);
+                this.putEntityUniqueId(this.playerEid);
                 break;
             case TYPE_SHOW:
                 this.putString(this.title);

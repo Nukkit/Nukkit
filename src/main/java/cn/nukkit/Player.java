@@ -438,7 +438,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.recalculatePermissions();
         this.getAdventureSettings().update();
         this.sendCommandData();
-        this.inventory.sendCreativeContents();
     }
 
     @Override
@@ -1888,7 +1887,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.pitch = (float) this.pitch;
         startGamePacket.seed = -1;
         startGamePacket.dimension = (byte) (this.level.getDimension() & 0xff);
-        startGamePacket.gamemode = getClientFriendlyGamemode(this.gamemode);
+        startGamePacket.worldGamemode = getClientFriendlyGamemode(this.gamemode);
         startGamePacket.difficulty = this.server.getDifficulty();
         startGamePacket.spawnX = (int) spawnPosition.x;
         startGamePacket.spawnY = (int) spawnPosition.y;
@@ -1930,13 +1929,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (this.gamemode == Player.SPECTATOR) {
             InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-            inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
+            inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
             this.dataPacket(inventoryContentPacket);
         } else {
-            InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-            inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-            inventoryContentPacket.slots = Item.getCreativeItems().stream().toArray(Item[]::new);
-            this.dataPacket(inventoryContentPacket);
+            this.inventory.sendCreativeContents();
         }
 
         this.setEnableClientCommand(true);
@@ -3369,6 +3365,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case InventoryTransactionPacket.TYPE_USE_ITEM_ON_ENTITY:
                             UseItemOnEntityData useItemOnEntityData = (UseItemOnEntityData) transactionPacket.transactionData;
+
+                            if (useItemOnEntityData.entityRuntimeId % 2 == 0) {
+                                useItemOnEntityData.entityRuntimeId /= 2; //wtf is that
+                            }
 
                             Entity target = this.level.getEntity(useItemOnEntityData.entityRuntimeId);
                             if (target == null) {

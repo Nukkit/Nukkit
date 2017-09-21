@@ -150,18 +150,18 @@ public class NetworkInventoryAction {
                 //These types need special handling.
                 switch (this.windowId) {
                     case SOURCE_TYPE_CRAFTING_ADD_INGREDIENT:
-                    case SOURCE_TYPE_CRAFTING_REMOVE_INGREDIENT:
-                        System.out.println("crafting change ingredient, old: " + this.oldItem + "   new: " + this.newItem + "    slot: " + this.inventorySlot);
+                    case SOURCE_TYPE_CRAFTING_REMOVE_INGREDIENT: //TODO: a lot
+                        //System.out.println("crafting change ingredient, old: " + this.oldItem + "   new: " + this.newItem + "    slot: " + this.inventorySlot);
                         window = player.getCraftingGrid();
                         return new SlotChangeAction(window, this.inventorySlot, this.oldItem, this.newItem);
                     case SOURCE_TYPE_CRAFTING_RESULT:
                         window = player.getCraftingGrid();
                         //return new SlotChangeAction(window, this.inventorySlot, this.);
 
-                        System.out.println("crafting result, old: " + this.oldItem + "   new: " + this.newItem + "    slot: " + this.inventorySlot);
+                        //System.out.println("crafting result, old: " + this.oldItem + "   new: " + this.newItem + "    slot: " + this.inventorySlot);
                         break;
                     case SOURCE_TYPE_CRAFTING_USE_INGREDIENT:
-                        System.out.println("crafting use ingredient, old: " + this.oldItem + "   new: " + this.newItem + "    slot: " + this.inventorySlot);
+                        //System.out.println("crafting use ingredient, old: " + this.oldItem + "   new: " + this.newItem + "    slot: " + this.inventorySlot);
                         break;
                     case SOURCE_TYPE_CONTAINER_DROP_CONTENTS:
                         //TODO: this type applies to all fake windows, not just crafting

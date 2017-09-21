@@ -29,7 +29,7 @@ public class MovePlayerPacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.eid = this.getVarLong();
+        this.eid = this.getEntityRuntimeId();
         Vector3f v = this.getVector3f();
         this.x = v.x;
         this.y = v.y;
@@ -39,7 +39,7 @@ public class MovePlayerPacket extends DataPacket {
         this.yaw = this.getLFloat();
         this.mode = this.getByte();
         this.onGround = this.getBoolean();
-        this.ridingEid = this.getVarLong();
+        this.ridingEid = this.getEntityRuntimeId();
         if (this.mode == MODE_TELEPORT) {
             this.int1 = this.getLInt();
             this.int2 = this.getLInt();
@@ -49,14 +49,14 @@ public class MovePlayerPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putVarLong(this.eid);
+        this.putEntityRuntimeId(this.eid);
         this.putVector3f(this.x, this.y, this.z);
         this.putLFloat(this.pitch);
         this.putLFloat(this.yaw);
         this.putLFloat(this.headYaw);
         this.putByte((byte) this.mode);
         this.putBoolean(this.onGround);
-        this.putVarLong(this.ridingEid);
+        this.putEntityRuntimeId(this.ridingEid);
         if (this.mode == MODE_TELEPORT) {
             this.putLInt(this.int1);
             this.putLInt(this.int2);

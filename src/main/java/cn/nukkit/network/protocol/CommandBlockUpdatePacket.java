@@ -34,7 +34,7 @@ public class CommandBlockUpdatePacket extends DataPacket {
             this.isRedstoneMode = this.getBoolean();
             this.isConditional = this.getBoolean();
         } else {
-            this.minecartEid = this.getVarLong();
+            this.minecartEid = this.getEntityRuntimeId();
         }
         this.command = this.getString();
         this.lastOutput = this.getString();
@@ -51,7 +51,7 @@ public class CommandBlockUpdatePacket extends DataPacket {
             this.putBoolean(this.isRedstoneMode);
             this.putBoolean(this.isConditional);
         } else {
-            this.putVarLong(this.minecartEid);
+            this.putEntityRuntimeId(this.minecartEid);
         }
         this.putString(this.command);
         this.putString(this.lastOutput);

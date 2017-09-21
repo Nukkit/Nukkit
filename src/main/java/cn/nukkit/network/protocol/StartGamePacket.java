@@ -25,7 +25,7 @@ public class StartGamePacket extends DataPacket {
     public int seed;
     public byte dimension;
     public int generator = 1;
-    public int gamemode;
+    public int worldGamemode;
     public int difficulty;
     public int spawnX;
     public int spawnY;
@@ -61,8 +61,8 @@ public class StartGamePacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putVarLong(this.entityUniqueId);
-        this.putVarLong(this.entityRuntimeId);
+        this.putEntityUniqueId(this.entityUniqueId);
+        this.putEntityRuntimeId(this.entityRuntimeId);
         this.putVarInt(this.playerGamemode);
         this.putVector3f(this.x, this.y, this.z);
         this.putLFloat(this.yaw);
@@ -70,7 +70,7 @@ public class StartGamePacket extends DataPacket {
         this.putVarInt(this.seed);
         this.putVarInt(this.dimension);
         this.putVarInt(this.generator);
-        this.putVarInt(this.gamemode);
+        this.putVarInt(this.worldGamemode);
         this.putVarInt(this.difficulty);
         this.putBlockVector3(this.spawnX, this.spawnY, this.spawnZ);
         this.putBoolean(this.hasAchievementsDisabled);

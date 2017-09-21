@@ -407,6 +407,36 @@ public class BinaryStream {
         this.putBoolean(rule.unknown2);
     }
 
+    /**
+     * Reads and returns an EntityUniqueID
+     *
+     * @return int
+     */
+    public long getEntityUniqueId() {
+        return this.getVarLong();
+    }
+
+    /**
+     * Writes an EntityUniqueID
+     */
+    public void putEntityUniqueId(long eid) {
+        this.putVarLong(eid);
+    }
+
+    /**
+     * Reads and returns an EntityRuntimeID
+     */
+    public long getEntityRuntimeId() {
+        return this.getUnsignedVarLong();
+    }
+
+    /**
+     * Writes an EntityUniqueID
+     */
+    public void putEntityRuntimeId(long eid) {
+        this.putUnsignedVarLong(eid);
+    }
+
     public BlockFace getBlockFace() {
         return BlockFace.fromIndex(this.getVarInt());
     }

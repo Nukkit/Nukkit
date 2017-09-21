@@ -19,7 +19,7 @@ public class CameraPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putVarLong(this.cameraUniqueId);
-        this.putVarLong(this.playerUniqueId);
+        this.putEntityUniqueId(this.cameraUniqueId);
+        this.putEntityUniqueId(this.playerUniqueId);
     }
 }

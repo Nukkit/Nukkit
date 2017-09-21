@@ -67,7 +67,7 @@ public class InventoryTransactionPacket extends DataPacket {
             case TYPE_USE_ITEM_ON_ENTITY:
                 UseItemOnEntityData useItemOnEntityData = (UseItemOnEntityData) this.transactionData;
 
-                this.putUnsignedVarInt(useItemOnEntityData.entityRuntimeId);
+                this.putEntityRuntimeId(useItemOnEntityData.entityRuntimeId);
                 this.putUnsignedVarInt(useItemOnEntityData.actionType);
                 this.putVarInt(useItemOnEntityData.hotbarSlot);
                 this.putSlot(useItemOnEntityData.itemInHand);
@@ -83,7 +83,7 @@ public class InventoryTransactionPacket extends DataPacket {
                 this.putVector3f(releaseItemData.headRot.asVector3f());
                 break;
             default:
-                throw new RuntimeException("Unknown transaction type $this->transactionType");
+                throw new RuntimeException("Unknown transaction type " + this.transactionType);
         }
     }
 
@@ -117,7 +117,7 @@ public class InventoryTransactionPacket extends DataPacket {
             case TYPE_USE_ITEM_ON_ENTITY:
                 UseItemOnEntityData useItemOnEntityData = new UseItemOnEntityData();
 
-                useItemOnEntityData.entityRuntimeId = this.getUnsignedVarLong();
+                useItemOnEntityData.entityRuntimeId = this.getEntityRuntimeId();
                 useItemOnEntityData.actionType = (int) this.getUnsignedVarInt();
                 useItemOnEntityData.hotbarSlot = this.getVarInt();
                 useItemOnEntityData.itemInHand = this.getSlot();
@@ -137,7 +137,7 @@ public class InventoryTransactionPacket extends DataPacket {
                 this.transactionData = releaseItemData;
                 break;
             default:
-                throw new RuntimeException("Unknown transaction type $this->transactionType");
+                throw new RuntimeException("Unknown transaction type " + this.transactionType);
         }
     }
 }

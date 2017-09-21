@@ -23,7 +23,7 @@ public class UpdateEquipmentPacket extends DataPacket {
     public void encode() {
         this.putByte((byte) this.windowId);
         this.putByte((byte) this.windowType);
-        this.putVarLong(this.eid);
+        this.putEntityUniqueId(this.eid);
         this.put(this.namedtag);
     }
 }

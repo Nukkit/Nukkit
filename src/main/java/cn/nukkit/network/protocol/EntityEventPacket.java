@@ -44,16 +44,16 @@ public class EntityEventPacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.eid = this.getVarLong();
+        this.eid = this.getEntityRuntimeId();
         this.event = this.getByte();
-        this.type = this.getByte();
+        this.type = this.getVarInt();
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putVarLong(this.eid);
+        this.putEntityRuntimeId(this.eid);
         this.putByte((byte) this.event);
-        this.putByte((byte) this.type);
+        this.putVarInt((byte) this.type);
     }
 }

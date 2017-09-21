@@ -23,8 +23,8 @@ public class AddPaintingPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putVarLong(this.entityUniqueId);
-        this.putVarLong(this.entityRuntimeId);
+        this.putEntityUniqueId(this.entityUniqueId);
+        this.putEntityRuntimeId(this.entityRuntimeId);
         this.putBlockVector3(this.x, this.y, this.z);
         this.putVarInt(this.direction);
         this.putString(this.title);
