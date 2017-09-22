@@ -119,10 +119,10 @@ public class LevelSoundEventPacket extends DataPacket {
     public float x;
     public float y;
     public float z;
-    public int extraData = -1;
-    public int pitch = 1;
-    public boolean unknownBool;
-    public boolean disableRelativeVolume;
+    public int extraData = -1; //TODO: Check name
+    public int pitch = 1; //TODO: Check name
+    public boolean isBabyMob;
+    public boolean isGlobal;
 
     @Override
     public void decode() {
@@ -133,8 +133,8 @@ public class LevelSoundEventPacket extends DataPacket {
         this.z = v.z;
         this.extraData = this.getVarInt();
         this.pitch = this.getVarInt();
-        this.unknownBool = this.getBoolean();
-        this.disableRelativeVolume = this.getBoolean();
+        this.isBabyMob = this.getBoolean();
+        this.isGlobal = this.getBoolean();
     }
 
     @Override
@@ -144,8 +144,8 @@ public class LevelSoundEventPacket extends DataPacket {
         this.putVector3f(this.x, this.y, this.z);
         this.putVarInt(this.extraData);
         this.putVarInt(this.pitch);
-        this.putBoolean(this.unknownBool);
-        this.putBoolean(this.disableRelativeVolume);
+        this.putBoolean(this.isBabyMob);
+        this.putBoolean(this.isGlobal);
     }
 
     @Override

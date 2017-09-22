@@ -237,4 +237,9 @@ public class EntityItem extends Entity {
 
         super.spawnTo(player);
     }
+
+    @Override
+    public boolean doesTriggerPressurePlate() {
+        return true;
+    }
 }

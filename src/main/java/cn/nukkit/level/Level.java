@@ -501,8 +501,8 @@ public class Level implements ChunkManager, Metadatable {
         pk.x = (float) pos.x;
         pk.y = (float) pos.y;
         pk.z = (float) pos.z;
-        pk.unknownBool = unknown;
-        pk.disableRelativeVolume = disableRelativeVolume;
+        pk.isBabyMob = unknown;
+        pk.isGlobal = disableRelativeVolume;
 
         if (players == null) {
             this.addChunkPacket(pos.getFloorX(), pos.getFloorZ(), pk);
@@ -1810,6 +1810,7 @@ public class Level implements ChunkManager, Metadatable {
 
             BlockBreakEvent ev = new BlockBreakEvent(player, target, item, player.isCreative(),
                     (player.lastBreak + breakTime * 1000) > System.currentTimeMillis());
+
             double distance;
             if (player.isSurvival() && !target.isBreakable(item)) {
                 ev.setCancelled();
@@ -1956,6 +1957,7 @@ public class Level implements ChunkManager, Metadatable {
         return this.useItemOn(vector, item, face, fx, fy, fz, player, false);
     }
 
+
     public Item useItemOn(Vector3 vector, Item item, BlockFace face, float fx, float fy, float fz, Player player, boolean playSound) {
         Block target = this.getBlock(vector);
         Block block = target.getSide(face);
@@ -2002,6 +2004,7 @@ public class Level implements ChunkManager, Metadatable {
             } else {
                 return null;
             }
+
         } else if (target.canBeActivated() && target.onActivate(item, null)) {
             return item;
         }
@@ -2368,14 +2371,18 @@ public class Level implements ChunkManager, Metadatable {
 
             for (Entity entity : oldEntities.values()) {
                 chunk.addEntity(entity);
-                oldChunk.removeEntity(entity);
-                entity.chunk = chunk;
+                if (oldChunk != null) {
+                    oldChunk.removeEntity(entity);
+                    entity.chunk = chunk;
+                }
             }
 
             for (BlockEntity blockEntity : oldBlockEntities.values()) {
                 chunk.addBlockEntity(blockEntity);
-                oldChunk.removeBlockEntity(blockEntity);
-                blockEntity.chunk = chunk;
+                if (oldChunk != null) {
+                    oldChunk.removeBlockEntity(blockEntity);
+                    blockEntity.chunk = chunk;
+                }
             }
 
             this.provider.setChunk(chunkX, chunkZ, chunk);
