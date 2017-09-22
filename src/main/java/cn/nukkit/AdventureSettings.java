@@ -22,6 +22,10 @@ public class AdventureSettings implements Cloneable {
 
     private Player player;
 
+    public AdventureSettings(Player player) {
+        this.player = player;
+    }
+
     public AdventureSettings clone(Player newPlayer) {
         try {
             AdventureSettings settings = (AdventureSettings) super.clone();

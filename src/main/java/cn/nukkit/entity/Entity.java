@@ -1097,7 +1097,7 @@ public abstract class Entity extends Location implements Metadatable {
         if (this.inPortalTicks == 80) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, PortalType.NETHER);
             getServer().getPluginManager().callEvent(ev);
-            
+
             //TODO: teleport
         }
 
