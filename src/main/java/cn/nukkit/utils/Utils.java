@@ -188,8 +188,6 @@ public class Utils {
     }
 
     public static int toInt(Object number) {
-        int s = (int) Math.round((double) number);
-
-        return s;
+        return (int) Math.round((double) number);
     }
 }

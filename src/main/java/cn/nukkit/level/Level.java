@@ -1755,7 +1755,6 @@ public class Level implements ChunkManager, Metadatable {
 
                             .putShort("Health", 5).putCompound("Item", itemTag).putShort("PickupDelay", delay));
 
-            itemEntity.setPickupDelay(delay); //TODO: fix this
             itemEntity.spawnToAll();
         }
     }
@@ -2371,14 +2370,18 @@ public class Level implements ChunkManager, Metadatable {
 
             for (Entity entity : oldEntities.values()) {
                 chunk.addEntity(entity);
-                oldChunk.removeEntity(entity);
-                entity.chunk = chunk;
+                if (oldChunk != null) {
+                    oldChunk.removeEntity(entity);
+                    entity.chunk = chunk;
+                }
             }
 
             for (BlockEntity blockEntity : oldBlockEntities.values()) {
                 chunk.addBlockEntity(blockEntity);
-                oldChunk.removeBlockEntity(blockEntity);
-                blockEntity.chunk = chunk;
+                if (oldChunk != null) {
+                    oldChunk.removeBlockEntity(blockEntity);
+                    blockEntity.chunk = chunk;
+                }
             }
 
             this.provider.setChunk(chunkX, chunkZ, chunk);

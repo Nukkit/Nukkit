@@ -1097,7 +1097,7 @@ public abstract class Entity extends Location implements Metadatable {
         if (this.inPortalTicks == 80) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, PortalType.NETHER);
             getServer().getPluginManager().callEvent(ev);
-
+            
             //TODO: teleport
         }
 
@@ -1380,7 +1380,8 @@ public abstract class Entity extends Location implements Metadatable {
                 dx *= 1.0F + entityCollisionReduction;
                 dz *= 1.0F + entityCollisionReduction;
                 if (this.riding == null) {
-                    setMotion(new Vector3(-dx, 0.0D, -dy));
+                    motionX -= dx;
+                    motionZ -= dy;
                 }
             }
         }
@@ -1780,9 +1781,9 @@ public abstract class Entity extends Location implements Metadatable {
             }
         }
 
-        this.motionX += motion.x;
-        this.motionY += motion.y;
-        this.motionZ += motion.z;
+        this.motionX = motion.x;
+        this.motionY = motion.y;
+        this.motionZ = motion.z;
 
         if (!this.justCreated) {
             this.updateMovement();

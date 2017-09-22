@@ -29,7 +29,7 @@ public interface ProtocolInfo {
     byte ADD_ENTITY_PACKET = 0x0d;
     byte REMOVE_ENTITY_PACKET = 0x0e;
     byte ADD_ITEM_ENTITY_PACKET = 0x0f;
-
+    byte ADD_HANGING_ENTITY_PACKET = 0x10;
     byte TAKE_ITEM_ENTITY_PACKET = 0x11;
     byte MOVE_ENTITY_PACKET = 0x12;
     byte MOVE_PLAYER_PACKET = 0x13;

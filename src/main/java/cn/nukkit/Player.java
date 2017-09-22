@@ -212,6 +212,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private ClientChainData loginChainData;
 
+    public int pickedXPOrb = 0;
+
     public Block breakingBlock = null;
 
     public int pickedXPOrb = 0;
@@ -2955,17 +2957,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         int[] used = new int[this.inventory.getSize()];
 
                         for (Item ingredient : ingredients) {
-                            inventorySlot = -1;
+                            slot = -1;
                             for (int index : this.inventory.getContents().keySet()) {
                                 Item i = this.inventory.getContents().get(index);
                                 if (ingredient.getId() != 0 && ingredient.deepEquals(i, ingredient.hasMeta()) && (i.getCount() - used[index]) >= 1) {
-                                    inventorySlot = index;
+                                    slot = index;
                                     used[index]++;
                                     break;
                                 }
                             }
 
-                            if (ingredient.getId() != 0 && inventorySlot == -1) {
+                            if (ingredient.getId() != 0 && slot == -1) {
                                 canCraft = false;
                                 break;
                             }
@@ -3009,6 +3011,154 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.level.dropItem(this, i);
                             }
                         }*/
+                    }
+
+                    if (recipe != null) {
+                        switch (recipe.getResult().getId()) {
+                            case Item.WORKBENCH:
+                                this.awardAchievement("buildWorkBench");
+                                break;
+                            case Item.WOODEN_PICKAXE:
+                                this.awardAchievement("buildPickaxe");
+                                break;
+                            case Item.FURNACE:
+                                this.awardAchievement("buildFurnace");
+                                break;
+                            case Item.WOODEN_HOE:
+                                this.awardAchievement("buildHoe");
+                                break;
+                            case Item.BREAD:
+                                this.awardAchievement("makeBread");
+                                break;
+                            case Item.CAKE:
+                                //TODO: detect complex recipes like cake that leave remains
+                                this.awardAchievement("bakeCake");
+                                this.inventory.addItem(new ItemBucket(0, 3));
+                                break;
+                            case Item.STONE_PICKAXE:
+                            case Item.GOLD_PICKAXE:
+                            case Item.IRON_PICKAXE:
+                            case Item.DIAMOND_PICKAXE:
+                                this.awardAchievement("buildBetterPickaxe");
+                                break;
+                            case Item.WOODEN_SWORD:
+                                this.awardAchievement("buildSword");
+                                break;
+                            case Item.DIAMOND:
+                                this.awardAchievement("diamond");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    break;
+                case ProtocolInfo.CONTAINER_SET_SLOT_PACKET:
+                    if (!this.spawned || !this.isAlive()) {
+                        break;
+                    }
+
+                    ContainerSetSlotPacket containerSetSlotPacket = (ContainerSetSlotPacket) packet;
+                    if (containerSetSlotPacket.slot < 0) {
+                        break;
+                    }
+
+                    Inventory inv;
+                    BaseTransaction transaction;
+                    if (containerSetSlotPacket.windowid == 0) { //Our inventory
+                        inv = this.inventory;
+                        if (containerSetSlotPacket.slot >= this.inventory.getSize()) {
+                            break;
+                        }
+                        if (this.isCreative()) {
+                            if (Item.getCreativeItemIndex(containerSetSlotPacket.item) != -1) {
+                                inv.setItem(containerSetSlotPacket.slot, containerSetSlotPacket.item);
+                                this.inventory.setHotbarSlotIndex(containerSetSlotPacket.slot, containerSetSlotPacket.slot); //links hotbar[packet.slot] to slots[packet.slot]
+                            }
+                        }
+                        transaction = new BaseTransaction(this.inventory, containerSetSlotPacket.slot, this.inventory.getItem(containerSetSlotPacket.slot), containerSetSlotPacket.item);
+                    } else if (containerSetSlotPacket.windowid == ContainerSetContentPacket.SPECIAL_ARMOR) { //Our armor
+                        inv = this.inventory;
+                        if (containerSetSlotPacket.slot >= 4) {
+                            break;
+                        }
+                        transaction = new BaseTransaction(this.inventory, containerSetSlotPacket.slot + this.inventory.getSize(), this.inventory.getArmorItem(containerSetSlotPacket.slot), containerSetSlotPacket.item);
+                    } else if (this.windowIndex.containsKey(containerSetSlotPacket.windowid)) {
+                        inv = this.windowIndex.get(containerSetSlotPacket.windowid);
+
+                        if (!(inv instanceof AnvilInventory)) {
+                            this.craftingType = CRAFTING_SMALL;
+                        }
+
+                        if (inv instanceof EnchantInventory && containerSetSlotPacket.item.hasEnchantments()) {
+                            ((EnchantInventory) inv).onEnchant(this, inv.getItem(containerSetSlotPacket.slot), containerSetSlotPacket.item);
+                        }
+
+                        transaction = new BaseTransaction(inv, containerSetSlotPacket.slot, inv.getItem(containerSetSlotPacket.slot), containerSetSlotPacket.item);
+                    } else {
+                        break;
+                    }
+
+                    if (inv != null) {
+                        Item sourceItem = inv.getItem(containerSetSlotPacket.slot);
+                        Item heldItem = sourceItem.clone();
+                        heldItem.setCount(sourceItem.getCount() - containerSetSlotPacket.item.getCount());
+                        if (heldItem.getCount() > 0) { //In win10, click mouse and hold on item
+                            InventoryClickEvent inventoryClickEvent = new InventoryClickEvent(inv, containerSetSlotPacket.slot, sourceItem, heldItem, containerSetSlotPacket.item);
+                            this.getServer().getPluginManager().callEvent(inventoryClickEvent);
+                            //TODO Fix hold on bug and support Cancellable
+                        }
+                    }
+
+                    if (transaction.getSourceItem().deepEquals(transaction.getTargetItem()) && transaction.getTargetItem().getCount() == transaction.getSourceItem().getCount()) { //No changes!
+                        //No changes, just a local inventory update sent by the server
+                        break;
+                    }
+
+
+                    if (this.currentTransaction == null || this.currentTransaction.getCreationTime() < (System.currentTimeMillis() - 8 * 1000)) {
+                        if (this.currentTransaction != null) {
+                            for (Inventory inventory : this.currentTransaction.getInventories()) {
+                                if (inventory instanceof PlayerInventory) {
+                                    ((PlayerInventory) inventory).sendArmorContents(this);
+                                }
+                                inventory.sendContents(this);
+                            }
+                        }
+                        this.currentTransaction = new SimpleTransactionGroup(this);
+                    }
+
+                    this.currentTransaction.addTransaction(transaction);
+
+                    if (this.currentTransaction.canExecute() || this.isCreative()) {
+                        HashSet<String> achievements = new HashSet<>();
+
+                        for (Transaction tr : this.currentTransaction.getTransactions()) {
+                            Inventory inv1 = tr.getInventory();
+
+                            if (inv1 instanceof FurnaceInventory) {
+                                if (tr.getSlot() == 2) {
+                                    switch (((FurnaceInventory) inv1).getResult().getId()) {
+                                        case Item.IRON_INGOT:
+                                            achievements.add("acquireIron");
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (this.currentTransaction.execute(this.isCreative())) {
+                            for (String achievement : achievements) {
+                                this.awardAchievement(achievement);
+                            }
+                        }
+
+                        this.currentTransaction = null;
+                    } else {
+                        if (containerSetSlotPacket.item.getId() != 0) {
+                            inventory.sendSlot(containerSetSlotPacket.hotbarSlot, this);
+                            inventory.sendSlot(containerSetSlotPacket.slot, this);
+                        }
                     }
 
                     if (recipe != null) {

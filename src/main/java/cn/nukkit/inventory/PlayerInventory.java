@@ -393,7 +393,7 @@ public class PlayerInventory extends BaseInventory {
             if (items[i].getId() == Item.AIR) {
                 this.clear(this.getSize() + i);
             } else {
-                this.setItem(this.getSize() + 1, items[i]);
+                this.setItem(this.getSize() + i, items[i]);
             }
         }
     }
@@ -452,6 +452,8 @@ public class PlayerInventory extends BaseInventory {
 
         /*//Because PE is stupid and shows 9 less slots than you send it, give it 9 dummy slots so it shows all the REAL slots.
         for(int i = this.getSize(); i < this.getSize() + this.getHotbarSize(); ++i){
+            pk.slots[i] = new ItemBlock(new BlockAir());
+        }
             pk.slots[i] = new ItemBlock(new BlockAir());
         }*/
 
