@@ -97,14 +97,13 @@ public class EntityArrow extends EntityProjectile {
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
+    public boolean entityBaseTick(int tickDiff) {
         if (this.closed) {
             return false;
         }
 
-        this.timing.startTiming();
-
-        boolean hasUpdate = super.onUpdate(currentTick);
+        tickDiff = 1;
+        boolean hasUpdate = super.entityBaseTick(tickDiff);
 
         if (this.onGround || this.hadCollision) {
             this.setCritical(false);
@@ -114,8 +113,6 @@ public class EntityArrow extends EntityProjectile {
             this.close();
             hasUpdate = true;
         }
-
-        this.timing.stopTiming();
 
         return hasUpdate;
     }

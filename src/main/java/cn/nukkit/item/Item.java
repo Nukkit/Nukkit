@@ -10,6 +10,7 @@ import cn.nukkit.inventory.Fuel;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
@@ -160,7 +161,7 @@ public class Item implements Cloneable {
     public static final int CLAY_BLOCK = 82;
     public static final int REEDS = 83;
     public static final int SUGARCANE_BLOCK = 83;
-
+    public static final int JUKEBOX = 84;
     public static final int FENCE = 85;
     public static final int PUMPKIN = 86;
     public static final int NETHERRACK = 87;
@@ -561,6 +562,19 @@ public class Item implements Cloneable {
     public static final int COOKED_SALMON = 463;
 
     public static final int GOLDEN_APPLE_ENCHANTED = 466;
+
+    public static final int RECORD_13 = 500;
+    public static final int RECORD_CAT = 501;
+    public static final int RECORD_BLOCKS = 502;
+    public static final int RECORD_CHIRP = 503;
+    public static final int RECORD_FAR = 504;
+    public static final int RECORD_MALL = 505;
+    public static final int RECORD_MELLOHI = 506;
+    public static final int RECORD_STAL = 507;
+    public static final int RECORD_STRAD = 508;
+    public static final int RECORD_WARD = 509;
+    public static final int RECORD_11 = 510;
+    public static final int RECORD_WAIT = 511;
 
     public static Class[] list = null;
 
@@ -1146,7 +1160,7 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.IRON_HORSE_ARMOR, 0));
         addCreativeItem(Item.get(Item.GOLD_HORSE_ARMOR, 0));
         addCreativeItem(Item.get(Item.DIAMOND_HORSE_ARMOR, 0));
-        
+
         addCreativeItem(Item.get(Item.SPAWN_EGG, 10)); //Chicken
         addCreativeItem(Item.get(Item.SPAWN_EGG, 11)); //Cow
         addCreativeItem(Item.get(Item.SPAWN_EGG, 12)); //Pig
@@ -1155,7 +1169,7 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.SPAWN_EGG, 16)); //Mooshroom
         addCreativeItem(Item.get(Item.SPAWN_EGG, 17)); //Squid
         addCreativeItem(Item.get(Item.SPAWN_EGG, 19)); //Bat 
-		//addCreativeItem(Item.get(Item.SPAWN_EGG, 20)); //Iron Golem
+        //addCreativeItem(Item.get(Item.SPAWN_EGG, 20)); //Iron Golem
         //addCreativeItem(Item.get(Item.SPAWN_EGG, 21)); //Snow Golem
         addCreativeItem(Item.get(Item.SPAWN_EGG, 22)); //Ocelot
         addCreativeItem(Item.get(Item.SPAWN_EGG, 23)); //Horse
@@ -1183,7 +1197,7 @@ public class Item implements Cloneable {
         addCreativeItem(Item.get(Item.SPAWN_EGG, 49)); //Guardian
         addCreativeItem(Item.get(Item.SPAWN_EGG, 50)); //ElderGuardian
         addCreativeItem(Item.get(Item.SPAWN_EGG, 54)); //Shulker
-        
+
         addCreativeItem(Item.get(Item.FIRE_CHARGE, 0));
         addCreativeItem(Item.get(Item.WOODEN_SWORD));
         addCreativeItem(Item.get(Item.WOODEN_HOE));
@@ -1899,6 +1913,10 @@ public class Item implements Cloneable {
         this.count = count;
     }
 
+    public boolean isNull() {
+        return this.count <= 0 || this.id == AIR;
+    }
+
     final public String getName() {
         return this.hasCustomName() ? this.getCustomName() : this.name;
     }
@@ -2042,6 +2060,22 @@ public class Item implements Cloneable {
         return false;
     }
 
+    /**
+     * Called when a player uses the item on air, for example throwing a projectile.
+     * Returns whether the item was changed, for example count decrease or durability change.
+     */
+    public boolean onClickAir(Player player, Vector3 directionVector) {
+        return false;
+    }
+
+    /**
+     * Called when a player is using this item and releases it. Used to handle bow shoot actions.
+     * Returns whether the item was changed, for example count decrease or durability change.
+     */
+    public boolean onReleaseUsing(Player player) {
+        return false;
+    }
+
     @Override
     public final boolean equals(Object item) {
         return item instanceof Item && this.equals((Item) item, true);
@@ -2053,6 +2087,13 @@ public class Item implements Cloneable {
 
     public final boolean equals(Item item, boolean checkDamage, boolean checkCompound) {
         return this.getId() == item.getId() && (!checkDamage || this.getDamage() == item.getDamage()) && (!checkCompound || Arrays.equals(this.getCompoundTag(), item.getCompoundTag()));
+    }
+
+    /**
+     * Returns whether the specified item stack has the same ID, damage, NBT and count as this item stack.
+     */
+    public final boolean equalsExact(Item other) {
+        return this.equals(other, true, true) && this.count == other.count;
     }
 
     public final boolean deepEquals(Item item) {

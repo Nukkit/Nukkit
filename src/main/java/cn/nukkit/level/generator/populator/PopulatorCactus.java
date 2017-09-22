@@ -5,6 +5,8 @@ import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 
+import java.util.Random;
+
 public class PopulatorCactus extends Populator {
 
     /**

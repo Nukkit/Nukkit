@@ -143,13 +143,13 @@ public abstract class BlockEntity extends Position {
         this.namedTag.putInt("z", (int) this.getZ());
     }
 
-    public CompoundTag getCleanedNBT(){
+    public CompoundTag getCleanedNBT() {
         this.saveNBT();
         CompoundTag tag = this.namedTag.clone();
         tag.remove("x").remove("y").remove("z").remove("id");
-        if(tag.getTags().size() > 0){
+        if (tag.getTags().size() > 0) {
             return tag;
-        }else{
+        } else {
             return null;
         }
     }

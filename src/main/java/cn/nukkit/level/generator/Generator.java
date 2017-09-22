@@ -1,7 +1,7 @@
 package cn.nukkit.level.generator;
 
 import cn.nukkit.level.ChunkManager;
-import cn.nukkit.level.Level;
+import cn.nukkit.level.Dimension;
 import cn.nukkit.level.generator.noise.Noise;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
@@ -18,15 +18,15 @@ public abstract class Generator {
     public static final int TYPE_INFINITE = 1;
     public static final int TYPE_FLAT = 2;
     public static final int TYPE_NETHER = 3;
+    public static final int TYPE_END = 4;
 
     public abstract int getId();
 
-    public int getDimension() {
-        return Level.DIMENSION_OVERWORLD;
-    }
-
     private static final Map<String, Class<? extends Generator>> nameList = new HashMap<>();
 
+    public Dimension getDimension() {
+        return Dimension.OVERWORLD;
+    }
     private static final Map<Integer, Class<? extends Generator>> typeList = new HashMap<>();
 
     public static boolean addGenerator(Class<? extends Generator> clazz, String name, int type) {

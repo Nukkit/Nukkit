@@ -52,21 +52,18 @@ public class EntitySnowball extends EntityProjectile {
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
+    public boolean entityBaseTick(int tickDiff) {
+        tickDiff = 1;
         if (this.closed) {
             return false;
         }
 
-        this.timing.startTiming();
-
-        boolean hasUpdate = super.onUpdate(currentTick);
+        boolean hasUpdate = this.entityBaseTick(tickDiff); // Why super?? All have this, this have super :/ HelpMe :(
 
         if (this.age > 1200 || this.isCollided) {
             this.kill();
             hasUpdate = true;
         }
-
-        this.timing.stopTiming();
 
         return hasUpdate;
     }

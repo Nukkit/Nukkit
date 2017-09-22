@@ -96,48 +96,19 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
         namedTag.putByte("Fuse", fuse);
     }
 
-    public boolean onUpdate(int currentTick) {
-
+    public boolean entityBaseTick(int tickDiff) {
+        tickDiff = 1;
         if (closed) {
             return false;
-        }
-
-        this.timing.startTiming();
-
-        int tickDiff = currentTick - lastUpdate;
-
-        if (tickDiff <= 0 && !justCreated) {
-            return true;
         }
 
         if (fuse % 5 == 0) {
             this.setDataProperty(new IntEntityData(DATA_FUSE_LENGTH, fuse));
         }
 
-        lastUpdate = currentTick;
-
         boolean hasUpdate = entityBaseTick(tickDiff);
 
         if (isAlive()) {
-
-            motionY -= getGravity();
-
-            move(motionX, motionY, motionZ);
-
-            float friction = 1 - getDrag();
-
-            motionX *= friction;
-            motionY *= friction;
-            motionZ *= friction;
-
-            updateMovement();
-
-            if (onGround) {
-                motionY *= -0.5;
-                motionX *= 0.7;
-                motionZ *= 0.7;
-            }
-
             fuse -= tickDiff;
 
             if (fuse <= 0) {
@@ -147,9 +118,7 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
 
         }
 
-        this.timing.stopTiming();
-
-        return hasUpdate || fuse >= 0 || Math.abs(motionX) > 0.00001 || Math.abs(motionY) > 0.00001 || Math.abs(motionZ) > 0.00001;
+        return hasUpdate || this.fuse >= 0;
     }
 
     public void explode() {

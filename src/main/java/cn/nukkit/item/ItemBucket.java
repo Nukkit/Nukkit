@@ -7,6 +7,7 @@ import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerBucketFillEvent;
+import cn.nukkit.level.Dimension;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
@@ -85,6 +86,17 @@ public class ItemBucket extends Item {
                             level.setBlock(b, new BlockWater());
                         }
                     }
+
+                    if (!(player.getLevel().getDimension() == Dimension.NETHER && targetBlock.getId() == Block.WATER)) {
+                        player.getLevel().setBlock(block, targetBlock, true, true);
+                    }
+
+                    // TODO:
+                    /*if (target instanceof BlockLava) {
+                        target.getLevel().addLevelSoundEvent(LevelSoundEventPacket.SOUND_BUCKET_EMPTY_LAVA);
+                    } else {
+                        target.getLevel().addLevelSoundEvent(LevelSoundEventPacket.SOUND_BUCKET_EMPTY_WATER);
+                    }*/
 
                     if (player.isSurvival()) {
                         Item clone = this.clone();

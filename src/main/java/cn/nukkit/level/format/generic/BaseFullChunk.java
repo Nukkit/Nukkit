@@ -482,5 +482,4 @@ public abstract class BaseFullChunk implements FullChunk {
     public void setLightPopulated(boolean value) {
 
     }
-
 }

@@ -16,9 +16,9 @@ public class PopulatorRavines extends Populator {
     private long worldLong1;
     private long worldLong2;
 
-    private int ravineRarity = 1;//2
+    private int ravineRarity = 2;
     private int ravineMinAltitude = 20;
-    private int ravineMaxAltitude = 67;
+    private int ravineMaxAltitude = 60; // // 67 Official. Normaly is 60 for fix Cave Generation shitty. ( 60 - minimal height of biomes )
     private int ravineMinLength = 84;
     private int ravineMaxLength = 111;
 
@@ -47,7 +47,7 @@ public class PopulatorRavines extends Populator {
     }
 
     protected void generateChunk(int chunkX, int chunkZ, FullChunk generatingChunkBuffer) {
-        if (this.random.nextInt(300) >= this.ravineRarity)
+        if (this.random.nextInt(200) >= this.ravineRarity)
             return;
         double d1 = (chunkX * 16) + this.random.nextInt(16);
         double d2 = numberInRange(random, this.ravineMinAltitude, this.ravineMaxAltitude);
@@ -180,13 +180,10 @@ public class PopulatorRavines extends Populator {
                         for (int localY = minY; localY >= maxY; localY--) {
                             double d11 = ((localY - 1) + 0.5D - paramDouble2) / d4;
                             if ((d9 * d9 + d10 * d10) * this.a[localY - 1] + d11 * d11 / 6.0D < 1.0D) {
-                                int material = generatingChunkBuffer.getBlockId(localX, localY, localZ);
-                                if (material == Block.GRASS) {
-                                    if (localY - 1 < 10) {
-                                        generatingChunkBuffer.setBlock(localX, localY, localZ, Block.LAVA);
-                                    } else {
-                                        generatingChunkBuffer.setBlock(localX, localY, localZ, Block.AIR);
-                                    }
+                                if (localY - 1 < 10) {
+                                    generatingChunkBuffer.setBlock(localX, localY, localZ, Block.LAVA);
+                                } else {
+                                    generatingChunkBuffer.setBlock(localX, localY, localZ, Block.AIR);
                                 }
                             }
                         }

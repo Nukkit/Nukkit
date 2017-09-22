@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.math.Vector3;
 
 /**
  * Created on 2015/12/2 by xtypr.
@@ -63,7 +64,7 @@ public class BlockObsidian extends BlockSolid {
                 this.west(), this.east(),
         };
         for (Block aNearby : nearby) {
-            if (aNearby != null) if (aNearby.getId() == NETHER_PORTAL) {
+            if (aNearby != null) if (aNearby.getId() == Block.NETHER_PORTAL) {
                 aNearby.onBreak(item);
             }
         }

@@ -2,7 +2,7 @@ package cn.nukkit.level.generator;
 
 import cn.nukkit.block.*;
 import cn.nukkit.level.ChunkManager;
-import cn.nukkit.level.Level;
+import cn.nukkit.level.Dimension;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.level.generator.noise.Simplex;
@@ -47,8 +47,8 @@ public class Nether extends Generator {
     }
 
     @Override
-    public int getDimension() {
-        return Level.DIMENSION_NETHER;
+    public Dimension getDimension() {
+        return Dimension.NETHER;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class Nether extends Generator {
                 new OreType(new BlockOreQuartz(), 20, 16, 0, 128),
                 new OreType(new BlockSoulSand(), 5, 64, 0, 128),
                 new OreType(new BlockGravel(), 5, 64, 0, 128),
-                new OreType(new BlockLava(), 1, 16, 0, (int) this.waterHeight),
+                new OreType(new BlockLava(), 1, 16, 0, (int) this.waterHeight)
         });
         this.populators.add(ores);
         this.populators.add(new PopulatorGlowStone());
@@ -148,6 +148,6 @@ public class Nether extends Generator {
     }
 
     public Vector3 getSpawn() {
-        return new Vector3(0, 64, 0);
+        return new Vector3(127.5, 128, 127.5);
     }
 }

@@ -33,6 +33,7 @@ public class EntityItem extends Entity {
     protected String thrower;
 
     protected Item item;
+    protected Entity entity;
 
     protected int pickupDelay;
 
@@ -114,21 +115,11 @@ public class EntityItem extends Entity {
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
+    public boolean entityBaseTick(int tickDiff) {
+        tickDiff = 1;
         if (this.closed) {
             return false;
         }
-
-        int tickDiff = currentTick - this.lastUpdate;
-
-        if (tickDiff <= 0 && !this.justCreated) {
-            return true;
-        }
-
-        this.lastUpdate = currentTick;
-
-        this.timing.startTiming();
-
 
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
@@ -148,30 +139,6 @@ public class EntityItem extends Entity {
                 }
             }
 
-            this.motionY -= this.getGravity();
-
-            if (this.checkObstruction(this.x, this.y, this.z)) {
-                hasUpdate = true;
-            }
-
-            this.move(this.motionX, this.motionY, this.motionZ);
-
-            double friction = 1 - this.getDrag();
-
-            if (this.onGround && (Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionZ) > 0.00001)) {
-                friction *= this.getLevel().getBlock(this.temporalVector.setComponents((int) Math.floor(this.x), (int) Math.floor(this.y - 1), (int) Math.floor(this.z) - 1)).getFrictionFactor();
-            }
-
-            this.motionX *= friction;
-            this.motionY *= 1 - this.getDrag();
-            this.motionZ *= friction;
-
-            if (this.onGround) {
-                this.motionY *= -0.5;
-            }
-
-            this.updateMovement();
-
             if (this.age > 6000) {
                 ItemDespawnEvent ev = new ItemDespawnEvent(this);
                 this.server.getPluginManager().callEvent(ev);
@@ -184,9 +151,17 @@ public class EntityItem extends Entity {
             }
         }
 
-        this.timing.stopTiming();
+        return hasUpdate;
+    }
 
-        return hasUpdate || !this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001;
+    @Override
+    public void tryChangeMovement() {
+        this.checkObstruction(this.x, this.y, this.z);
+        entity.tryChangeMovement();
+    }
+
+    protected boolean applyGravityBeforeDrag() {
+        return true;
     }
 
     @Override
@@ -261,5 +236,10 @@ public class EntityItem extends Entity {
         player.dataPacket(pk);
 
         super.spawnTo(player);
+    }
+
+    @Override
+    public boolean doesTriggerPressurePlate() {
+        return true;
     }
 }

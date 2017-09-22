@@ -2,6 +2,8 @@ package cn.nukkit.level.generator.biome;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.level.ChunkManager;
+import cn.nukkit.level.generator.biome.nether.*;
+import cn.nukkit.level.generator.biome.normal.*;
 import cn.nukkit.level.generator.populator.Populator;
 import cn.nukkit.math.NukkitRandom;
 
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 
 /**
  * author: MagicDroidX
+ * Modificated by NycuRO on 05.08.2017
  * Nukkit Project
  */
 public abstract class Biome {
@@ -17,32 +20,84 @@ public abstract class Biome {
     public static final int OCEAN = 0;
     public static final int PLAINS = 1;
     public static final int DESERT = 2;
-    public static final int MOUNTAINS = 3;
+    public static final int EXTREME_HILLS = 3;
     public static final int FOREST = 4;
     public static final int TAIGA = 5;
-    public static final int SWAMP = 6;
+    public static final int SWAMPLAND = 6;
     public static final int RIVER = 7;
-    public static final int JUNGLE = 21;
-    public static final int SAVANNA = 35;
-    public static final int ROOFED_FOREST = 29;
-    public static final int ROOFED_FOREST_M = 157;
-    public static final int MUSHROOM_ISLAND = 14;
-
     public static final int HELL = 8;
-
-    public static final int ICE_PLAINS = 12;
-
-
-    public static final int BEACH = 16;
-
-
-    public static final int SMALL_MOUNTAINS = 20;
-
-
+    /**
+     * 9
+     * 10
+     */
+    public static final int FROZEN_RIVER = 11;
+    public static final int ICE_FLATS = 12;
+    /** 13 **/
+    public static final int MUSHROOM_ISLAND = 14;
+    public static final int MUSHROOM_ISLAND_SHORE = 15;
+    public static final int BEACHES = 16;
+    /**
+     * 17
+     * 18
+     * 19
+     * 20
+     */
+    public static final int JUNGLE = 21;
+    /** 22 */
+    public static final int JUNGLE_EDGE = 23;
+    public static final int DEEP_OCEAN = 24;
+    public static final int STONE_BEACH = 25;
+    public static final int COLD_BEACH = 26;
     public static final int BIRCH_FOREST = 27;
+    /** 28 */
+    public static final int ROOFED_FOREST = 29;
+    public static final int TAIGA_COLD = 30;
+    /** 31 */
+    public static final int MEGA_TAIGA = 32;
+    /** 33 */
+    public static final int EXTREME_HILLS_WITH_TREES = 34;
+    public static final int SAVANNA = 35;
+    /** 36 */
+    public static final int MESA = 37;
+    /** 38 */
+    public static final int MESA_PLATEAU = 39;
+    /**
+     * 40 - 126
+     */
+    public static final int THE_VOID = 127;
+    /** 128 */
+    public static final int MUTATED_PLAINS = 129;
+    public static final int MUTATED_DESERT = 130;
+    public static final int MUTATED_EXTREME_HILLS = 131;
+    public static final int MUTATED_FOREST = 132;
+    public static final int MUTATED_TAIGA = 133;
+    public static final int MUTATED_SWAMPLAND = 134;
+    /**
+     * 135 - 139
+     */
+    public static final int MUTATED_ICE_FLATS = 140;
+    /**
+     * 141 - 148
+     */
+    public static final int MUTATED_JUNGLE = 149;
+    /** 150 */
+    public static final int MUTATED_JUNGLE_EDGE = 151;
+    /**
+     * 152 - 156
+     */
+    public static final int MUTATED_ROOFED_FOREST = 157;
+    public static final int MUTATED_TAIGA_COLD = 158;
+    /** 159 */
+    public static final int MUTATED_REDWOOD_TAIGA = 160;
+    /** 161 */
+    public static final int MUTATED_EXTREME_HILLS_WITH_TREES = 162;
+    public static final int MUTATED_SAVANNA = 163;
+    /** 164 */
+    public static final int MUTATED_MESA = 165;
+    /** 166 */
+    public static final int MUTATED_MESA_CLEAR_ROCK = 167;
 
-
-    public static final int MAX_BIOMES = 256;
+    private static final int MAX_BIOMES = 256;
 
     private static final Biome[] biomes = new Biome[MAX_BIOMES];
 
@@ -56,8 +111,8 @@ public abstract class Biome {
 
     private Block[] groundCover;
 
-    protected double rainfall = 0.5;
-    protected double temperature = 0.5;
+    protected double rainfall = 0.5f;
+    protected double temperature = 0.5f;
     protected int grassColor = 0;
 
     protected static void register(int id, Biome biome) {
@@ -68,26 +123,84 @@ public abstract class Biome {
 
     public static void init() {
         register(OCEAN, new OceanBiome());
-        register(PLAINS, new PlainBiome());
+        register(PLAINS, new PlainsBiome());
         register(DESERT, new DesertBiome());
-        register(MOUNTAINS, new MountainsBiome());
+        register(EXTREME_HILLS, new ExtremeHillsBiome());
         register(FOREST, new ForestBiome());
         register(TAIGA, new TaigaBiome());
-        register(SWAMP, new SwampBiome());
+        register(SWAMPLAND, new SwamplandBiome());
         register(RIVER, new RiverBiome());
-        register(ICE_PLAINS, new IcePlainsBiome());
-        register(SMALL_MOUNTAINS, new SmallMountainsBiome());
-        register(BIRCH_FOREST, new ForestBiome(ForestBiome.TYPE_BIRCH));
-
-        register(JUNGLE, new JungleBiome());
-        register(ROOFED_FOREST, new RoofedForestBiome());
-        register(ROOFED_FOREST_M, new RoofedForestMBiome());
-        register(MUSHROOM_ISLAND, new MushroomIsland());
-        register(SAVANNA, new SavannaBiome());
-
-        register(BEACH, new BeachBiome());
-
         register(HELL, new HellBiome());
+        /**
+         * 9
+         * 10
+         */
+        register(FROZEN_RIVER, new FrozenRiverBiome());
+        register(ICE_FLATS, new IcePlainsBiome());
+        /** 13 **/
+        register(MUSHROOM_ISLAND, new MushroomIslandBiome());
+        register(MUSHROOM_ISLAND_SHORE, new MushroomIslandBiome(MushroomIslandBiome.TYPE_SHORE));
+        register(BEACHES, new BeachBiome());
+        /**
+         * 17
+         * 18
+         * 19
+         * 20
+         */
+        register(JUNGLE, new JungleBiome());
+        /** 22 */
+        register(JUNGLE_EDGE, new JungleBiome(JungleBiome.TYPE_EDGE));
+        register(STONE_BEACH, new BeachBiome(BeachBiome.TYPE_STONE));
+        register(DEEP_OCEAN, new OceanBiome(OceanBiome.TYPE_DEEP));
+        register(COLD_BEACH, new BeachBiome(BeachBiome.TYPE_COLD));
+        register(BIRCH_FOREST, new ForestBiome(ForestBiome.TYPE_BIRCH));
+        /** 28 */
+        register(ROOFED_FOREST, new ForestBiome(ForestBiome.TYPE_ROOFED));
+        register(TAIGA_COLD, new ColdTaigaBiome());
+         /** 30 */
+        register(MEGA_TAIGA, new TaigaBiome(TaigaBiome.TYPE_MEGA));
+         /** 33 */
+        register(EXTREME_HILLS_WITH_TREES, new ExtremeHillsPlusBiome());
+        register(SAVANNA, new SavannahBiome());
+        /** 36 */
+        register(MESA, new MesaBiome(MesaBiome.TYPE_NORMAL));
+        /** 38 */
+        register(MESA_PLATEAU, new MesaBiome(MesaBiome.TYPE_PLATEAU));
+        /**
+         * 40 - 126
+         */
+        register(THE_VOID, new VoidBiome());
+        /** 128 */
+        register(MUTATED_PLAINS, new PlainsBiome(PlainsBiome.TYPE_SUNFLOWERS));
+        register(MUTATED_DESERT, new DesertBiome(DesertBiome.TYPE_M));
+        register(MUTATED_EXTREME_HILLS, new ExtremeHillsBiome(ExtremeHillsBiome.TYPE_M));
+        register(MUTATED_FOREST, new ForestBiome(ForestBiome.TYPE_FLOWER));
+        register(MUTATED_TAIGA, new TaigaBiome(TaigaBiome.TYPE_M));
+        register(MUTATED_SWAMPLAND, new SwamplandBiome(SwamplandBiome.TYPE_M));
+        /**
+         * 135 - 139
+         */
+        register(MUTATED_ICE_FLATS, new IcePlainsBiome(IcePlainsBiome.TYPE_SPIKES));
+        /**
+         * 141 - 148
+         */
+        register(MUTATED_JUNGLE, new JungleBiome(JungleBiome.TYPE_M));
+        /** 150 */
+        register(MUTATED_JUNGLE_EDGE, new JungleBiome(JungleBiome.TYPE_EDGE_M));
+        /**
+         * 151 - 156
+         */
+        register(MUTATED_ROOFED_FOREST, new ForestBiome(ForestBiome.TYPE_ROOFED_M));
+        register(MUTATED_TAIGA_COLD, new ColdTaigaBiome(ColdTaigaBiome.TYPE_M));
+        /** 159 */
+        register(MUTATED_REDWOOD_TAIGA, new TaigaBiome(TaigaBiome.TYPE_SPRUCE));
+        /** 161 */
+        register(MUTATED_EXTREME_HILLS_WITH_TREES, new ExtremeHillsPlusBiome(ExtremeHillsPlusBiome.TYPE_M));
+        register(MUTATED_SAVANNA, new SavannahBiome(SavannahBiome.TYPE_M));
+        /** 164 */
+        register(MUTATED_MESA, new MesaBiome(MesaBiome.TYPE_BRYCE));
+        /** 166 */
+        register(MUTATED_MESA_CLEAR_ROCK, new MesaBiome(MesaBiome.TYPE_PLATEAU_M));
     }
 
     public static Biome getBiome(int id) {

@@ -1,6 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityPistonArm;
+import cn.nukkit.event.block.BlockPistonChangeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.PistonInSound;
@@ -86,12 +89,21 @@ public abstract class BlockPistonBase extends BlockSolid {
 
     @Override
     public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_REDSTONE || type == Level.BLOCK_UPDATE_NORMAL) {
-            //checkState();
+        if (type != 6 && type != 1) {
+            return 0;
+        } else {
+            BlockEntity blockEntity = this.level.getBlockEntity(this);
+            if (blockEntity instanceof BlockEntityPistonArm) {
+                BlockEntityPistonArm arm = (BlockEntityPistonArm) blockEntity;
+                boolean powered = this.isPowered();
+                if (arm.powered != powered) {
+                    this.level.getServer().getPluginManager().callEvent(new BlockPistonChangeEvent(this, powered ? 0 : 15, powered ? 15 : 0));
+                    arm.powered = !arm.powered;
+                }
+            }
+
             return type;
         }
-
-        return 0;
     }
 
     private void checkState() {
