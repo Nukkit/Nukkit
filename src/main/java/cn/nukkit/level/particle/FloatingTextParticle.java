@@ -2,13 +2,14 @@ package cn.nukkit.level.particle;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.EntityMetadata;
-import cn.nukkit.entity.item.EntityItem;
+import cn.nukkit.item.Item;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.network.protocol.AddEntityPacket;
+import cn.nukkit.network.protocol.AddPlayerPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.RemoveEntityPacket;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -16,6 +17,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * Package cn.nukkit.level.particle in project Nukkit .
  */
 public class FloatingTextParticle extends Particle {
+
+
     protected String text;
     protected String title;
     protected long entityId = -1;
@@ -32,8 +35,16 @@ public class FloatingTextParticle extends Particle {
         this.title = title;
     }
 
+    public String getText() {
+        return text;
+    }
+
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public void setTitle(String title) {
@@ -66,10 +77,11 @@ public class FloatingTextParticle extends Particle {
         }
 
         if (!this.invisible) {
-            AddEntityPacket pk = new AddEntityPacket();
+            AddPlayerPacket pk = new AddPlayerPacket();
+            pk.uuid = UUID.randomUUID();
+            pk.username = "";
             pk.entityUniqueId = this.entityId;
             pk.entityRuntimeId = this.entityId;
-            pk.type = EntityItem.NETWORK_ID;
             pk.x = (float) this.x;
             pk.y = (float) (this.y - 0.75);
             pk.z = (float) this.z;
@@ -85,7 +97,11 @@ public class FloatingTextParticle extends Particle {
             );
             pk.metadata = new EntityMetadata()
                     .putLong(Entity.DATA_FLAGS, flags)
-                    .putString(Entity.DATA_NAMETAG, this.title + (!this.text.isEmpty() ? "\n" + this.text : ""));
+                    .putString(Entity.DATA_NAMETAG, this.title + (!this.text.isEmpty() ? "\n" + this.text : ""))
+                    .putFloat(Entity.DATA_TYPE_FLOAT, 0.01f) //zero causes problems on debug builds?
+                    .putLong(Entity.DATA_LEAD_HOLDER_EID,-1)
+                    .putFloat(Entity.DATA_SCALE, 0.01f);
+            pk.item = Item.get(Item.AIR);
             packets.add(pk);
         }
 
