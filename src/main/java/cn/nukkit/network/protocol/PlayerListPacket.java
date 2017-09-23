@@ -33,7 +33,7 @@ public class PlayerListPacket extends DataPacket {
                 this.putVarLong(entry.entityId);
                 this.putString(entry.name);
                 this.putSkin(entry.skin);
-                this.putByteArray(entry.capeData);
+                this.putByteArray(entry.skin.getCape().getData());
                 this.putString(entry.geometryModel);
                 this.putByteArray(entry.geometryData);
                 this.putString(entry.xboxUserId);

@@ -217,7 +217,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public int pickedXPOrb = 0;
 
     protected int formWindowCount = 0;
-    protected HashMap<Integer, FormWindow> formWindows = new HashMap<>();
+    protected Map<Integer, FormWindow> formWindows = new HashMap<>();
+    protected Map<Integer, FormWindow> serverSettings = new HashMap<>();
 
     public int getStartActionTick() {
         return startAction;
@@ -815,7 +816,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.sendPotionEffects(this);
         this.sendData(this);
         this.inventory.sendContents(this);
-        this.inventory.sendHotbarContents();
         this.inventory.sendArmorContents(this);
 
         SetTimePacket setTimePacket = new SetTimePacket();
@@ -1853,12 +1853,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         float foodSaturationLevel = this.namedTag.getFloat("foodSaturationLevel");
         this.foodData = new PlayerFood(this, foodLevel, foodSaturationLevel);
 
-        if (this.isCreative()) {
-            this.inventory.setHeldItemSlot(0);
-        } else {
-            this.inventory.setHeldItemSlot(this.inventory.getHotbarSlotIndex(0));
-        }
-
         if (this.isSpectator()) this.keepMovement = true;
 
         this.setEnableClientCommand(true);
@@ -2184,7 +2178,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     this.setDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION, false);
 
-                    this.inventory.equipItem(mobEquipmentPacket.hotbarSlot, mobEquipmentPacket.inventorySlot);
+                    this.inventory.equipItem(mobEquipmentPacket.hotbarSlot);
                     break;
                 case ProtocolInfo.PLAYER_ACTION_PACKET:
                     PlayerActionPacket playerActionPacket = (PlayerActionPacket) packet;
@@ -2614,8 +2608,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.getServer().getLogger().debug(this.getName() + " failed to rename an item in an anvil");
                                 this.inventory.sendContents(this);
                             }
-                        } else {
-                            //TODO: Anvil crafting recipes
                         }
                         break;
                     } else if (!this.windowIndex.containsKey(craftingEventPacket.windowId)) {
@@ -3503,13 +3495,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         return; //In PE this should never happen
                     }
 
-                    for (int hotbarSlot = 0; hotbarSlot < hotbarPacket.slots.length; hotbarSlot++) {
-                        int slotLink = hotbarPacket.slots[hotbarSlot];
-
-                        this.inventory.setHotbarSlotIndex(hotbarSlot, slotLink == -1 ? slotLink : slotLink - 9);
-                    }
-
                     this.inventory.equipItem(hotbarPacket.selectedHotbarSlot);
+                    break;
+                case ProtocolInfo.SERVER_SETTINGS_REQUEST_PACKET:
+
                     break;
                 default:
                     break;
@@ -4504,6 +4493,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     /**
+     * Shows a new setting page in game settings
+     * You can find out settings result by listening to PlayerFormRespondedEvent
+     */
+    public int addServerSettings(FormWindow window) {
+        int id = this.formWindowCount++;
+
+        this.serverSettings.put(id, window);
+        return id;
+    }
+
+    /**
      * Creates and sends a BossBar to the player
      *
      * @param text   The BossBar message
@@ -4664,7 +4664,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (inv instanceof PlayerInventory) {
                 ((PlayerInventory) inv).sendArmorContents(this);
-                ((PlayerInventory) inv).sendHotbarContents();
             }
         }
     }
