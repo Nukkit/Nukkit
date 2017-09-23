@@ -98,9 +98,8 @@ public class FloatingTextParticle extends Particle {
             pk.metadata = new EntityMetadata()
                     .putLong(Entity.DATA_FLAGS, flags)
                     .putString(Entity.DATA_NAMETAG, this.title + (!this.text.isEmpty() ? "\n" + this.text : ""))
-                    .putFloat(Entity.DATA_TYPE_FLOAT, 0.01f) //zero causes problems on debug builds?
                     .putLong(Entity.DATA_LEAD_HOLDER_EID,-1)
-                    .putFloat(Entity.DATA_SCALE, 0.01f);
+                    .putFloat(Entity.DATA_SCALE, 0.01f); //zero causes problems on debug builds?
             pk.item = Item.get(Item.AIR);
             packets.add(pk);
         }

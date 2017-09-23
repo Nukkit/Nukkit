@@ -810,7 +810,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected void doFirstSpawn() {
         this.spawned = true;
 
-        this.server.sendRecipeList(this);
         this.getAdventureSettings().update();
 
         this.sendPotionEffects(this);
@@ -837,9 +836,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         respawnPacket.z = (float) pos.z;
         this.dataPacket(respawnPacket);
 
-        PlayStatusPacket playStatusPacket = new PlayStatusPacket();
-        playStatusPacket.status = PlayStatusPacket.PLAYER_SPAWN;
-        this.dataPacket(playStatusPacket);
+        this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
 
         PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(this,
                 new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.joined", new String[]{
@@ -1839,6 +1836,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.server.saveOfflinePlayerData(this.username, nbt, true);
         }
 
+        this.sendPlayStatus(PlayStatusPacket.LOGIN_SUCCESS);
+        this.server.onPlayerLogin(this);
+
         ListTag<DoubleTag> posList = nbt.getList("Pos", DoubleTag.class);
 
         super.init(this.level.getChunk((int) posList.get(0).data >> 4, (int) posList.get(2).data >> 4, true), nbt);
@@ -1853,17 +1853,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         float foodSaturationLevel = this.namedTag.getFloat("foodSaturationLevel");
         this.foodData = new PlayerFood(this, foodLevel, foodSaturationLevel);
 
-        PlayerLoginEvent ev;
-        this.server.getPluginManager().callEvent(ev = new PlayerLoginEvent(this, "Plugin reason"));
-        if (ev.isCancelled()) {
-            this.close(this.getLeaveMessage(), ev.getKickMessage());
-
-            return;
-        }
-
-        this.server.addOnlinePlayer(this);
-        this.loggedIn = true;
-
         if (this.isCreative()) {
             this.inventory.setHeldItemSlot(0);
         } else {
@@ -1872,6 +1861,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (this.isSpectator()) this.keepMovement = true;
 
+        this.setEnableClientCommand(true);
+
+        this.forceMovement = this.teleportPosition = this.getPosition();
+
+        ResourcePacksInfoPacket infoPacket = new ResourcePacksInfoPacket();
+        infoPacket.resourcePackEntries = this.server.getResourcePackManager().getResourceStack();
+        infoPacket.mustAccept = this.server.getForceResources();
+        this.dataPacket(infoPacket);
+    }
+
+    protected void completeLoginSequence() {
         if (this.spawnPosition == null && this.namedTag.contains("SpawnLevel") && (level = this.server.getLevelByName(this.namedTag.getString("SpawnLevel"))) != null) {
             this.spawnPosition = new Position(this.namedTag.getInt("SpawnX"), this.namedTag.getInt("SpawnY"), this.namedTag.getInt("SpawnZ"), level);
         }
@@ -1904,9 +1904,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat
         this.dataPacket(startGamePacket);
 
-        SetTimePacket setTimePacket = new SetTimePacket();
-        setTimePacket.time = this.level.getTime();
-        this.dataPacket(setTimePacket);
+        PlayerLoginEvent ev;
+        this.server.getPluginManager().callEvent(ev = new PlayerLoginEvent(this, "Plugin reason"));
+        if (ev.isCancelled()) {
+            this.close(this.getLeaveMessage(), ev.getKickMessage());
+            return;
+        }
+
+        this.loggedIn = true;
+
+        this.level.sendTime(this);
 
         this.setMovementSpeed(DEFAULT_SPEED);
         this.sendAttributes();
@@ -1928,6 +1935,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.setRemoveFormat(false);
         }
 
+        this.sendCommandData();
+
         if (this.gamemode == Player.SPECTATOR) {
             InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
             inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
@@ -1936,13 +1945,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.inventory.sendCreativeContents();
         }
 
-        this.setEnableClientCommand(true);
-
-        this.server.sendFullPlayerListData(this);
-
-        this.forceMovement = this.teleportPosition = this.getPosition();
-
-        this.server.onPlayerLogin(this);
+        this.server.addOnlinePlayer(this);
+        this.server.onPlayerCompleteLoginSequence(this);
     }
 
     public void handleDataPacket(DataPacket packet) {
@@ -1978,15 +1982,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (loginPacket.getProtocol() < ProtocolInfo.CURRENT_PROTOCOL) {
                             message = "disconnectionScreen.outdatedClient";
 
-                            PlayStatusPacket pk = new PlayStatusPacket();
-                            pk.status = PlayStatusPacket.LOGIN_FAILED_CLIENT;
-                            this.directDataPacket(pk);
+                            this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
                         } else {
                             message = "disconnectionScreen.outdatedServer";
 
-                            PlayStatusPacket pk = new PlayStatusPacket();
-                            pk.status = PlayStatusPacket.LOGIN_FAILED_SERVER;
-                            this.directDataPacket(pk);
+                            this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_SERVER);
                         }
                         this.close("", message, false);
                         break;
@@ -2049,15 +2049,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    PlayStatusPacket statusPacket = new PlayStatusPacket();
-                    statusPacket.status = PlayStatusPacket.LOGIN_SUCCESS;
-                    this.dataPacket(statusPacket);
-
-                    ResourcePacksInfoPacket infoPacket = new ResourcePacksInfoPacket();
-                    infoPacket.resourcePackEntries = this.server.getResourcePackManager().getResourceStack();
-                    infoPacket.mustAccept = this.server.getForceResources();
-                    this.dataPacket(infoPacket);
-
+                    this.processLogin();
                     break;
                 case ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET:
                     ResourcePackClientResponsePacket responsePacket = (ResourcePackClientResponsePacket) packet;
@@ -2089,7 +2081,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.dataPacket(stackPacket);
                             break;
                         case ResourcePackClientResponsePacket.STATUS_COMPLETED:
-                            this.processLogin();
+                            this.completeLoginSequence();
                             break;
                     }
                     break;
@@ -2180,28 +2172,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     MobEquipmentPacket mobEquipmentPacket = (MobEquipmentPacket) packet;
 
-                    if (mobEquipmentPacket.inventorySlot == 255) {
-                        mobEquipmentPacket.inventorySlot = -1; //Cleared inventorySlot
-                    } else {
-                        if (mobEquipmentPacket.inventorySlot < 9) {
-                            this.getServer().getLogger().debug("Tried to equip a inventorySlot that does not exist (index " + mobEquipmentPacket.inventorySlot + ")");
-                            this.inventory.sendContents(this);
-                            return;
-                        }
-                        mobEquipmentPacket.inventorySlot -= 9; //Get real inventory inventorySlot
+                    Item item = this.inventory.getItem(mobEquipmentPacket.hotbarSlot);
 
-                        Item item = this.inventory.getItem(mobEquipmentPacket.inventorySlot);
-
-                        if (!item.equals(mobEquipmentPacket.item)) {
-                            this.server.getLogger().debug("Tried to equip " + mobEquipmentPacket.item + " but have " + item + " in target inventorySlot");
-                            this.inventory.sendContents(this);
-                            return;
-                        }
+                    if (!item.equals(mobEquipmentPacket.item)) {
+                        this.server.getLogger().debug("Tried to equip " + mobEquipmentPacket.item + " but have " + item + " in target slot");
+                        this.inventory.sendContents(this);
+                        return;
                     }
 
-                    this.inventory.equipItem(mobEquipmentPacket.hotbarSlot, mobEquipmentPacket.inventorySlot);
+                    this.inventory.equipItem(mobEquipmentPacket.hotbarSlot);
 
                     this.setDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION, false);
+
+                    this.inventory.equipItem(mobEquipmentPacket.hotbarSlot, mobEquipmentPacket.inventorySlot);
                     break;
                 case ProtocolInfo.PLAYER_ACTION_PACKET:
                     PlayerActionPacket playerActionPacket = (PlayerActionPacket) packet;
@@ -2435,7 +2418,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    Item item = this.inventory.getItemInHand();
+                    item = this.inventory.getItemInHand();
 
                     switch (interactPacket.action) {
                         case InteractPacket.ACTION_MOUSEOVER:
@@ -4351,6 +4334,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         return false;
+    }
+
+    protected void sendPlayStatus(int status) {
+        sendPlayStatus(status, false);
+    }
+
+    protected void sendPlayStatus(int status, boolean immediate) {
+        PlayStatusPacket pk = new PlayStatusPacket();
+        pk.status = status;
+
+        if (immediate) {
+            this.directDataPacket(pk);
+        } else {
+            this.dataPacket(pk);
+        }
     }
 
     private boolean isLevelChange = false;
