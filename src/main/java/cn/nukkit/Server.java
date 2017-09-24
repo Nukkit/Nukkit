@@ -70,6 +70,7 @@ import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePackManager;
 import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
+import cn.nukkit.scheduler.Task;
 import cn.nukkit.utils.*;
 import cn.nukkit.utils.bugreport.ExceptionHandler;
 import co.aikar.timings.Timings;
@@ -816,7 +817,6 @@ public class Server {
 
     public void onPlayerCompleteLoginSequence(Player player) {
         this.sendFullPlayerListData(player);
-        this.sendRecipeList(player);
     }
 
     public void onPlayerLogin(Player player) {
