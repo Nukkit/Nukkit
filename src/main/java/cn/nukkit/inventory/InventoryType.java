@@ -12,7 +12,7 @@ public enum InventoryType {
     FURNACE(3, "Furnace", 2),
     CRAFTING(5, "Crafting", 1), //4 CRAFTING slots, 1 RESULT
     WORKBENCH(10, "Crafting", 1), //9 CRAFTING slots, 1 RESULT
-    BREWING_STAND(4, "Brewing", 4), //1 INPUT, 3 POTION
+    BREWING_STAND(5, "Brewing", 4), //1 INPUT, 3 POTION, 1 fuel
     ANVIL(3, "Anvil", 5), //2 INPUT, 1 OUTPUT
     ENCHANT_TABLE(2, "Enchant", 3), //1 INPUT/OUTPUT, 1 LAPIS
     DISPENSER(0, "Dispenser", 6), //9 CONTAINER
