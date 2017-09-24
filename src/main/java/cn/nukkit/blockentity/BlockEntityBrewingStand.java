@@ -320,7 +320,12 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
                 .putInt("x", (int) this.x)
                 .putInt("y", (int) this.y)
                 .putInt("z", (int) this.z)
-                .putShort("CookTime", this.brewTime);
+                .putShort("FuelTotal", this.fuelTotal)
+                .putShort("FuelAmount", this.fuelAmount);
+
+        if (this.brewTime < MAX_BREW_TIME) {
+            nbt.putShort("CookTime", this.brewTime);
+        }
 
         if (this.hasName()) {
             nbt.put("CustomName", namedTag.get("CustomName"));
