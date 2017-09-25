@@ -6,10 +6,7 @@ import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.level.sound.LaunchSound;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.DoubleTag;
-import cn.nukkit.nbt.tag.FloatTag;
-import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.nbt.tag.*;
 
 /**
  * @author CreeperFace
@@ -38,6 +35,10 @@ public abstract class ProjectileItem extends Item {
                         .add(new FloatTag("", (float) player.yaw))
                         .add(new FloatTag("", (float) player.pitch)));
 
+        for (Tag tag : getAdditionalNBT()) {
+            nbt.put(tag.getName(), tag);
+        }
+
         Entity projectile = Entity.createEntity(this.getProjectileEntityType(), player.getLevel().getChunk(player.getFloorX() >> 4, player.getFloorZ() >> 4), nbt, player);
         if (projectile != null) {
             projectile.setMotion(projectile.getMotion().multiply(this.getThrowForce()));
@@ -60,5 +61,9 @@ public abstract class ProjectileItem extends Item {
             return false;
         }
         return true;
+    }
+
+    protected Tag[] getAdditionalNBT() {
+        return new Tag[0];
     }
 }

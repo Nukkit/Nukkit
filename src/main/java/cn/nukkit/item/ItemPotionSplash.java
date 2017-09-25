@@ -1,5 +1,8 @@
 package cn.nukkit.item;
 
+import cn.nukkit.nbt.tag.IntTag;
+import cn.nukkit.nbt.tag.Tag;
+
 /**
  * Created on 2015/12/27 by xtypr.
  * Package cn.nukkit.item in project Nukkit .
@@ -32,5 +35,10 @@ public class ItemPotionSplash extends ProjectileItem {
     @Override
     public float getThrowForce() {
         return 1f;
+    }
+
+    @Override
+    protected Tag[] getAdditionalNBT() {
+        return new Tag[]{new IntTag("PotionId", this.meta)};
     }
 }
