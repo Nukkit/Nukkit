@@ -4,7 +4,7 @@ package cn.nukkit.item;
  * Created on 2015/12/27 by xtypr.
  * Package cn.nukkit.item in project Nukkit .
  */
-public class ItemPotionSplash extends Item {
+public class ItemPotionSplash extends ProjectileItem {
 
     public ItemPotionSplash(Integer meta) {
         this(meta, 1);
@@ -22,5 +22,15 @@ public class ItemPotionSplash extends Item {
     @Override
     public boolean canBeActivated() {
         return true;
+    }
+
+    @Override
+    public String getProjectileEntityType() {
+        return "ThrownPotion";
+    }
+
+    @Override
+    public float getThrowForce() {
+        return 1f;
     }
 }
