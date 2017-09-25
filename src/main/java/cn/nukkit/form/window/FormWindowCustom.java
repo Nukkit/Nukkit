@@ -111,4 +111,29 @@ public class FormWindowCustom extends FormWindow {
                 sliderResponses, stepSliderResponses, toggleResponses);
     }
 
+    /**
+     * Set Elements from Response
+     * Used on ServerSettings Form Response. After players set settings, we need to sync these settings to the server.
+     */
+    public void setElementsFromResponse() {
+        if (this.response != null) {
+            this.response.responses.forEach((i, response) -> {
+                Element e = content.get(i);
+                if (e != null) {
+                    if (e instanceof ElementDropdown) {
+                        ((ElementDropdown) e).defaultOptionIndex = ((ElementDropdown) e).options.indexOf(response);
+                    } else if (e instanceof ElementInput) {
+                        ((ElementInput) e).defaultText = (String)response;
+                    } else if (e instanceof ElementSlider) {
+                        ((ElementSlider) e).defaultValue = (Float)response;
+                    } else if (e instanceof ElementStepSlider) {
+                        ((ElementStepSlider) e).defaultStepIndex = ((ElementStepSlider) e).steps.indexOf(response);
+                    } else if (e instanceof ElementToggle) {
+                        ((ElementToggle) e).defaultValue = (Boolean)response;
+                    }
+                }
+            });
+        }
+    }
+
 }

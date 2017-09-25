@@ -30,6 +30,7 @@ import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.event.server.DataPacketSendEvent;
 import cn.nukkit.form.window.FormWindow;
+import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.inventory.*;
 import cn.nukkit.inventory.transaction.InventoryTransaction;
 import cn.nukkit.inventory.transaction.SimpleInventoryTransaction;
@@ -2386,6 +2387,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         getServer().getPluginManager().callEvent(event);
 
                         formWindows.remove(modalFormPacket.formId);
+                    } else if (serverSettings.containsKey(modalFormPacket.formId)) {
+                        FormWindow window = serverSettings.get(modalFormPacket.formId);
+                        window.setResponse(modalFormPacket.data.trim());
+
+                        PlayerSettingsRespondedEvent event = new PlayerSettingsRespondedEvent(this, modalFormPacket.formId, window);
+                        getServer().getPluginManager().callEvent(event);
+
+                        //Set back new settings if not been cancelled
+                        if (!event.isCancelled() && window instanceof FormWindowCustom) ((FormWindowCustom) window).setElementsFromResponse();
                     }
 
                     break;
@@ -3108,19 +3118,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     break;
                 case ProtocolInfo.LEVEL_SOUND_EVENT_PACKET:
-                    LevelSoundEventPacket levelSoundEventPacket = (LevelSoundEventPacket) packet;
-
-                    if (this.isBreakingBlock()) {
-                        LevelSoundEventPacket pk1 = new LevelSoundEventPacket();
-                        pk1.sound = LevelSoundEventPacket.SOUND_HIT;
-                        pk1.extraData = this.breakingBlock.getId();
-                        pk1.pitch = 1;
-                        pk1.x = (float) this.breakingBlock.x;
-                        pk1.y = (float) this.breakingBlock.y;
-                        pk1.z = (float) this.breakingBlock.z;
-
-                        this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk1);
-                    }
+                    //LevelSoundEventPacket levelSoundEventPacket = (LevelSoundEventPacket) packet;
+                    //We just need to broadcast this packet to all viewers.
+                    this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, packet);
                     break;
                 case ProtocolInfo.INVENTORY_TRANSACTION_PACKET:
                     if (this.isSpectator()) {
@@ -3466,7 +3466,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.inventory.equipItem(hotbarPacket.selectedHotbarSlot);
                     break;
                 case ProtocolInfo.SERVER_SETTINGS_REQUEST_PACKET:
-
+                    this.serverSettings.forEach((id, window) -> {
+                        ServerSettingsResponsePacket re = new ServerSettingsResponsePacket();
+                        re.formId = id;
+                        re.data = window.getJSONData();
+                        this.dataPacket(re);
+                    });
                     break;
                 default:
                     break;
