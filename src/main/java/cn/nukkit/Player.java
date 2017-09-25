@@ -3150,19 +3150,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     break;
                 case ProtocolInfo.LEVEL_SOUND_EVENT_PACKET:
-                    LevelSoundEventPacket levelSoundEventPacket = (LevelSoundEventPacket) packet;
-
-                    if (this.isBreakingBlock()) {
-                        LevelSoundEventPacket pk1 = new LevelSoundEventPacket();
-                        pk1.sound = LevelSoundEventPacket.SOUND_HIT;
-                        pk1.extraData = this.breakingBlock.getId();
-                        pk1.pitch = 1;
-                        pk1.x = (float) this.breakingBlock.x;
-                        pk1.y = (float) this.breakingBlock.y;
-                        pk1.z = (float) this.breakingBlock.z;
-
-                        this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk1);
-                    }
+                    //LevelSoundEventPacket levelSoundEventPacket = (LevelSoundEventPacket) packet;
+                    //We just need to broadcast this packet to all viewers.
+                    this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, packet);
                     break;
                 case ProtocolInfo.INVENTORY_TRANSACTION_PACKET:
                     if (this.isSpectator()) {
