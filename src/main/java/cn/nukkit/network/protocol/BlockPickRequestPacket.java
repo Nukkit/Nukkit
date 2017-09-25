@@ -9,6 +9,7 @@ public class BlockPickRequestPacket extends DataPacket {
     public int x;
     public int y;
     public int z;
+    public boolean addUserData;
     public int selectedSlot;
 
     @Override
@@ -22,6 +23,7 @@ public class BlockPickRequestPacket extends DataPacket {
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
+        this.putBoolean(this.addUserData);
         this.selectedSlot = this.getByte();
     }
 
