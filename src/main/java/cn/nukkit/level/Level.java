@@ -489,11 +489,11 @@ public class Level implements ChunkManager, Metadatable {
         this.addSound(sound, players.stream().toArray(Player[]::new));
     }
 
-    public void addLevelSoundEvent(byte type, int pitch, int data, Vector3 pos, boolean unknown, boolean disableRelativeVolume) {
-        this.addLevelSoundEvent(type, pitch, data, pos, this.players.values(), unknown, disableRelativeVolume);
+    public void addLevelSoundEvent(int type, int pitch, int data, Vector3 pos) {
+        this.addLevelSoundEvent(type, pitch, data, pos, false);
     }
 
-    public void addLevelSoundEvent(byte type, int pitch, int data, Vector3 pos, Collection<Player> players, boolean unknown, boolean disableRelativeVolume) {
+    public void addLevelSoundEvent(int type, int pitch, int data, Vector3 pos, boolean isGlobal) {
         LevelSoundEventPacket pk = new LevelSoundEventPacket();
         pk.sound = type;
         pk.pitch = pitch;
@@ -501,14 +501,9 @@ public class Level implements ChunkManager, Metadatable {
         pk.x = (float) pos.x;
         pk.y = (float) pos.y;
         pk.z = (float) pos.z;
-        pk.isBabyMob = unknown;
-        pk.isGlobal = disableRelativeVolume;
+        pk.isGlobal = isGlobal;
 
-        if (players == null) {
-            this.addChunkPacket(pos.getFloorX(), pos.getFloorZ(), pk);
-        } else {
-            Server.broadcastPacket(players, pk);
-        }
+        this.addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
     }
 
     public void addParticle(Particle particle) {
@@ -758,8 +753,8 @@ public class Level implements ChunkManager, Metadatable {
                             bolt.setEffect(false);
                         }
 
-                        this.addLevelSoundEvent(LevelSoundEventPacket.SOUND_THUNDER, 93, -1, vector, false, false);
-                        this.addLevelSoundEvent(LevelSoundEventPacket.SOUND_EXPLODE, 93, -1, vector, false, false);
+                        this.addLevelSoundEvent(LevelSoundEventPacket.SOUND_THUNDER, 93, -1, vector, false);
+                        this.addLevelSoundEvent(LevelSoundEventPacket.SOUND_EXPLODE, 93, -1, vector, false);
                     }
 
                 }
@@ -2090,7 +2085,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (playSound) {
-            this.addSound(new BlockPlaceSound(hand, hand.getId()));
+            this.addLevelSoundEvent(LevelSoundEventPacket.SOUND_PLACE, 1, item.getId(), hand, false);
         }
 
         if (item.getCount() <= 0) {

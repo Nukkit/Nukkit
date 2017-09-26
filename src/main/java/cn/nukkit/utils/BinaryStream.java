@@ -369,6 +369,16 @@ public class BinaryStream {
         return new BlockVector3(this.getVarInt(), (int) this.getUnsignedVarInt(), this.getVarInt());
     }
 
+    public BlockVector3 getSignedBlockPosition() {
+        return new BlockVector3(getVarInt(), getVarInt(), getVarInt());
+    }
+
+    public void putSignedBlockPosition(BlockVector3 v) {
+        putVarInt(v.x);
+        putVarInt(v.y);
+        putVarInt(v.z);
+    }
+
     public void putBlockVector3(BlockVector3 v) {
         this.putBlockVector3(v.x, v.y, v.z);
     }

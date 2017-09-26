@@ -312,6 +312,11 @@ public class Item implements Cloneable {
     public static final int END_ROD = 208;
     public static final int END_GATEWAY = 209;
 
+    public static final int MAGMA = 213;
+    public static final int BLOCK_NETHER_WART_BLOCK = 214;
+    public static final int RED_NETHER_BRICK = 215;
+    public static final int BONE_BLOCK = 216;
+
     public static final int SHULKER_BOX = 218;
     public static final int PURPLE_GLAZED_TERRACOTTA = 219;
     public static final int WHITE_GLAZED_TERRACOTTA = 220;

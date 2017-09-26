@@ -4,7 +4,6 @@ import cn.nukkit.AdventureSettings.Type;
 import cn.nukkit.block.*;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityItemFrame;
-import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
@@ -15,7 +14,6 @@ import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.EntityCreeper;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
-import cn.nukkit.event.block.SignChangeEvent;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -79,8 +77,8 @@ import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * author: MagicDroidX & Box
@@ -3009,7 +3007,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     BlockEntity t = this.level.getBlockEntity(pos);
-                    if (t instanceof BlockEntitySign) {
+                    if (t instanceof BlockEntitySpawnable) {
                         CompoundTag nbt;
                         try {
                             nbt = NBTIO.read(blockEntityDataPacket.namedTag, ByteOrder.LITTLE_ENDIAN, true);
@@ -3017,28 +3015,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             throw new RuntimeException(e);
                         }
 
-                        if (!BlockEntity.SIGN.equals(nbt.getString("id"))) {
-                            ((BlockEntitySign) t).spawnTo(this);
-                        } else {
-                            SignChangeEvent signChangeEvent = new SignChangeEvent(t.getBlock(), this, new String[]{
-                                    this.removeFormat ? TextFormat.clean(nbt.getString("Text1")) : nbt.getString("Text1"),
-                                    this.removeFormat ? TextFormat.clean(nbt.getString("Text2")) : nbt.getString("Text2"),
-                                    this.removeFormat ? TextFormat.clean(nbt.getString("Text3")) : nbt.getString("Text3"),
-                                    this.removeFormat ? TextFormat.clean(nbt.getString("Text4")) : nbt.getString("Text4")
-                            });
-
-                            if (!t.namedTag.contains("Creator") || !Objects.equals(this.getUniqueId().toString(), t.namedTag.getString("Creator"))) {
-                                signChangeEvent.setCancelled();
-                            }
-
-                            this.server.getPluginManager().callEvent(signChangeEvent);
-
-                            if (!signChangeEvent.isCancelled()) {
-                                ((BlockEntitySign) t).setText(signChangeEvent.getLine(0), signChangeEvent.getLine(1), signChangeEvent.getLine(2), signChangeEvent.getLine(3));
-                            } else {
-                                ((BlockEntitySign) t).spawnTo(this);
-                            }
-
+                        if (!((BlockEntitySpawnable) t).updateCompoundTag(nbt, this)) {
+                            ((BlockEntitySpawnable) t).spawnTo(this);
                         }
                     }
                     break;
