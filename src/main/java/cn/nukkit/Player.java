@@ -3389,66 +3389,78 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         case InventoryTransactionPacket.TYPE_RELEASE_ITEM:
                             ReleaseItemData releaseItemData = (ReleaseItemData) transactionPacket.transactionData;
 
-                            type = releaseItemData.actionType;
-                            switch (type) {
-                                case InventoryTransactionPacket.RELEASE_ITEM_ACTION_RELEASE:
-                                    if (this.isUsingItem()) {
-                                        item = this.inventory.getItemInHand();
-                                        if (item.onReleaseUsing(this)) {
-                                            this.inventory.setItemInHand(item);
-                                        }
-                                    } else {
-                                        this.inventory.sendContents(this);
-                                    }
-
-                                    this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false);
-                                    return;
-                                case InventoryTransactionPacket.RELEASE_ITEM_ACTION_CONSUME:
-                                    this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false);
-                                    Item itemInHand = this.inventory.getItemInHand();
-                                    PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
-                                    this.server.getPluginManager().callEvent(consumeEvent);
-                                    if (consumeEvent.isCancelled()) {
-                                        this.inventory.sendContents(this);
-                                        break;
-                                    }
-
-                                    if (itemInHand.getId() == Item.POTION) {
-                                        Potion potion = Potion.getPotion(itemInHand.getDamage()).setSplash(false);
-
-                                        if (this.getGamemode() == SURVIVAL) {
-                                            if (itemInHand.getCount() > 1) {
-                                                ItemGlassBottle bottle = new ItemGlassBottle();
-                                                if (this.inventory.canAddItem(bottle)) {
-                                                    this.inventory.addItem(bottle);
-                                                }
-                                                --itemInHand.count;
-                                            } else {
-                                                itemInHand = new ItemGlassBottle();
+                            try {
+                                type = releaseItemData.actionType;
+                                switch (type) {
+                                    case InventoryTransactionPacket.RELEASE_ITEM_ACTION_RELEASE:
+                                        if (this.isUsingItem()) {
+                                            item = this.inventory.getItemInHand();
+                                            if (item.onReleaseUsing(this)) {
+                                                this.inventory.setItemInHand(item);
                                             }
+                                        } else {
+                                            this.inventory.sendContents(this);
                                         }
+                                        return;
+                                    case InventoryTransactionPacket.RELEASE_ITEM_ACTION_CONSUME:
+                                        Item itemInHand = this.inventory.getItemInHand();
+                                        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
 
-                                        if (potion != null) {
-                                            potion.applyPotion(this);
+                                        if (itemInHand.getId() == Item.POTION) {
+                                            this.server.getPluginManager().callEvent(consumeEvent);
+                                            if (consumeEvent.isCancelled()) {
+                                                this.inventory.sendContents(this);
+                                                break;
+                                            }
+                                            Potion potion = Potion.getPotion(itemInHand.getDamage()).setSplash(false);
+
+                                            if (this.getGamemode() == SURVIVAL) {
+                                                --itemInHand.count;
+                                                this.inventory.setItemInHand(itemInHand);
+                                                this.inventory.addItem(new ItemGlassBottle());
+                                            }
+
+                                            if (potion != null) {
+                                                potion.applyPotion(this);
+                                            }
+
+                                        } else if (itemInHand.getId() == Item.BUCKET && itemInHand.getDamage() == 1) { //milk
+                                            this.server.getPluginManager().callEvent(consumeEvent);
+                                            if (consumeEvent.isCancelled()) {
+                                                this.inventory.sendContents(this);
+                                                break;
+                                            }
+
+                                            EntityEventPacket eventPacket = new EntityEventPacket();
+                                            eventPacket.eid = this.getId();
+                                            eventPacket.event = EntityEventPacket.USE_ITEM;
+                                            this.dataPacket(eventPacket);
+                                            Server.broadcastPacket(this.getViewers().values(), eventPacket);
+
+                                            if (this.isSurvival()) {
+                                                itemInHand.count--;
+                                                this.inventory.setItemInHand(itemInHand);
+                                                this.inventory.addItem(new ItemBucket());
+                                            }
+
+                                            this.removeAllEffects();
+                                        } else {
+                                            this.server.getPluginManager().callEvent(consumeEvent);
+                                            if (consumeEvent.isCancelled()) {
+                                                this.inventory.sendContents(this);
+                                                break;
+                                            }
+
+                                            Food food = Food.getByRelative(itemInHand);
+                                            if (food != null && food.eatenBy(this)) --itemInHand.count;
+                                            this.inventory.setItemInHand(itemInHand);
                                         }
-
-                                    } else {
-                                        EntityEventPacket eventPacket = new EntityEventPacket();
-                                        eventPacket.eid = this.getId();
-                                        eventPacket.event = EntityEventPacket.USE_ITEM;
-                                        this.dataPacket(eventPacket);
-                                        Server.broadcastPacket(this.getViewers().values(), eventPacket);
-
-                                        Food food = Food.getByRelative(itemInHand);
-                                        if (food != null) if (food.eatenBy(this)) --itemInHand.count;
-                                    }
-
-                                    this.inventory.setItemInHand(itemInHand);
-                                    this.inventory.sendHeldItem(this);
-
-                                    return;
-                                default:
-                                    break;
+                                        return;
+                                    default:
+                                        break;
+                                }
+                            } finally {
+                                this.setUsingItem(false);
                             }
                             break;
                         default:

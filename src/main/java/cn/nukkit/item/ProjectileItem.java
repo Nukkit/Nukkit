@@ -65,6 +65,6 @@ public abstract class ProjectileItem extends Item {
     }
 
     protected void correctNBT(CompoundTag nbt) {
-        
+
     }
 }
