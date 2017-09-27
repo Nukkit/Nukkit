@@ -11,7 +11,6 @@ import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.*;
-import cn.nukkit.entity.mob.EntityCreeper;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
@@ -72,12 +71,13 @@ import cn.nukkit.utils.*;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -220,6 +220,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected int formWindowCount = 0;
     protected Map<Integer, FormWindow> formWindows = new HashMap<>();
     protected Map<Integer, FormWindow> serverSettings = new HashMap<>();
+
+    protected Map<Long, DummyBossBar> dummyBossBars = new HashMap<>();
 
     public int getStartActionTick() {
         return startAction;
@@ -1647,6 +1649,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.dataPacket(pk);
             messageQueue.clear();
         }
+
+        if (this.spawned && this.dummyBossBars.size() > 0 && currentTick % 100 == 0) {
+            this.dummyBossBars.values().forEach(DummyBossBar::updateBossEntityPosition);
+        }
+
         return true;
     }
 
@@ -4361,6 +4368,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.nextChunkOrderRun = 0;
             this.newPosition = null;
 
+            //DummyBossBar
+            this.getDummyBossBars().values().forEach(DummyBossBar::reshow);
             //Weather
             this.getLevel().sendWeather(this);
             //Update time
@@ -4491,48 +4500,43 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @param length The BossBar percentage
      * @return bossBarId  The BossBar ID, you should store it if you want to remove or update the BossBar later
      */
-
+    @Deprecated
     public long createBossBar(String text, int length) {
-        // First we spawn a entity
-        long bossBarId = 1095216660480L + ThreadLocalRandom.current().nextLong(0, 0x7fffffffL);
-        AddEntityPacket pkAdd = new AddEntityPacket();
-        pkAdd.type = EntityCreeper.NETWORK_ID;
-        pkAdd.entityUniqueId = bossBarId;
-        pkAdd.entityRuntimeId = bossBarId;
-        pkAdd.x = (float) this.x;
-        pkAdd.y = (float) -10; // Below the bedrock
-        pkAdd.z = (float) this.z;
-        pkAdd.speedX = (float) this.motionX;
-        pkAdd.speedY = (float) this.motionY;
-        pkAdd.speedZ = (float) this.motionZ;
-        EntityMetadata metadata = new EntityMetadata()
-                // Default Metadata tags
-                .putLong(DATA_FLAGS, 0)
-                .putShort(DATA_AIR, 400)
-                .putShort(DATA_MAX_AIR, 400)
-                .putLong(DATA_LEAD_HOLDER_EID, -1)
-                .putFloat(DATA_SCALE, 1f)
-                .putString(Entity.DATA_NAMETAG, text) // Set the entity name
-                .putInt(Entity.DATA_SCALE, 0); // And make it invisible
-        pkAdd.metadata = metadata;
-        this.dataPacket(pkAdd);
+        DummyBossBar bossBar = new DummyBossBar.Builder(this).text(text).length(length).build();
+        return this.createBossBar(bossBar);
+    }
 
-        // Now we send the entity attributes
-        // TODO: Attributes should be sent on AddEntityPacket, however it doesn't work (client bug?)
-        UpdateAttributesPacket pkAttributes = new UpdateAttributesPacket();
-        pkAttributes.entityId = bossBarId;
-        Attribute attr = Attribute.getAttribute(Attribute.MAX_HEALTH);
-        attr.setMaxValue(100); // Max value - We need to change the max value first, or else the "setValue" will return a IllegalArgumentException
-        attr.setValue(length); // Entity health
-        pkAttributes.entries = new Attribute[]{attr};
-        this.dataPacket(pkAttributes);
+    /**
+     * Creates and sends a BossBar to the player
+     *
+     * @param dummyBossBar DummyBossBar Object (Instantiate it by the Class Builder)
+     * @see DummyBossBar.Builder
+     * @return bossBarId  The BossBar ID, you should store it if you want to remove or update the BossBar later
+     */
+    public long createBossBar(DummyBossBar dummyBossBar) {
+        this.dummyBossBars.put(dummyBossBar.getBossBarId(), dummyBossBar);
+        dummyBossBar.create();
+        return dummyBossBar.getBossBarId();
+    }
 
-        // And now we send the bossbar packet
-        BossEventPacket pkBoss = new BossEventPacket();
-        pkBoss.bossEid = bossBarId;
-        pkBoss.type = BossEventPacket.TYPE_SHOW;
-        this.dataPacket(pkBoss);
-        return bossBarId;
+    /**
+     * Get a DummyBossBar object
+     * @param bossBarId The BossBar ID
+     * @return DummyBossBar object
+     * @see DummyBossBar#setText(String) Set BossBar text
+     * @see DummyBossBar#setLength(float) Set BossBar length
+     * @see DummyBossBar#setColor(Color) Set BossBar color
+     */
+    public DummyBossBar getDummyBossBar(long bossBarId) {
+        return this.dummyBossBars.getOrDefault(bossBarId, null);
+    }
+
+    /**
+     * Get all DummyBossBar objects
+     * @return DummyBossBars Map
+     */
+    public Map<Long, DummyBossBar> getDummyBossBars() {
+        return dummyBossBars;
     }
 
     /**
@@ -4542,35 +4546,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @param length    The new BossBar length
      * @param bossBarId The BossBar ID
      */
+    @Deprecated
     public void updateBossBar(String text, int length, long bossBarId) {
-        // First we update the boss bar length
-        UpdateAttributesPacket pkAttributes = new UpdateAttributesPacket();
-        pkAttributes.entityId = bossBarId;
-        Attribute attr = Attribute.getAttribute(Attribute.MAX_HEALTH);
-        attr.setMaxValue(100); // Max value - We need to change the max value first, or else the "setValue" will return a IllegalArgumentException
-        attr.setValue(length); // Entity health
-        pkAttributes.entries = new Attribute[]{attr};
-        this.dataPacket(pkAttributes);
-        // And then the boss bar text
-        SetEntityDataPacket pkMetadata = new SetEntityDataPacket();
-        pkMetadata.eid = bossBarId;
-        pkMetadata.metadata = new EntityMetadata()
-                // Default Metadata tags
-                .putLong(DATA_FLAGS, 0)
-                .putShort(DATA_AIR, 400)
-                .putShort(DATA_MAX_AIR, 400)
-                .putLong(DATA_LEAD_HOLDER_EID, -1)
-                .putFloat(DATA_SCALE, 1f)
-                .putString(Entity.DATA_NAMETAG, text) // Set the entity name
-                .putInt(Entity.DATA_SCALE, 0); // And make it invisible
-        this.dataPacket(pkMetadata);
-
-        // And now we send the bossbar packet
-        BossEventPacket pkBoss = new BossEventPacket();
-        pkBoss.bossEid = bossBarId;
-        pkBoss.type = BossEventPacket.TYPE_UPDATE;
-        this.dataPacket(pkBoss);
-        return;
+        if (this.dummyBossBars.containsKey(bossBarId)) {
+            DummyBossBar bossBar = this.dummyBossBars.get(bossBarId);
+            bossBar.setText(text);
+            bossBar.setLength(length);
+        }
     }
 
     /**
@@ -4579,9 +4561,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @param bossBarId The BossBar ID
      */
     public void removeBossBar(long bossBarId) {
-        RemoveEntityPacket pkRemove = new RemoveEntityPacket();
-        pkRemove.eid = bossBarId;
-        this.dataPacket(pkRemove);
+        if (this.dummyBossBars.containsKey(bossBarId)) {
+            this.dummyBossBars.get(bossBarId).destroy();
+            this.dummyBossBars.remove(bossBarId);
+        }
     }
 
     public int getWindowId(Inventory inventory) {
