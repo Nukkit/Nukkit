@@ -108,6 +108,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final int PERMISSION_MEMBER = 1;
     public static final int PERMISSION_VISITOR = 0;
 
+    public static final int ANVIL_WINDOW_ID = 2;
+    public static final int ENCHANT_WINDOW_ID = 3;
+
     protected final SourceInterface interfaz;
 
     public boolean playedBefore;
@@ -116,7 +119,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public int gamemode;
     public long lastBreak;
 
-    protected int windowCnt = 2;
+    protected int windowCnt = 4;
 
     protected Map<Inventory, Integer> windows;
 
@@ -3110,7 +3113,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     InventoryTransactionPacket transactionPacket = (InventoryTransactionPacket) packet;
 
-
                     List<InventoryAction> actions = new ArrayList<>();
                     for (NetworkInventoryAction networkInventoryAction : transactionPacket.actions) {
                         try {
@@ -3167,12 +3169,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             if (this.level.useItemOn(blockVector.asVector3(), i, face, useItemData.clickPos.x, useItemData.clickPos.y, useItemData.clickPos.z, this) != null) {
                                                 break packetswitch;
                                             }
-                                        } else if (inventory.getItemInHand().deepEquals(useItemData.itemInHand)) {
+                                        } else if (inventory.getItemInHand().equals(useItemData.itemInHand)) {
                                             Item i = inventory.getItemInHand();
                                             Item oldItem = i.clone();
                                             //TODO: Implement adventure mode checks
                                             if ((i = this.level.useItemOn(blockVector.asVector3(), i, face, useItemData.clickPos.x, useItemData.clickPos.y, useItemData.clickPos.z, this)) != null) {
-                                                if (!i.deepEquals(oldItem) || i.getCount() != oldItem.getCount()) {
+                                                if (!i.equals(oldItem) || i.getCount() != oldItem.getCount()) {
                                                     inventory.setItemInHand(i);
                                                     inventory.sendHeldItem(this.getViewers().values());
                                                 }
@@ -3222,7 +3224,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     if (this.canInteract(blockVector.add(0.5, 0.5, 0.5), this.isCreative() ? 13 : 7) && (i = this.level.useBreakOn(blockVector.asVector3(), i, this, true)) != null) {
                                         if (this.isSurvival()) {
                                             this.getFoodData().updateFoodExpLevel(0.025);
-                                            if (!i.deepEquals(oldItem) || i.getCount() != oldItem.getCount()) {
+                                            if (!i.equals(oldItem) || i.getCount() != oldItem.getCount()) {
                                                 inventory.setItemInHand(i);
                                                 inventory.sendHeldItem(this.getViewers().values());
                                             }
@@ -4610,7 +4612,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         int cnt;
         if (forceId == null) {
-            this.windowCnt = cnt = Math.max(2, ++this.windowCnt % 99);
+            this.windowCnt = cnt = Math.max(4, ++this.windowCnt % 99);
         } else {
             cnt = forceId;
         }

@@ -31,22 +31,6 @@ import java.util.regex.Pattern;
  */
 public class Item implements Cloneable {
 
-    private static CompoundTag parseCompoundTag(byte[] tag) {
-        try {
-            return NBTIO.read(tag, ByteOrder.LITTLE_ENDIAN);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private byte[] writeCompoundTag(CompoundTag tag) {
-        try {
-            return NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     //All Block IDs are here too
     public static final int AIR = 0;
     public static final int STONE = 1;
@@ -1889,16 +1873,24 @@ public class Item implements Cloneable {
     public CompoundTag getNamedTag() {
         if (!this.hasCompoundTag()) {
             return null;
-        } else if (this.cachedNBT != null) {
-            return this.cachedNBT;
         }
-        return this.cachedNBT = parseCompoundTag(this.tags);
+
+        if (this.cachedNBT == null) {
+            this.cachedNBT = parseCompoundTag(this.tags);
+        }
+
+        if (this.cachedNBT != null) {
+            this.cachedNBT.setName("");
+        }
+
+        return this.cachedNBT;
     }
 
     public Item setNamedTag(CompoundTag tag) {
         if (tag.isEmpty()) {
             return this.clearNamedTag();
         }
+        tag.setName(null);
 
         this.cachedNBT = tag;
         this.tags = writeCompoundTag(tag);
@@ -1908,6 +1900,23 @@ public class Item implements Cloneable {
 
     public Item clearNamedTag() {
         return this.setCompoundTag(new byte[0]);
+    }
+
+    public static CompoundTag parseCompoundTag(byte[] tag) {
+        try {
+            return NBTIO.read(tag, ByteOrder.LITTLE_ENDIAN);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public byte[] writeCompoundTag(CompoundTag tag) {
+        try {
+            tag.setName("");
+            return NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int getCount() {
@@ -2091,7 +2100,19 @@ public class Item implements Cloneable {
     }
 
     public final boolean equals(Item item, boolean checkDamage, boolean checkCompound) {
-        return this.getId() == item.getId() && (!checkDamage || this.getDamage() == item.getDamage()) && (!checkCompound || Arrays.equals(this.getCompoundTag(), item.getCompoundTag()));
+        if (this.getId() == item.getId() && (!checkDamage || this.getDamage() == item.getDamage())) {
+            if (checkCompound) {
+                if (Arrays.equals(this.getCompoundTag(), item.getCompoundTag())) {
+                    return true;
+                } else if (this.hasCompoundTag() && item.hasCompoundTag()) {
+                    return this.getNamedTag().equals(item.getNamedTag());
+                }
+            } else {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -2101,24 +2122,19 @@ public class Item implements Cloneable {
         return this.equals(other, true, true) && this.count == other.count;
     }
 
+    @Deprecated
     public final boolean deepEquals(Item item) {
-        return deepEquals(item, true);
+        return equals(item, true);
     }
 
+    @Deprecated
     public final boolean deepEquals(Item item, boolean checkDamage) {
-        return deepEquals(item, checkDamage, true);
+        return equals(item, checkDamage, true);
     }
 
+    @Deprecated
     public final boolean deepEquals(Item item, boolean checkDamage, boolean checkCompound) {
-        if (this.equals(item, checkDamage, checkCompound)) {
-            return true;
-        } else if (item.hasCompoundTag()) {
-            return item.getNamedTag().equals(this.getNamedTag());
-        } else if (this.hasCompoundTag()) {
-            return this.getNamedTag().equals(item.getNamedTag());
-        }
-
-        return false;
+        return equals(item, checkDamage, checkCompound);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package cn.nukkit.network.protocol.types;
 
 import cn.nukkit.Player;
+import cn.nukkit.inventory.AnvilInventory;
 import cn.nukkit.inventory.Inventory;
 import cn.nukkit.inventory.transaction.action.CreativeInventoryAction;
 import cn.nukkit.inventory.transaction.action.DropItemAction;
@@ -173,6 +174,36 @@ public class NetworkInventoryAction {
                             throw new RuntimeException("Fake container " + window.getClass().getName() + " for " + player.getName() + " does not contain " + this.oldItem);
                         }
                         return new SlotChangeAction(window, inventorySlot, this.oldItem, this.newItem);
+                }
+
+                if (this.windowId >= SOURCE_TYPE_ANVIL_OUTPUT && this.windowId <= SOURCE_TYPE_ANVIL_INPUT) { //anvil actions
+                    Inventory inv = player.getWindowById(Player.ANVIL_WINDOW_ID);
+
+                    if (!(inv instanceof AnvilInventory)) {
+                        throw new RuntimeException("Player " + player.getName() + " has no open anvil inventory");
+                    }
+                    AnvilInventory anvil = (AnvilInventory) inv;
+
+                    switch (this.windowId) {
+                        case SOURCE_TYPE_ANVIL_INPUT:
+                            //System.out.println("action input");
+                            this.inventorySlot = 0;
+                            return new SlotChangeAction(anvil, this.inventorySlot, this.oldItem, this.newItem);
+                        case SOURCE_TYPE_ANVIL_MATERIAL:
+                            //System.out.println("material");
+                            this.inventorySlot = 1;
+                            return new SlotChangeAction(anvil, this.inventorySlot, this.oldItem, this.newItem);
+                        case SOURCE_TYPE_ANVIL_OUTPUT:
+                            //System.out.println("action output");
+                            break;
+                        case SOURCE_TYPE_ANVIL_RESULT:
+                            this.inventorySlot = 2;
+                            anvil.clear(0);
+                            anvil.clear(1);
+                            anvil.setItem(2, this.oldItem);
+                            //System.out.println("action result");
+                            return new SlotChangeAction(anvil, this.inventorySlot, this.oldItem, this.newItem);
+                    }
                 }
 
                 //TODO: more stuff
