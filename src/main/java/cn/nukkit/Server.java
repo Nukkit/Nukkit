@@ -1006,6 +1006,7 @@ public class Server {
 
         if ((this.tickCounter & 0b1111) == 0) {
             this.titleTick();
+            this.network.resetStatistics();
             this.maxTick = 20;
             this.maxUse = 0;
 
@@ -1074,7 +1075,7 @@ public class Server {
 
     // TODO: Fix title tick
     public void titleTick() {
-        if (true || !Nukkit.ANSI) {
+        if (!Nukkit.ANSI) {
             return;
         }
 
@@ -1094,8 +1095,6 @@ public class Server {
                 " | Load " + this.getTickUsage() + "%" + (char) 0x07;
 
         System.out.print(title);
-
-        this.network.resetStatistics();
     }
 
     public QueryRegenerateEvent getQueryInformation() {
