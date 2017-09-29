@@ -29,7 +29,7 @@ public class BossEventPacket extends DataPacket {
     public int type;
     public long playerEid;
     public float healthPercent;
-    public String title;
+    public String title = "";
     public short unknown;
     public int color;
     public int overlay;

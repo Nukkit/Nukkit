@@ -2,6 +2,7 @@ package cn.nukkit.network.protocol.types;
 
 import cn.nukkit.Player;
 import cn.nukkit.inventory.AnvilInventory;
+import cn.nukkit.inventory.EnchantInventory;
 import cn.nukkit.inventory.Inventory;
 import cn.nukkit.inventory.transaction.action.CreativeInventoryAction;
 import cn.nukkit.inventory.transaction.action.DropItemAction;
@@ -204,6 +205,33 @@ public class NetworkInventoryAction {
                             //System.out.println("action result");
                             return new SlotChangeAction(anvil, this.inventorySlot, this.oldItem, this.newItem);
                     }
+                }
+
+                if (this.windowId >= SOURCE_TYPE_ENCHANT_OUTPUT && this.windowId <= SOURCE_TYPE_ENCHANT_INPUT) {
+                    Inventory inv = player.getWindowById(Player.ENCHANT_WINDOW_ID);
+
+                    if (!(inv instanceof EnchantInventory)) {
+                        throw new RuntimeException("Player " + player.getName() + " has no open enchant inventory");
+                    }
+                    EnchantInventory enchant = (EnchantInventory) inv;
+
+                    switch (this.windowId) {
+                        case SOURCE_TYPE_ENCHANT_INPUT:
+                            this.inventorySlot = 0;
+                            Item local = enchant.getItem(0);
+                            if (local.equals(this.newItem, true, false)) {
+                                enchant.setItem(0, this.newItem);
+                            }
+                            break;
+                        case SOURCE_TYPE_ENCHANT_MATERIAL:
+                            this.inventorySlot = 1;
+                            break;
+                        case SOURCE_TYPE_ENCHANT_OUTPUT:
+                            //ignore?
+                            return null;
+                    }
+
+                    return new SlotChangeAction(enchant, this.inventorySlot, this.oldItem, this.newItem);
                 }
 
                 //TODO: more stuff

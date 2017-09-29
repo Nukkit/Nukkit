@@ -1892,11 +1892,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
+        Level level;
         if (this.spawnPosition == null && this.namedTag.contains("SpawnLevel") && (level = this.server.getLevelByName(this.namedTag.getString("SpawnLevel"))) != null) {
             this.spawnPosition = new Position(this.namedTag.getInt("SpawnX"), this.namedTag.getInt("SpawnY"), this.namedTag.getInt("SpawnZ"), level);
         }
 
         Position spawnPosition = this.getSpawn();
+
         StartGamePacket startGamePacket = new StartGamePacket();
         startGamePacket.entityUniqueId = this.id;
         startGamePacket.entityRuntimeId = this.id;
@@ -1907,7 +1909,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.yaw = (float) this.yaw;
         startGamePacket.pitch = (float) this.pitch;
         startGamePacket.seed = -1;
-        startGamePacket.dimension = (byte) (this.level.getDimension() & 0xff);
+        startGamePacket.dimension = (byte) (spawnPosition.level.getDimension() & 0xff);
         startGamePacket.worldGamemode = getClientFriendlyGamemode(this.gamemode);
         startGamePacket.difficulty = this.server.getDifficulty();
         startGamePacket.spawnX = (int) spawnPosition.x;
@@ -1926,7 +1928,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.loggedIn = true;
 
-        this.level.sendTime(this);
+        spawnPosition.level.sendTime(this);
 
         this.setMovementSpeed(DEFAULT_SPEED);
         this.sendAttributes();
@@ -3123,7 +3125,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     List<InventoryAction> actions = new ArrayList<>();
                     for (NetworkInventoryAction networkInventoryAction : transactionPacket.actions) {
                         try {
-                            actions.add(networkInventoryAction.createInventoryAction(this));
+                            InventoryAction a = networkInventoryAction.createInventoryAction(this);
+
+                            if (a != null) {
+                                actions.add(a);
+                            }
                         } catch (Throwable e) {
                             MainLogger.getLogger().debug("Unhandled inventory action from " + this.getName() + ": " + e.getMessage());
                             this.sendAllInventories();
