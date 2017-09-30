@@ -24,14 +24,14 @@ public class AvailableCommandsPacket extends DataPacket {
     public static final int ARG_TYPE_VALUE = 0x03;
     public static final int ARG_TYPE_TARGET = 0x04;
 
-    public static final int ARG_TYPE_STRING = 0x0c;
-    public static final int ARG_TYPE_POSITION = 0x0d;
+    public static final int ARG_TYPE_STRING = 0x0d;
+    public static final int ARG_TYPE_POSITION = 0x0e;
 
-    public static final int ARG_TYPE_RAWTEXT = 0x10;
-    public static final int ARG_TYPE_TEXT = 0x12;
+    public static final int ARG_TYPE_RAWTEXT = 0x11;
+    public static final int ARG_TYPE_TEXT = 0x13;
 
-    public static final int ARG_TYPE_JSON = 0x15;
-    public static final int ARG_TYPE_COMMAND = 0x1c;
+    public static final int ARG_TYPE_JSON = 0x16;
+    public static final int ARG_TYPE_COMMAND = 0x1d;
 
     public static final int ARG_FLAG_ENUM = 0x200000;
     public static final int ARG_FLAG_TEMPLATE = 0x01000000;

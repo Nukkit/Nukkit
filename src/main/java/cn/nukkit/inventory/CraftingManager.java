@@ -327,6 +327,8 @@ public class CraftingManager {
     }
 
     public Recipe[] getRecipesByResult(Item result) {
+        Map<String, Recipe> lookup = recipeLookup.get(result.getId() + ":" + result.getDamage());
+        if (lookup == null) return new Recipe[0];
         return recipeLookup.get(result.getId() + ":" + result.getDamage()).values().stream().toArray(Recipe[]::new);
     }
 

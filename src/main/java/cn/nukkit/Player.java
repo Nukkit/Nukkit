@@ -33,6 +33,7 @@ import cn.nukkit.inventory.*;
 import cn.nukkit.inventory.transaction.InventoryTransaction;
 import cn.nukkit.inventory.transaction.SimpleInventoryTransaction;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
+import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.inventory.transaction.data.ReleaseItemData;
 import cn.nukkit.inventory.transaction.data.UseItemData;
 import cn.nukkit.inventory.transaction.data.UseItemOnEntityData;
@@ -2627,7 +2628,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     boolean canCraft = true;
 
                     if (craftingEventPacket.input.length == 0) {
-                        Recipe[] recipes = getServer().getCraftingManager().getRecipesByResult(craftingEventPacket.output[0]);
+                        Recipe[] recipes = new Recipe[]{recipe};
 
                         if (recipes == null || recipes.length == 0) {
                             this.getServer().getLogger().debug("Uknown recipe for output (" + craftingEventPacket.output[0] + ")");
@@ -2676,7 +2677,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
 
                             for (Item ingredient : serialized.values()) {
-                                if (!this.inventory.contains(ingredient)) {
+                                if (!this.craftingGrid.contains(ingredient)) {
                                     continue recipeloop;
                                 }
                             }
@@ -2692,7 +2693,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
 
                             for (Item ingredient : serialized.values()) {
-                                this.inventory.removeItem(ingredient);
+                                this.craftingGrid.removeItem(ingredient);
                             }
 
                             this.inventory.addItem(recipe.getResult());
@@ -2741,7 +2742,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
 
                         for (Item ingredient : serialized.values()) {
-                            if (!this.inventory.contains(ingredient)) {
+                            if (!this.craftingGrid.contains(ingredient)) {
                                 canCraft = false;
                                 break;
                             }
@@ -2761,7 +2762,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
 
                         for (Item ingredient : serialized.values()) {
-                            this.inventory.removeItem(ingredient);
+                            this.craftingGrid.removeItem(ingredient);
                         }
 
                         this.inventory.addItem(recipe.getResult());
@@ -3122,12 +3123,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     InventoryTransactionPacket transactionPacket = (InventoryTransactionPacket) packet;
 
+                    boolean isCrafting = false;
                     List<InventoryAction> actions = new ArrayList<>();
                     for (NetworkInventoryAction networkInventoryAction : transactionPacket.actions) {
                         try {
                             InventoryAction a = networkInventoryAction.createInventoryAction(this);
-
                             if (a != null) {
+                                if (a instanceof SlotChangeAction) {
+                                    if (((SlotChangeAction) a).getInventory() instanceof CraftingGrid) isCrafting = true;
+                                }
                                 actions.add(a);
                             }
                         } catch (Throwable e) {
@@ -3141,7 +3145,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         case InventoryTransactionPacket.TYPE_NORMAL:
                             InventoryTransaction transaction = new SimpleInventoryTransaction(this, actions);
 
-                            if (!transaction.execute()) {
+                            if (!transaction.execute() && !isCrafting) {
                                 for (Inventory inventory : transaction.getInventories()) {
                                     inventory.sendContents(this);
                                     if (inventory instanceof PlayerInventory) {
