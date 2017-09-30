@@ -2555,6 +2555,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     this.craftingType = CRAFTING_SMALL;
                     this.resetCraftingGridType();
+
                     if (this.windowIndex.containsKey(containerClosePacket.windowId)) {
                         this.server.getPluginManager().callEvent(new InventoryCloseEvent(this.windowIndex.get(containerClosePacket.windowId), this));
                         this.removeWindow(this.windowIndex.get(containerClosePacket.windowId));
@@ -2655,7 +2656,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     for (Item ingredient : serialized.values()) {
-                        this.craftingGrid.removeItem(ingredient);
+                        this.craftingGrid.removeFromAll(ingredient);
                     }
 
                     this.inventory.addItem(recipe.getResult());

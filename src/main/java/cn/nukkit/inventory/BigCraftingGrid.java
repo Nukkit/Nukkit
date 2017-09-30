@@ -6,7 +6,7 @@ package cn.nukkit.inventory;
 public class BigCraftingGrid extends CraftingGrid {
 
     public BigCraftingGrid(InventoryHolder holder) {
-        super(holder);
+        super(holder, 9);
     }
 
     @Override

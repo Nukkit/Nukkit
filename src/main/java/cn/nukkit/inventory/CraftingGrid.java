@@ -1,6 +1,10 @@
 package cn.nukkit.inventory;
 
 import cn.nukkit.Player;
+import cn.nukkit.item.Item;
+import cn.nukkit.utils.MainLogger;
+
+import java.util.HashMap;
 
 /**
  * author: MagicDroidX
@@ -9,7 +13,11 @@ import cn.nukkit.Player;
 public class CraftingGrid extends BaseInventory {
 
     public CraftingGrid(InventoryHolder holder) {
-        super(holder, InventoryType.CRAFTING);
+        this(holder, 4);
+    }
+
+    public CraftingGrid(InventoryHolder holder, int overrideSize) {
+        super(holder, InventoryType.CRAFTING, new HashMap<>(), overrideSize);
     }
 
     @Override
@@ -23,6 +31,24 @@ public class CraftingGrid extends BaseInventory {
 
     public String getName() {
         return "Crafting";
+    }
+
+    public void removeFromAll(Item item) {
+        int count = item.getCount();
+
+        for (int i = 0; i < this.size; i++) {
+            Item target = this.getItem(i);
+
+            if (target.equals(item, true, false)) {
+                count--;
+                target.count--;
+                this.setItem(i, target);
+            }
+        }
+
+        if (count != 0) {
+            MainLogger.getLogger().debug("Unexpected ingredient count (" + count + ") in crafting grid");
+        }
     }
 
     public void sendSlot(int index, Player... target) {
