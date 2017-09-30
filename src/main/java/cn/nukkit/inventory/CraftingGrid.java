@@ -43,6 +43,7 @@ public class CraftingGrid extends BaseInventory {
                 count--;
                 target.count--;
                 this.setItem(i, target);
+                if (count <= 0) break;
             }
         }
 

@@ -2572,6 +2572,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     Recipe recipe = this.server.getCraftingManager().getRecipe(craftingEventPacket.id);
+                    Recipe[] recipes = this.server.getCraftingManager().getRecipesByResult(craftingEventPacket.output[0]);
+                    
+                    boolean isValid = false;
+                    for (Recipe rec : recipes){
+                        if (rec.getId().equals(recipe.getId())) {
+                            isValid = true;   
+                            break;
+                        }
+                    }
+                    if (isValid) recipes = new Recipe[]{recipe};
 
                     if (!this.windowIndex.containsKey(craftingEventPacket.windowId)) {
                         this.inventory.sendContents(this);
@@ -2580,8 +2590,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.dataPacket(containerClosePacket);
                         break;
                     }
-
-                    if (recipe == null || (((recipe instanceof BigShapelessRecipe) || (recipe instanceof BigShapedRecipe)) && this.craftingType == CRAFTING_SMALL)) {
+                    
+                    if (isValid && (recipe == null || (((recipe instanceof BigShapelessRecipe) || (recipe instanceof BigShapedRecipe)) && this.craftingType == CRAFTING_SMALL))) {
                         this.inventory.sendContents(this);
                         break;
                     }
@@ -2598,48 +2608,66 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     boolean canCraft = true;
+                    Map<String, Item> realSerialized = new HashMap<>();
+                    
+                    for (Recipe rec : recipes) {
+                        ArrayList<Item> ingredientz = new ArrayList<>();
+                    
+                        if (rec == null || (((rec instanceof BigShapelessRecipe) || (rec instanceof BigShapedRecipe)) && this.craftingType == CRAFTING_SMALL)) {
+                            continue;
+                        }
 
-                    ArrayList<Item> ingredientz = new ArrayList<>();
+                        if (rec instanceof ShapedRecipe) {
+                            Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) rec).getIngredientMap();
+                            
+                            for (Map<Integer, Item> map : ingredients.values()) {
+                                for (Item ingredient : map.values()) {
+                                    if (ingredient != null && ingredient.getId() != Item.AIR) {
+                                        ingredientz.add(ingredient);
+                                    }
+                                }
+                            }
+                        } else if (recipe instanceof ShapelessRecipe) {
+                            ShapelessRecipe recipe0 = (ShapelessRecipe) recipe;
 
-                    if (recipe instanceof ShapedRecipe) {
-
-                        Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) recipe).getIngredientMap();
-                        for (Map<Integer, Item> map : ingredients.values()) {
-                            for (Item ingredient : map.values()) {
+                            for (Item ingredient : recipe0.getIngredientList()) {
                                 if (ingredient != null && ingredient.getId() != Item.AIR) {
                                     ingredientz.add(ingredient);
                                 }
                             }
                         }
-                    } else if (recipe instanceof ShapelessRecipe) {
-                        ShapelessRecipe recipe0 = (ShapelessRecipe) recipe;
 
-                        for (Item ingredient : recipe0.getIngredientList()) {
-                            if (ingredient != null && ingredient.getId() != Item.AIR) {
-                                ingredientz.add(ingredient);
+                        Map<String, Item> serialized = new HashMap<>();
+
+                        for (Item ingredient : ingredientz) {
+                            String hash = ingredient.getId() + ":" + ingredient.getDamage();
+                            Item r = serialized.get(hash);
+
+                            if (r != null) {
+                                r.count += ingredient.getCount();
+                                continue;
+                            }
+
+                            serialized.put(hash, ingredient);
+                        }
+
+                        boolean isPossible = true;
+                        for (Item ingredient : serialized.values()) {
+                            if (!this.craftingGrid.contains(ingredient)) {
+                                if (isValid) {
+                                    canCraft = false;
+                                    break;
+                                }
+                                else {
+                                    isPossible = false;
+                                    break;
+                                }
                             }
                         }
-                    }
-
-                    Map<String, Item> serialized = new HashMap<>();
-
-                    for (Item ingredient : ingredientz) {
-                        String hash = ingredient.getId() + ":" + ingredient.getDamage();
-                        Item r = serialized.get(hash);
-
-                        if (r != null) {
-                            r.count += ingredient.getCount();
-                            continue;
-                        }
-
-                        serialized.put(hash, ingredient);
-                    }
-
-                    for (Item ingredient : serialized.values()) {
-                        if (!this.craftingGrid.contains(ingredient)) {
-                            canCraft = false;
-                            break;
-                        }
+                        if (!isPossible) continue;
+                        recipe = rec;
+                        realSerialized = serialized;
+                        break;
                     }
 
                     if (!canCraft) {
@@ -2647,7 +2675,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         return;
                     }
 
-                    CraftItemEvent craftItemEvent = new CraftItemEvent(this, serialized.values().stream().toArray(Item[]::new), recipe);
+                    CraftItemEvent craftItemEvent = new CraftItemEvent(this, realSerialized.values().stream().toArray(Item[]::new), recipe);
                     getServer().getPluginManager().callEvent(craftItemEvent);
 
                     if (craftItemEvent.isCancelled()) {
@@ -2655,7 +2683,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    for (Item ingredient : serialized.values()) {
+                    for (Item ingredient : realSerialized.values()) {
                         this.craftingGrid.removeFromAll(ingredient);
                     }
 

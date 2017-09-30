@@ -54,7 +54,7 @@ public class CraftingManager {
                     if (id != null && !id.isEmpty()) {
                         UUID uuid = UUID.fromString(id);
                         result.setId(uuid);
-                        this.recipes.put(uuid, result);
+                        this.registerShapelessRecipe(result);
                     }
                     break;
                 case 1:
@@ -81,7 +81,7 @@ public class CraftingManager {
                     if (id != null && !id.isEmpty()) {
                         UUID uuid = UUID.fromString(id);
                         shapedRecipe.setId(uuid);
-                        this.recipes.put(uuid, shapedRecipe);
+                        this.registerShapedRecipe(shapedRecipe);
                     }
                     break;
                 case 2:

@@ -173,6 +173,11 @@ public class SimpleInventoryTransaction implements InventoryTransaction {
                         list.remove(i);
                         sortedThisLoop++;
                     }
+                    else if (actionSource.equals(lastTargetItem)) {
+                        lastTargetItem.count -= actionSource.count;
+                        list.remove(i);
+                        if (lastTargetItem.count == 0) sortedThisLoop++;
+                    }
                 }
             } while (sortedThisLoop > 0);
 
