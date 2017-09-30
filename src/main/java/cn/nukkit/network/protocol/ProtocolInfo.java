@@ -9,7 +9,7 @@ public interface ProtocolInfo {
     /**
      * Actual Minecraft: PE protocol version
      */
-    int CURRENT_PROTOCOL = 137;
+    int CURRENT_PROTOCOL = Integer.valueOf("137"); //plugins can change it
 
     String MINECRAFT_VERSION = "v1.2.1";
     String MINECRAFT_VERSION_NETWORK = "1.2.1";
