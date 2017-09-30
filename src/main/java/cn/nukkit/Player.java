@@ -3171,12 +3171,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.inventory.equipItem(hotbarPacket.selectedHotbarSlot);
                     break;
                 case ProtocolInfo.SERVER_SETTINGS_REQUEST_PACKET:
-                    this.serverSettings.forEach((id, window) -> {
-                        ServerSettingsResponsePacket re = new ServerSettingsResponsePacket();
-                        re.formId = id;
-                        re.data = window.getJSONData();
-                        this.dataPacket(re);
-                    });
+                    PlayerServerSettingsRequestEvent settingsRequestEvent = new PlayerServerSettingsRequestEvent(this, new HashMap<>(this.serverSettings))
+                    this.getServer().getPluginManager().callEvent(settingsRequestEvent);
+                            
+                    if (!settingsRequestEvent.isCancelled()) {
+                        settingsRequestEvent.getSettings().forEach((id, window) -> {
+                            ServerSettingsResponsePacket re = new ServerSettingsResponsePacket();
+                            re.formId = id;
+                            re.data = window.getJSONData();
+                            this.dataPacket(re);
+                        });
+                    }
                     break;
                 default:
                     break;
