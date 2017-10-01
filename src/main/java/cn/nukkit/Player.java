@@ -2192,7 +2192,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     this.setDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION, false);
 
-                    this.inventory.equipItem(mobEquipmentPacket.hotbarSlot);
                     break;
                 case ProtocolInfo.PLAYER_ACTION_PACKET:
                     PlayerActionPacket playerActionPacket = (PlayerActionPacket) packet;
