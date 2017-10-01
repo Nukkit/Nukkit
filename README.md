@@ -35,7 +35,7 @@ Nukkit is **under improvement** yet, we welcome contributions.
 
 Example servers running Nukkit
 --------------------
-- **play.EaseCation.com**
+- **play.EaseCation.net**
 - **play.GameTeam.cz**
 - **MultiLabs.net**
 
