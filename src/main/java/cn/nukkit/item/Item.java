@@ -480,7 +480,8 @@ public class Item implements Cloneable {
     public static final int SPAWN_EGG = 383;
     public static final int EXPERIENCE_BOTTLE = 384;
     public static final int FIRE_CHARGE = 385;
-
+    public static final int BOOK_AND_QUILL = 386;
+    public static final int WRITTEN_BOOK = 387;
     public static final int EMERALD = 388;
     public static final int ITEM_FRAME = 389;
     public static final int FLOWER_POT = 390;
@@ -744,7 +745,8 @@ public class Item implements Cloneable {
             list[SPAWN_EGG] = ItemSpawnEgg.class; //383
             list[EXPERIENCE_BOTTLE] = ItemExpBottle.class; //384
             //TODO: list[FIRE_CHARGE] = ItemFireCharge.class; //385
-
+            //TODO: list[BOOK_AND_QUILL] = ItemBookAndQuill.class; //386
+            list[WRITTEN_BOOK] = ItemBookWritten.class; //387
             list[EMERALD] = ItemEmerald.class; //388
             list[ITEM_FRAME] = ItemItemFrame.class; //389
             list[FLOWER_POT] = ItemFlowerPot.class; //390
