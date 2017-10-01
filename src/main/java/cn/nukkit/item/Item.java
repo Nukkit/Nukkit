@@ -846,7 +846,7 @@ public class Item implements Cloneable {
         for (Map map : list) {
             try {
                 int id = (int) map.get("id");
-                int damage = Utils.toInt(map.getOrDefault("damage", 0D));
+                int damage = (int) map.getOrDefault("damage", 0);
                 String hex = (String) map.get("nbt_hex");
                 byte[] nbt = hex != null ? DatatypeConverter.parseHexBinary(hex) : new byte[0];
 
