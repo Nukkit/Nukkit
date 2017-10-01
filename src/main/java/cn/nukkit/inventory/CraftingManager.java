@@ -10,6 +10,7 @@ import cn.nukkit.utils.Config;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.Utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -32,13 +33,17 @@ public class CraftingManager {
     public static CraftingDataPacket packet = null;
 
     public CraftingManager() {
-        try {
-            Utils.writeFile(Server.getInstance().getDataPath() + "recipes.json", Server.class.getClassLoader().getResourceAsStream("recipes.json"));
-        } catch (IOException e) {
-            MainLogger.getLogger().logException(e);
-            //return;
+        String path = Server.getInstance().getDataPath() + "recipes.json";
+
+        if (!new File(path).exists()) {
+            try {
+                Utils.writeFile(path, Server.class.getClassLoader().getResourceAsStream("recipes.json"));
+            } catch (IOException e) {
+                MainLogger.getLogger().logException(e);
+            }
         }
-        List<Map> recipes = new Config(Server.getInstance().getDataPath() + "recipes.json", Config.JSON).getMapList("recipes");
+
+        List<Map> recipes = new Config(path, Config.JSON).getMapList("recipes");
         MainLogger.getLogger().info("Loading recipes...");
         for (Map<String, Object> recipe : recipes) { //TODO: implement this better
             switch (Utils.toInt(recipe.get("type"))) {

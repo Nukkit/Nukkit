@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DyeColor;
 
 /**
@@ -23,6 +24,11 @@ public class BlockGlassPaneStained extends BlockGlassPane {
     @Override
     public String getName() {
         return getDyeColor().getName() + " stained glass pane";
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return getDyeColor().getColor();
     }
 
     public DyeColor getDyeColor() {
