@@ -1645,15 +1645,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.checkTeleportPosition();
         this.checkInteractNearby();
 
-        // TODO: remove this workaround (broken client MCPE 1.0.0)
-        if (!messageQueue.isEmpty()) {
-            TextPacket pk = new TextPacket();
-            pk.type = TextPacket.TYPE_RAW;
-            pk.message = String.join("\n", messageQueue);
-            this.dataPacket(pk);
-            messageQueue.clear();
-        }
-
         if (this.spawned && this.dummyBossBars.size() > 0 && currentTick % 100 == 0) {
             this.dummyBossBars.values().forEach(DummyBossBar::updateBossEntityPosition);
         }
@@ -1723,8 +1714,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         return null;
     }
-
-    private ArrayList<String> messageQueue = new ArrayList<>();
 
     public void checkNetwork() {
         if (!this.isOnline()) {
@@ -3298,15 +3287,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void sendMessage(String message) {
-        // TODO: Remove this workaround (broken client MCPE 1.0.0)
-        messageQueue.add(this.server.getLanguage().translateString(message));
-
-        /*
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_RAW;
         pk.message = this.server.getLanguage().translateString(message);
         this.dataPacket(pk);
-        */
     }
 
     @Override
@@ -3336,6 +3320,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.type = TextPacket.TYPE_RAW;
             pk.message = this.server.getLanguage().translateString(message, parameters);
         }
+        this.dataPacket(pk);
+    }
+
+    public void sendChat(String message) {
+        this.sendChat("", message);
+    }
+
+    public void sendChat(String source, String message) {
+        TextPacket pk = new TextPacket();
+        pk.type = TextPacket.TYPE_CHAT;
+        pk.source = source;
+        pk.message = this.server.getLanguage().translateString(message);
         this.dataPacket(pk);
     }
 
