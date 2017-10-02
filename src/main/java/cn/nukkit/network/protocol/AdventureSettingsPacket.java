@@ -60,6 +60,7 @@ public class AdventureSettingsPacket extends DataPacket {
     }
 
     public void encode() {
+        this.reset();
         this.putUnsignedVarInt(this.flags);
         this.putUnsignedVarInt(this.commandPermission);
         this.putUnsignedVarInt(this.flags2);
