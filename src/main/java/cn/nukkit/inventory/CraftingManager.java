@@ -151,6 +151,16 @@ public class CraftingManager {
                 "S"
         )).setIngredient("S", Item.get(Item.SUGARCANE, 0, 1)));
 
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.PURPUR_BLOCK, 0, 4),
+                "CC",
+                "CC"
+        )).setIngredient("C", Item.get(Item.POPPED_CHORUS_FRUIT, 0, 1)));
+
+        this.registerRecipe((new ShapedRecipe(Item.get(Item.END_ROD, 0, 4),
+                "N",
+                "C"
+        )).setIngredient("N", Item.get(Item.BLAZE_ROD, 0, 1)).setIngredient("C", Item.get(Item.POPPED_CHORUS_FRUIT, 0, 1)));
+
         this.registerRecipe((new BigShapedRecipe(Item.get(Item.BED, 0, 1),
                 "WWW",
                 "PPP",
@@ -737,6 +747,8 @@ public class CraftingManager {
                 "PSP",
                 "PPP"
         ).setIngredient("P", Item.get(Item.OBSIDIAN, 0, 1)).setIngredient("S", Item.get(Item.ENDER_EYE, 0, 1)));
+
+
     }
 
     protected void registerFurnace() {
@@ -759,7 +771,7 @@ public class CraftingManager {
         this.registerRecipe(new FurnaceRecipe(Item.get(Item.COOKED_CHICKEN, 0, 1), Item.get(Item.RAW_CHICKEN, null, 1)));
         this.registerRecipe(new FurnaceRecipe(Item.get(Item.BAKED_POTATO, 0, 1), Item.get(Item.POTATO, null, 1)));
         this.registerRecipe(new FurnaceRecipe(Item.get(Item.COOKED_MUTTON, 0, 1), Item.get(Item.RAW_MUTTON, null, 1)));
-
+        this.registerRecipe(new FurnaceRecipe(Item.get(Item.CHORUS_FRUIT, 0, 1), Item.get(Item.POPPED_CHORUS_FRUIT, 0, 1)));
         this.registerRecipe(new FurnaceRecipe(Item.get(Item.HARDENED_CLAY, 0, 1), Item.get(Item.CLAY_BLOCK, null, 1)));
     }
 
