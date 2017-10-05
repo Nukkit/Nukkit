@@ -350,6 +350,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.getAdventureSettings().get(Type.ALLOW_FLIGHT);
     }
 
+    public void setAllowModifyWorld(boolean value) {
+        this.getAdventureSettings().set(Type.WORLD_IMMUTABLE, !value);
+        this.getAdventureSettings().set(Type.BUILD_AND_MINE, value);
+        this.getAdventureSettings().update();
+    }
+
+    public void setAllowInteract(boolean value) {
+        setAllowInteract(value, value);
+    }
+
+    public void setAllowInteract(boolean value, boolean containers) {
+        this.getAdventureSettings().set(Type.WORLD_IMMUTABLE, !value);
+        this.getAdventureSettings().set(Type.DOORS_AND_SWITCHED, value);
+        this.getAdventureSettings().set(Type.OPEN_CONTAINERS, containers);
+        this.getAdventureSettings().update();
+    }
+
     @Deprecated
     public void setAutoJump(boolean value) {
         this.getAdventureSettings().set(Type.AUTO_JUMP, value);
