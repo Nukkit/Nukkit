@@ -1,23 +1,24 @@
 package cn.nukkit.form.element;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ElementStepSlider extends Element {
 
     public String type = "step_slider";
     public String text = "";
-    public ArrayList<String> steps;
+    public List<String> steps;
     public int defaultStepIndex = 0;
 
     public ElementStepSlider(String text) {
         this(text, new ArrayList<>());
     }
 
-    public ElementStepSlider(String text, ArrayList<String> steps) {
+    public ElementStepSlider(String text, List<String> steps) {
         this(text, steps, 0);
     }
 
-    public ElementStepSlider(String text, ArrayList<String> steps, int defaultStep) {
+    public ElementStepSlider(String text, List<String> steps, int defaultStep) {
         this.text = text;
         this.steps = steps;
         this.defaultStepIndex = defaultStep;

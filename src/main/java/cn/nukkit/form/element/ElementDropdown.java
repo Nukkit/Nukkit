@@ -1,23 +1,24 @@
 package cn.nukkit.form.element;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ElementDropdown extends Element {
 
     public String type = "dropdown";
     public String text = "";
-    public ArrayList<String> options;
+    public List<String> options;
     public int defaultOptionIndex = 0;
 
     public ElementDropdown(String text) {
         this(text, new ArrayList<>());
     }
 
-    public ElementDropdown(String text, ArrayList<String> options) {
+    public ElementDropdown(String text, List<String> options) {
         this(text, options, 0);
     }
 
-    public ElementDropdown(String text, ArrayList<String> options, int defaultOption) {
+    public ElementDropdown(String text, List<String> options, int defaultOption) {
         this.text = text;
         this.options = options;
         this.defaultOptionIndex = defaultOption;

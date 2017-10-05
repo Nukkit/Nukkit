@@ -4,7 +4,6 @@ import cn.nukkit.network.protocol.AdventureSettingsPacket;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Nukkit Project
@@ -49,8 +48,8 @@ public class AdventureSettings implements Cloneable {
 
     public void update() {
         AdventureSettingsPacket pk = new AdventureSettingsPacket();
-        for (Entry<Type, Boolean> entry : this.values.entrySet()) {
-            pk.setFlag(entry.getKey().getId(), entry.getValue());
+        for (Type t : Type.values()) {
+            pk.setFlag(t.getId(), get(t));
         }
 
         pk.commandPermission = (player.isOp() ? AdventureSettingsPacket.PERMISSION_OPERATOR : AdventureSettingsPacket.PERMISSION_NORMAL);
