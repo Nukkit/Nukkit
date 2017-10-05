@@ -2745,7 +2745,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET:
                     RequestChunkRadiusPacket requestChunkRadiusPacket = (RequestChunkRadiusPacket) packet;
                     ChunkRadiusUpdatedPacket chunkRadiusUpdatePacket = new ChunkRadiusUpdatedPacket();
-                    this.chunkRadius = Math.max(5, Math.min(requestChunkRadiusPacket.radius, this.viewDistance));
+                    this.chunkRadius = Math.max(3, Math.min(requestChunkRadiusPacket.radius, this.viewDistance));
                     chunkRadiusUpdatePacket.radius = this.chunkRadius;
                     this.dataPacket(chunkRadiusUpdatePacket);
                     break;
@@ -3283,6 +3283,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         return false;
+    }
+
+    public void setViewDistance(int distance) {
+        this.chunkRadius = distance;
+
+        ChunkRadiusUpdatedPacket pk = new ChunkRadiusUpdatedPacket();
+        pk.radius = distance;
+
+        this.dataPacket(pk);
+    }
+
+    public int getViewDistance() {
+        return this.chunkRadius;
     }
 
     @Override
