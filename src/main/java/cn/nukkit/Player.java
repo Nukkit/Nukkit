@@ -4658,4 +4658,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean isBreakingBlock() {
         return this.breakingBlock != null;
     }
+
+    /**
+     * Show a window of a XBOX account's profile
+     * @param xuid XUID
+     */
+    public void showXboxProfile(String xuid) {
+        ShowProfilePacket pk = new ShowProfilePacket();
+        pk.xuid = getLoginChainData().getXUID();
+        this.dataPacket(pk);
+    }
 }

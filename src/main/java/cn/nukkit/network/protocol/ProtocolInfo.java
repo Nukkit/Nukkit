@@ -92,6 +92,7 @@ public interface ProtocolInfo {
     byte AVAILABLE_COMMANDS_PACKET = 0x4c;
     byte COMMAND_REQUEST_PACKET = 0x4d;
     byte COMMAND_BLOCK_UPDATE_PACKET = 0x4e;
+    byte COMMAND_OUTPUT_PACKET = 0x4f;
     byte UPDATE_TRADE_PACKET = 0x50;
     byte UPDATE_EQUIPMENT_PACKET = 0x51;
     byte RESOURCE_PACK_DATA_INFO_PACKET = 0x52;
@@ -116,5 +117,7 @@ public interface ProtocolInfo {
     byte MODAL_FORM_RESPONSE_PACKET = 0x65;
     byte SERVER_SETTINGS_REQUEST_PACKET = 0x66;
     byte SERVER_SETTINGS_RESPONSE_PACKET = 0x67;
+    byte SHOW_PROFILE_PACKET = 0x68;
+    byte SET_DEFAULT_GAME_TYPE_PACKET = 0x69;
     byte BATCH_PACKET = (byte) 0xff;
 }
