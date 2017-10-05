@@ -4538,7 +4538,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean pickupEntity(Entity entity, boolean near) {
-        if (!this.spawned || !this.isAlive() || !this.isOnline()) {
+        if (!this.spawned || !this.isAlive() || !this.isOnline() || this.getGamemode() == SPECTATOR) {
             return false;
         }
 
