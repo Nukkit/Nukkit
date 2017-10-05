@@ -4055,7 +4055,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             this.spawnToAll();
-            this.isLevelChange = false;
             this.forceMovement = this.teleportPosition;
             this.teleportPosition = null;
             return true;
@@ -4078,8 +4077,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.dataPacket(pk);
         }
     }
-
-    private boolean isLevelChange = false;
 
     @Override
     public boolean teleport(Location location, TeleportCause cause) {

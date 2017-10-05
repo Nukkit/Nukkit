@@ -123,7 +123,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
 
     @Override
     public BaseInventory getInventory() {
-        if (this.isPaired() && this.doubleInventory == null) {
+        if (this.doubleInventory == null && this.isPaired()) {
             this.checkPairing();
         }
 
