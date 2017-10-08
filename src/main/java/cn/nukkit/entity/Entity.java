@@ -246,6 +246,8 @@ public abstract class Entity extends Location implements Metadatable {
     protected float health = 20;
     private int maxHealth = 20;
 
+    protected float absorption = 0;
+
     protected float ySize = 0;
     public boolean keepMovement = false;
 
@@ -859,6 +861,11 @@ public abstract class Entity extends Location implements Metadatable {
         if (source.isCancelled()) {
             return false;
         }
+        if (this.absorption > 0) {  //Damage Absorption
+            float absorptionHealth = this.absorption - source.getFinalDamage() > 0 ? source.getFinalDamage() : this.absorption;
+            this.setAbsorption(this.absorption - absorptionHealth);
+            source.setDamage(-absorptionHealth, EntityDamageEvent.DamageModifier.ABSORPTION);
+        }
         setLastDamageCause(source);
         setHealth(getHealth() - source.getFinalDamage());
         return true;
@@ -1253,6 +1260,17 @@ public abstract class Entity extends Location implements Metadatable {
         int ticks = seconds * 20;
         if (ticks > this.fireTicks) {
             this.fireTicks = ticks;
+        }
+    }
+
+    public float getAbsorption() {
+        return absorption;
+    }
+
+    public void setAbsorption(float absorption) {
+        if (absorption != this.absorption) {
+            this.absorption = absorption;
+            if (this instanceof Player) ((Player) this).setAttribute(Attribute.getAttribute(Attribute.ABSORPTION).setValue(absorption));
         }
     }
 
