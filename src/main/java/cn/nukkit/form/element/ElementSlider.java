@@ -6,24 +6,22 @@ public class ElementSlider extends Element {
     public String text = "";
     public float min = 0f;
     public float max = 100f;
-    public float step;
+    public int step;
     public float defaultValue;
 
     public ElementSlider(String text, float min, float max) {
-        this(text, min, max, -1f);
+        this(text, min, max, -1);
     }
 
-    public ElementSlider(String text, float min, float max, float step) {
-        this(text, min, max, step, -1f);
+    public ElementSlider(String text, float min, float max, int step) {
+        this(text, min, max, step, -1);
     }
 
-    public ElementSlider(String text, float min, float max, float step, float defaultValue) {
+    public ElementSlider(String text, float min, float max, int step, float defaultValue) {
         this.text = text;
-        if (min < 0f) this.min = 0f;
-        else this.min = min;
-        if (max > min) this.max = this.min;
-        else this.max = max;
-        if (this.step != -1f && this.step > 0) this.step = step;
+        this.min = min < 0f ? 0f : min;
+        this.max = max > this.min ? max : this.min;
+        if (step != -1f && step > 0) this.step = step;
         if (defaultValue != -1f) this.defaultValue = defaultValue;
     }
 
