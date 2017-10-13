@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ElementStepSlider extends Element {
 
-    private final String type = "step_slider";
+    private final String type = "step_slider"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
     private String text = "";
     private List<String> steps;
     private int defaultStepIndex = 0;

@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 
 public class FormWindowModal extends FormWindow {
 
-    private final String type = "modal";
+    private final String type = "modal"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
     private String title = "";
     private String content = "";
     private String button1 = "";

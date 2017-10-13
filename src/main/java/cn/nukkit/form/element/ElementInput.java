@@ -2,7 +2,7 @@ package cn.nukkit.form.element;
 
 public class ElementInput extends Element {
 
-    private final String type = "input";
+    private final String type = "input"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
     private String text = "";
     private String placeholder = "";
     private String defaultText = "";
