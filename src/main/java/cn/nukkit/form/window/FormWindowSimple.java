@@ -9,10 +9,10 @@ import java.util.List;
 
 public class FormWindowSimple extends FormWindow {
 
-    public String type = "form";
-    public String title = "";
-    public String content = "";
-    public List<ElementButton> buttons;
+    private final String type = "form";
+    private String title = "";
+    private String content = "";
+    private List<ElementButton> buttons;
 
     private FormResponseSimple response = null;
 
@@ -24,6 +24,26 @@ public class FormWindowSimple extends FormWindow {
         this.title = title;
         this.content = content;
         this.buttons = buttons;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public List<ElementButton> getButtons() {
+        return buttons;
     }
 
     public void addButton(ElementButton button) {

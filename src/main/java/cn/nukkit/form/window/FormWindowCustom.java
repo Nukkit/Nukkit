@@ -12,10 +12,10 @@ import java.util.List;
 
 public class FormWindowCustom extends FormWindow {
 
-    public String type = "custom_form";
-    public String title = "";
-    public ElementButtonImageData icon;
-    public List<Element> content;
+    private final String type = "custom_form";
+    private String title = "";
+    private ElementButtonImageData icon;
+    private List<Element> content;
 
     private FormResponseCustom response;
 
@@ -33,8 +33,24 @@ public class FormWindowCustom extends FormWindow {
         if (!icon.isEmpty()) this.icon = new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_URL, icon);
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public List<Element> getElements() {
+        return content;
+    }
+
     public void addElement(Element element) {
         content.add(element);
+    }
+
+    public ElementButtonImageData getIcon() {
+        return icon;
     }
 
     public void setIcon(String icon) {
@@ -85,7 +101,7 @@ public class FormWindowCustom extends FormWindow {
                 continue;
             }
             if (e instanceof ElementDropdown) {
-                String answer = ((ElementDropdown) e).options.get(Integer.parseInt(elementData));
+                String answer = ((ElementDropdown) e).getOptions().get(Integer.parseInt(elementData));
                 dropdownResponses.put(i, new FormResponseData(Integer.parseInt(elementData), answer));
                 responses.put(i, answer);
             } else if (e instanceof ElementInput) {
@@ -96,7 +112,7 @@ public class FormWindowCustom extends FormWindow {
                 sliderResponses.put(i, answer);
                 responses.put(i, answer);
             } else if (e instanceof ElementStepSlider) {
-                String answer = ((ElementStepSlider) e).steps.get(Integer.parseInt(elementData));
+                String answer = ((ElementStepSlider) e).getSteps().get(Integer.parseInt(elementData));
                 stepSliderResponses.put(i, new FormResponseData(Integer.parseInt(elementData), answer));
                 responses.put(i, answer);
             } else if (e instanceof ElementToggle) {
@@ -117,19 +133,19 @@ public class FormWindowCustom extends FormWindow {
      */
     public void setElementsFromResponse() {
         if (this.response != null) {
-            this.response.responses.forEach((i, response) -> {
+            this.response.getResponses().forEach((i, response) -> {
                 Element e = content.get(i);
                 if (e != null) {
                     if (e instanceof ElementDropdown) {
-                        ((ElementDropdown) e).defaultOptionIndex = ((ElementDropdown) e).options.indexOf(response);
+                        ((ElementDropdown) e).setDefaultOptionIndex(((ElementDropdown) e).getOptions().indexOf(response));
                     } else if (e instanceof ElementInput) {
-                        ((ElementInput) e).defaultText = (String)response;
+                        ((ElementInput) e).setDefaultText((String)response);
                     } else if (e instanceof ElementSlider) {
-                        ((ElementSlider) e).defaultValue = (Float)response;
+                        ((ElementSlider) e).setDefaultValue((Float)response);
                     } else if (e instanceof ElementStepSlider) {
-                        ((ElementStepSlider) e).defaultStepIndex = ((ElementStepSlider) e).steps.indexOf(response);
+                        ((ElementStepSlider) e).setDefaultOptionIndex(((ElementStepSlider) e).getSteps().indexOf(response));
                     } else if (e instanceof ElementToggle) {
-                        ((ElementToggle) e).defaultValue = (Boolean)response;
+                        ((ElementToggle) e).setDefaultValue((Boolean)response);
                     }
                 }
             });

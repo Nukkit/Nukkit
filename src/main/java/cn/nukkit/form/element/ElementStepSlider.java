@@ -5,10 +5,10 @@ import java.util.List;
 
 public class ElementStepSlider extends Element {
 
-    public String type = "step_slider";
-    public String text = "";
-    public List<String> steps;
-    public int defaultStepIndex = 0;
+    private final String type = "step_slider";
+    private String text = "";
+    private List<String> steps;
+    private int defaultStepIndex = 0;
 
     public ElementStepSlider(String text) {
         this(text, new ArrayList<>());
@@ -24,9 +24,25 @@ public class ElementStepSlider extends Element {
         this.defaultStepIndex = defaultStep;
     }
 
+    public int getDefaultStepIndex() {
+        return defaultStepIndex;
+    }
+
     public void setDefaultOptionIndex(int index) {
         if (index >= steps.size()) return;
         this.defaultStepIndex = index;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public List<String> getSteps() {
+        return steps;
     }
 
     public void addStep(String step) {

@@ -1,5 +1,5 @@
 package cn.nukkit.form.element;
 
-abstract public class Element {
+public abstract class Element {
 
 }

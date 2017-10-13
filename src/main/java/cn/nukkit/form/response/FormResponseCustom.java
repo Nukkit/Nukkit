@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class FormResponseCustom extends FormResponse {
 
-    public HashMap<Integer, Object> responses = new HashMap<>();
+    private HashMap<Integer, Object> responses = new HashMap<>();
     private HashMap<Integer, FormResponseData> dropdownResponses = new HashMap<>();
     private HashMap<Integer, String> inputResponses = new HashMap<>();
     private HashMap<Integer, Float> sliderResponses = new HashMap<>();
@@ -21,6 +21,10 @@ public class FormResponseCustom extends FormResponse {
         this.sliderResponses = sliderResponses;
         this.stepSliderResponses = stepSliderResponses;
         this.toggleResponses = toggleResponses;
+    }
+
+    public HashMap<Integer, Object> getResponses() {
+        return responses;
     }
 
     public Object getResponse(int id) {

@@ -2,9 +2,9 @@ package cn.nukkit.form.element;
 
 public class ElementToggle extends Element {
 
-    public String type = "toggle";
-    public String text = "";
-    public boolean defaultValue = false;
+    private final String type = "toggle";
+    private String text = "";
+    private boolean defaultValue = false;
 
     public ElementToggle(String text) {
         this(text, false);
@@ -15,4 +15,19 @@ public class ElementToggle extends Element {
         this.defaultValue = defaultValue;
     }
 
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public boolean isDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(boolean defaultValue) {
+        this.defaultValue = defaultValue;
+    }
 }

@@ -5,10 +5,10 @@ import java.util.List;
 
 public class ElementDropdown extends Element {
 
-    public String type = "dropdown";
-    public String text = "";
-    public List<String> options;
-    public int defaultOptionIndex = 0;
+    private final String type = "dropdown";
+    private String text = "";
+    private List<String> options;
+    private int defaultOptionIndex = 0;
 
     public ElementDropdown(String text) {
         this(text, new ArrayList<>());
@@ -24,9 +24,25 @@ public class ElementDropdown extends Element {
         this.defaultOptionIndex = defaultOption;
     }
 
+    public int getDefaultOptionIndex() {
+        return defaultOptionIndex;
+    }
+
     public void setDefaultOptionIndex(int index) {
         if (index >= options.size()) return;
         this.defaultOptionIndex = index;
+    }
+
+    public List<String> getOptions() {
+        return options;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public void addOption(String option) {

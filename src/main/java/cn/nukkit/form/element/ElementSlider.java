@@ -2,12 +2,12 @@ package cn.nukkit.form.element;
 
 public class ElementSlider extends Element {
 
-    public String type = "slider";
-    public String text = "";
-    public float min = 0f;
-    public float max = 100f;
-    public int step;
-    public float defaultValue;
+    private final String type = "slider";
+    private String text = "";
+    private float min = 0f;
+    private float max = 100f;
+    private int step;
+    private float defaultValue;
 
     public ElementSlider(String text, float min, float max) {
         this(text, min, max, -1);
@@ -25,4 +25,43 @@ public class ElementSlider extends Element {
         if (defaultValue != -1f) this.defaultValue = defaultValue;
     }
 
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public float getMin() {
+        return min;
+    }
+
+    public void setMin(float min) {
+        this.min = min;
+    }
+
+    public float getMax() {
+        return max;
+    }
+
+    public void setMax(float max) {
+        this.max = max;
+    }
+
+    public int getStep() {
+        return step;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
+    }
+
+    public float getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(float defaultValue) {
+        this.defaultValue = defaultValue;
+    }
 }

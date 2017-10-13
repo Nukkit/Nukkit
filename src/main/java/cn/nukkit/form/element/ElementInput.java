@@ -2,10 +2,10 @@ package cn.nukkit.form.element;
 
 public class ElementInput extends Element {
 
-    public String type = "input";
-    public String text = "";
-    public String placeholder = "";
-    public String defaultText = "";
+    private final String type = "input";
+    private String text = "";
+    private String placeholder = "";
+    private String defaultText = "";
 
     public ElementInput(String text) {
         this(text, "");
@@ -21,4 +21,27 @@ public class ElementInput extends Element {
         this.defaultText = defaultText;
     }
 
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getPlaceHolder() {
+        return placeholder;
+    }
+
+    public void setPlaceHolder(String placeholder) {
+        this.placeholder = placeholder;
+    }
+
+    public String getDefaultText() {
+        return defaultText;
+    }
+
+    public void setDefaultText(String defaultText) {
+        this.defaultText = defaultText;
+    }
 }

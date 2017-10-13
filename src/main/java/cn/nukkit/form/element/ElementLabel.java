@@ -2,11 +2,18 @@ package cn.nukkit.form.element;
 
 public class ElementLabel extends Element {
 
-    public String type = "label";
-    public String text = "";
+    private final String type = "label";
+    private String text = "";
 
     public ElementLabel(String text) {
         this.text = text;
     }
 
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 }
