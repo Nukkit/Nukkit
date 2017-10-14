@@ -18,7 +18,7 @@ import java.util.Objects;
  * author: MagicDroidX
  * Nukkit Project
  */
-public abstract class EntityVehicle extends EntityInteractable implements EntityRideable {
+public abstract class EntityVehicle extends Entity implements EntityRideable, EntityInteractable {
 
     public EntityVehicle(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
