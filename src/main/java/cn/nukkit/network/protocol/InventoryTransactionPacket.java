@@ -42,6 +42,7 @@ public class InventoryTransactionPacket extends DataPacket {
 
     @Override
     public void encode() {
+        this.reset();
         this.putUnsignedVarInt(this.transactionType);
 
         this.putUnsignedVarInt(this.actions.length);

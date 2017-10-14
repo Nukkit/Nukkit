@@ -26,6 +26,7 @@ public class UpdateTradePacket extends DataPacket {
 
     @Override
     public void encode() {
+        this.reset();
         this.putByte(windowId);
         this.putByte(windowType);
         this.putVarInt(unknownVarInt1);

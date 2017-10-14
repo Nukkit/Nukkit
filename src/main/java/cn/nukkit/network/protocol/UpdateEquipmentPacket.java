@@ -21,6 +21,7 @@ public class UpdateEquipmentPacket extends DataPacket {
 
     @Override
     public void encode() {
+        this.reset();
         this.putByte((byte) this.windowId);
         this.putByte((byte) this.windowType);
         this.putEntityUniqueId(this.eid);

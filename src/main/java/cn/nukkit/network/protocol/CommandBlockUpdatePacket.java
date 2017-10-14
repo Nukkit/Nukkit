@@ -44,6 +44,7 @@ public class CommandBlockUpdatePacket extends DataPacket {
 
     @Override
     public void encode() {
+        this.reset();
         this.putBoolean(this.isBlock);
         if (this.isBlock) {
             this.putBlockVector3(this.x, this.y, this.z);

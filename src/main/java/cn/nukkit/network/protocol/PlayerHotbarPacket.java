@@ -32,6 +32,7 @@ public class PlayerHotbarPacket extends DataPacket {
 
     @Override
     public void encode() {
+        this.reset();
         this.putUnsignedVarInt(this.selectedHotbarSlot);
         this.putByte((byte) this.windowId);
         this.putUnsignedVarInt(this.slots.length);
