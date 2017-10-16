@@ -64,6 +64,7 @@ public abstract class EntityVehicle extends Entity implements EntityRideable, En
      * @param entity The target Entity
      * @return {@code true} if the mounting successful
      */
+    @Override
     public boolean mountEntity(Entity entity) {
         Objects.requireNonNull(entity, "The target of the mounting entity can't be null");
         this.PitchDelta = 0.0D;

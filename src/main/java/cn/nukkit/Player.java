@@ -2449,11 +2449,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.getServer().getPluginManager().callEvent(new PlayerMouseOverEntityEvent(this, targetEntity));
                             break;
                         case InteractPacket.ACTION_VEHICLE_EXIT:
-                            if (!(targetEntity instanceof EntityVehicle) || this.riding == null) {
+                            if (!(targetEntity instanceof EntityRideable) || this.riding == null) {
                                 break;
                             }
 
-                            ((EntityVehicle) riding).mountEntity(this);
+                            ((EntityRideable) riding).mountEntity(this);
                             break;
                     }
                     break;
@@ -3544,8 +3544,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.hasSpawned = new HashMap<>();
             this.spawnPosition = null;
 
-            if (this.riding instanceof EntityVehicle) {
-                ((EntityVehicle) this.riding).linkedEntity = null;
+            if (this.riding instanceof EntityRideable) {
+                this.riding.linkedEntity = null;
             }
 
             this.riding = null;

@@ -1048,8 +1048,8 @@ public abstract class Entity extends Location implements Metadatable {
             Timings.entityBaseTickTimer.stopTiming();
             return false;
         }
-        if (riding != null && !riding.isAlive()) {
-            ((EntityVehicle) riding).mountEntity(this);
+        if (riding != null && !riding.isAlive() && riding instanceof EntityRideable) {
+            ((EntityRideable) riding).mountEntity(this);
         }
 
         if (!this.effects.isEmpty()) {
