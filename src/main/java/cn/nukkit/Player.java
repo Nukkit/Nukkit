@@ -353,6 +353,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setAllowModifyWorld(boolean value) {
         this.getAdventureSettings().set(Type.WORLD_IMMUTABLE, !value);
         this.getAdventureSettings().set(Type.BUILD_AND_MINE, value);
+        this.getAdventureSettings().set(Type.WORLD_BUILDER, value);
         this.getAdventureSettings().update();
     }
 
@@ -1181,8 +1182,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (newSettings == null) {
             newSettings = this.getAdventureSettings().clone(this);
-            newSettings.set(Type.WORLD_IMMUTABLE, gamemode != 3);
-            newSettings.set(Type.BUILD_AND_MINE, gamemode != 3);
+            newSettings.set(Type.WORLD_IMMUTABLE, (gamemode & 0x02) > 0);
+            newSettings.set(Type.BUILD_AND_MINE, (gamemode & 0x02) <= 0);
+            newSettings.set(Type.WORLD_BUILDER, (gamemode & 0x02) <= 0);
             newSettings.set(Type.ALLOW_FLIGHT, (gamemode & 0x01) > 0);
             newSettings.set(Type.NO_CLIP, gamemode == 0x03);
             newSettings.set(Type.FLYING, gamemode == 0x03);
@@ -1832,7 +1834,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.adventureSettings = new AdventureSettings(this)
-                .set(Type.WORLD_IMMUTABLE, !isAdventure())
+                .set(Type.WORLD_IMMUTABLE, isAdventure())
+                .set(Type.WORLD_BUILDER, !isAdventure())
                 .set(Type.AUTO_JUMP, true)
                 .set(Type.ALLOW_FLIGHT, isCreative())
                 .set(Type.NO_CLIP, isSpectator());
