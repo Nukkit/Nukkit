@@ -87,6 +87,7 @@ public class DummyBossBar {
         if (!this.text.equals(text)) {
             this.text = text;
             this.updateBossEntityNameTag();
+            this.sendSetBossBarTitle();
         }
     }
 
@@ -179,6 +180,15 @@ public class DummyBossBar {
         pk.type = BossEventPacket.TYPE_TEXTURE;
         pk.color = this.getMixedColor();
         player.dataPacket(pk);
+    }
+
+    private void sendSetBossBarTitle() {
+        BossEventPacket pkBoss = new BossEventPacket();
+        pkBoss.bossEid = bossBarId;
+        pkBoss.type = BossEventPacket.TYPE_TITLE;
+        pkBoss.title = text;
+        pkBoss.healthPercent = this.length;
+        player.dataPacket(pkBoss);
     }
 
     /**
