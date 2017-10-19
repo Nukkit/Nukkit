@@ -143,7 +143,7 @@ public class DummyBossBar {
                 .putShort(Entity.DATA_MAX_AIR, 400)
                 .putLong(Entity.DATA_LEAD_HOLDER_EID, -1)
                 .putString(Entity.DATA_NAMETAG, text) // Set the entity name
-                .putInt(Entity.DATA_SCALE, 0); // And make it invisible
+                .putFloat(Entity.DATA_SCALE, 0); // And make it invisible
 
         player.dataPacket(pkAdd);
     }
