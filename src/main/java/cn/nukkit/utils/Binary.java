@@ -123,14 +123,12 @@ public class Binary {
                     break;
                 case Entity.DATA_TYPE_SLOT:
                     SlotEntityData slot = (SlotEntityData) d;
-                    stream.putLShort(slot.blockId);
-                    stream.putByte((byte) slot.meta);
-                    stream.putLShort(slot.count);
+                    stream.putSlot(slot.getData());
                     break;
                 case Entity.DATA_TYPE_POS:
                     IntPositionEntityData pos = (IntPositionEntityData) d;
                     stream.putVarInt(pos.x);
-                    stream.putByte((byte) pos.y);
+                    stream.putVarInt(pos.y);
                     stream.putVarInt(pos.z);
                     break;
                 case Entity.DATA_TYPE_LONG:
@@ -177,7 +175,7 @@ public class Binary {
                     value = new SlotEntityData(key, item.getId(), item.getDamage(), item.getCount());
                     break;
                 case Entity.DATA_TYPE_POS:
-                    BlockVector3 v3 = stream.getBlockVector3();
+                    BlockVector3 v3 = stream.getSignedBlockPosition();
                     value = new IntPositionEntityData(key, v3.x, v3.y, v3.z);
                     break;
                 case Entity.DATA_TYPE_LONG:
