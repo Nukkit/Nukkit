@@ -106,6 +106,8 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
     @Override
     public void onOpen(Player who) {
         super.onOpen(who);
+        this.left.viewers.add(who);
+        this.right.viewers.add(who);
 
         if (this.getViewers().size() == 1) {
             BlockEventPacket pk1 = new BlockEventPacket();
@@ -165,6 +167,8 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
             }
         }
 
+        this.left.viewers.remove(who);
+        this.right.viewers.remove(who);
         super.onClose(who);
     }
 
