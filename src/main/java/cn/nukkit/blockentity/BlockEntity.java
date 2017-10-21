@@ -38,6 +38,7 @@ public abstract class BlockEntity extends Position {
     public static final String COMPARATOR = "Comparator";
     public static final String HOPPER = "Hopper";
     public static final String BED = "Bed";
+    public static final String JUKEBOX = "Jukebox";
 
 
     public static long count = 1;

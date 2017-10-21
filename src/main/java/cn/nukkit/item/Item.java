@@ -815,6 +815,18 @@ public class Item implements Cloneable {
             list[COOKED_SALMON] = ItemSalmonCooked.class; //463
 
             list[GOLDEN_APPLE_ENCHANTED] = ItemAppleGoldEnchanted.class; //466
+            list[RECORD_11] = ItemRecord11.class;
+            list[RECORD_CAT] = ItemRecordCat.class;
+            list[RECORD_13] = ItemRecord13.class;
+            list[RECORD_BLOCKS] = ItemRecordBlocks.class;
+            list[RECORD_CHIRP] = ItemRecordChirp.class;
+            list[RECORD_FAR] = ItemRecordFar.class;
+            list[RECORD_WARD] = ItemRecordWard.class;
+            list[RECORD_MALL] = ItemRecordMall.class;
+            list[RECORD_MELLOHI] = ItemRecordMellohi.class;
+            list[RECORD_STAL] = ItemRecordStal.class;
+            list[RECORD_STRAD] = ItemRecordStrad.class;
+            list[RECORD_WAIT] = ItemRecordWait.class;
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {

@@ -1,9 +1,9 @@
 package cn.nukkit.item;
 
 /**
- * Created by CreeperFace on 7.8.2017.
+ * @author CreeperFace
  */
-public class ItemRecord extends Item {
+public abstract class ItemRecord extends Item {
 
     public ItemRecord() {
         this(0, 1);
@@ -14,11 +14,13 @@ public class ItemRecord extends Item {
     }
 
     public ItemRecord(Integer meta, int count) {
-        super(meta, count); //TODO: records
+        super(meta, count);
     }
 
     @Override
     public int getMaxStackSize() {
         return 1;
     }
+
+    public abstract int getSoundId();
 }
