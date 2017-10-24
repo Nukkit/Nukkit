@@ -11,6 +11,7 @@ import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.*;
 import cn.nukkit.entity.projectile.EntityArrow;
+import cn.nukkit.entity.projectile.EntityEgg;
 import cn.nukkit.entity.projectile.EntityEnderPearl;
 import cn.nukkit.entity.projectile.EntitySnowball;
 import cn.nukkit.event.HandlerList;
@@ -430,7 +431,7 @@ public class Server {
 
         if (this.getDefaultLevel() == null) {
             String defaultName = this.getPropertyString("level-name", "world");
-            if (defaultName == null || "".equals(defaultName.trim())) {
+            if (defaultName == null || defaultName.trim().isEmpty()) {
                 this.getLogger().warning("level-name cannot be null, using default");
                 defaultName = "world";
                 this.setPropertyString("level-name", defaultName);
@@ -814,6 +815,10 @@ public class Server {
         }
     }
 
+    public void onPlayerCompleteLoginSequence(Player player) {
+        this.sendFullPlayerListData(player);
+    }
+
     public void onPlayerLogin(Player player) {
         if (this.sendUsageTicker > 0) {
             this.uniquePlayers.add(player.getUniqueId());
@@ -1001,6 +1006,7 @@ public class Server {
 
         if ((this.tickCounter & 0b1111) == 0) {
             this.titleTick();
+            this.network.resetStatistics();
             this.maxTick = 20;
             this.maxUse = 0;
 
@@ -1069,7 +1075,7 @@ public class Server {
 
     // TODO: Fix title tick
     public void titleTick() {
-        if (true || !Nukkit.ANSI) {
+        if (!Nukkit.ANSI) {
             return;
         }
 
@@ -1089,8 +1095,6 @@ public class Server {
                 " | Load " + this.getTickUsage() + "%" + (char) 0x07;
 
         System.out.print(title);
-
-        this.network.resetStatistics();
     }
 
     public QueryRegenerateEvent getQueryInformation() {
@@ -1891,8 +1895,9 @@ public class Server {
 
     /**
      * Checks the current thread against the expected primary thread for the server.
-     *
+     * <p>
      * <b>Note:</b> this method should not be used to indicate the current synchronized state of the runtime. A current thread matching the main thread indicates that it is synchronized, but a mismatch does not preclude the same assumption.
+     *
      * @return true if the current thread matches the expected primary thread, false otherwise
      */
     public boolean isPrimaryThread() {
@@ -1949,6 +1954,7 @@ public class Server {
         Entity.registerEntity("ThrownExpBottle", EntityExpBottle.class);
         Entity.registerEntity("XpOrb", EntityXPOrb.class);
         Entity.registerEntity("ThrownPotion", EntityPotion.class);
+        Entity.registerEntity("Egg", EntityEgg.class);
 
         Entity.registerEntity("Human", EntityHuman.class, true);
 
@@ -1975,6 +1981,7 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.COMPARATOR, BlockEntityComparator.class);
         BlockEntity.registerBlockEntity(BlockEntity.HOPPER, BlockEntityHopper.class);
         BlockEntity.registerBlockEntity(BlockEntity.BED, BlockEntityBed.class);
+        BlockEntity.registerBlockEntity(BlockEntity.JUKEBOX, BlockEntityJukebox.class);
     }
 
     public static Server getInstance() {
