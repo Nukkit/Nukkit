@@ -21,7 +21,7 @@ import java.util.*;
  * Nukkit Project
  * ===============
  */
-public class ClientChainData {
+public final class ClientChainData {
 
     public static ClientChainData of(byte[] buffer) {
         return new ClientChainData(buffer);
