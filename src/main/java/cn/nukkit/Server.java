@@ -264,6 +264,7 @@ public class Server {
         this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ConfigSection() {
             {
                 put("motd", "Nukkit Server For Minecraft: PE");
+                put("sub-motd", "Powered by Nukkit");
                 put("server-port", 19132);
                 put("server-ip", "0.0.0.0");
                 put("view-distance", 10);
@@ -1185,15 +1186,19 @@ public class Server {
     }
 
     public static String getGamemodeString(int mode) {
+        return getGamemodeString(mode, false);
+    }
+
+    public static String getGamemodeString(int mode, boolean direct) {
         switch (mode) {
             case Player.SURVIVAL:
-                return "%gameMode.survival";
+                return direct ? "Survival" : "%gameMode.survival";
             case Player.CREATIVE:
-                return "%gameMode.creative";
+                return direct ? "Creative" : "%gameMode.creative";
             case Player.ADVENTURE:
-                return "%gameMode.adventure";
+                return direct ? "Adventure" : "%gameMode.adventure";
             case Player.SPECTATOR:
-                return "%gameMode.spectator";
+                return direct ? "Spectator" : "%gameMode.spectator";
         }
         return "UNKNOWN";
     }
@@ -1279,6 +1284,10 @@ public class Server {
 
     public String getMotd() {
         return this.getPropertyString("motd", "Nukkit Server For Minecraft: PE");
+    }
+
+    public String getSubMotd() {
+        return this.getPropertyString("sub-motd", "Powered by Nukkit");
     }
 
     public boolean getForceResources() {
