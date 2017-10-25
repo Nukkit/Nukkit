@@ -41,6 +41,7 @@ public class Network {
     private double download = 0;
 
     private String name;
+    private String subName;
 
     public Network(Server server) {
         this.registerPackets();
@@ -91,7 +92,7 @@ public class Network {
             this.advancedInterfaces.add((AdvancedSourceInterface) interfaz);
             ((AdvancedSourceInterface) interfaz).setNetwork(this);
         }
-        interfaz.setName(this.name);
+        interfaz.setName(this.name + "!@#" + this.subName);
     }
 
     public void unregisterInterface(SourceInterface interfaz) {
@@ -108,9 +109,17 @@ public class Network {
         return name;
     }
 
+    public String getSubName() {
+        return subName;
+    }
+
+    public void setSubName(String subName) {
+        this.subName = subName;
+    }
+
     public void updateName() {
         for (SourceInterface interfaz : this.interfaces) {
-            interfaz.setName(this.name);
+            interfaz.setName(this.name + "!@#" + this.subName);
         }
     }
 
