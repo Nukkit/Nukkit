@@ -133,7 +133,7 @@ public class ClientChainData {
 
     private BinaryStream bs = new BinaryStream();
 
-    private ClientChainData(byte[] buffer) {
+    public ClientChainData(byte[] buffer) {
         bs.setBuffer(buffer, 0);
         decodeChainData();
         decodeSkinData();
