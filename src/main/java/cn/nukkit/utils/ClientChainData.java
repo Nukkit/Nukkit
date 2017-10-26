@@ -21,7 +21,7 @@ import java.util.*;
  * Nukkit Project
  * ===============
  */
-public class ClientChainData {
+public final class ClientChainData implements LoginChainData {
 
     public static ClientChainData of(byte[] buffer) {
         return new ClientChainData(buffer);
@@ -31,58 +31,72 @@ public class ClientChainData {
         return of(pk.getBuffer());
     }
 
+    @Override
     public String getUsername() {
         return username;
     }
 
+    @Override
     public UUID getClientUUID() {
         return clientUUID;
     }
 
+    @Override
     public String getIdentityPublicKey() {
         return identityPublicKey;
     }
 
+    @Override
     public long getClientId() {
         return clientId;
     }
 
+    @Override
     public String getServerAddress() {
         return serverAddress;
     }
 
+    @Override
     public String getDeviceModel() {
         return deviceModel;
     }
 
+    @Override
     public int getDeviceOS() {
         return deviceOS;
     }
 
+    @Override
     public String getGameVersion() {
         return gameVersion;
     }
 
+    @Override
     public int getGuiScale() {
         return guiScale;
     }
 
+    @Override
     public String getLanguageCode() {
         return languageCode;
     }
 
+    @Override
     public String getXUID() {
         return xuid;
     }
 
+    @Override
     public int getCurrentInputMode() {
         return currentInputMode;
     }
 
+    @Override
     public int getDefaultInputMode() {
         return defaultInputMode;
     }
 
+    @Override
     public String getCapeData() {
         return capeData;
     }
@@ -90,6 +104,7 @@ public class ClientChainData {
     public final static int UI_PROFILE_CLASSIC = 0;
     public final static int UI_PROFILE_POCKET = 1;
 
+    @Override
     public int getUIProfile() {
         return UIProfile;
     }
@@ -133,7 +148,7 @@ public class ClientChainData {
 
     private BinaryStream bs = new BinaryStream();
 
-    public ClientChainData(byte[] buffer) {
+    private ClientChainData(byte[] buffer) {
         bs.setBuffer(buffer, 0);
         decodeChainData();
         decodeSkinData();
