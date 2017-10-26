@@ -1,5 +1,8 @@
 package cn.nukkit.item;
 
+import cn.nukkit.Player;
+import cn.nukkit.math.Vector3;
+
 /**
  * author: MagicDroidX
  * Nukkit Project
@@ -36,6 +39,20 @@ abstract public class ItemArmor extends Item {
     @Override
     public boolean isArmor() {
         return true;
+    }
+
+    @Override
+    public boolean onClickAir(Player player, Vector3 directionVector) {
+        if (this.isHelmet() && player.getInventory().getHelmet().isNull()) {
+            if (player.getInventory().setHelmet(this)) this.setCount(0);
+        } else if (this.isChestplate() && player.getInventory().getChestplate().isNull()) {
+            if (player.getInventory().setChestplate(this)) this.setCount(0);
+        } else if (this.isLeggings() && player.getInventory().getLeggings().isNull()) {
+            if (player.getInventory().setHelmet(this)) this.setCount(0);
+        } else if (this.isBoots() && player.getInventory().getBoots().isNull()) {
+            if (player.getInventory().setBoots(this)) this.setCount(0);
+        }
+        return this.getCount() == 0;
     }
 
     @Override
