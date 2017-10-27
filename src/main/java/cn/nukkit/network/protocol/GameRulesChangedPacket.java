@@ -23,7 +23,7 @@ public class GameRulesChangedPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putInt(this.ruleDatas.length);
+        this.putUnsignedVarInt(this.ruleDatas.length);
         for (RuleData rule : this.ruleDatas) {
             this.putRuleData(rule);
         }

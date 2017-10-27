@@ -1834,11 +1834,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.spawnY = (int) spawnPosition.y;
         startGamePacket.spawnZ = (int) spawnPosition.z;
         startGamePacket.hasAchievementsDisabled = true;
-        startGamePacket.dayCycleStopTime = -1;
+        startGamePacket.dayCycleStopTime = this.level.getTime();
         startGamePacket.eduMode = false;
         startGamePacket.rainLevel = 0;
         startGamePacket.lightningLevel = 0;
         startGamePacket.commandsEnabled = this.isEnableClientCommand();
+        startGamePacket.ruleDatas = this.getGameRules();
         startGamePacket.levelId = "";
         startGamePacket.worldName = this.getServer().getNetwork().getName();
         startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat
@@ -1888,6 +1889,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.forceMovement = this.teleportPosition = this.getPosition();
 
         this.server.onPlayerLogin(this);
+    }
+
+    public RuleData[] getGameRules() {
+        List<RuleData> rules = new ArrayList<>();
+
+        // todo: more game rules
+
+        rules.add(new RuleData<>("dodaylightcycle", !this.level.stopTime, RuleData.BOOLEAN_TYPE));
+
+        return rules.toArray(new RuleData[rules.size()]);
+    }
+
+    public void sendGameRules() {
+
+        GameRulesChangedPacket pk = new GameRulesChangedPacket();
+        pk.ruleDatas = this.getGameRules();
+        this.dataPacket(pk);
     }
 
     public void handleDataPacket(DataPacket packet) {
