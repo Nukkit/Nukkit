@@ -215,7 +215,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected int lastEnderPearl = -1;
 
-    private ClientChainData loginChainData;
+    private LoginChainData loginChainData;
 
     public Block breakingBlock = null;
 
@@ -4537,7 +4537,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.close(message, message, false);
     }
 
-    public ClientChainData getLoginChainData() {
+    public LoginChainData getLoginChainData() {
         return this.loginChainData;
     }
 

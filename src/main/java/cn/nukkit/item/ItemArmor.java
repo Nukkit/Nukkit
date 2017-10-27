@@ -44,14 +44,19 @@ abstract public class ItemArmor extends Item {
     @Override
     public boolean onClickAir(Player player, Vector3 directionVector) {
         if (this.isHelmet() && player.getInventory().getHelmet().isNull()) {
-            if (player.getInventory().setHelmet(this)) this.setCount(0);
+            if (player.getInventory().setHelmet(this))
+                player.getInventory().clear(player.getInventory().getHeldItemIndex());
         } else if (this.isChestplate() && player.getInventory().getChestplate().isNull()) {
-            if (player.getInventory().setChestplate(this)) this.setCount(0);
+            if (player.getInventory().setChestplate(this))
+                player.getInventory().clear(player.getInventory().getHeldItemIndex());
         } else if (this.isLeggings() && player.getInventory().getLeggings().isNull()) {
-            if (player.getInventory().setHelmet(this)) this.setCount(0);
+            if (player.getInventory().setHelmet(this))
+                player.getInventory().clear(player.getInventory().getHeldItemIndex());
         } else if (this.isBoots() && player.getInventory().getBoots().isNull()) {
-            if (player.getInventory().setBoots(this)) this.setCount(0);
+            if (player.getInventory().setBoots(this))
+                player.getInventory().clear(player.getInventory().getHeldItemIndex());
         }
+
         return this.getCount() == 0;
     }
 
