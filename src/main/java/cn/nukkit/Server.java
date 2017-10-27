@@ -833,7 +833,7 @@ public class Server {
 
     public void addOnlinePlayer(Player player) {
         this.playerList.put(player.getUniqueId(), player);
-        this.updatePlayerListData(player.getUniqueId(), player.getId(), player.getDisplayName(), player.getSkin());
+        this.updatePlayerListData(player.getUniqueId(), player.getId(), player.getDisplayName(), player.getSkin(), player.getLoginChainData().getXUID());
     }
 
     public void removeOnlinePlayer(Player player) {
@@ -849,18 +849,26 @@ public class Server {
     }
 
     public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin) {
-        this.updatePlayerListData(uuid, entityId, name, skin, this.playerList.values());
+        this.updatePlayerListData(uuid, entityId, name, skin, "", this.playerList.values());
+    }
+
+    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId) {
+        this.updatePlayerListData(uuid, entityId, name, skin, xboxUserId, this.playerList.values());
     }
 
     public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, Player[] players) {
+        this.updatePlayerListData(uuid, entityId, name, skin, "", players);
+    }
+
+    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, Player[] players) {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
-        pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(uuid, entityId, name, skin)};
+        pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(uuid, entityId, name, skin, xboxUserId)};
         Server.broadcastPacket(players, pk);
     }
 
-    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, Collection<Player> players) {
-        this.updatePlayerListData(uuid, entityId, name, skin,
+    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, Collection<Player> players) {
+        this.updatePlayerListData(uuid, entityId, name, skin, xboxUserId,
                 players.stream()
                         .filter(p -> !p.getUniqueId().equals(uuid))
                         .toArray(Player[]::new));
@@ -882,17 +890,15 @@ public class Server {
     }
 
     public void sendFullPlayerListData(Player player) {
-        final UUID uuid = player.getUniqueId();
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
-        pk.entries = this.playerList.values()
-                .stream()
-                .filter(p -> !p.getUniqueId().equals(uuid))
+        pk.entries = this.playerList.values().stream()
                 .map(p -> new PlayerListPacket.Entry(
                         p.getUniqueId(),
                         p.getId(),
                         p.getDisplayName(),
-                        p.getSkin()))
+                        p.getSkin(),
+                        p.getLoginChainData().getXUID()))
                 .toArray(PlayerListPacket.Entry[]::new);
 
         player.dataPacket(pk);

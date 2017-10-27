@@ -65,10 +65,16 @@ public class PlayerListPacket extends DataPacket {
         }
 
         public Entry(UUID uuid, long entityId, String name, Skin skin) {
+            this(uuid, entityId, name, skin, "");
+        }
+
+        public Entry(UUID uuid, long entityId, String name, Skin skin, String xboxUserId) {
             this.uuid = uuid;
             this.entityId = entityId;
             this.name = name;
             this.skin = skin;
+            this.capeData = skin.getCape().getData();
+            this.xboxUserId = xboxUserId == null ? "" : xboxUserId;
         }
     }
 
