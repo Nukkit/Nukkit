@@ -4107,7 +4107,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        if (super.teleport(to, null)) { // null to prevent fire of duplicate EntityTeleportEvent
+        //TODO Remove it! A hack to solve the client-side teleporting bug! (inside into the block)
+        if (super.teleport(to.getY() == to.getFloorY() ? to.add(0, 0.00001, 0) : to, null)) { // null to prevent fire of duplicate EntityTeleportEvent
             this.removeAllWindows();
 
             this.teleportPosition = new Vector3(this.x, this.y, this.z);
