@@ -359,6 +359,7 @@ public class Server {
 
         this.network = new Network(this);
         this.network.setName(this.getMotd());
+        this.network.setSubName(this.getSubMotd());
 
         this.logger.info(this.getLanguage().translateString("nukkit.server.info", this.getName(), TextFormat.YELLOW + this.getNukkitVersion() + TextFormat.WHITE, TextFormat.AQUA + this.getCodename() + TextFormat.WHITE, this.getApiVersion()));
         this.logger.info(this.getLanguage().translateString("nukkit.server.license", this.getName()));
