@@ -2846,11 +2846,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, packet);
                     break;
                 case ProtocolInfo.INVENTORY_TRANSACTION_PACKET:
-                    if (this.isSpectator()) {
-                        this.sendAllInventories();
-                        break;
-                    }
-
                     InventoryTransactionPacket transactionPacket = (InventoryTransactionPacket) packet;
 
                     boolean isCrafting = false;
@@ -2874,6 +2869,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     switch (transactionPacket.transactionType) {
                         case InventoryTransactionPacket.TYPE_NORMAL:
+                            if (this.isSpectator()) {
+                                this.sendAllInventories();
+                                break;
+                            }
                             InventoryTransaction transaction = new SimpleInventoryTransaction(this, actions);
 
                             if (!transaction.execute() && !isCrafting) {
@@ -3046,6 +3045,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             switch (type) {
                                 case InventoryTransactionPacket.USE_ITEM_ON_ENTITY_ACTION_INTERACT:
                                     PlayerInteractEntityEvent playerInteractEntityEvent = new PlayerInteractEntityEvent(this, target, item);
+                                    if (this.isSpectator()) playerInteractEntityEvent.setCancelled();
                                     getServer().getPluginManager().callEvent(playerInteractEntityEvent);
 
                                     if (playerInteractEntityEvent.isCancelled()) {
@@ -3069,10 +3069,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     }
                                     break;
                                 case InventoryTransactionPacket.USE_ITEM_ON_ENTITY_ACTION_ATTACK:
-                                    if (this.getGamemode() == Player.VIEW) {
-                                        break;
-                                    }
-
                                     float itemDamage = item.getAttackDamage();
 
                                     for (Enchantment enchantment : item.getEnchantments()) {
@@ -3092,7 +3088,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         }
                                     }
 
-                                    if (!target.attack(new EntityDamageByEntityEvent(this, target, DamageCause.ENTITY_ATTACK, damage))) {
+                                    EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(this, target, DamageCause.ENTITY_ATTACK, damage);
+                                    if (this.isSpectator()) entityDamageByEntityEvent.setCancelled();
+                                    if (!target.attack(entityDamageByEntityEvent)) {
                                         if (item.isTool() && this.isSurvival()) {
                                             this.inventory.sendContents(this);
                                         }
@@ -3117,6 +3115,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             break;
                         case InventoryTransactionPacket.TYPE_RELEASE_ITEM:
+                            if (this.isSpectator()) {
+                                this.sendAllInventories();
+                                break packetswitch;
+                            }
                             ReleaseItemData releaseItemData = (ReleaseItemData) transactionPacket.transactionData;
 
                             try {
