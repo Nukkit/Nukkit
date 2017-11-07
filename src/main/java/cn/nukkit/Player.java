@@ -221,6 +221,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public int pickedXPOrb = 0;
 
+    protected int protocol;
+
     protected int formWindowCount = 0;
     protected Map<Integer, FormWindow> formWindows = new HashMap<>();
     protected Map<Integer, FormWindow> serverSettings = new HashMap<>();
@@ -2010,6 +2012,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
+                    this.protocol = loginPacket.protocol;
                     this.username = TextFormat.clean(loginPacket.username);
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();
@@ -3618,6 +3621,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.username;
     }
 
+    public int getProtocol() {
+        return this.protocol;
+    }
+
     @Override
     public void kill() {
         if (!this.spawned) {
@@ -4461,13 +4468,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.isConnected();
     }
 
-
     public static BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, byte[] payload) {
         FullChunkDataPacket pk = new FullChunkDataPacket();
         pk.chunkX = chunkX;
         pk.chunkZ = chunkZ;
         pk.data = payload;
         pk.encode();
+        pk.isEncoded = true;
 
         BatchPacket batch = new BatchPacket();
         byte[][] batchPayload = new byte[2][];

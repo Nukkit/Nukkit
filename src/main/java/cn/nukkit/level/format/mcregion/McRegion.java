@@ -156,7 +156,8 @@ public class McRegion extends BaseLevelProvider {
         }
         stream.put(tiles);
 
-        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer());
+        byte[] buffer = stream.getBuffer();
+        //this.getLevel().chunkRequestCallback(x, z, buffer, buffer);
 
         return null;
     }

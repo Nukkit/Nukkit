@@ -16,10 +16,11 @@ import cn.nukkit.utils.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.*;
 
 /**
@@ -201,6 +202,13 @@ public class Chunk extends BaseChunk {
         this.nbt.remove("ExtraData");
     }
 
+    /*public Chunk(int chunkX, int chunkZ, ChunkSection[] subChunks, Entity[] entities, BlockEntity[] blockEntities, byte[] biomeIds, int[] heightMap) {
+        this.x = chunkX;
+        this.z = chunkZ;
+        this.sections = subChunks;
+        this.setBiom
+    }*/
+
     @Override
     public boolean isPopulated() {
         return this.nbt.contains("TerrainPopulated") && this.nbt.getBoolean("TerrainPopulated");
@@ -267,100 +275,65 @@ public class Chunk extends BaseChunk {
     }
 
     public static Chunk fromFastBinary(byte[] data, LevelProvider provider) {
-        try {
-            CompoundTag chunk = NBTIO.read(new DataInputStream(new ByteArrayInputStream(data)), ByteOrder.BIG_ENDIAN);
-            if (!chunk.contains("Level") || !(chunk.get("Level") instanceof CompoundTag)) {
-                return null;
-            }
+        /*BinaryStream stream = new BinaryStream(data);
 
-            return new Chunk(provider, chunk.getCompound("Level"));
-        } catch (Exception e) {
-            return null;
+        int x = stream.getInt();
+        int z = stream.getInt();
+
+        int sectionCount = stream.getByte();
+        cn.nukkit.level.format.ChunkSection[] sections = new cn.nukkit.level.format.ChunkSection[sectionCount];
+        for(int i = 0; i < sectionCount; i++) {
+            int y = stream.getByte();
+
+            sections[i] = ChunkSection.fromFastBinary(y, stream.get(10240));
         }
+
+        byte[] hight = stream.getByteArray();
+
+
+        int[] heightMap;
+        ByteBuffer byteBuffer = ByteBuffer.allocate(hight.length);
+        byteBuffer.put(hight);
+        IntBuffer intBuffer = byteBuffer.asIntBuffer();
+        heightMap = intBuffer.array();
+
+        byte[] biomeIds = stream.get(256);
+
+        Chunk chunk = new Chunk(x, z, sections, new Entity[0], new BlockEntity[0], biomeIds, heightMap;*/
+
+        return null;
     }
 
 
     @Override
     public byte[] toFastBinary() {
-        CompoundTag nbt = this.getNBT().copy();
-        nbt.putInt("xPos", this.x);
-        nbt.putInt("zPos", this.z);
-
-        nbt.putIntArray("BiomeColors", this.getBiomeColorArray());
-        nbt.putIntArray("HeightMap", this.getHeightMapArray());
-
+        BinaryStream stream = new BinaryStream();
+        stream.putInt(this.x);
+        stream.putInt(this.z);
+        byte count = 0;
+        byte[] sectionsData = new byte[0];
         for (cn.nukkit.level.format.ChunkSection section : this.getSections()) {
             if (section instanceof EmptyChunkSection) {
                 continue;
             }
-            CompoundTag s = new CompoundTag(null);
-            s.putByte("Y", section.getY());
-            s.putByteArray("Blocks", section.getIdArray());
-            s.putByteArray("Data", section.getDataArray());
-            s.putByteArray("BlockLight", section.getLightArray());
-            s.putByteArray("SkyLight", section.getSkyLightArray());
-            nbt.getList("Sections", CompoundTag.class).add(s);
+
+            count++;
+            sectionsData = Binary.appendBytes(sectionsData, new byte[]{(byte) section.getY()}, section.toFastBinary());
         }
 
-        ArrayList<CompoundTag> entities = new ArrayList<>();
-        for (Entity entity : this.getEntities().values()) {
-            if (!(entity instanceof Player) && !entity.closed) {
-                entity.saveNBT();
-                entities.add(entity.namedTag);
-            }
-        }
-        ListTag<CompoundTag> entityListTag = new ListTag<>("Entities");
-        entityListTag.setAll(entities);
-        nbt.putList(entityListTag);
+        stream.putByte(count);
+        stream.put(sectionsData);
 
-        ArrayList<CompoundTag> tiles = new ArrayList<>();
-        for (BlockEntity blockEntity : this.getBlockEntities().values()) {
-            blockEntity.saveNBT();
-            tiles.add(blockEntity.namedTag);
-        }
-        ListTag<CompoundTag> tileListTag = new ListTag<>("TileEntities");
-        tileListTag.setAll(tiles);
-        nbt.putList(tileListTag);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(data.length * 4);
+        IntBuffer intBuffer = byteBuffer.asIntBuffer();
+        intBuffer.put(this.heightMap);
 
-        List<BlockUpdateEntry> entries = this.provider.getLevel().getPendingBlockUpdates(this);
+        byte[] heightMap = byteBuffer.array();
+        stream.putByteArray(heightMap);
 
-        if (entries != null) {
-            ListTag<CompoundTag> tileTickTag = new ListTag<>("TileTicks");
-            long totalTime = this.provider.getLevel().getCurrentTick();
+        stream.put(Binary.appendBytes(this.getBiomeIdArray(), new byte[]{(byte) ((isLightPopulated() ? 4 : 0) | (isPopulated() ? 2 : 0) | (isGenerated() ? 1 : 0))}));
 
-            for (BlockUpdateEntry entry : entries) {
-                CompoundTag entryNBT = new CompoundTag()
-                        .putString("i", entry.block.getClass().getSimpleName())
-                        .putInt("x", entry.pos.getFloorX())
-                        .putInt("y", entry.pos.getFloorY())
-                        .putInt("z", entry.pos.getFloorZ())
-                        .putInt("t", (int) (entry.delay - totalTime))
-                        .putInt("p", entry.priority);
-                tileTickTag.add(entryNBT);
-            }
-
-            nbt.putList(tileTickTag);
-        }
-
-        BinaryStream extraData = new BinaryStream();
-        Map<Integer, Integer> extraDataArray = this.getBlockExtraDataArray();
-        extraData.putInt(extraDataArray.size());
-        for (Integer key : extraDataArray.keySet()) {
-            extraData.putInt(key);
-            extraData.putShort(extraDataArray.get(key));
-        }
-
-        nbt.putByteArray("ExtraData", extraData.getBuffer());
-
-        CompoundTag chunk = new CompoundTag("");
-        chunk.putCompound("Level", nbt);
-
-        try {
-            return NBTIO.write(chunk, ByteOrder.BIG_ENDIAN);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        return stream.getBuffer();
     }
 
     @Override

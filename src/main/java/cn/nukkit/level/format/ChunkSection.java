@@ -51,5 +51,9 @@ public interface ChunkSection extends Cloneable {
 
     byte[] getBytes();
 
+    byte[] getBytes11();
+
     ChunkSection clone();
+
+    byte[] toFastBinary();
 }

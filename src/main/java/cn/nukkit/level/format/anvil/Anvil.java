@@ -1,22 +1,23 @@
 package cn.nukkit.level.format.anvil;
 
-import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.format.ChunkRequestTask;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.scheduler.AsyncTask;
-import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteOrder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -101,7 +102,7 @@ public class Anvil extends BaseLevelProvider {
             throw new ChunkException("Invalid Chunk Set");
         }
 
-        byte[] blockEntities = new byte[0];
+        /*byte[] blockEntities = new byte[0];
 
         if (!chunk.getBlockEntities().isEmpty()) {
             List<CompoundTag> tagList = new ArrayList<>();
@@ -159,9 +160,9 @@ public class Anvil extends BaseLevelProvider {
         }
         stream.put(blockEntities);
 
-        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer());
+        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer());*/
 
-        return null;
+        return new ChunkRequestTask(this.level, chunk);
     }
 
     @Override

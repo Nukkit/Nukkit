@@ -210,7 +210,7 @@ public class LevelDB implements LevelProvider {
         }
         stream.put(tiles);
 
-        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer());
+        //this.getLevel().chunkRequestCallback(x, z, stream.getBuffer(), stream.getBuffer());
 
         return null;
     }

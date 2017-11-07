@@ -17,6 +17,7 @@ import cn.nukkit.entity.projectile.EntitySnowball;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.level.LevelInitEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
+import cn.nukkit.event.server.BatchPacketsEvent;
 import cn.nukkit.event.server.QueryRegenerateEvent;
 import cn.nukkit.inventory.CraftingManager;
 import cn.nukkit.inventory.Recipe;
@@ -565,8 +566,15 @@ public class Server {
         if (players == null || packets == null || players.length == 0 || packets.length == 0) {
             return;
         }
-
         Timings.playerNetworkSendTimer.startTiming();
+
+        BatchPacketsEvent ev = new BatchPacketsEvent(players, packets, forceSync);
+        getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) {
+            Timings.playerNetworkSendTimer.stopTiming();
+            return;
+        }
+
         byte[][] payload = new byte[packets.length * 2][];
         for (int i = 0; i < packets.length; i++) {
             DataPacket p = packets[i];

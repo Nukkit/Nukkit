@@ -3,6 +3,7 @@ package cn.nukkit.level.format.generic;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.utils.ChunkException;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -131,6 +132,22 @@ public class EmptyChunkSection implements ChunkSection {
     @Override
     public byte[] getBytes() {
         return new byte[6144];
+    }
+
+    @Override
+    public byte[] getBytes11() {
+        ByteBuffer buffer = ByteBuffer.allocate(10240);
+        byte[] skyLight = new byte[2048];
+        Arrays.fill(skyLight, (byte) 0xff);
+        buffer.position(6144);
+        return buffer
+                .put(skyLight)
+                .array();
+    }
+
+    @Override
+    public byte[] toFastBinary() {
+        return new byte[0];
     }
 
     @Override
