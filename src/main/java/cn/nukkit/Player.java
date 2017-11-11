@@ -1,16 +1,54 @@
 package cn.nukkit;
 
+import java.awt.Color;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+
 import cn.nukkit.AdventureSettings.Type;
-import cn.nukkit.block.*;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockAir;
+import cn.nukkit.block.BlockDoor;
+import cn.nukkit.block.BlockEnderChest;
+import cn.nukkit.block.BlockNoteblock;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityItemFrame;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandDataVersions;
-import cn.nukkit.entity.*;
-import cn.nukkit.entity.data.*;
-import cn.nukkit.entity.item.*;
+import cn.nukkit.entity.Attribute;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityHuman;
+import cn.nukkit.entity.EntityInteractable;
+import cn.nukkit.entity.EntityLiving;
+import cn.nukkit.entity.EntityRideable;
+import cn.nukkit.entity.data.EntityData;
+import cn.nukkit.entity.data.EntityMetadata;
+import cn.nukkit.entity.data.IntPositionEntityData;
+import cn.nukkit.entity.data.ShortEntityData;
+import cn.nukkit.entity.data.Skin;
+import cn.nukkit.entity.data.StringEntityData;
+import cn.nukkit.entity.item.EntityBoat;
+import cn.nukkit.entity.item.EntityItem;
+import cn.nukkit.entity.item.EntityMinecartAbstract;
+import cn.nukkit.entity.item.EntityMinecartEmpty;
+import cn.nukkit.entity.item.EntityXPOrb;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
@@ -22,14 +60,54 @@ import cn.nukkit.event.inventory.CraftItemEvent;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryPickupArrowEvent;
 import cn.nukkit.event.inventory.InventoryPickupItemEvent;
-import cn.nukkit.event.player.*;
+import cn.nukkit.event.player.PlayerAchievementAwardedEvent;
+import cn.nukkit.event.player.PlayerAnimationEvent;
+import cn.nukkit.event.player.PlayerBedEnterEvent;
+import cn.nukkit.event.player.PlayerBedLeaveEvent;
+import cn.nukkit.event.player.PlayerBlockPickEvent;
+import cn.nukkit.event.player.PlayerChatEvent;
+import cn.nukkit.event.player.PlayerChunkRequestEvent;
+import cn.nukkit.event.player.PlayerCommandPreprocessEvent;
+import cn.nukkit.event.player.PlayerDeathEvent;
+import cn.nukkit.event.player.PlayerFormRespondedEvent;
+import cn.nukkit.event.player.PlayerGameModeChangeEvent;
+import cn.nukkit.event.player.PlayerInteractEntityEvent;
+import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
+import cn.nukkit.event.player.PlayerInvalidMoveEvent;
+import cn.nukkit.event.player.PlayerItemConsumeEvent;
+import cn.nukkit.event.player.PlayerJoinEvent;
+import cn.nukkit.event.player.PlayerKickEvent;
+import cn.nukkit.event.player.PlayerLoginEvent;
+import cn.nukkit.event.player.PlayerMapInfoRequestEvent;
+import cn.nukkit.event.player.PlayerMouseOverEntityEvent;
+import cn.nukkit.event.player.PlayerMoveEvent;
+import cn.nukkit.event.player.PlayerPreLoginEvent;
+import cn.nukkit.event.player.PlayerQuitEvent;
+import cn.nukkit.event.player.PlayerRespawnEvent;
+import cn.nukkit.event.player.PlayerServerSettingsRequestEvent;
+import cn.nukkit.event.player.PlayerSettingsRespondedEvent;
+import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import cn.nukkit.event.player.PlayerToggleFlightEvent;
+import cn.nukkit.event.player.PlayerToggleGlideEvent;
+import cn.nukkit.event.player.PlayerToggleSneakEvent;
+import cn.nukkit.event.player.PlayerToggleSprintEvent;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.event.server.DataPacketSendEvent;
 import cn.nukkit.form.window.FormWindow;
 import cn.nukkit.form.window.FormWindowCustom;
-import cn.nukkit.inventory.*;
+import cn.nukkit.inventory.BigCraftingGrid;
+import cn.nukkit.inventory.BigShapedRecipe;
+import cn.nukkit.inventory.BigShapelessRecipe;
+import cn.nukkit.inventory.CraftingGrid;
+import cn.nukkit.inventory.Inventory;
+import cn.nukkit.inventory.InventoryHolder;
+import cn.nukkit.inventory.PlayerCursorInventory;
+import cn.nukkit.inventory.PlayerInventory;
+import cn.nukkit.inventory.Recipe;
+import cn.nukkit.inventory.ShapedRecipe;
+import cn.nukkit.inventory.ShapelessRecipe;
 import cn.nukkit.inventory.transaction.InventoryTransaction;
 import cn.nukkit.inventory.transaction.SimpleInventoryTransaction;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
@@ -37,7 +115,12 @@ import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.inventory.transaction.data.ReleaseItemData;
 import cn.nukkit.inventory.transaction.data.UseItemData;
 import cn.nukkit.inventory.transaction.data.UseItemOnEntityData;
-import cn.nukkit.item.*;
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemArrow;
+import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemBucket;
+import cn.nukkit.item.ItemGlassBottle;
+import cn.nukkit.item.ItemMap;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.food.Food;
 import cn.nukkit.lang.TextContainer;
@@ -52,12 +135,74 @@ import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.level.particle.PunchBlockParticle;
 import cn.nukkit.level.sound.ExperienceOrbSound;
 import cn.nukkit.level.sound.ItemFrameItemRemovedSound;
-import cn.nukkit.math.*;
+import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.BlockVector3;
+import cn.nukkit.math.NukkitMath;
+import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.math.Vector2;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.nbt.NBTIO;
-import cn.nukkit.nbt.tag.*;
+import cn.nukkit.nbt.tag.ByteTag;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.DoubleTag;
+import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.network.SourceInterface;
-import cn.nukkit.network.protocol.*;
+import cn.nukkit.network.protocol.AdventureSettingsPacket;
+import cn.nukkit.network.protocol.AnimatePacket;
+import cn.nukkit.network.protocol.AvailableCommandsPacket;
+import cn.nukkit.network.protocol.BatchPacket;
+import cn.nukkit.network.protocol.BlockEntityDataPacket;
+import cn.nukkit.network.protocol.BlockPickRequestPacket;
+import cn.nukkit.network.protocol.ChangeDimensionPacket;
+import cn.nukkit.network.protocol.ChunkRadiusUpdatedPacket;
+import cn.nukkit.network.protocol.CommandRequestPacket;
+import cn.nukkit.network.protocol.ContainerClosePacket;
+import cn.nukkit.network.protocol.CraftingEventPacket;
+import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.network.protocol.DisconnectPacket;
+import cn.nukkit.network.protocol.EntityEventPacket;
+import cn.nukkit.network.protocol.FullChunkDataPacket;
+import cn.nukkit.network.protocol.InteractPacket;
+import cn.nukkit.network.protocol.InventoryContentPacket;
+import cn.nukkit.network.protocol.InventoryTransactionPacket;
+import cn.nukkit.network.protocol.ItemFrameDropItemPacket;
+import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.network.protocol.LoginPacket;
+import cn.nukkit.network.protocol.MapInfoRequestPacket;
+import cn.nukkit.network.protocol.MobEquipmentPacket;
+import cn.nukkit.network.protocol.ModalFormRequestPacket;
+import cn.nukkit.network.protocol.ModalFormResponsePacket;
+import cn.nukkit.network.protocol.MovePlayerPacket;
+import cn.nukkit.network.protocol.PlayStatusPacket;
+import cn.nukkit.network.protocol.PlayerActionPacket;
+import cn.nukkit.network.protocol.PlayerHotbarPacket;
+import cn.nukkit.network.protocol.PlayerInputPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.network.protocol.RequestChunkRadiusPacket;
+import cn.nukkit.network.protocol.ResourcePackChunkDataPacket;
+import cn.nukkit.network.protocol.ResourcePackChunkRequestPacket;
+import cn.nukkit.network.protocol.ResourcePackClientResponsePacket;
+import cn.nukkit.network.protocol.ResourcePackDataInfoPacket;
+import cn.nukkit.network.protocol.ResourcePackStackPacket;
+import cn.nukkit.network.protocol.ResourcePacksInfoPacket;
+import cn.nukkit.network.protocol.RespawnPacket;
+import cn.nukkit.network.protocol.ServerSettingsResponsePacket;
+import cn.nukkit.network.protocol.SetCommandsEnabledPacket;
+import cn.nukkit.network.protocol.SetEntityMotionPacket;
+import cn.nukkit.network.protocol.SetPlayerGameTypePacket;
+import cn.nukkit.network.protocol.SetSpawnPositionPacket;
+import cn.nukkit.network.protocol.SetTimePacket;
+import cn.nukkit.network.protocol.SetTitlePacket;
+import cn.nukkit.network.protocol.ShowProfilePacket;
+import cn.nukkit.network.protocol.StartGamePacket;
+import cn.nukkit.network.protocol.TakeItemEntityPacket;
+import cn.nukkit.network.protocol.TextPacket;
+import cn.nukkit.network.protocol.TransferPacket;
+import cn.nukkit.network.protocol.UpdateAttributesPacket;
+import cn.nukkit.network.protocol.UpdateBlockPacket;
 import cn.nukkit.network.protocol.types.ContainerIds;
 import cn.nukkit.network.protocol.types.NetworkInventoryAction;
 import cn.nukkit.permission.PermissibleBase;
@@ -68,18 +213,16 @@ import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePack;
-import cn.nukkit.utils.*;
+import cn.nukkit.utils.Binary;
+import cn.nukkit.utils.BlockIterator;
+import cn.nukkit.utils.ClientChainData;
+import cn.nukkit.utils.DummyBossBar;
+import cn.nukkit.utils.LoginChainData;
+import cn.nukkit.utils.MainLogger;
+import cn.nukkit.utils.TextFormat;
+import cn.nukkit.utils.Zlib;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
-
-import java.awt.*;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.ByteOrder;
-import java.util.*;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * author: MagicDroidX & Box
@@ -2256,6 +2399,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         case PlayerActionPacket.ACTION_ABORT_BREAK:
                             this.lastBreak = Long.MAX_VALUE;
                             this.breakingBlock = null;
+                            break;
                         case PlayerActionPacket.ACTION_STOP_BREAK:
                             LevelEventPacket pk = new LevelEventPacket();
                             pk.evid = LevelEventPacket.EVENT_BLOCK_STOP_BREAK;
@@ -2582,11 +2726,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     Recipe recipe = this.server.getCraftingManager().getRecipe(craftingEventPacket.id);
                     Recipe[] recipes = this.server.getCraftingManager().getRecipesByResult(craftingEventPacket.output[0]);
-                    
+
                     boolean isValid = false;
                     for (Recipe rec : recipes){
                         if (rec.getId().equals(recipe.getId())) {
-                            isValid = true;   
+                            isValid = true;
                             break;
                         }
                     }
@@ -2599,7 +2743,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.dataPacket(containerClosePacket);
                         break;
                     }
-                    
+
                     if (isValid && (recipe == null || (((recipe instanceof BigShapelessRecipe) || (recipe instanceof BigShapedRecipe)) && this.craftingType == CRAFTING_SMALL))) {
                         this.inventory.sendContents(this);
                         break;
@@ -2618,17 +2762,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     boolean canCraft = true;
                     Map<String, Item> realSerialized = new HashMap<>();
-                    
+
                     for (Recipe rec : recipes) {
                         ArrayList<Item> ingredientz = new ArrayList<>();
-                    
+
                         if (rec == null || (((rec instanceof BigShapelessRecipe) || (rec instanceof BigShapedRecipe)) && this.craftingType == CRAFTING_SMALL)) {
                             continue;
                         }
 
                         if (rec instanceof ShapedRecipe) {
                             Map<Integer, Map<Integer, Item>> ingredients = ((ShapedRecipe) rec).getIngredientMap();
-                            
+
                             for (Map<Integer, Item> map : ingredients.values()) {
                                 for (Item ingredient : map.values()) {
                                     if (ingredient != null && ingredient.getId() != Item.AIR) {
@@ -3608,7 +3752,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.namedTag.putInt("foodLevel", this.getFoodData().getLevel());
             this.namedTag.putFloat("foodSaturationLevel", this.getFoodData().getFoodSaturationLevel());
 
-            if (!this.username.isEmpty() && this.namedTag != null) {
+            if (!this.username.isEmpty()) {
                 this.server.saveOfflinePlayerData(this.username, this.namedTag, async);
             }
         }
