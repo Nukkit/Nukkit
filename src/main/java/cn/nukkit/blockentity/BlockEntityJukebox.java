@@ -21,7 +21,11 @@ public class BlockEntityJukebox extends BlockEntitySpawnable {
     public BlockEntityJukebox(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
 
-        this.recordItem = NBTIO.getItemHelper(nbt.getCompound("RecordItem"));
+        if (nbt.contains("RecordItem")) {
+            this.recordItem = NBTIO.getItemHelper(nbt.getCompound("RecordItem"));
+        } else {
+            this.recordItem = Item.get(0);
+        }
     }
 
     @Override

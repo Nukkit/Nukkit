@@ -53,6 +53,7 @@ import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import co.aikar.timings.TimingsHistory;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Lists;
 
 import java.io.File;
 import java.io.IOException;
@@ -160,6 +161,7 @@ public class Level implements ChunkManager, Metadatable {
     };
 
     private final TreeSet<BlockUpdateEntry> updateQueue = new TreeSet<>();
+    private final List<BlockUpdateEntry> nextTickUpdates = Lists.newArrayList();
     //private final Map<BlockVector3, Integer> updateQueueIndex = new HashMap<>();
 
     private final Map<Long, Map<Integer, Player>> chunkSendQueue = new HashMap<>();
@@ -769,7 +771,6 @@ public class Level implements ChunkManager, Metadatable {
 
         this.unloadChunks();
         this.timings.doTickPending.startTiming();
-        List<BlockUpdateEntry> toSchedule = new ArrayList<>();
 
         for (int i = 0; i < this.updateQueue.size(); i++) {
             BlockUpdateEntry entry = this.updateQueue.first();
@@ -778,6 +779,11 @@ public class Level implements ChunkManager, Metadatable {
                 break;
             }
 
+            this.updateQueue.remove(entry);
+            this.nextTickUpdates.add(entry);
+        }
+
+        for (BlockUpdateEntry entry : this.nextTickUpdates) {
             if (isAreaLoaded(new AxisAlignedBB(entry.pos, entry.pos))) {
                 Block block = this.getBlock(entry.pos);
 
@@ -785,14 +791,11 @@ public class Level implements ChunkManager, Metadatable {
                     block.onUpdate(BLOCK_UPDATE_SCHEDULED);
                 }
             } else {
-                toSchedule.add(entry);
+                this.scheduleUpdate(entry.block, entry.pos, 0);
             }
-            this.updateQueue.remove(entry);
         }
 
-        for (BlockUpdateEntry entry : toSchedule) {
-            this.scheduleUpdate(entry.block, entry.pos, 0);
-        }
+        this.nextTickUpdates.clear();
         this.timings.doTickPending.stopTiming();
 
         TimingsHistory.entityTicks += this.updateEntities.size();
@@ -1264,6 +1267,10 @@ public class Level implements ChunkManager, Metadatable {
             return;
         }
 
+        if (block instanceof BlockRedstoneComparator) {
+            MainLogger.getLogger().notice("schedule update: " + getCurrentTick());
+        }
+
         BlockUpdateEntry entry = new BlockUpdateEntry(pos.floor(), block, ((long) delay) + getCurrentTick(), priority);
 
         if (!this.updateQueue.contains(entry)) {
@@ -1281,6 +1288,12 @@ public class Level implements ChunkManager, Metadatable {
         BlockUpdateEntry entry = new BlockUpdateEntry(pos, block);
 
         return this.updateQueue.contains(entry);
+    }
+
+    public boolean isBlockTickPending(Vector3 pos, Block block) {
+        BlockUpdateEntry entry = new BlockUpdateEntry(pos, block);
+
+        return this.nextTickUpdates.contains(entry);
     }
 
     public List<BlockUpdateEntry> getPendingBlockUpdates(FullChunk chunk) {
@@ -2011,7 +2024,7 @@ public class Level implements ChunkManager, Metadatable {
             hand.position(block);
         }
 
-        if (hand.isSolid() && hand.getBoundingBox() != null) {
+        if (!hand.canPassThrough() && hand.getBoundingBox() != null) {
             Entity[] entities = this.getCollidingEntities(hand.getBoundingBox());
             int realCount = 0;
             for (Entity e : entities) {
