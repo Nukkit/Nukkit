@@ -24,7 +24,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>21.0</version>
+            <version>23.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -40,6 +40,12 @@
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
             <version>2.14.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.iq80.leveldb/leveldb -->
+        <dependency>
+            <groupId>org.iq80.leveldb</groupId>
+            <artifactId>leveldb</artifactId>
+            <version>0.9</version>
         </dependency>
         <dependency>
             <!-- This dependency doesn't seem to be available in public maven repos.
@@ -58,11 +64,6 @@
             <version>4.1.6.Final</version>
         </dependency>
         <dependency>
-            <groupId>com.github.dblock</groupId>
-            <artifactId>oshi-core</artifactId>
-            <version>3.4.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <version>1.7.25</version>
@@ -72,6 +73,11 @@
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+		<dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -91,7 +97,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.7.0</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
@@ -127,24 +133,6 @@
                         </configuration>
                         <goals>
                             <goal>install-file</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
-                <executions>
-                    <execution>
-                        <id>enforce</id>
-                        <configuration>
-                            <rules>
-                                <DependencyConvergence />
-                            </rules>
-                        </configuration>
-                        <goals>
-                            <goal>enforce</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -216,6 +204,14 @@
                         <tags>false</tags>
                         <forceLongFormat>false</forceLongFormat>
                     </gitDescribe>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>9</source>
+                    <target>9</target>
                 </configuration>
             </plugin>
         </plugins>
