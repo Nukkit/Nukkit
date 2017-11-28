@@ -14,10 +14,8 @@ import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.network.protocol.CraftingDataPacket;
 import cn.nukkit.utils.DyeColor;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * author: MagicDroidX
@@ -68,7 +66,7 @@ public class EnchantInventory extends ContainerInventory {
 
     }
 
-    @Override
+    /*@Override
     public void onSlotChange(int index, Item before, boolean send) {
         super.onSlotChange(index, before, send);
 
@@ -178,7 +176,7 @@ public class EnchantInventory extends ContainerInventory {
                 this.sendEnchantmentList();
             }
         }
-    }
+    }*/
 
     @Override
     public void onClose(Player who) {

@@ -14,5 +14,5 @@ public abstract class ItemRecord extends Item {
         return 1;
     }
 
-    public abstract int getSoundId();
+    public abstract String getSoundId();
 }

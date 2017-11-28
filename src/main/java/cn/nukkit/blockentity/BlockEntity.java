@@ -77,8 +77,14 @@ public abstract class BlockEntity extends Position {
         this.z = this.namedTag.getInt("z");
         this.movable = this.namedTag.getBoolean("isMovable");
 
+        this.initBlockEntity();
+
         this.chunk.addBlockEntity(this);
         this.getLevel().addBlockEntity(this);
+    }
+
+    protected void initBlockEntity() {
+
     }
 
     public static BlockEntity createBlockEntity(String type, FullChunk chunk, CompoundTag nbt, Object... args) {

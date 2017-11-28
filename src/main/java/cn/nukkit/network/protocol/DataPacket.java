@@ -19,6 +19,14 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     public abstract byte pid();
 
+    public void decode(int protocol) {
+        decode();
+    }
+
+    public void encode(int protocol) {
+        encode();
+    }
+
     public abstract void decode();
 
     public abstract void encode();

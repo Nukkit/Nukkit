@@ -2431,7 +2431,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     this.craftingType = CRAFTING_SMALL;
-                    this.resetCraftingGridType();
+                    //this.resetCraftingGridType();
 
                     InteractPacket interactPacket = (InteractPacket) packet;
 
@@ -2517,7 +2517,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
                     this.craftingType = CRAFTING_SMALL;
-                    this.resetCraftingGridType();
+                    //this.resetCraftingGridType();
 
                     EntityEventPacket entityEventPacket = (EntityEventPacket) packet;
 
@@ -4246,13 +4246,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void resetCraftingGridType() {
-        if (this.craftingGrid instanceof BigCraftingGrid) {
+        if (this.craftingGrid != null) {
             Item[] drops = this.inventory.addItem(this.craftingGrid.getContents().values().stream().toArray(Item[]::new));
-            for (Item drop : drops) {
-                this.dropItem(drop);
+
+            if (drops.length > 0) {
+                for (Item drop : drops) {
+                    this.dropItem(drop);
+                }
+
+                this.craftingGrid.clearAll();
             }
 
-            this.craftingGrid = new CraftingGrid(this);
+            if (this.craftingGrid instanceof BigCraftingGrid) {
+                this.craftingGrid = new CraftingGrid(this);
+            }
             this.craftingType = 0;
         }
     }
