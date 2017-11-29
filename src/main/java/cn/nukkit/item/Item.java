@@ -15,6 +15,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.nbt.tag.Tag;
+import cn.nukkit.network.protocol.PlayerProtocol;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.MainLogger;
@@ -24,10 +25,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -614,6 +612,10 @@ public class Item implements Cloneable {
         return hasMeta;
     }
 
+    public boolean hasAnyDamageValue() {
+        return this.meta == -1;
+    }
+
     public boolean canBeActivated() {
         return false;
     }
@@ -965,6 +967,13 @@ public class Item implements Cloneable {
         if (b.length != 1) meta = Integer.valueOf(b[1]) & 0xFFFF;
 
         return get(id, meta);
+    }
+
+    public static Item fromJson(Map<String, Object> data) {
+        String nbt = (String) data.getOrDefault("nbt_hex", "");
+        return get(Utils.toInt(data.get("id")), Utils.toInt(data.getOrDefault("damage", 0)),
+                Utils.toInt(data.getOrDefault("count", 1)), nbt.isEmpty() ? new byte[0] :
+                        DatatypeConverter.parseHexBinary(nbt));
     }
 
     public static Item[] fromStringMultiple(String str) {
@@ -1526,21 +1535,6 @@ public class Item implements Cloneable {
      */
     public final boolean equalsExact(Item other) {
         return this.equals(other, true, true) && this.count == other.count;
-    }
-
-    @Deprecated
-    public final boolean deepEquals(Item item) {
-        return equals(item, true);
-    }
-
-    @Deprecated
-    public final boolean deepEquals(Item item, boolean checkDamage) {
-        return equals(item, checkDamage, true);
-    }
-
-    @Deprecated
-    public final boolean deepEquals(Item item, boolean checkDamage, boolean checkCompound) {
-        return equals(item, checkDamage, checkCompound);
     }
 
     @Override
