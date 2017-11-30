@@ -25,7 +25,7 @@ __A Nuclear-Powered Server Software For Minecraft: Pocket Edition__
 Introduction
 -------------
 
-Nukkit is nuclear-powered server software for Minecraft: Pocket Edition.
+Nukkit is nuclear-powered server software for Minecraft.
 It has a few key advantages over other server software:
 
 * Written in Java, Nukkit is faster and more stable.
