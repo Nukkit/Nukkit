@@ -67,4 +67,8 @@ public abstract class BlockEntitySpawnable extends BlockEntity {
     public boolean updateCompoundTag(CompoundTag nbt, Player player) {
         return false;
     }
+
+    public CompoundTag getSpawnCompound11() {
+        return getSpawnCompound();
+    }
 }

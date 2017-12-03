@@ -83,6 +83,10 @@ public interface Inventory {
 
     boolean isEmpty();
 
+    void decreaseCount(int slot);
+
+    void increaseDamage(int slot);
+
     Set<Player> getViewers();
 
     InventoryType getType();

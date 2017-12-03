@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.event.inventory.InventoryClickEvent;
 import cn.nukkit.event.inventory.InventoryTransactionEvent;
 import cn.nukkit.inventory.Inventory;
+import cn.nukkit.inventory.PlayerCursorInventory;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
@@ -236,6 +237,7 @@ public class InventoryTransaction {
 
         SlotChangeAction from = null;
         SlotChangeAction to = null;
+        boolean cursor = false;
         Player who = null;
 
         for (InventoryAction action : this.actions) {
@@ -243,7 +245,11 @@ public class InventoryTransaction {
                 continue;
             }
             SlotChangeAction slotChange = (SlotChangeAction) action;
-
+            if (slotChange.getInventory() instanceof PlayerCursorInventory) {
+                cursor = true;
+                who = ((PlayerCursorInventory) slotChange.getInventory()).getHolder();
+                continue;
+            }
             if (slotChange.getInventory() instanceof PlayerInventory) {
                 who = (Player) slotChange.getInventory().getHolder();
             }
@@ -255,8 +261,8 @@ public class InventoryTransaction {
             }
         }
 
-        if (who != null && to != null) {
-            if (from.getTargetItem().getCount() > from.getSourceItem().getCount()) {
+        if (who != null && from != null && (cursor || to != null)) {
+            if (to != null && from.getTargetItem().getCount() > from.getSourceItem().getCount()) {
                 from = to;
             }
 
@@ -280,13 +286,13 @@ public class InventoryTransaction {
 
         if (!callExecuteEvent()) {
             this.sendInventories();
-            return true;
+            return false;
         }
 
         for (InventoryAction action : this.actions) {
             if (!action.onPreExecute(this.source)) {
                 this.sendInventories();
-                return true;
+                return false;
             }
         }
 

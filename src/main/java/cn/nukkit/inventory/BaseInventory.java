@@ -516,6 +516,21 @@ public abstract class BaseInventory implements Inventory {
     }
 
     @Override
+    public void increaseDamage(int slot) {
+        Item item = this.getItem(slot);
+    }
+
+    @Override
+    public void decreaseCount(int slot) {
+        Item item = this.getItem(slot);
+
+        if (item.getCount() > 0) {
+            item.count--;
+            this.setItem(slot, item);
+        }
+    }
+
+    @Override
     public void sendContents(Collection<Player> players) {
         this.sendContents(players.stream().toArray(Player[]::new));
     }

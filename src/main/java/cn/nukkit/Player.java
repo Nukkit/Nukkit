@@ -220,6 +220,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public int pickedXPOrb = 0;
 
+    protected int protocol;
     protected int formWindowCount = 0;
     protected Map<Integer, FormWindow> formWindows = new HashMap<>();
     protected Map<Integer, FormWindow> serverSettings = new HashMap<>();
@@ -2009,6 +2010,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
+                    this.protocol = loginPacket.protocol;
                     this.username = TextFormat.clean(loginPacket.username);
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();
@@ -3000,7 +3002,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             if (potion != null) {
                                                 potion.applyPotion(this);
                                             }
-
                                         } else if (itemInHand.getId() == Item.BUCKET && itemInHand.getDamage() == 1) { //milk
                                             this.server.getPluginManager().callEvent(consumeEvent);
                                             if (consumeEvent.isCancelled()) {
@@ -3461,6 +3462,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public String getName() {
         return this.username;
+    }
+
+    public int getProtocol() {
+        return this.protocol;
     }
 
     @Override
@@ -4252,10 +4257,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (this.craftingGrid instanceof BigCraftingGrid) {
                 this.craftingGrid = new CraftingGrid(this);
-
-                ContainerClosePacket pk = new ContainerClosePacket(); //be sure, big crafting is really closed
-                pk.windowId = ContainerIds.NONE;
-                this.dataPacket(pk);
             }
             this.craftingType = 0;
         }
@@ -4330,13 +4331,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.isConnected();
     }
 
-
     public static BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, byte[] payload) {
         FullChunkDataPacket pk = new FullChunkDataPacket();
         pk.chunkX = chunkX;
         pk.chunkZ = chunkZ;
         pk.data = payload;
         pk.encode();
+        pk.isEncoded = true;
 
         BatchPacket batch = new BatchPacket();
         byte[][] batchPayload = new byte[2][];

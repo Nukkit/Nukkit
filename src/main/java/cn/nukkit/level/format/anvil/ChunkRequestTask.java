@@ -122,8 +122,8 @@ public class ChunkRequestTask extends AsyncTask {
     @Override
     public void onCompletion(Server server) {
         Level level = server.getLevel(this.levelId);
-        if (level != null && this.hasResult()) {
+        /*if (level != null && this.hasResult()) {
             level.chunkRequestCallback(this.chunkX, this.chunkZ, (byte[]) this.getResult());
-        }
+        }*/
     }
 }

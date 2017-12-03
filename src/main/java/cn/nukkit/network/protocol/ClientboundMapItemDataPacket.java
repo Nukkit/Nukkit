@@ -23,6 +23,9 @@ public class ClientboundMapItemDataPacket extends DataPacket { //TODO: update to
     public byte dimensionId;
 
     public MapDecorator[] decorators = new MapDecorator[0];
+
+    public long[] decoratorEntities = new long[0];
+
     public int[] colors = new int[0];
     public BufferedImage image = null;
 
@@ -72,6 +75,11 @@ public class ClientboundMapItemDataPacket extends DataPacket { //TODO: update to
         }
 
         if ((update & DECORATIONS_UPDATE) != 0) {
+            this.putUnsignedVarInt(decoratorEntities.length);
+            for (long id : this.decoratorEntities) {
+                this.putEntityUniqueId(id);
+            }
+
             this.putUnsignedVarInt(decorators.length);
 
             for (MapDecorator decorator : decorators) {
@@ -80,7 +88,7 @@ public class ClientboundMapItemDataPacket extends DataPacket { //TODO: update to
                 this.putByte(decorator.offsetX);
                 this.putByte(decorator.offsetZ);
                 this.putString(decorator.label);
-                this.putVarInt(decorator.color.getRGB());
+                this.putUnsignedVarInt(decorator.color.getRGB());
             }
         }
 

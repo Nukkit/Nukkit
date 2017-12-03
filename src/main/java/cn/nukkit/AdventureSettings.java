@@ -57,8 +57,6 @@ public class AdventureSettings implements Cloneable {
         pk.entityUniqueId = player.getId();
 
         Server.broadcastPacket(Server.getInstance().getOnlinePlayers().values(), pk);
-
-        player.resetInAirTicks();
     }
 
     public enum Type {

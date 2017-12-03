@@ -59,6 +59,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -2464,7 +2465,9 @@ public class Level implements ChunkManager, Metadatable {
         if (this.chunkSendTasks.containsKey(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
-                    player.sendChunk(x, z, (DataPacket) this.chunkCache.get(index));
+                    ChunkCacheEntry entry = (ChunkCacheEntry) this.chunkCache.get(index);
+
+                    player.sendChunk(x, z, player.getProtocol() <= 113 ? entry.packet11 : entry.packet);
                 }
             }
 
@@ -2476,7 +2479,9 @@ public class Level implements ChunkManager, Metadatable {
     private void processChunkRequest() {
         if (!this.chunkSendQueue.isEmpty()) {
             this.timings.syncChunkSendTimer.startTiming();
-            for (Long index : new ArrayList<>(this.chunkSendQueue.keySet())) {
+            for (Entry<Long, Map<Integer, Player>> entry : new ArrayList<>(this.chunkSendQueue.entrySet())) {
+                Long index = entry.getKey();
+
                 if (this.chunkSendTasks.containsKey(index)) {
                     continue;
                 }
@@ -2498,12 +2503,12 @@ public class Level implements ChunkManager, Metadatable {
         }
     }
 
-    public void chunkRequestCallback(int x, int z, byte[] payload) {
+    public void chunkRequestCallback(int x, int z, BatchPacket payload, BatchPacket payload11) {
         this.timings.syncChunkSendTimer.startTiming();
         Long index = Level.chunkHash(x, z);
 
         if (this.cacheChunks && !this.chunkCache.containsKey(index)) {
-            this.chunkCache.put(index, Player.getChunkCacheFromData(x, z, payload));
+            this.chunkCache.put(index, new ChunkCacheEntry(payload, payload11));
             this.sendChunkFromCache(x, z);
             this.timings.syncChunkSendTimer.stopTiming();
             return;
@@ -2512,7 +2517,7 @@ public class Level implements ChunkManager, Metadatable {
         if (this.chunkSendTasks.containsKey(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
-                    player.sendChunk(x, z, payload);
+                    player.sendChunk(x, z, player.getProtocol() <= 113 ? payload11 : payload);
                 }
             }
 
@@ -3220,5 +3225,54 @@ public class Level implements ChunkManager, Metadatable {
 
     public int getSpawnRadius() {
         return getGameRules().getInt("spawnRadius");
+    }
+
+    private static ChunkCacher chunkCacher = new ChunkCacher() {
+        @Override
+        public BatchPacket getData(int x, int z, byte[] payload, int protocol) {
+            FullChunkDataPacket pk = new FullChunkDataPacket();
+            pk.chunkX = x;
+            pk.chunkZ = z;
+            pk.data = payload;
+            pk.encode();
+            pk.isEncoded = true;
+
+            BatchPacket batch = new BatchPacket();
+            byte[][] batchPayload = new byte[2][];
+            byte[] buf = pk.getBuffer();
+            batchPayload[0] = Binary.writeUnsignedVarInt(buf.length);
+            batchPayload[1] = buf;
+            byte[] data = Binary.appendBytes(batchPayload);
+            try {
+                batch.payload = Zlib.deflate(data, Server.getInstance().networkCompressionLevel);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return batch;
+        }
+    };
+
+    public static void setChunkCacher(ChunkCacher cacher) {
+        chunkCacher = cacher;
+    }
+
+    public static BatchPacket getChunkCacheFromData(int x, int z, byte[] data, int protocol) {
+        return chunkCacher.getData(x, z, data, protocol);
+    }
+
+    public interface ChunkCacher {
+
+        BatchPacket getData(int x, int z, byte[] payload, int protocol);
+    }
+
+    private static class ChunkCacheEntry {
+
+        public BatchPacket packet;
+        public BatchPacket packet11;
+
+        public ChunkCacheEntry(BatchPacket pk, BatchPacket packet11) {
+            this.packet = pk;
+            this.packet11 = packet11;
+        }
     }
 }
