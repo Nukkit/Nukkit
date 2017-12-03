@@ -51,9 +51,9 @@ public class MainLogger extends ThreadedLogger {
     }
 
     @Override
-    public void bug(String message) {
+    public void emergency(String message) {
         if (logLevel.getLevel() >= LogLevel.EMERGENCY.getLevel())
-            this.send(TextFormat.RED + "[CRITICAL] " + message);
+            this.send(TextFormat.RED + "[EMERGENCY] " + message);
     }
 
     @Override
