@@ -221,7 +221,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public int pickedXPOrb = 0;
 
     protected int protocol;
-
     protected int formWindowCount = 0;
     protected Map<Integer, FormWindow> formWindows = new HashMap<>();
     protected Map<Integer, FormWindow> serverSettings = new HashMap<>();
@@ -3003,7 +3002,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             if (potion != null) {
                                                 potion.applyPotion(this);
                                             }
-
                                         } else if (itemInHand.getId() == Item.BUCKET && itemInHand.getDamage() == 1) { //milk
                                             this.server.getPluginManager().callEvent(consumeEvent);
                                             if (consumeEvent.isCancelled()) {

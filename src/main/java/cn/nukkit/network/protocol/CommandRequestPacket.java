@@ -1,7 +1,6 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.network.protocol.types.CommandOriginData;
-
 /**
  * author: MagicDroidX
  * Nukkit Project
@@ -59,5 +58,4 @@ public class CommandRequestPacket extends DataPacket {
     @Override
     public void encode() {
     }
-
 }

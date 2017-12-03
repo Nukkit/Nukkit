@@ -245,13 +245,11 @@ public class InventoryTransaction {
                 continue;
             }
             SlotChangeAction slotChange = (SlotChangeAction) action;
-
             if (slotChange.getInventory() instanceof PlayerCursorInventory) {
                 cursor = true;
                 who = ((PlayerCursorInventory) slotChange.getInventory()).getHolder();
                 continue;
             }
-
             if (slotChange.getInventory() instanceof PlayerInventory) {
                 who = (Player) slotChange.getInventory().getHolder();
             }
