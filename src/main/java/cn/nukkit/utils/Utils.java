@@ -5,7 +5,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -170,22 +169,64 @@ public class Utils {
         return result & 0xFFFFFFFFL;
     }
 
-    public static <T> java.util.List<T[]> toChunk(java.util.List<T> list, int size) {
-        java.util.List<T[]> result = new ArrayList<>();
-        T[] arr = (T[]) list.stream().toArray();
-
-        int from = 0;
-        int to = size >= arr.length ? arr.length : size;
-
-        while (from < arr.length) {
-            T[] subArray = Arrays.copyOfRange(arr, from, to);
-            from = to;
-            to += size;
-            if (to > arr.length) {
-                to = arr.length;
-            }
-            result.add(subArray);
+    public static Object[][] splitArray(Object[] arrayToSplit, int chunkSize) {
+        if (chunkSize <= 0) {
+            return null;
         }
-        return result;
+
+        int rest = arrayToSplit.length % chunkSize;
+        int chunks = arrayToSplit.length / chunkSize + (rest > 0 ? 1 : 0);
+
+        Object[][] arrays = new Object[chunks][];
+        for (int i = 0; i < (rest > 0 ? chunks - 1 : chunks); i++) {
+            arrays[i] = Arrays.copyOfRange(arrayToSplit, i * chunkSize, i * chunkSize + chunkSize);
+        }
+        if (rest > 0) {
+            arrays[chunks - 1] = Arrays.copyOfRange(arrayToSplit, (chunks - 1) * chunkSize, (chunks - 1) * chunkSize + rest);
+        }
+        return arrays;
+    }
+
+    public static void reverseArray(Object[] data) {
+        reverseArray(data, false);
+    }
+
+    public static Object[] reverseArray(Object[] array, boolean copy) {
+        Object[] data = array;
+        if (copy) {
+            data = new Object[array.length];
+            System.arraycopy(array, 0, data, 0, data.length);
+        }
+
+        for (int left = 0, right = data.length - 1; left < right; left++, right--) {
+            // swap the values at the left and right indices
+            Object temp = data[left];
+            data[left] = data[right];
+            data[right] = temp;
+        }
+
+        return data;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T[][] clone2dArray(T[][] array) {
+        T[][] newArray = (T[][]) new Object[array.length][];
+        for (int i = 0; i < newArray.length; i++) {
+            T[] old = array[i];
+            T[] n = (T[]) new Object[old.length];
+
+            System.arraycopy(old, 0, n, 0, n.length);
+            newArray[i] = n;
+        }
+
+        return newArray;
+    }
+
+    public static int toInt(Object number) {
+        if (number instanceof Integer) {
+            return (Integer) number;
+        }
+
+        return (int) Math.round((double) number);
     }
 }
