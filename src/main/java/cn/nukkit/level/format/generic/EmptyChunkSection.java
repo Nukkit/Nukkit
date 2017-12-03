@@ -134,6 +134,22 @@ public class EmptyChunkSection implements ChunkSection {
     }
 
     @Override
+    public byte[] getBytes11() {
+        ByteBuffer buffer = ByteBuffer.allocate(10240);
+        byte[] skyLight = new byte[2048];
+        Arrays.fill(skyLight, (byte) 0xff);
+        buffer.position(6144);
+        return buffer
+                .put(skyLight)
+                .array();
+    }
+
+    @Override
+    public byte[] toFastBinary() {
+        return new byte[0];
+    }
+
+    @Override
     public ChunkSection clone() {
         return this;
     }

@@ -1,6 +1,8 @@
 package cn.nukkit.level.format.anvil;
 
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Binary;
+import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
 
 import java.nio.ByteBuffer;
@@ -273,6 +275,29 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     }
 
     @Override
+    public byte[] getBytes11() {
+        ByteBuffer buffer = ByteBuffer.allocate(10240);
+        byte[] blocks = new byte[4096];
+        byte[] data = new byte[2048];
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                int i = (x << 7) | (z << 3);
+                for (int y = 0; y < 16; y += 2) {
+                    blocks[(i << 1) | y] = (byte) this.getBlockId(x, y, z);
+                    blocks[(i << 1) | (y + 1)] = (byte) this.getBlockId(x, y + 1, z);
+                    int b1 = this.getBlockData(x, y, z);
+                    int b2 = this.getBlockData(x, y + 1, z);
+                    data[i | (y >> 1)] = (byte) ((b2 << 4) | b1);
+                }
+            }
+        }
+        return buffer
+                .put(blocks)
+                .put(data)
+                .array();
+    }
+
+    @Override
     public ChunkSection clone() {
         ChunkSection section;
         try {
@@ -285,6 +310,23 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
         section.blockLight = this.blockLight.clone();
         section.blocks = this.blocks.clone();
         section.data = this.data.clone();
+        return section;
+    }
+
+    @Override
+    public byte[] toFastBinary() {
+        return Binary.appendBytes(this.blocks, this.data, this.skyLight, this.blockLight);
+    }
+
+    public static ChunkSection fromFastBinary(int y, byte[] data) {
+        ChunkSection section = new ChunkSection(y);
+
+        BinaryStream stream = new BinaryStream(data);
+        section.blocks = stream.get(4096);
+        section.data = stream.get(2048);
+        section.skyLight = stream.get(2048);
+        section.blockLight = stream.get(2048);
+
         return section;
     }
 }

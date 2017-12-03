@@ -4,10 +4,15 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.event.block.SignChangeEvent;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.BlockEntityDataPacket;
 import cn.nukkit.utils.TextFormat;
 
+import java.io.IOException;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,24 +24,29 @@ public class BlockEntitySign extends BlockEntitySpawnable {
 
     public BlockEntitySign(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
 
-        if (!nbt.contains("Text")) {
+    @Override
+    protected void initBlockEntity() {
+        if (!namedTag.contains("Text")) {
             List<String> lines = new ArrayList<>();
 
             for (int i = 1; i <= 4; i++) {
                 String key = "Text" + i;
 
-                if (nbt.contains(key)) {
-                    String line = nbt.getString(key);
+                if (namedTag.contains(key)) {
+                    String line = namedTag.getString(key);
 
                     lines.add(line);
 
-                    nbt.remove(key);
+                    namedTag.remove(key);
                 }
             }
 
-            nbt.putString("Text", String.join("\n", lines));
+            namedTag.putString("Text", String.join("\n", lines));
         }
+
+        super.initBlockEntity();
     }
 
     @Override
@@ -52,7 +62,12 @@ public class BlockEntitySign extends BlockEntitySpawnable {
     }
 
     public boolean setText(String... lines) {
-        this.namedTag.putString("Text", String.join("\n", lines));
+        String[] text = new String[4];
+        Arrays.fill(text, "");
+
+        System.arraycopy(lines, 0, text, 0, Math.min(lines.length, 4));
+
+        this.namedTag.putString("Text", String.join("\n", text));
         this.spawnToAll();
 
         if (this.chunk != null) {
@@ -64,7 +79,14 @@ public class BlockEntitySign extends BlockEntitySpawnable {
     }
 
     public String[] getText() {
-        return this.namedTag.getString("Text").split("\n");
+        String[] text = new String[4];
+        Arrays.fill(text, "");
+
+        String[] origin = this.namedTag.getString("Text").split("\n");
+
+        System.arraycopy(origin, 0, text, 0, Math.min(4, origin.length));
+
+        return text;
     }
 
     @Override
@@ -97,10 +119,44 @@ public class BlockEntitySign extends BlockEntitySpawnable {
     }
 
     @Override
+    public void spawnTo(Player player) {
+        if (this.closed) {
+            return;
+        }
+
+        CompoundTag tag = player.getProtocol() <= 113 ? this.getSpawnCompound11() : this.getSpawnCompound();
+        BlockEntityDataPacket pk = new BlockEntityDataPacket();
+        pk.x = (int) this.x;
+        pk.y = (int) this.y;
+        pk.z = (int) this.z;
+        try {
+            pk.namedTag = NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        player.dataPacket(pk);
+    }
+
+    @Override
     public CompoundTag getSpawnCompound() {
         return new CompoundTag()
                 .putString("id", BlockEntity.SIGN)
                 .putString("Text", this.namedTag.getString("Text"))
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z);
+
+    }
+
+    public CompoundTag getSpawnCompound11() {
+        String[] text = this.getText();
+
+        return new CompoundTag()
+                .putString("id", BlockEntity.SIGN)
+                .putString("Text1", text[0])
+                .putString("Text2", text[1])
+                .putString("Text3", text[2])
+                .putString("Text4", text[3])
                 .putInt("x", (int) this.x)
                 .putInt("y", (int) this.y)
                 .putInt("z", (int) this.z);
