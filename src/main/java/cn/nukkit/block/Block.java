@@ -840,9 +840,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
                 return 4.0;
             case ItemTool.TIER_IRON:
                 return 6.0;
-            case ItemTool.TIER_DIAMOND:
-                return 8.0;
             case ItemTool.TIER_GOLD:
+                return 8.0;
+            case ItemTool.TIER_DIAMOND:
                 return 12.0;
             default:
                 return 1.0;
