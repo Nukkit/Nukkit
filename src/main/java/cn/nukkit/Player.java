@@ -2635,29 +2635,66 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     EntityEventPacket entityEventPacket = (EntityEventPacket) packet;
 
                     switch (entityEventPacket.event) {
-                        case EntityEventPacket.USE_ITEM:
+                        case EntityEventPacket.EATING_ITEM:
                             if (this.protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)){
-                                PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, this.inventory.getItemInHand());
+                                Item itemInHand = this.inventory.getItemInHand();
+                                PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
                                 this.server.getPluginManager().callEvent(consumeEvent);
                                 if (consumeEvent.isCancelled()){
                                     this.inventory.sendContents(this);
                                     break;
                                 }
 
-                                if (consumeEvent.getItem().getId() == Item.POTION){
-                                    Potion potion = Potion.getPotion(consumeEvent.getItem().getId()).setSplash(false);
+                                if (itemInHand.getId() == Item.POTION) {
+                                    this.server.getPluginManager().callEvent(consumeEvent);
+                                    if (consumeEvent.isCancelled()) {
+                                        this.inventory.sendContents(this);
+                                        break;
+                                    }
+                                    Potion potion = Potion.getPotion(itemInHand.getDamage()).setSplash(false);
 
-                                    if (potion != null) potion.applyPotion(this);
+                                    if (this.getGamemode() == SURVIVAL) {
+                                        --itemInHand.count;
+                                        this.inventory.setItemInHand(itemInHand);
+                                        this.inventory.addItem(new ItemGlassBottle());
+                                    }
+
+                                    if (potion != null) {
+                                        potion.applyPotion(this);
+                                    }
+
+                                } else if (itemInHand.getId() == Item.BUCKET && itemInHand.getDamage() == 1) { //milk
+                                    this.server.getPluginManager().callEvent(consumeEvent);
+                                    if (consumeEvent.isCancelled()) {
+                                        this.inventory.sendContents(this);
+                                        break;
+                                    }
+
+                                    EntityEventPacket eventPacket = new EntityEventPacket();
+                                    eventPacket.eid = this.getId();
+                                    eventPacket.event = EntityEventPacket.USE_ITEM;
+                                    this.dataPacket(eventPacket);
+                                    Server.broadcastPacket(this.getViewers().values(), eventPacket);
+
+                                    if (this.isSurvival()) {
+                                        itemInHand.count--;
+                                        this.inventory.setItemInHand(itemInHand);
+                                        this.inventory.addItem(new ItemBucket());
+                                    }
+
+                                    this.removeAllEffects();
+                                } else {
+                                    this.server.getPluginManager().callEvent(consumeEvent);
+                                    if (consumeEvent.isCancelled()) {
+                                        this.inventory.sendContents(this);
+                                        break;
+                                    }
+
+                                    Food food = Food.getByRelative(itemInHand);
+                                    if (food != null && food.eatenBy(this)) --itemInHand.count;
+                                    this.inventory.setItemInHand(itemInHand);
                                 }
                             }
-                            break;
-                        case EntityEventPacket.EATING_ITEM:
-                            if (entityEventPacket.data == 0) {
-                                break;
-                            }
-
-                            /*this.dataPacket(packet); //bug?
-                            Server.broadcastPacket(this.getViewers().values(), packet);*/
                             break;
                     }
                     break;
