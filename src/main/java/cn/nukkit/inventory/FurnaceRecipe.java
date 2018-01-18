@@ -1,9 +1,6 @@
 package cn.nukkit.inventory;
 
-import cn.nukkit.Server;
 import cn.nukkit.item.Item;
-
-import java.util.UUID;
 
 /**
  * author: MagicDroidX
@@ -11,15 +8,25 @@ import java.util.UUID;
  */
 public class FurnaceRecipe implements Recipe {
 
-    private UUID uuid = null;
-
     private final Item output;
 
     private Item ingredient;
 
+    private int recipeProtocol = 130;
+
     public FurnaceRecipe(Item result, Item ingredient) {
         this.output = result.clone();
         this.ingredient = ingredient.clone();
+    }
+
+    @Override
+    public boolean isCompatibleWith(int protocolVersion) {
+        return recipeProtocol <= protocolVersion;
+    }
+
+    @Override
+    public void setRecipeProtocol(int protocol){
+        this.recipeProtocol = protocol;
     }
 
     public void setInput(Item item) {
@@ -31,25 +38,12 @@ public class FurnaceRecipe implements Recipe {
     }
 
     @Override
-    public UUID getId() {
-        return uuid;
-    }
-
-    @Override
-    public void setId(UUID uuid) {
-        if (this.uuid != null) {
-            throw new IllegalStateException("Id is already set");
-        }
-        this.uuid = uuid;
-    }
-
-    @Override
     public Item getResult() {
         return this.output.clone();
     }
 
     @Override
-    public void registerToCraftingManager() {
-        Server.getInstance().getCraftingManager().registerFurnaceRecipe(this);
+    public void registerToCraftingManager(CraftingManager manager) {
+        manager.registerFurnaceRecipe(this);
     }
 }

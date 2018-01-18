@@ -2,8 +2,6 @@ package cn.nukkit.inventory;
 
 import cn.nukkit.item.Item;
 
-import java.util.UUID;
-
 /**
  * author: MagicDroidX
  * Nukkit Project
@@ -12,13 +10,8 @@ public interface Recipe {
 
     Item getResult();
 
-    void registerToCraftingManager();
+    boolean isCompatibleWith(int protocolVersion);
+    void setRecipeProtocol(int protocolVersion);
 
-    UUID getId();
-
-    void setId(UUID id);
-
-    default boolean requiresCraftingTable() {
-        return false;
-    }
+    void registerToCraftingManager(CraftingManager manager);
 }
