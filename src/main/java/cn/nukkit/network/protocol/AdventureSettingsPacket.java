@@ -48,14 +48,20 @@ public class AdventureSettingsPacket extends DataPacket {
 
     public long entityUniqueId; //This is a little-endian long, NOT a var-long. (WTF Mojang)
 
+    @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("ADVENTURE_SETTINGS_PACKET");
+    }
+
     public void decode(PlayerProtocol protocol) {
         this.flags = getUnsignedVarInt();
         this.commandPermission = getUnsignedVarInt();
-        if (!protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)){
+        if (protocol.getMainNumber() >= 130) {
             this.flags2 = getUnsignedVarInt();
             this.playerPermission = getUnsignedVarInt();
             this.customFlags = getUnsignedVarInt();
             this.entityUniqueId = getLLong();
+            return;
         }
     }
 
@@ -63,11 +69,12 @@ public class AdventureSettingsPacket extends DataPacket {
         this.reset(protocol);
         this.putUnsignedVarInt(this.flags);
         this.putUnsignedVarInt(this.commandPermission);
-        if (!protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)){
+        if (protocol.getMainNumber() >= 130) {
             this.putUnsignedVarInt(this.flags2);
             this.putUnsignedVarInt(this.playerPermission);
             this.putUnsignedVarInt(this.customFlags);
             this.putLLong(this.entityUniqueId);
+            return;
         }
     }
 
@@ -94,13 +101,6 @@ public class AdventureSettingsPacket extends DataPacket {
                 this.flags &= ~flag;
             }
         }
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.ADVENTURE_SETTINGS_PACKET :
-                ProtocolInfo.ADVENTURE_SETTINGS_PACKET;
     }
 
 }

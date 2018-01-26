@@ -98,9 +98,7 @@ public class LevelEventPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.LEVEL_EVENT_PACKET :
-                ProtocolInfo.LEVEL_EVENT_PACKET;
+        return protocol.getPacketId("LEVEL_EVENT_PACKET");
     }
 
     @Override

@@ -12,10 +12,9 @@ public class BlockPickRequestPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.BLOCK_PICK_REQUEST_PACKET :
-                ProtocolInfo.BLOCK_PICK_REQUEST_PACKET;
+        return protocol.getPacketId("BLOCK_PICK_REQUEST_PACKET");
     }
+
     @Override
     public void decode(PlayerProtocol protocol) {
         BlockVector3 v = this.getSignedBlockPosition();

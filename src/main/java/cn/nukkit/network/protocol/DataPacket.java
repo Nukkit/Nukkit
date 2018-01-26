@@ -17,6 +17,11 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
     public Integer orderIndex = null;
     public Integer orderChannel = null;
 
+    @Deprecated
+    public byte pid(){
+        return pid(PlayerProtocol.getNewestProtocol());
+    }
+
     public abstract byte pid(PlayerProtocol protocol);
 
     public abstract void decode(PlayerProtocol protocol);
@@ -26,7 +31,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
     public void reset(PlayerProtocol protocol) {
         super.reset();
         this.putByte(this.pid(protocol));
-        if (!protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) this.putShort(0);
+        if (protocol.getMainNumber() == 130) this.putShort(0);
     }
 
     public void setChannel(int channel) {

@@ -26,6 +26,11 @@ public class MovePlayerPacket extends DataPacket {
     public int int2 = 0;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("MOVE_PLAYER_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         this.eid = this.getEntityRuntimeId();
         Vector3f v = this.getVector3f();
@@ -59,13 +64,6 @@ public class MovePlayerPacket extends DataPacket {
             this.putLInt(this.int1);
             this.putLInt(this.int2);
         }
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.MOVE_PLAYER_PACKET :
-                ProtocolInfo.MOVE_PLAYER_PACKET;
     }
 
 }

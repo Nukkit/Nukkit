@@ -8,9 +8,7 @@ public class BlockEventPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.BLOCK_EVENT_PACKET :
-                ProtocolInfo.BLOCK_EVENT_PACKET;
+        return protocol.getPacketId("BLOCK_EVENT_PACKET");
     }
 
     public int x;

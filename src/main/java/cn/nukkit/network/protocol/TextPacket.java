@@ -7,9 +7,7 @@ public class TextPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.TEXT_PACKET :
-                ProtocolInfo.TEXT_PACKET;
+        return protocol.getPacketId("TEXT_PACKET");
     }
 
     public static final byte TYPE_RAW = 0;
@@ -30,7 +28,7 @@ public class TextPacket extends DataPacket {
     @Override
     public void decode(PlayerProtocol protocol) {
         this.type = (byte) getByte();
-        if (!protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) this.isLocalized = this.getBoolean();
+        if (protocol.getMainNumber() >= 130) this.isLocalized = this.getBoolean();
         switch (type) {
             case TYPE_POPUP:
             case TYPE_CHAT:
@@ -57,7 +55,7 @@ public class TextPacket extends DataPacket {
     public void encode(PlayerProtocol protocol) {
         this.reset(protocol);
         this.putByte(this.type);
-        if (!protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) this.putBoolean(this.isLocalized);
+        if (protocol.getMainNumber() >= 130) this.putBoolean(this.isLocalized);
         switch (this.type) {
             case TYPE_POPUP:
             case TYPE_CHAT:

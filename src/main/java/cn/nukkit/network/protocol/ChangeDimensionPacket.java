@@ -15,6 +15,11 @@ public class ChangeDimensionPacket extends DataPacket {
     public boolean respawn;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("CHANGE_DIMENSION_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
 
     }
@@ -27,10 +32,4 @@ public class ChangeDimensionPacket extends DataPacket {
         this.putBoolean(this.respawn);
     }
 
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.CHANGE_DIMENSION_PACKET :
-                ProtocolInfo.CHANGE_DIMENSION_PACKET;
-    }
 }

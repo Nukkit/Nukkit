@@ -11,9 +11,7 @@ public class ContainerOpenPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.CONTAINER_OPEN_PACKET :
-                ProtocolInfo.CONTAINER_OPEN_PACKET;
+        return protocol.getPacketId("CONTAINER_OPEN_PACKET");
     }
 
     public int windowId;

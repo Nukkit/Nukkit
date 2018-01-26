@@ -10,6 +10,11 @@ public class AnimatePacket extends DataPacket {
     public float unknown;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("ANIMATE_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         this.action = this.getVarInt();
         this.eid = getEntityRuntimeId();
@@ -26,13 +31,6 @@ public class AnimatePacket extends DataPacket {
         if ((this.action & 0x80) != 0) {
             this.putLFloat(this.unknown);
         }
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.ANIMATE_PACKET :
-                ProtocolInfo.ANIMATE_PACKET;
     }
 
 }

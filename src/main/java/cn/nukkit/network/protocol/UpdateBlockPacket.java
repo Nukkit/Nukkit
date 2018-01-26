@@ -25,9 +25,7 @@ public class UpdateBlockPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.UPDATE_BLOCK_PACKET :
-                ProtocolInfo.UPDATE_BLOCK_PACKET;
+        return protocol.getPacketId("UPDATE_BLOCK_PACKET");
     }
 
     @Override

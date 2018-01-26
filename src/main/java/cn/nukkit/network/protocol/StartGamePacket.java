@@ -9,9 +9,7 @@ public class StartGamePacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.START_GAME_PACKET :
-                ProtocolInfo.START_GAME_PACKET;
+        return protocol.getPacketId("START_GAME_PACKET");
     }
 
     public long entityUniqueId;

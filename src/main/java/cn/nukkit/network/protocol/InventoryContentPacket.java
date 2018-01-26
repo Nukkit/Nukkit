@@ -10,9 +10,7 @@ public class InventoryContentPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.CONTAINER_SET_CONTENT_PACKET :
-                ProtocolInfo.INVENTORY_CONTENT_PACKET;
+        return protocol.getPacketId("INVENTORY_CONTENT_PACKET");
     }
 
     public static final int SPECIAL_INVENTORY = 0;
@@ -38,9 +36,7 @@ public class InventoryContentPacket extends DataPacket {
     @Override
     public void decode(PlayerProtocol protocol) {
         this.inventoryId = (int) this.getUnsignedVarInt();
-        if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)){
-            this.eid = this.getUnsignedVarLong();
-        }
+        if (protocol.getMainNumber() == 113) this.eid = this.getUnsignedVarLong();
         int count = (int) this.getUnsignedVarInt();
         this.slots = new Item[count];
 
@@ -48,7 +44,7 @@ public class InventoryContentPacket extends DataPacket {
             this.slots[s] = this.getSlot();
         }
 
-        if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) {
+        if (protocol.getMainNumber() == 113) {
             int hotbar = (int) this.getUnsignedVarInt();
             this.hotbar = new int[hotbar];
 
@@ -60,34 +56,36 @@ public class InventoryContentPacket extends DataPacket {
 
     @Override
     public void encode(PlayerProtocol protocol) {
-        if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) {
-            this.reset(protocol);
-            this.putUnsignedVarInt(this.inventoryId);
-            this.putEntityUniqueId(this.eid);
-            this.putUnsignedVarInt(this.slots.length+9);
-            for (Item slot : this.slots){
-                this.putSlot(slot);
-            }
-            for (int i = 0; i < 9; i++){
-                this.putSlot(Item.get(Item.AIR));
-            }
-            if (this.inventoryId == SPECIAL_INVENTORY) {
-                this.putUnsignedVarInt(9);
-                for (int i = 0; i < 9; i++){
-                    this.putVarInt(i+9);
+        switch (protocol.getMainNumber()){
+            case 130:
+            default:
+                this.reset(protocol);
+                this.putUnsignedVarInt(this.inventoryId);
+                this.putUnsignedVarInt(this.slots.length);
+                for (Item slot : this.slots) {
+                    this.putSlot(slot);
                 }
-            }
-            else this.putUnsignedVarInt(0);
+                return;
+            case 113:
+                this.reset(protocol);
+                this.putUnsignedVarInt(this.inventoryId);
+                this.putEntityUniqueId(this.eid);
+                this.putUnsignedVarInt(this.slots.length+9);
+                for (Item slot : this.slots){
+                    this.putSlot(slot);
+                }
+                for (int i = 0; i < 9; i++){
+                    this.putSlot(Item.get(Item.AIR));
+                }
+                if (this.inventoryId == SPECIAL_INVENTORY) {
+                    this.putUnsignedVarInt(9);
+                    for (int i = 0; i < 9; i++){
+                        this.putVarInt(i+9);
+                    }
+                }
+                else this.putUnsignedVarInt(0);
+                return;
         }
-        else {
-            this.reset(protocol);
-            this.putUnsignedVarInt(this.inventoryId);
-            this.putUnsignedVarInt(this.slots.length);
-            for (Item slot : this.slots) {
-                this.putSlot(slot);
-            }
-        }
-
     }
 
     @Override

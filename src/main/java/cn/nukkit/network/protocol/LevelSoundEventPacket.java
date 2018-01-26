@@ -181,6 +181,11 @@ public class LevelSoundEventPacket extends DataPacket {
     public boolean isBabyMob;
     public boolean isGlobal;
 
+	@Override
+	public byte pid(PlayerProtocol protocol) {
+		return protocol.getPacketId("LEVEL_SOUND_EVENT_PACKET");
+	}
+
     @Override
     public void decode(PlayerProtocol protocol) {
         this.sound = this.getByte();
@@ -205,10 +210,4 @@ public class LevelSoundEventPacket extends DataPacket {
         this.putBoolean(this.isGlobal);
     }
 
-	@Override
-	public byte pid(PlayerProtocol protocol) {
-		return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-				ProtocolInfo113.LEVEL_SOUND_EVENT_PACKET :
-				ProtocolInfo.LEVEL_SOUND_EVENT_PACKET;
-	}
 }

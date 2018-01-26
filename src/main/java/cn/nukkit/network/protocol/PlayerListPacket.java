@@ -16,6 +16,11 @@ public class PlayerListPacket extends DataPacket {
     public Entry[] entries = new Entry[0];
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("PLAYER_LIST_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
 
     }
@@ -31,7 +36,7 @@ public class PlayerListPacket extends DataPacket {
                 this.putVarLong(entry.entityId);
                 this.putString(entry.name);
                 this.putSkin(entry.skin);
-                if (!protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)){
+                if (protocol.getMainNumber() >= 130){
                     this.putByteArray(entry.skin.getCape().getData());
                     this.putString(entry.geometryModel);
                     this.putByteArray(entry.geometryData);
@@ -42,13 +47,6 @@ public class PlayerListPacket extends DataPacket {
             }
         }
 
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.PLAYER_LIST_PACKET :
-                ProtocolInfo.PLAYER_LIST_PACKET;
     }
 
     public static class Entry {

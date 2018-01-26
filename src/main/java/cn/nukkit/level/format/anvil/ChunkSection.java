@@ -252,8 +252,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public byte[] getBytes(PlayerProtocol protocol) {
-        ByteBuffer buffer = ByteBuffer.allocate(6144);
-        ByteBuffer buffer113 = ByteBuffer.allocate(10240);
+        ByteBuffer buffer;
         byte[] blocks = new byte[4096];
         byte[] data = new byte[2048];
         byte[] skyLight = new byte[2048];
@@ -276,16 +275,24 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
                 }
             }
         }
-        if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) return buffer113
-                .put(blocks)
-                .put(data)
-                .put(skyLight)
-                .put(blockLight)
-                .array();
-        else return buffer
-                .put(blocks)
-                .put(data)
-                .array();
+
+        switch (protocol.getMainNumber()){
+            case 130:
+            default:
+                buffer = ByteBuffer.allocate(6144);
+                return buffer
+                        .put(blocks)
+                        .put(data)
+                        .array();
+            case 113:
+                buffer = ByteBuffer.allocate(10240);
+                return buffer
+                        .put(blocks)
+                        .put(data)
+                        .put(skyLight)
+                        .put(blockLight)
+                        .array();
+        }
     }
 
     @Override

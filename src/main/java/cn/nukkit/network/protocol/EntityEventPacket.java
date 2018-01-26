@@ -33,9 +33,7 @@ public class EntityEventPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.ENTITY_EVENT_PACKET :
-                ProtocolInfo.ENTITY_EVENT_PACKET;
+        return protocol.getPacketId("ENTITY_EVENT_PACKET");
     }
 
     public long eid;

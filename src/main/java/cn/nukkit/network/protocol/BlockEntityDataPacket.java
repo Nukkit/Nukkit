@@ -15,9 +15,7 @@ public class BlockEntityDataPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.BLOCK_ENTITY_DATA_PACKET :
-                ProtocolInfo.BLOCK_ENTITY_DATA_PACKET;
+        return protocol.getPacketId("BLOCK_ENTITY_DATA_PACKET");
     }
 
     @Override

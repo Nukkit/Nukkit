@@ -8,9 +8,7 @@ public class MapInfoRequestPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.MAP_INFO_REQUEST_PACKET :
-                ProtocolInfo.MAP_INFO_REQUEST_PACKET;
+        return protocol.getPacketId("MAP_INFO_REQUEST_PACKET");
     }
 
     @Override

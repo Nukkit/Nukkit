@@ -14,9 +14,7 @@ public class AddPlayerPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.ADD_PLAYER_PACKET :
-                ProtocolInfo.ADD_PLAYER_PACKET;
+        return protocol.getPacketId("ADD_PLAYER_PACKET");
     }
 
     public UUID uuid;

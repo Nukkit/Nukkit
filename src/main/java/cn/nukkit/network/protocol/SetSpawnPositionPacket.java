@@ -15,6 +15,11 @@ public class SetSpawnPositionPacket extends DataPacket {
     public boolean spawnForced = false;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("SET_SPAWN_POSITION_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
 
     }
@@ -25,13 +30,6 @@ public class SetSpawnPositionPacket extends DataPacket {
         this.putVarInt(this.spawnType);
         this.putBlockVector3(this.x, this.y, this.z);
         this.putBoolean(this.spawnForced);
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.SET_SPAWN_POSITION_PACKET :
-                ProtocolInfo.SET_SPAWN_POSITION_PACKET;
     }
 
 }

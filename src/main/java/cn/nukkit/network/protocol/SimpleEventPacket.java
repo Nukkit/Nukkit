@@ -6,9 +6,7 @@ public class SimpleEventPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.SIMPLE_EVENT_PACKET :
-                ProtocolInfo.SIMPLE_EVENT_PACKET;
+        return protocol.getPacketId("SIMPLE_EVENT_PACKET");
     }
 
     @Override

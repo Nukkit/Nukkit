@@ -7,9 +7,7 @@ public class CameraPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.CAMERA_PACKET :
-                ProtocolInfo.CAMERA_PACKET;
+        return protocol.getPacketId("CAMERA_PACKET");
     }
 
     @Override

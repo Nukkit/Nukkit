@@ -9,6 +9,11 @@ public class ResourcePacksInfoPacket extends DataPacket {
     public ResourcePack[] resourcePackEntries = new ResourcePack[0];
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("RESOURCE_PACKS_INFO_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
 
     }
@@ -35,10 +40,4 @@ public class ResourcePacksInfoPacket extends DataPacket {
         }
     }
 
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.RESOURCE_PACKS_INFO_PACKET :
-                ProtocolInfo.RESOURCE_PACKS_INFO_PACKET;
-    }
 }

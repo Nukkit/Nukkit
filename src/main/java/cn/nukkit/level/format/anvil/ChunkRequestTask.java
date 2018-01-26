@@ -13,6 +13,7 @@ import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.HashMap;
 
 /**
  * author: MagicDroidX
@@ -25,8 +26,7 @@ public class ChunkRequestTask extends AsyncTask {
     protected final int chunkX;
     protected final int chunkZ;
 
-    protected byte[] blockEntities;
-    protected byte[] blockEntities113;
+    protected HashMap<PlayerProtocol, byte[]> blockEntities;
 
     public ChunkRequestTask(Level level, Chunk chunk) {
         this.levelId = level.getId();
@@ -34,25 +34,22 @@ public class ChunkRequestTask extends AsyncTask {
         this.chunkX = chunk.getX();
         this.chunkZ = chunk.getZ();
 
-        byte[] buffer = new byte[0];
-        byte[] buffer113 = new byte[0];
+        for (PlayerProtocol protocol : PlayerProtocol.values()){
+            byte[] buffer = new byte[0];
 
-        for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-            if (blockEntity instanceof BlockEntitySpawnable) {
-                try {
-                    buffer = Binary.appendBytes(buffer, NBTIO.write(((BlockEntitySpawnable) blockEntity)
-                            .getSpawnCompound(PlayerProtocol.PLAYER_PROTOCOL_130), ByteOrder.BIG_ENDIAN, true));
-                    buffer113 = Binary.appendBytes(buffer, NBTIO.write(((BlockEntitySpawnable) blockEntity)
-                            .getSpawnCompound(PlayerProtocol.PLAYER_PROTOCOL_113), ByteOrder.BIG_ENDIAN, true));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+            for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
+                if (blockEntity instanceof BlockEntitySpawnable) {
+                    try {
+                        buffer = Binary.appendBytes(buffer, NBTIO.write(((BlockEntitySpawnable) blockEntity)
+                                .getSpawnCompound(protocol), ByteOrder.BIG_ENDIAN, true));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-
             }
-        }
 
-        this.blockEntities = buffer;
-        this.blockEntities113 = buffer113;
+            this.blockEntities.put(protocol, buffer);
+        }
     }
 
     @Override
@@ -64,62 +61,51 @@ public class ChunkRequestTask extends AsyncTask {
         byte[] skyLight = chunk.getBlockSkyLightArray();
         int[] heightMap = chunk.getHeightMapArray();
         int[] biomeColors = chunk.getBiomeColorArray();
-        ByteBuffer buffer = ByteBuffer.allocate(
-                16 * 16 * (128 + 64 + 64 + 64)
-                        + 256
-                        + 256
-                        + this.blockEntities.length
-        );
-        ByteBuffer buffer113 = ByteBuffer.allocate(
-                16 * 16 * (128 + 64 + 64 + 64)
-                        + 256
-                        + 256
-                        + 256
-                        + 256
-                        + this.blockEntities113.length
-        );
 
-        ByteBuffer orderedIds = ByteBuffer.allocate(16 * 16 * 128);
-        ByteBuffer orderedData = ByteBuffer.allocate(16 * 16 * 64);
-        ByteBuffer orderedSkyLight = ByteBuffer.allocate(16 * 16 * 64);
-        ByteBuffer orderedLight = ByteBuffer.allocate(16 * 16 * 64);
+        HashMap<PlayerProtocol, byte[]> result = new HashMap<>();
 
-        for (int x = 0; x < 16; ++x) {
-            for (int z = 0; z < 16; ++z) {
-                orderedIds.put(this.getColumn(ids, x, z));
-                orderedData.put(this.getHalfColumn(meta, x, z));
-                orderedSkyLight.put(this.getHalfColumn(skyLight, x, z));
-                orderedLight.put(this.getHalfColumn(blockLight, x, z));
+        for (PlayerProtocol protocol : PlayerProtocol.values()) {
+            ByteBuffer buffer = ByteBuffer.allocate(
+                    16 * 16 * (128 + 64 + 64 + 64)
+                            + 256
+                            + 256
+                            + this.blockEntities.get(protocol).length
+            );
+
+            ByteBuffer orderedIds = ByteBuffer.allocate(16 * 16 * 128);
+            ByteBuffer orderedData = ByteBuffer.allocate(16 * 16 * 64);
+            ByteBuffer orderedSkyLight = ByteBuffer.allocate(16 * 16 * 64);
+            ByteBuffer orderedLight = ByteBuffer.allocate(16 * 16 * 64);
+
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                    orderedIds.put(this.getColumn(ids, x, z));
+                    orderedData.put(this.getHalfColumn(meta, x, z));
+                    orderedSkyLight.put(this.getHalfColumn(skyLight, x, z));
+                    orderedLight.put(this.getHalfColumn(blockLight, x, z));
+                }
             }
-        }
 
-        ByteBuffer orderedHeightMap = ByteBuffer.allocate(heightMap.length);
-        for (int i : heightMap) {
-            orderedHeightMap.put((byte) (i & 0xff));
+            ByteBuffer orderedHeightMap = ByteBuffer.allocate(heightMap.length);
+            for (int i : heightMap) {
+                orderedHeightMap.put((byte) (i & 0xff));
+            }
+            ByteBuffer orderedBiomeColors = ByteBuffer.allocate(biomeColors.length * 4);
+            for (int i : biomeColors) {
+                orderedBiomeColors.put(Binary.writeInt(i));
+            }
+            buffer = buffer
+                    .put(orderedIds)
+                    .put(orderedData)
+                    .put(orderedHeightMap)
+                    .put(orderedBiomeColors);
+            if (protocol.getMainNumber() == 113) {
+                buffer = buffer.put(orderedSkyLight).put(orderedLight);
+            }
+            buffer.put(this.blockEntities.get(protocol));
+            result.put(protocol, buffer.array());
         }
-        ByteBuffer orderedBiomeColors = ByteBuffer.allocate(biomeColors.length * 4);
-        for (int i : biomeColors) {
-            orderedBiomeColors.put(Binary.writeInt(i));
-        }
-
-        this.setResult(
-                new byte[][]{buffer
-                        .put(orderedIds)
-                        .put(orderedData)
-                        .put(orderedHeightMap)
-                        .put(orderedBiomeColors)
-                        .put(this.blockEntities)
-                        .array(),
-                           buffer113
-                        .put(orderedIds)
-                        .put(orderedData)
-                        .put(orderedHeightMap)
-                        .put(orderedBiomeColors)
-                        .put(orderedSkyLight)
-                        .put(orderedLight)
-                        .put(this.blockEntities113)
-                        .array()}
-        );
+        this.setResult(result);
     }
 
     public byte[] getColumn(byte[] data, int x, int z) {
@@ -150,8 +136,8 @@ public class ChunkRequestTask extends AsyncTask {
     public void onCompletion(Server server) {
         Level level = server.getLevel(this.levelId);
         if (level != null && this.hasResult()) {
-            byte[][] result = (byte[][]) this.getResult();
-            level.chunkRequestCallback(this.chunkX, this.chunkZ, result[1], result[0]);
+            HashMap<PlayerProtocol, byte[]> result = (HashMap<PlayerProtocol, byte[]>) this.getResult();
+            level.chunkRequestCallback(this.chunkX, this.chunkZ, result);
         }
     }
 }

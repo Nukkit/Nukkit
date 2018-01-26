@@ -31,8 +31,7 @@ public class CraftingManager {
 
     private static int RECIPE_COUNT = 0;
 
-    public static CraftingDataPacket packet113 = null;
-    public static CraftingDataPacket packet = null;
+    public static HashMap<PlayerProtocol, CraftingDataPacket> packets = null;
 
     private static final Comparator<Item> recipeComparator = (i1, i2) -> {
         if (i1.getId() > i2.getId()) {
@@ -173,38 +172,31 @@ public class CraftingManager {
     }
 
     public void rebuildPacket() {
-        CraftingDataPacket pk = new CraftingDataPacket();
-        CraftingDataPacket pk113 = new CraftingDataPacket();
-        pk.cleanRecipes = true;
-        pk113.cleanRecipes = true;
-
-        for (Recipe recipe : this.getRecipes().values()) {
-            if (recipe instanceof ShapedRecipe) {
-                pk.addShapedRecipe((ShapedRecipe) recipe);
-                if (recipe.isCompatibleWith(113)) pk113.addShapedRecipe((ShapedRecipe) recipe);
-            } else if (recipe instanceof ShapelessRecipe) {
-                pk.addShapelessRecipe((ShapelessRecipe) recipe);
-                if (recipe.isCompatibleWith(113)) pk113.addShapelessRecipe((ShapelessRecipe) recipe);
+        packets.clear();
+        for (PlayerProtocol protocol : PlayerProtocol.values()){
+            CraftingDataPacket pk = new CraftingDataPacket();
+            pk.cleanRecipes = true;
+            for (Recipe recipe : this.getRecipes().values()) {
+                if (recipe instanceof ShapedRecipe) {
+                    if (recipe.isCompatibleWith(protocol.getNumber())) pk.addShapedRecipe((ShapedRecipe) recipe);
+                } else if (recipe instanceof ShapelessRecipe) {
+                    if (recipe.isCompatibleWith(protocol.getNumber())) pk.addShapelessRecipe((ShapelessRecipe) recipe);
+                }
             }
+
+            for (FurnaceRecipe recipe : this.getFurnaceRecipes().values()) {
+                if (recipe.isCompatibleWith(protocol.getNumber())) pk.addFurnaceRecipe((FurnaceRecipe) recipe);
+            }
+
+            pk.encode(protocol);
+            pk.isEncoded = true;
+
+            packets.put(protocol, pk);
         }
-
-        for (FurnaceRecipe recipe : this.getFurnaceRecipes().values()) {
-            pk.addFurnaceRecipe(recipe);
-            if (recipe.isCompatibleWith(113)) pk113.addFurnaceRecipe((FurnaceRecipe) recipe);
-        }
-
-        pk.encode(PlayerProtocol.PLAYER_PROTOCOL_130);
-        pk.isEncoded = true;
-
-        pk113.encode(PlayerProtocol.PLAYER_PROTOCOL_113);
-        pk113.isEncoded = true;
-
-        packet113 = pk113;
-        packet = pk;
     }
 
     public Recipe getRecipe(UUID id) {
-        return this.recipes.containsKey(id) ? this.recipes.get(id) : null;
+        return this.recipes.getOrDefault(id, null);
     }
     public Recipe[] getRecipesByResult(Item... output){
         if (output.length == 0) return new Recipe[0];

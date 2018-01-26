@@ -7,9 +7,7 @@ public class ServerSettingsResponsePacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                0 :
-                ProtocolInfo.SERVER_SETTINGS_RESPONSE_PACKET;
+        return protocol.getPacketId("SERVER_SETTINGS_RESPONSE_PACKET");
     }
 
     @Override

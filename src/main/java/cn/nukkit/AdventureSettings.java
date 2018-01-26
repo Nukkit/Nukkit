@@ -59,9 +59,9 @@ public class AdventureSettings implements Cloneable {
 
         //As 1.1 players are not able to proccess it, we must filter only NOT 1.1 players
         Server.broadcastPacket(Server.getInstance().getOnlinePlayers().values().stream().filter(
-                player -> !player.getProtocol().equals(PlayerProtocol.PLAYER_PROTOCOL_113)
+                player -> player.getProtocol().getMainNumber() == 130
         ).toArray(Player[]::new), pk);
-        if (player.getProtocol().equals(PlayerProtocol.PLAYER_PROTOCOL_113)) player.dataPacket(pk);
+        if (player.getProtocol().getMainNumber() == 130) player.dataPacket(pk);
 
         player.resetInAirTicks();
     }

@@ -6,6 +6,11 @@ public class ResourcePackChunkRequestPacket extends DataPacket {
     public int chunkIndex;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("RESOURCE_PACK_CHUNK_REQUEST_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         this.packId = this.getString();
         this.chunkIndex = this.getLInt();
@@ -18,10 +23,4 @@ public class ResourcePackChunkRequestPacket extends DataPacket {
         this.putLInt(this.chunkIndex);
     }
 
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.RESOURCE_PACK_CHUNK_REQUEST_PACKET :
-                ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET;
-    }
 }

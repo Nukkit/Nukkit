@@ -8,6 +8,11 @@ public class SpawnExperienceOrbPacket extends DataPacket {
     public int amount;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("SPAWN_EXPERIENCE_ORB_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
 
     }
@@ -19,10 +24,4 @@ public class SpawnExperienceOrbPacket extends DataPacket {
         this.putUnsignedVarInt(this.amount);
     }
 
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.SPAWN_EXPERIENCE_ORB_PACKET :
-                ProtocolInfo.SPAWN_EXPERIENCE_ORB_PACKET;
-    }
 }

@@ -12,8 +12,6 @@ import java.util.UUID;
  */
 public class CommandRequestPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.COMMAND_REQUEST_PACKET;
-
     public static final int TYPE_PLAYER = 0;
     public static final int TYPE_COMMAND_BLOCK = 1;
     public static final int TYPE_MINECART_COMMAND_BLOCK = 2;
@@ -45,43 +43,43 @@ public class CommandRequestPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.COMMAND_STEP_PACKET :
-                ProtocolInfo.COMMAND_REQUEST_PACKET;
+        return protocol.getPacketId("COMMAND_REQUEST_PACKET");
     }
 
     @Override
     public void decode(PlayerProtocol protocol) {
-        if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)){
-            this.command = this.getString();
-            this.overload = this.getString();
-            this.uvarint1 = this.getUnsignedVarInt();
-            this.currentStep = this.getUnsignedVarInt();
-            this.done = this.getBoolean();
-            this.clientId = this.getVarLong();
-            String argsString = this.getString();
-            this.args = new Gson().fromJson(argsString, CommandArgs.class);
-            this.outputJson = this.getString();
-            while (!this.feof()) {
-                this.getByte(); //prevent assertion errors
-            }
-            return;
-        }
         this.command = this.getString();
-        if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_130)){
-            this.type = this.getVarInt();
-            this.requestId = this.getString();
-            this.playerUniqueId = this.getVarLong();
-            return;
+        switch (protocol.getNumber()){
+            case 141:
+            default:
+                CommandOriginData.Origin type = CommandOriginData.Origin.values()[(int) this.getUnsignedVarInt()];
+                UUID uuid = this.getUUID(protocol);
+                String requestId = this.getString();
+                Long varLong = null;
+                if (type == CommandOriginData.Origin.DEV_CONSOLE || type == CommandOriginData.Origin.TEST) {
+                    varLong = this.getVarLong();
+                }
+                this.data = new CommandOriginData(type, uuid, requestId, varLong);
+                return;
+            case 130:
+                this.type = this.getVarInt();
+                this.requestId = this.getString();
+                this.playerUniqueId = this.getVarLong();
+                return;
+            case 113:
+                this.overload = this.getString();
+                this.uvarint1 = this.getUnsignedVarInt();
+                this.currentStep = this.getUnsignedVarInt();
+                this.done = this.getBoolean();
+                this.clientId = this.getVarLong();
+                String argsString = this.getString();
+                this.args = new Gson().fromJson(argsString, CommandArgs.class);
+                this.outputJson = this.getString();
+                while (!this.feof()) {
+                    this.getByte(); //prevent assertion errors
+                }
+                return;
         }
-        CommandOriginData.Origin type = CommandOriginData.Origin.values()[(int) this.getUnsignedVarInt()];
-        UUID uuid = this.getUUID(protocol);
-        String requestId = this.getString();
-        Long varLong = null;
-        if (type == CommandOriginData.Origin.DEV_CONSOLE || type == CommandOriginData.Origin.TEST) {
-            varLong = this.getVarLong();
-        }
-        this.data = new CommandOriginData(type, uuid, requestId, varLong);
     }
 
     @Override

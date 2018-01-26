@@ -12,9 +12,7 @@ public class UpdateAttributesPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.UPDATE_ATTRIBUTES_PACKET :
-                ProtocolInfo.UPDATE_ATTRIBUTES_PACKET;
+        return protocol.getPacketId("UPDATE_ATTRIBUTES_PACKET");
     }
 
     public void decode(PlayerProtocol protocol) {

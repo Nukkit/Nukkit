@@ -35,6 +35,11 @@ public class PlayerActionPacket extends DataPacket {
     public int face;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("PLAYER_ACTION_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         this.entityId = this.getEntityRuntimeId();
         this.action = this.getVarInt();
@@ -52,13 +57,6 @@ public class PlayerActionPacket extends DataPacket {
         this.putVarInt(this.action);
         this.putBlockVector3(this.x, this.y, this.z);
         this.putVarInt(this.face);
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.PLAYER_ACTION_PACKET :
-                ProtocolInfo.PLAYER_ACTION_PACKET;
     }
 
 }

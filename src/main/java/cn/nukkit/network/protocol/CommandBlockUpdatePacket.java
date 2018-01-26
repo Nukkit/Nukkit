@@ -19,9 +19,7 @@ public class CommandBlockUpdatePacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.COMMAND_BLOCK_UPDATE_PACKET :
-                ProtocolInfo.COMMAND_BLOCK_UPDATE_PACKET;
+        return protocol.getPacketId("COMMAND_BLOCK_UPDATE_PACKET");
     }
 
     @Override

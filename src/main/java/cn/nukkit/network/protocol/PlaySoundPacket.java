@@ -11,9 +11,7 @@ public class PlaySoundPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.PLAY_SOUND_PACKET :
-                ProtocolInfo.PLAY_SOUND_PACKET;
+        return protocol.getPacketId("PLAY_SOUND_PACKET");
     }
 
     @Override

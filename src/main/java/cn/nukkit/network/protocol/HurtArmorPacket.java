@@ -8,6 +8,11 @@ public class HurtArmorPacket extends DataPacket {
     public int health;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("HURT_ARMOR_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
 
     }
@@ -16,13 +21,6 @@ public class HurtArmorPacket extends DataPacket {
     public void encode(PlayerProtocol protocol) {
         this.reset(protocol);
         this.putVarInt(this.health);
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.HURT_ARMOR_PACKET :
-                ProtocolInfo.HURT_ARMOR_PACKET;
     }
 
 }

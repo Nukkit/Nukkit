@@ -20,9 +20,7 @@ public class MoveEntityPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.MOVE_ENTITY_PACKET :
-                ProtocolInfo.MOVE_ENTITY_PACKET;
+        return protocol.getPacketId("MOVE_ENTITY_PACKET");
     }
 
     @Override

@@ -14,6 +14,11 @@ public class AddPaintingPacket extends DataPacket {
     public String title;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("ADD_PAINTING_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
 
     }
@@ -26,13 +31,6 @@ public class AddPaintingPacket extends DataPacket {
         this.putBlockVector3(this.x, this.y, this.z);
         this.putVarInt(this.direction);
         this.putString(this.title);
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.ADD_PAINTING_PACKET :
-                ProtocolInfo.ADD_PAINTING_PACKET;
     }
 
 }

@@ -20,9 +20,7 @@ public class SetTitlePacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.SET_TITLE_PACKET :
-                ProtocolInfo.SET_TITLE_PACKET;
+        return protocol.getPacketId("SET_TITLE_PACKET");
     }
 
     @Override

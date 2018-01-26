@@ -8,9 +8,7 @@ public class FullChunkDataPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.FULL_CHUNK_DATA_PACKET :
-                ProtocolInfo.FULL_CHUNK_DATA_PACKET;
+        return protocol.getPacketId("FULL_CHUNK_DATA_PACKET");
     }
 
     public int chunkX;

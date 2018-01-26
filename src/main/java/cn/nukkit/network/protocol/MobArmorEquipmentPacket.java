@@ -10,9 +10,7 @@ public class MobArmorEquipmentPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.MOB_ARMOR_EQUIPMENT_PACKET :
-                ProtocolInfo.MOB_ARMOR_EQUIPMENT_PACKET;
+        return protocol.getPacketId("MOB_ARMOR_EQUIPMENT_PACKET");
     }
 
     public long eid;

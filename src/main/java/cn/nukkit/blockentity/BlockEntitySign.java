@@ -99,7 +99,7 @@ public class BlockEntitySign extends BlockEntitySpawnable {
 
     @Override
     public CompoundTag getSpawnCompound(PlayerProtocol protocol) {
-        if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) return new CompoundTag()
+        if (protocol.getMainNumber() == 113) return new CompoundTag()
                 .putString("id", BlockEntity.SIGN)
                 .putString("Text1", getText(0))
                 .putString("Text2", getText(1))

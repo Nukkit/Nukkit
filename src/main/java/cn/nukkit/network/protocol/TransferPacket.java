@@ -7,6 +7,11 @@ public class TransferPacket extends DataPacket {
     public int port = 19132; // Server port
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("TRANSFER_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         this.address = this.getString();
         this.port = (short) this.getLShort();
@@ -19,10 +24,4 @@ public class TransferPacket extends DataPacket {
         this.putLShort(port);
     }
 
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.TRANSFER_PACKET :
-                ProtocolInfo.TRANSFER_PACKET;
-    }
 }

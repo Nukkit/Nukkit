@@ -9,6 +9,11 @@ public class ResourcePackDataInfoPacket extends DataPacket {
     public byte[] sha256;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("RESOURCE_PACK_DATA_INFO_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         this.packId = this.getString();
         this.maxChunkSize = this.getLInt();
@@ -27,10 +32,4 @@ public class ResourcePackDataInfoPacket extends DataPacket {
         this.putByteArray(this.sha256);
     }
 
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.RESOURCE_PACK_DATA_INFO_PACKET :
-                ProtocolInfo.RESOURCE_PACK_DATA_INFO_PACKET;
-    }
 }

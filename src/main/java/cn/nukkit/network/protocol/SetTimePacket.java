@@ -10,9 +10,7 @@ public class SetTimePacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.SET_TIME_PACKET :
-                ProtocolInfo.SET_TIME_PACKET;
+        return protocol.getPacketId("SET_TIME_PACKET");
     }
 
     @Override

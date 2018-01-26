@@ -11,6 +11,11 @@ public class ResourcePackClientResponsePacket extends DataPacket {
     public String[] packIds;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("RESOURCE_PACK_CLIENT_RESPONSE_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         this.responseStatus = (byte) this.getByte();
         this.packIds = new String[this.getLShort()];
@@ -29,10 +34,4 @@ public class ResourcePackClientResponsePacket extends DataPacket {
         }
     }
 
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.RESOURCE_PACK_CLIENT_RESPONSE_PACKET :
-                ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET;
-    }
 }

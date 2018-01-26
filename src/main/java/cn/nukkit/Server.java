@@ -569,48 +569,34 @@ public class Server {
         }
 
         Timings.playerNetworkSendTimer.startTiming();
-        byte[][] payload113 = new byte[packets.length * 2][];
-        byte[][] payload = new byte[packets.length * 2][];
-        for (int i = 0; i < packets.length; i++) {
-            DataPacket p = packets[i];
-            DataPacket p113 = p.clone();
-            if (!p.isEncoded) {
-                p.encode(PlayerProtocol.PLAYER_PROTOCOL_130);
-            }
-            if (!p113.isEncoded){
-                p113.encode(PlayerProtocol.PLAYER_PROTOCOL_113);
-            }
-            byte[] buf = p.getBuffer();
-            byte[] buf113 = p113.getBuffer();
-            payload[i * 2] = Binary.writeUnsignedVarInt(buf.length);
-            payload[i * 2 + 1] = buf;
-            payload113[i * 2] = Binary.writeUnsignedVarInt(buf113.length);
-            payload113[i * 2 + 1] = buf113;
-        }
-        byte[] data113;
-        data113 = Binary.appendBytes(payload113);
-        byte[] data;
-        data = Binary.appendBytes(payload);
 
-        List<String> targets = new ArrayList<>();
-        List<String> targets113 = new ArrayList<>();
-        for (Player p : players) {
-            if (p.isConnected()) {
-                if (p.getProtocol().equals(PlayerProtocol.PLAYER_PROTOCOL_113))
-                    targets113.add(this.identifier.get(p.rawHashCode()));
-                else targets.add(this.identifier.get(p.rawHashCode()));
+        for (PlayerProtocol protocol : PlayerProtocol.values()){
+            byte[][] payload = new byte[packets.length * 2][];
+            for (int i = 0; i < packets.length; i++) {
+                DataPacket p = packets[i];
+                if (!p.isEncoded) p.encode(protocol);
+                byte[] buf = p.getBuffer();
+                payload[i * 2] = Binary.writeUnsignedVarInt(buf.length);
+                payload[i * 2 + 1] = buf;
             }
-        }
+            byte[] data;
+            data = Binary.appendBytes(payload);
 
-        if (!forceSync && this.networkCompressionAsync) {
-            this.getScheduler().scheduleAsyncTask(null, new CompressBatchedTask(data113, targets113, this.networkCompressionLevel));
-            this.getScheduler().scheduleAsyncTask(null, new CompressBatchedTask(data, targets, this.networkCompressionLevel));
-        } else {
-            try {
-                this.broadcastPacketsCallback(Zlib.deflate(data, this.networkCompressionLevel), targets);
-                this.broadcastPacketsCallback(Zlib.deflate(data113, this.networkCompressionLevel), targets113);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            List<String> targets = new ArrayList<>();
+            for (Player p : players) {
+                if (p.isConnected()) {
+                    if (p.getProtocol().equals(protocol)) targets.add(this.identifier.get(p.rawHashCode()));
+                }
+            }
+
+            if (!forceSync && this.networkCompressionAsync) {
+                this.getScheduler().scheduleAsyncTask(null, new CompressBatchedTask(data, targets, this.networkCompressionLevel));
+            } else {
+                try {
+                    this.broadcastPacketsCallback(Zlib.deflate(data, this.networkCompressionLevel), targets);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         Timings.playerNetworkSendTimer.stopTiming();
@@ -923,8 +909,7 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        player.dataPacket(player.getProtocol().equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                CraftingManager.packet113 : CraftingManager.packet);
+        player.dataPacket(CraftingManager.packets.get(player.getProtocol()));
     }
 
     private void checkTickUpdates(int currentTick, long tickTime) {

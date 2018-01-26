@@ -15,9 +15,7 @@ public class PlayerSkinPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                0 :
-                ProtocolInfo.PLAYER_SKIN_PACKET;
+        return protocol.getPacketId("PLAYER_SKIN_PACKET");
     }
 
     @Override

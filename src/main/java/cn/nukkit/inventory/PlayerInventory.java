@@ -325,24 +325,24 @@ public class PlayerInventory extends BaseInventory {
     public void sendArmorContents(Player[] players) {
         Item[] armor = this.getArmorContents();
 
-        MobArmorEquipmentPacket pk = new MobArmorEquipmentPacket();
-        pk.eid = this.getHolder().getId();
-        pk.slots = armor;
-        MobArmorEquipmentPacket pk113 = (MobArmorEquipmentPacket) pk.clone();
-        pk.encode(PlayerProtocol.PLAYER_PROTOCOL_130);
-        pk.isEncoded = true;
-        pk113.encode(PlayerProtocol.PLAYER_PROTOCOL_113);
-        pk113.isEncoded = true;
+        for (PlayerProtocol protocol : PlayerProtocol.values()){
+            MobArmorEquipmentPacket pk = new MobArmorEquipmentPacket();
+            pk.eid = this.getHolder().getId();
+            pk.slots = armor;
+            pk.encode(protocol);
+            pk.isEncoded = true;
 
-        for (Player player : players) {
-            if (player.equals(this.getHolder())) {
-                InventoryContentPacket pk2 = new InventoryContentPacket();
-                pk2.eid = player.getId();
-                pk2.inventoryId = InventoryContentPacket.SPECIAL_ARMOR;
-                pk2.slots = armor;
-                player.dataPacket(pk2);
-            } else {
-                player.dataPacket(player.getProtocol().equals(PlayerProtocol.PLAYER_PROTOCOL_113) ? pk113 : pk);
+            for (Player player : players) {
+                if (!player.getProtocol().equals(protocol)) continue;
+                if (player.equals(this.getHolder())) {
+                    InventoryContentPacket pk2 = new InventoryContentPacket();
+                    pk2.eid = player.getId();
+                    pk2.inventoryId = InventoryContentPacket.SPECIAL_ARMOR;
+                    pk2.slots = armor;
+                    player.dataPacket(pk2);
+                } else {
+                    player.dataPacket(pk);
+                }
             }
         }
     }
@@ -378,24 +378,24 @@ public class PlayerInventory extends BaseInventory {
     public void sendArmorSlot(int index, Player[] players) {
         Item[] armor = this.getArmorContents();
 
-        MobArmorEquipmentPacket pk = new MobArmorEquipmentPacket();
-        pk.eid = this.getHolder().getId();
-        pk.slots = armor;
-        MobArmorEquipmentPacket pk113 = (MobArmorEquipmentPacket) pk.clone();
-        pk113.encode(PlayerProtocol.PLAYER_PROTOCOL_113);
-        pk113.isEncoded = true;
-        pk.encode(PlayerProtocol.PLAYER_PROTOCOL_130);
-        pk.isEncoded = true;
+        for (PlayerProtocol protocol : PlayerProtocol.values()){
+            MobArmorEquipmentPacket pk = new MobArmorEquipmentPacket();
+            pk.eid = this.getHolder().getId();
+            pk.slots = armor;
+            pk.encode(protocol);
+            pk.isEncoded = true;
 
-        for (Player player : players) {
-            if (player.equals(this.getHolder())) {
-                InventorySlotPacket pk2 = new InventorySlotPacket();
-                pk2.inventoryId = InventoryContentPacket.SPECIAL_ARMOR;
-                pk2.slot = index - this.getSize();
-                pk2.item = this.getItem(index);
-                player.dataPacket(pk2);
-            } else {
-                player.dataPacket(player.getProtocol().equals(PlayerProtocol.PLAYER_PROTOCOL_113) ? pk113 : pk);
+            for (Player player : players) {
+                if (!player.getProtocol().equals(protocol)) continue;
+                if (player.equals(this.getHolder())) {
+                    InventorySlotPacket pk2 = new InventorySlotPacket();
+                    pk2.inventoryId = InventoryContentPacket.SPECIAL_ARMOR;
+                    pk2.slot = index - this.getSize();
+                    pk2.item = this.getItem(index);
+                    player.dataPacket(pk2);
+                } else {
+                    player.dataPacket(pk);
+                }
             }
         }
     }

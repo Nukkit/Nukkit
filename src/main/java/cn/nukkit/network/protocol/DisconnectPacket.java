@@ -10,9 +10,7 @@ public class DisconnectPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.DISCONNECT_PACKET :
-                ProtocolInfo.DISCONNECT_PACKET;
+        return protocol.getPacketId("DISCONNECT_PACKET");
     }
 
     @Override

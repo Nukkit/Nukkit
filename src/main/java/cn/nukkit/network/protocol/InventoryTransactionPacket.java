@@ -39,9 +39,7 @@ public class InventoryTransactionPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                0 :
-                ProtocolInfo.INVENTORY_TRANSACTION_PACKET;
+        return protocol.getPacketId("INVENTORY_TRANSACTION_PACKET");
     }
 
     @Override

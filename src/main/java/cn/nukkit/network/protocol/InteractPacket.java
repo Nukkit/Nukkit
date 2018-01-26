@@ -18,6 +18,11 @@ public class InteractPacket extends DataPacket {
     public long target;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("INTERACT_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         this.action = this.getByte();
         this.target = this.getEntityRuntimeId();
@@ -28,13 +33,6 @@ public class InteractPacket extends DataPacket {
         this.reset(protocol);
         this.putByte((byte) this.action);
         this.putEntityRuntimeId(this.target);
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.INTERACT_PACKET :
-                ProtocolInfo.INTERACT_PACKET;
     }
 
 }

@@ -12,6 +12,11 @@ public class RespawnPacket extends DataPacket {
     public float z;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("RESPAWN_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         Vector3f v = this.getVector3f();
         this.x = v.x;
@@ -23,13 +28,6 @@ public class RespawnPacket extends DataPacket {
     public void encode(PlayerProtocol protocol) {
         this.reset(protocol);
         this.putVector3f(this.x, this.y, this.z);
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.RESPAWN_PACKET :
-                ProtocolInfo.RESPAWN_PACKET;
     }
 
 }

@@ -80,32 +80,41 @@ public class Binary {
     }
 
     public static UUID readUUID(byte[] bytes, PlayerProtocol protocol) {
-        if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) return new UUID(readLong(bytes), readLong(new byte[]{
-                bytes[8],
-                bytes[9],
-                bytes[10],
-                bytes[11],
-                bytes[12],
-                bytes[13],
-                bytes[14],
-                bytes[15]
-        }));
-        return new UUID(readLLong(bytes), readLLong(new byte[]{
-                bytes[8],
-                bytes[9],
-                bytes[10],
-                bytes[11],
-                bytes[12],
-                bytes[13],
-                bytes[14],
-                bytes[15]
-        }));
+        switch (protocol.getMainNumber()){
+            case 130:
+            default:
+                return new UUID(readLLong(bytes), readLLong(new byte[]{
+                        bytes[8],
+                        bytes[9],
+                        bytes[10],
+                        bytes[11],
+                        bytes[12],
+                        bytes[13],
+                        bytes[14],
+                        bytes[15]
+                }));
+            case 113:
+                return new UUID(readLong(bytes), readLong(new byte[]{
+                        bytes[8],
+                        bytes[9],
+                        bytes[10],
+                        bytes[11],
+                        bytes[12],
+                        bytes[13],
+                        bytes[14],
+                        bytes[15]
+                }));
+        }
     }
 
     public static byte[] writeUUID(UUID uuid, PlayerProtocol protocol) {
-        if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) return
-                appendBytes(writeLong(uuid.getMostSignificantBits()), writeLong(uuid.getLeastSignificantBits()));
-        else return appendBytes(writeLLong(uuid.getMostSignificantBits()), writeLLong(uuid.getLeastSignificantBits()));
+        switch (protocol.getMainNumber()){
+            case 130:
+            default:
+                appendBytes(writeLLong(uuid.getMostSignificantBits()), writeLLong(uuid.getLeastSignificantBits()));
+            case 113:
+                return appendBytes(writeLong(uuid.getMostSignificantBits()), writeLong(uuid.getLeastSignificantBits()));
+        }
     }
 
     public static byte[] writeMetadata(EntityMetadata metadata) {

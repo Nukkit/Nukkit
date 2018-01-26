@@ -28,6 +28,11 @@ public class CraftingDataPacket extends DataPacket {
     public List<Object> entries = new ArrayList<>();
     public boolean cleanRecipes;
 
+    @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("CRAFTING_DATA_PACKET");
+    }
+
     private static int writeEntry(Object entry, BinaryStream stream, PlayerProtocol protocol) {
         if (entry instanceof ShapelessRecipe) {
             return writeShapelessRecipe(((ShapelessRecipe) entry), stream, protocol);
@@ -150,13 +155,6 @@ public class CraftingDataPacket extends DataPacket {
         }
 
         this.putBoolean(cleanRecipes);
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.CRAFTING_DATA_PACKET :
-                ProtocolInfo.CRAFTING_DATA_PACKET;
     }
 
 }

@@ -12,6 +12,11 @@ public class PlayerInputPacket extends DataPacket {
     public boolean unknownBool2;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("PLAYER_INPUT_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         this.motionX = this.getLFloat();
         this.motionY = this.getLFloat();
@@ -22,13 +27,6 @@ public class PlayerInputPacket extends DataPacket {
     @Override
     public void encode(PlayerProtocol protocol) {
 
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.PLAYER_INPUT_PACKET :
-                ProtocolInfo.PLAYER_INPUT_PACKET;
     }
 
 }

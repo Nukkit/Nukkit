@@ -9,6 +9,11 @@ public class RemoveBlockPacket extends DataPacket {
     public int z;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("REMOVE_BLOCK_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         BlockVector3 v = this.getBlockVector3();
         this.x = v.x;
@@ -18,12 +23,6 @@ public class RemoveBlockPacket extends DataPacket {
 
     @Override
     public void encode(PlayerProtocol protocol) {
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol){
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.REMOVE_BLOCK_PACKET : 0;
     }
 
 }

@@ -6,9 +6,7 @@ public class RiderJumpPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.RIDER_JUMP_PACKET :
-                ProtocolInfo.RIDER_JUMP_PACKET;
+        return protocol.getPacketId("RIDER_JUMP_PACKET");
     }
 
     @Override

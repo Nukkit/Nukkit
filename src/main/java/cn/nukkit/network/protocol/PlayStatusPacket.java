@@ -7,9 +7,7 @@ public class PlayStatusPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.PLAY_STATUS_PACKET :
-                ProtocolInfo.PLAY_STATUS_PACKET;
+        return protocol.getPacketId("PLAY_STATUS_PACKET");
     }
 
     public static final int LOGIN_SUCCESS = 0;

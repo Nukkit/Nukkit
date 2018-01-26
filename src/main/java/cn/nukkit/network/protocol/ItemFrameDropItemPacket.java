@@ -12,6 +12,11 @@ public class ItemFrameDropItemPacket extends DataPacket {
     public int z;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("ITEM_FRAME_DROP_ITEM_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         BlockVector3 v = this.getBlockVector3();
         this.z = v.z;
@@ -24,10 +29,4 @@ public class ItemFrameDropItemPacket extends DataPacket {
 
     }
 
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.ITEM_FRAME_DROP_ITEM_PACKET :
-                ProtocolInfo.ITEM_FRAME_DROP_ITEM_PACKET;
-    }
 }

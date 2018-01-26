@@ -10,9 +10,7 @@ public class UpdateEquipmentPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.UPDATE_EQUIP_PACKET :
-                ProtocolInfo.UPDATE_EQUIPMENT_PACKET;
+        return protocol.getPacketId("UPDATE_EQUIPMENT_PACKET");
     }
 
     @Override

@@ -33,9 +33,7 @@ public class ClientboundMapItemDataPacket extends DataPacket { //TODO: update to
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.CLIENTBOUND_MAP_ITEM_DATA_PACKET :
-                ProtocolInfo.CLIENTBOUND_MAP_ITEM_DATA_PACKET;
+        return protocol.getPacketId("CLIENTBOUND_MAP_ITEM_DATA_PACKET");
     }
 
     @Override
@@ -77,7 +75,7 @@ public class ClientboundMapItemDataPacket extends DataPacket { //TODO: update to
             this.putUnsignedVarInt(decorators.length);
 
             for (MapDecorator decorator : decorators) {
-                if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113))
+                if (protocol.getMainNumber() == 113)
                     this.putVarInt((decorator.rotation & 0x0f) | (decorator.icon << 4));
                 else {
                     this.putByte(decorator.rotation);
@@ -86,7 +84,7 @@ public class ClientboundMapItemDataPacket extends DataPacket { //TODO: update to
                 this.putByte(decorator.offsetX);
                 this.putByte(decorator.offsetZ);
                 this.putString(decorator.label);
-                if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) this.putLInt(decorator.color.getRGB());
+                if (protocol.getMainNumber() == 113) this.putLInt(decorator.color.getRGB());
                 else this.putVarInt(decorator.color.getRGB());
             }
         }

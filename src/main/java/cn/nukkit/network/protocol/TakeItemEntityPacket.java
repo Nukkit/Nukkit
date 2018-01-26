@@ -9,6 +9,11 @@ public class TakeItemEntityPacket extends DataPacket {
     public long target;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("TAKE_ITEM_ENTITY_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         this.target = this.getEntityRuntimeId();
         this.entityId = this.getEntityRuntimeId();
@@ -19,13 +24,6 @@ public class TakeItemEntityPacket extends DataPacket {
         this.reset(protocol);
         this.putEntityRuntimeId(this.target);
         this.putEntityRuntimeId(this.entityId);
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.TAKE_ITEM_ENTITY_PACKET :
-                ProtocolInfo.TAKE_ITEM_ENTITY_PACKET;
     }
 
 }

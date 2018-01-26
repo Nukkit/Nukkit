@@ -10,9 +10,7 @@ public class MobEquipmentPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.MOB_EQUIPMENT_PACKET :
-                ProtocolInfo.MOB_EQUIPMENT_PACKET;
+        return protocol.getPacketId("MOB_EQUIPMENT_PACKET");
     }
 
     public long eid;
@@ -26,7 +24,7 @@ public class MobEquipmentPacket extends DataPacket {
         this.eid = this.getEntityRuntimeId(); //EntityRuntimeID
         this.item = this.getSlot();
         this.inventorySlot = this.getByte();
-        if (this.windowId == 0 && protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) this.inventorySlot -= 9;
+        if (this.windowId == 0 && protocol.getMainNumber() == 113) this.inventorySlot -= 9;
         if (this.inventorySlot < 0) this.inventorySlot += 9;
         this.hotbarSlot = this.getByte();
         this.windowId = this.getByte();
@@ -37,8 +35,8 @@ public class MobEquipmentPacket extends DataPacket {
         this.reset(protocol);
         this.putEntityRuntimeId(this.eid); //EntityRuntimeID
         this.putSlot(this.item);
-        if (this.windowId == 0 && protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) this.inventorySlot += 9;
-        if (this.inventorySlot < 0) this.inventorySlot -= 9;
+        if (this.windowId == 0 && protocol.getMainNumber() == 113) this.inventorySlot += 9;
+        if (this.inventorySlot < 0) this.inventorySlot += 9;
         this.putByte((byte) (this.inventorySlot));
         this.putByte((byte) this.hotbarSlot);
         this.putByte((byte) this.windowId);

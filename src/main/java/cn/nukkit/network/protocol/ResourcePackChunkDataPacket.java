@@ -8,6 +8,11 @@ public class ResourcePackChunkDataPacket extends DataPacket {
     public byte[] data;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("RESOURCE_PACK_CHUNK_DATA_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         this.packId = this.getString();
         this.chunkIndex = this.getLInt();
@@ -23,12 +28,5 @@ public class ResourcePackChunkDataPacket extends DataPacket {
         this.putLLong(this.progress);
         this.putLInt(this.data.length);
         this.put(this.data);
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.RESOURCE_PACK_CHUNK_DATA_PACKET :
-                ProtocolInfo.RESOURCE_PACK_CHUNK_DATA_PACKET;
     }
 }

@@ -29,11 +29,10 @@ public class UseItemPacket extends DataPacket {
 
     public Item item;
 
-     @Override
-     public byte pid(PlayerProtocol protocol){
-         return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                 ProtocolInfo113.USE_ITEM_PACKET : 0;
-     }
+    @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("USE_ITEM_PACKET");
+    }
 
     @Override
     public void decode(PlayerProtocol protocol) {

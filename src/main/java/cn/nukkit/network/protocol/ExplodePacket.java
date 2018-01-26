@@ -16,9 +16,7 @@ public class ExplodePacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.EXPLODE_PACKET :
-                ProtocolInfo.EXPLODE_PACKET;
+        return protocol.getPacketId("EXPLODE_PACKET");
     }
 
     @Override

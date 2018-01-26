@@ -18,9 +18,7 @@ public class ContainerSetDataPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.CONTAINER_SET_DATA_PACKET :
-                ProtocolInfo.CONTAINER_SET_DATA_PACKET;
+        return protocol.getPacketId("CONTAINER_SET_DATA_PACKET");
     }
 
     public int windowId;

@@ -13,9 +13,7 @@ public class SetEntityMotionPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.SET_ENTITY_MOTION_PACKET :
-                ProtocolInfo.SET_ENTITY_MOTION_PACKET;
+        return protocol.getPacketId("SET_ENTITY_MOTION_PACKET");
     }
 
     @Override

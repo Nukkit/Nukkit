@@ -10,9 +10,7 @@ public class ShowCreditsPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.SHOW_CREDITS_PACKET :
-                ProtocolInfo.SHOW_CREDITS_PACKET;
+        return protocol.getPacketId("SHOW_CREDITS_PACKET");
     }
 
     @Override

@@ -6,9 +6,7 @@ public class GUIDataPickItemPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                0 :
-                ProtocolInfo.GUI_DATA_PICK_ITEM_PACKET;
+        return protocol.getPacketId("GUI_DATA_PICK_ITEM_PACKET");
     }
 
     @Override

@@ -15,6 +15,11 @@ public class SetEntityLinkPacket extends DataPacket {
     public byte unknownByte;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("SET_ENTITY_LINK_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
 
     }
@@ -28,10 +33,4 @@ public class SetEntityLinkPacket extends DataPacket {
         this.putByte(this.unknownByte);
     }
 
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.SET_ENTITY_LINK_PACKET :
-                ProtocolInfo.SET_ENTITY_LINK_PACKET;
-    }
 }

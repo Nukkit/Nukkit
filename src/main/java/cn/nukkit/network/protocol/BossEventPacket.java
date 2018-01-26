@@ -34,9 +34,7 @@ public class BossEventPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.BOSS_EVENT_PACKET :
-                ProtocolInfo.BOSS_EVENT_PACKET;
+        return protocol.getPacketId("BOSS_EVENT_PACKET");
     }
 
     @Override

@@ -12,9 +12,7 @@ public class AddItemEntityPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.ADD_ITEM_ENTITY_PACKET :
-                ProtocolInfo.ADD_ITEM_ENTITY_PACKET;
+        return protocol.getPacketId("ADD_ITEM_ENTITY_PACKET");
     }
 
     public long entityUniqueId;

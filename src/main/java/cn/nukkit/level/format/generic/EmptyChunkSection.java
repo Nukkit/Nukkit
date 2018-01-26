@@ -132,7 +132,7 @@ public class EmptyChunkSection implements ChunkSection {
 
     @Override
     public byte[] getBytes(PlayerProtocol protocol) {
-        if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) {
+        if (protocol.getMainNumber() == 113) {
             ByteBuffer buffer = ByteBuffer.allocate(10240);
             byte[] skyLight = new byte[2048];
             Arrays.fill(skyLight, (byte) 0xff);

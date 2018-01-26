@@ -14,9 +14,7 @@ public class UpdateTradePacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.UPDATE_TRADE_PACKET :
-                ProtocolInfo.UPDATE_TRADE_PACKET;
+        return protocol.getPacketId("UPDATE_TRADE_PACKET");
     }
 
     @Override

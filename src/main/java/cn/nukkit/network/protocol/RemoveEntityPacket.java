@@ -10,9 +10,7 @@ public class RemoveEntityPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.REMOVE_ENTITY_PACKET :
-                ProtocolInfo.REMOVE_ENTITY_PACKET;
+        return protocol.getPacketId("REMOVE_ENTITY_PACKET");
     }
 
     @Override

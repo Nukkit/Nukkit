@@ -25,10 +25,22 @@ public class CraftingEventPacket extends DataPacket {
     public Item[] output;
 
     @Override
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("CRAFTING_EVENT_PACKET");
+    }
+
+    @Override
     public void decode(PlayerProtocol protocol) {
         this.windowId = this.getByte();
-        if (protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113)) this.type = (int) this.getUnsignedVarInt();
-        else this.type = this.getVarInt();
+        switch(protocol.getMainNumber()){
+            case 130:
+            default:
+                this.type = this.getVarInt();
+                break;
+            case 113:
+                this.type = (int) this.getUnsignedVarInt();
+                break;
+        }
         this.id = this.getUUID(protocol);
 
         int inputSize = (int) this.getUnsignedVarInt();
@@ -47,13 +59,6 @@ public class CraftingEventPacket extends DataPacket {
     @Override
     public void encode(PlayerProtocol protocol) {
 
-    }
-
-    @Override
-    public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.CRAFTING_EVENT_PACKET :
-                ProtocolInfo.CRAFTING_EVENT_PACKET;
     }
 
 }

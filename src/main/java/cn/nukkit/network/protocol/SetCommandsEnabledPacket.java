@@ -6,9 +6,7 @@ public class SetCommandsEnabledPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.SET_COMMANDS_ENABLED_PACKET :
-                ProtocolInfo.SET_COMMANDS_ENABLED_PACKET;
+        return protocol.getPacketId("SET_COMMANDS_ENABLED_PACKET");
     }
 
     @Override

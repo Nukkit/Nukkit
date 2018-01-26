@@ -109,15 +109,7 @@ public class Level implements ChunkManager, Metadatable {
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .build().asMap();
 
-    // Use a weak map to avoid OOM
-    private final ConcurrentMap<Object, Object> chunkCache113 = CacheBuilder.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .build().asMap();
-    private final ConcurrentMap<Object, Object> chunkCache = CacheBuilder.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .build().asMap();
+    private final HashMap<PlayerProtocol, ConcurrentMap<Object, Object>> chunkCache = new HashMap<>();
 
     private boolean cacheChunks = false;
 
@@ -832,7 +824,6 @@ public class Level implements ChunkManager, Metadatable {
                     long index = entry.getKey();
                     Map<Short, Object> blocks = entry.getValue().get();
                     this.chunkCache.remove(index);
-                    this.chunkCache113.remove(index);
                     int chunkX = Level.getHashX(index);
                     int chunkZ = Level.getHashZ(index);
                     if (blocks == null || blocks.size() > MAX_BLOCK_CACHE) {
@@ -853,7 +844,6 @@ public class Level implements ChunkManager, Metadatable {
                 }
             } else {
                 this.chunkCache.clear();
-                this.chunkCache113.clear();
             }
 
             this.changedBlocks.clear();
@@ -1038,16 +1028,13 @@ public class Level implements ChunkManager, Metadatable {
     public void clearCache(boolean full) {
         if (full) {
             this.chunkCache.clear();
-            this.chunkCache113.clear();
             this.blockCache.clear();
         } else {
-            if (this.chunkCache.size() > 2048) {
-                this.chunkCache.clear();
+            Iterator<PlayerProtocol> chunkIterator = this.chunkCache.keySet().iterator();
+            while (chunkIterator.hasNext()){
+                PlayerProtocol protocol = chunkIterator.next();
+                if (this.chunkCache.get(protocol).size() > 2048) chunkIterator.remove();
             }
-            if (this.chunkCache113.size() > 2048){
-                this.chunkCache113.clear();
-            }
-
             if (this.blockCache.size() > 2048) {
                 this.blockCache.clear();
             }
@@ -1056,7 +1043,6 @@ public class Level implements ChunkManager, Metadatable {
 
     public void clearChunkCache(int chunkX, int chunkZ) {
         this.chunkCache.remove(Level.chunkHash(chunkX, chunkZ));
-        this.chunkCache113.remove(Level.chunkHash(chunkX, chunkZ));
     }
 
     private void tickChunks() {
@@ -1663,7 +1649,6 @@ public class Level implements ChunkManager, Metadatable {
                 this.sendBlocks(this.getChunkPlayers((int) position.x >> 4, (int) position.z >> 4).values().stream()
                         .toArray(Player[]::new), new Block[]{block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
                 this.chunkCache.remove(index);
-                this.chunkCache113.remove(index);
             } else {
                 addBlockChange(index, (int) block.x, (int) block.y, (int) block.z);
             }
@@ -2387,7 +2372,6 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         this.chunkCache.remove(index);
-        this.chunkCache113.remove(index);
         chunk.setChanged();
 
         if (!this.isChunkInUse(chunkX, chunkZ)) {
@@ -2465,9 +2449,7 @@ public class Level implements ChunkManager, Metadatable {
         if (this.chunkSendTasks.containsKey(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
-                    if (player.getProtocol().equals(PlayerProtocol.PLAYER_PROTOCOL_113))
-                        player.sendChunk(x, z, (DataPacket) this.chunkCache113.get(index));
-                    else player.sendChunk(x, z, (DataPacket) this.chunkCache.get(index));
+                    player.sendChunk(x, z, (DataPacket) this.chunkCache.get(player.getProtocol()).get(index));
                 }
             }
 
@@ -2486,10 +2468,15 @@ public class Level implements ChunkManager, Metadatable {
                 int x = getHashX(index);
                 int z = getHashZ(index);
                 this.chunkSendTasks.put(index, true);
-                if (this.chunkCache.containsKey(index) || this.chunkCache113.containsKey(index)) {
-                    this.sendChunkFromCache(x, z);
-                    continue;
+                boolean shouldContinue = false;
+                for (PlayerProtocol protocol : this.chunkCache.keySet()){
+                    if (this.chunkCache.get(protocol).containsKey(index)) {
+                        this.sendChunkFromCache(x, z);
+                        shouldContinue = true;
+                        break;
+                    }
                 }
+                if (shouldContinue) continue;
                 this.timings.syncChunkSendPrepareTimer.startTiming();
                 AsyncTask task = this.provider.requestChunkTask(x, z);
                 if (task != null) {
@@ -2501,22 +2488,26 @@ public class Level implements ChunkManager, Metadatable {
         }
     }
 
-    public void chunkRequestCallback(int x, int z, byte[] payload113, byte[] payload) {
+    public void chunkRequestCallback(int x, int z, HashMap<PlayerProtocol, byte[]> payload) {
         this.timings.syncChunkSendTimer.startTiming();
         Long index = Level.chunkHash(x, z);
 
-        if (this.cacheChunks && (!this.chunkCache.containsKey(index) || !this.chunkCache113.containsKey(index))) {
-            this.chunkCache.put(index, Player.getChunkCacheFromData(x, z, payload, PlayerProtocol.PLAYER_PROTOCOL_130));
-            this.chunkCache113.put(index, Player.getChunkCacheFromData(x, z, payload113, PlayerProtocol.PLAYER_PROTOCOL_113));
-            this.sendChunkFromCache(x, z);
-            this.timings.syncChunkSendTimer.stopTiming();
-            return;
-        }
-
+        payload.forEach((protocol, chunkCache) -> {
+            if (!this.chunkCache.containsKey(protocol)) this.chunkCache.put(protocol, CacheBuilder.newBuilder()
+                    .maximumSize(1000)
+                    .expireAfterWrite(10, TimeUnit.MINUTES)
+                    .build().asMap());
+            if (this.cacheChunks && !this.chunkCache.get(protocol).containsKey(index)) {
+                this.chunkCache.get(protocol).put(index, Player.getChunkCacheFromData(x, z, chunkCache, protocol));
+                this.sendChunkFromCache(x, z);
+                this.timings.syncChunkSendTimer.stopTiming();
+                return;
+            }
+        });
         if (this.chunkSendTasks.containsKey(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
-                    player.sendChunk(x, z, payload113, payload);
+                    player.sendChunk(x, z, payload);
                 }
             }
 
@@ -2711,7 +2702,6 @@ public class Level implements ChunkManager, Metadatable {
         this.chunks.remove(index);
         this.chunkTickList.remove(index);
         this.chunkCache.remove(index);
-        this.chunkCache113.remove(index);
 
         this.timings.doChunkUnload.stopTiming();
 

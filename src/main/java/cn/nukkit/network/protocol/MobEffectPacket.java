@@ -8,9 +8,7 @@ public class MobEffectPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.MOB_EFFECT_PACKET :
-                ProtocolInfo.MOB_EFFECT_PACKET;
+        return protocol.getPacketId("MOB_EFFECT_PACKET");
     }
 
     public static final byte EVENT_ADD = 1;

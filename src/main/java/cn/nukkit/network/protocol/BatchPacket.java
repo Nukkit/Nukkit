@@ -10,9 +10,7 @@ public class BatchPacket extends DataPacket {
 
     @Override
     public byte pid(PlayerProtocol protocol) {
-        return protocol.equals(PlayerProtocol.PLAYER_PROTOCOL_113) ?
-                ProtocolInfo113.BATCH_PACKET :
-                ProtocolInfo.BATCH_PACKET;
+        return protocol.getPacketId("BATCH_PACKET");
     }
 
     @Override
