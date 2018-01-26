@@ -31,7 +31,7 @@ public class CraftingManager {
 
     private static int RECIPE_COUNT = 0;
 
-    public static HashMap<PlayerProtocol, CraftingDataPacket> packets = null;
+    public static HashMap<PlayerProtocol, CraftingDataPacket> packets = new HashMap<>();
 
     private static final Comparator<Item> recipeComparator = (i1, i2) -> {
         if (i1.getId() > i2.getId()) {

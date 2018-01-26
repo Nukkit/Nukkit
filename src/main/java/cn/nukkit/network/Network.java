@@ -128,7 +128,6 @@ public class Network {
                     if (!this.packetPools.containsKey(protocol)) this.packetPools.put(protocol, new Class[256]);
                     this.packetPools.get(protocol)[packetID & 0xff] = clazz;
                 }
-                else System.out.println("Class for packet "+clazz.getName()+" in protocol "+protocol.getNumber()+" does not exist");
             }
         }
         catch (Exception exc) {}
