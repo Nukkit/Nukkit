@@ -2468,15 +2468,18 @@ public class Level implements ChunkManager, Metadatable {
                 int x = getHashX(index);
                 int z = getHashZ(index);
                 this.chunkSendTasks.put(index, true);
-                boolean shouldContinue = false;
+                //Check if we cached chunk for all protocols
+                boolean wasInterrupted = false;
                 for (PlayerProtocol protocol : this.chunkCache.keySet()){
-                    if (this.chunkCache.get(protocol).containsKey(index)) {
-                        this.sendChunkFromCache(x, z);
-                        shouldContinue = true;
+                    if (!this.chunkCache.get(protocol).containsKey(index)) {
+                        wasInterrupted = true;
                         break;
                     }
                 }
-                if (shouldContinue) continue;
+                if (!wasInterrupted && !this.chunkCache.isEmpty()) {
+                    this.sendChunkFromCache(x, z);
+                    continue;
+                }
                 this.timings.syncChunkSendPrepareTimer.startTiming();
                 AsyncTask task = this.provider.requestChunkTask(x, z);
                 if (task != null) {
@@ -2499,11 +2502,13 @@ public class Level implements ChunkManager, Metadatable {
                     .build().asMap());
             if (this.cacheChunks && !this.chunkCache.get(protocol).containsKey(index)) {
                 this.chunkCache.get(protocol).put(index, Player.getChunkCacheFromData(x, z, chunkCache, protocol));
-                this.sendChunkFromCache(x, z);
-                this.timings.syncChunkSendTimer.stopTiming();
-                return;
             }
         });
+        if (this.cacheChunks) {
+            this.sendChunkFromCache(x, z);
+            this.timings.syncChunkSendTimer.stopTiming();
+            return;
+        }
         if (this.chunkSendTasks.containsKey(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
