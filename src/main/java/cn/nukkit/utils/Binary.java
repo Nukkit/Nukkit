@@ -111,7 +111,7 @@ public class Binary {
         switch (protocol.getMainNumber()){
             case 130:
             default:
-                appendBytes(writeLLong(uuid.getMostSignificantBits()), writeLLong(uuid.getLeastSignificantBits()));
+                return appendBytes(writeLLong(uuid.getMostSignificantBits()), writeLLong(uuid.getLeastSignificantBits()));
             case 113:
                 return appendBytes(writeLong(uuid.getMostSignificantBits()), writeLong(uuid.getLeastSignificantBits()));
         }
