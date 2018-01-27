@@ -15,6 +15,19 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>central</id>
+            <name>potestas-releases</name>
+            <url>https://repo.potestas.xyz/main</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>potestas-snapshots</name>
+            <url>https://repo.potestas.xyz/main</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.fusesource.jansi</groupId>
@@ -54,8 +67,16 @@
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
+            <artifactId>netty-handler</artifactId>
             <version>4.1.6.Final</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-epoll</artifactId>
+            <version>4.1.6.Final</version>
+            <scope>compile</scope>
+            <classifier>linux-x86_64</classifier>
         </dependency>
         <dependency>
             <groupId>com.github.dblock</groupId>
@@ -84,6 +105,12 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.jupiter.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>4.39.2</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

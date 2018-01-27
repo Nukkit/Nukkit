@@ -153,6 +153,7 @@ public class Server {
 
     private boolean networkCompressionAsync = true;
     public int networkCompressionLevel = 7;
+    private int networkZlibProvider = 0;
 
     private boolean autoTickRate = true;
     private int autoTickRateLimit = 20;
@@ -291,6 +292,7 @@ public class Server {
                 put("auto-save", true);
                 put("force-resources", false);
                 put("bug-report", true);
+                put("xbox-auth", true);
             }
         });
 
@@ -310,8 +312,8 @@ public class Server {
 
         ServerScheduler.WORKERS = (int) poolSize;
 
-        this.networkCompressionLevel = (int) this.getConfig("network.compression-level", 7);
-        this.networkCompressionAsync = (boolean) this.getConfig("network.async-compression", true);
+        this.networkZlibProvider = (int) this.getConfig("network.zlib-provider", 0);
+        Zlib.setProvider(this.networkZlibProvider);
 
         this.networkCompressionLevel = (int) this.getConfig("network.compression-level", 7);
         this.networkCompressionAsync = (boolean) this.getConfig("network.async-compression", true);
@@ -548,8 +550,12 @@ public class Server {
         packet.encode();
         packet.isEncoded = true;
 
-        for (Player player : players) {
-            player.dataPacket(packet);
+        if(packet.pid() == ProtocolInfo.BATCH_PACKET) {
+            for (Player player : players) {
+                player.dataPacket(packet);
+            }
+        } else {
+            getInstance().batchPackets(players, new DataPacket[]{packet}, true);
         }
 
         if (packet.encapsulatedPacket != null) {

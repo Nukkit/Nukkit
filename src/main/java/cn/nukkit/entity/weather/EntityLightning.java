@@ -119,8 +119,8 @@ public class EntityLightning extends Entity implements EntityLightningStrike {
         this.entityBaseTick(tickDiff);
 
         if (this.state == 2) {
-            this.level.addLevelSoundEvent(LevelSoundEventPacket.SOUND_THUNDER, 93, -1, this);
-            this.level.addLevelSoundEvent(LevelSoundEventPacket.SOUND_EXPLODE, 93, -1, this);
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_THUNDER, 93, -1);
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_EXPLODE, 93, -1);
         }
 
         this.state--;
@@ -153,7 +153,7 @@ public class EntityLightning extends Entity implements EntityLightningStrike {
         if (this.state >= 0) {
             if (this.isEffect) {
                 AxisAlignedBB bb = getBoundingBox().grow(3, 3, 3);
-                bb.maxX += 6;
+                bb.setMaxX(bb.getMaxX() + 6);
 
                 for (Entity entity : this.level.getCollidingEntities(bb, this)) {
                     entity.onStruckByLightning(this);
