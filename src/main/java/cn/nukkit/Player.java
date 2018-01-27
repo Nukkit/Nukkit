@@ -2033,13 +2033,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     int near = Integer.MAX_VALUE; PlayerProtocol pr = null;
                     for (PlayerProtocol protocol : PlayerProtocol.values()){
                         int protocolVersion = protocol.getNumber();
-                        if (protocolVersion < loginPacket.getProtocol()) continue;
+                        if (protocolVersion > loginPacket.getProtocol()) continue;
                         if (protocolVersion == loginPacket.getProtocol()){
                             this.protocol = protocol;
                             break;
                         }
-                        if (protocolVersion-loginPacket.getProtocol() < near){
-                            near = protocolVersion-loginPacket.getProtocol();
+                        if (loginPacket.getProtocol()-protocolVersion < near){
+                            near = loginPacket.getProtocol()-protocolVersion;
                             pr = protocol;
                         }
                     }

@@ -246,7 +246,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     public Integer putPacket(Player player, DataPacket packet, boolean needACK, boolean immediate) {
         if (this.identifiers.containsKey(player.rawHashCode())) {
             byte[] buffer;
-            if (packet.pid(player.getProtocol()) == player.getProtocol().getPacketId("BATCH_PACKET")) {
+            if (packet.getClass().getSimpleName().equals("BatchPacket")) {
                 buffer = ((BatchPacket) packet).payload;
             } else if (!needACK) {
                 this.server.batchPackets(new Player[]{player}, new DataPacket[]{packet}, true);

@@ -31,7 +31,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
     public void reset(PlayerProtocol protocol) {
         super.reset();
         this.putByte(this.pid(protocol));
-        if (protocol.getMainNumber() == 130) this.putShort(0);
+        if (protocol.getMainNumber() >= 130) this.putShort(0);
     }
 
     public void setChannel(int channel) {

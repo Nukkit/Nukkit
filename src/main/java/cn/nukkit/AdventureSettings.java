@@ -61,7 +61,7 @@ public class AdventureSettings implements Cloneable {
         Server.broadcastPacket(Server.getInstance().getOnlinePlayers().values().stream().filter(
                 player -> player.getProtocol().getMainNumber() == 130
         ).toArray(Player[]::new), pk);
-        if (player.getProtocol().getMainNumber() == 130) player.dataPacket(pk);
+        if (player.getProtocol().getMainNumber() == 113) player.dataPacket(pk);
 
         player.resetInAirTicks();
     }
