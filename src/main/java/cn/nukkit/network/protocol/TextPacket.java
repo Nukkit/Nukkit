@@ -22,6 +22,10 @@ public class TextPacket extends DataPacket {
     public byte type;
     public String source = "";
     public String message = "";
+    public String thirdPartyName = "";
+    public int platformId = 0;
+    public String xuid = "";
+    public String platformChatId = "";
     public String[] parameters = new String[0];
     public boolean isLocalized = false;
 
@@ -35,6 +39,8 @@ public class TextPacket extends DataPacket {
             case TYPE_WHISPER:
             case TYPE_ANNOUNCEMENT:
                 this.source = this.getString();
+                this.thirdPartyName = this.getString();
+                this.platformId = this.getVarInt();
             case TYPE_RAW:
             case TYPE_TIP:
             case TYPE_SYSTEM:
@@ -49,6 +55,10 @@ public class TextPacket extends DataPacket {
                     this.parameters[i] = this.getString();
                 }
         }
+        if (protocol.getMainNumber() >= 130){
+            this.xuid = this.getString();
+            if (protocol.getNumber() >= 200) this.platformChatId = this.getString();
+        }
     }
 
     @Override
@@ -62,6 +72,10 @@ public class TextPacket extends DataPacket {
             case TYPE_WHISPER:
             case TYPE_ANNOUNCEMENT:
                 this.putString(this.source);
+                if (protocol.getNumber() >= 200) {
+                    this.putString(this.thirdPartyName);
+                    this.putVarInt(this.platformId);
+                }
             case TYPE_RAW:
             case TYPE_TIP:
             case TYPE_SYSTEM:
@@ -74,6 +88,14 @@ public class TextPacket extends DataPacket {
                 for (String parameter : this.parameters) {
                     this.putString(parameter);
                 }
+                if (protocol.getNumber() >= 200) { //prevent from crashing
+                    this.putString(this.thirdPartyName);
+                    this.putVarInt(this.platformId);
+                }
+        }
+        if (protocol.getMainNumber() >= 130){
+            this.putString(this.xuid);
+            if (protocol.getNumber() >= 200) this.putString(this.platformChatId);
         }
     }
 

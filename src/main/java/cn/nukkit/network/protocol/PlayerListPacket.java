@@ -35,12 +35,18 @@ public class PlayerListPacket extends DataPacket {
                 this.putUUID(entry.uuid, protocol);
                 this.putVarLong(entry.entityId);
                 this.putString(entry.name);
-                this.putSkin(entry.skin);
+                if (protocol.getNumber() >= 200){
+                    this.putString(entry.thirdPartyName);
+                    this.putVarInt(entry.platformId);
+                }
+                this.putSkin(entry.skin, protocol);
                 if (protocol.getMainNumber() >= 130){
+                    if (protocol.getNumber() >= 200) this.putBoolean(entry.skin.getCape().getData().length != 0);
                     this.putByteArray(entry.skin.getCape().getData());
                     this.putString(entry.geometryModel);
                     this.putByteArray(entry.geometryData);
                     this.putString(entry.xboxUserId);
+                    this.putString(entry.platformChatId);
                 }
             } else {
                 this.putUUID(entry.uuid, protocol);
@@ -54,11 +60,14 @@ public class PlayerListPacket extends DataPacket {
         public final UUID uuid;
         public long entityId = 0;
         public String name = "";
+        public String thirdPartyName = ""; //TODO
+        public int platformId = 0; //TODO
         public Skin skin;
         public byte[] capeData = new byte[0]; //TODO
         public String geometryModel = "";
         public byte[] geometryData = new byte[0]; //TODO
         public String xboxUserId = ""; //TODO
+        public String platformChatId = ""; //TODO
 
         public Entry(UUID uuid) {
             this.uuid = uuid;
@@ -69,12 +78,19 @@ public class PlayerListPacket extends DataPacket {
         }
 
         public Entry(UUID uuid, long entityId, String name, Skin skin, String xboxUserId) {
+            this(uuid, entityId, name, skin, xboxUserId, "", 0, "");
+        }
+
+        public Entry(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, String thirdPartyName, int platformId, String platformChatId){
             this.uuid = uuid;
             this.entityId = entityId;
             this.name = name;
+            this.thirdPartyName = thirdPartyName;
+            this.platformId = platformId;
             this.skin = skin;
             this.capeData = skin.getCape().getData();
             this.xboxUserId = xboxUserId == null ? "" : xboxUserId;
+            this.platformChatId = platformChatId;
         }
     }
 

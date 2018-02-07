@@ -249,13 +249,15 @@ public class BinaryStream {
         return Binary.readUUID(this.get(16), protocol);
     }
 
-    public void putSkin(Skin skin) {
+    public void putSkin(Skin skin, PlayerProtocol protocol) {
         this.putString(skin.getModel());
+        if (protocol.getNumber() >= 200) this.putLInt(1); //TODO CHECK
         this.putByteArray(skin.getData());
     }
 
     public Skin getSkin() {
         String modelId = this.getString();
+        this.getLInt(); //TODO CHECK
         byte[] skinData = this.getByteArray();
         return new Skin(skinData, modelId);
     }
