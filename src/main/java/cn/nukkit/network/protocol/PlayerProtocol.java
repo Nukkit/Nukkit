@@ -8,10 +8,8 @@ public enum PlayerProtocol {
     PLAYER_PROTOCOL_113 (113, ProtocolInfo113.class),
     //1.2.0-1.2.3
     PLAYER_PROTOCOL_130 (130, ProtocolInfo130.class),
-    //1.2.5 - 1.2.9
-    PLAYER_PROTOCOL_141 (141, 130, ProtocolInfo130.class),
-    //1.2.10 - x
-    PLAYER_PROTOCOL_200 (200, 130, ProtocolInfo130.class);
+    //1.2.5 - x
+    PLAYER_PROTOCOL_141 (141, 130, ProtocolInfo130.class);
 
     private int number;
     public int getNumber(){
