@@ -5,22 +5,21 @@ package cn.nukkit.network.protocol;
  * Nukkit Project
  */
 public class BatchPacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.BATCH_PACKET;
 
     public byte[] payload;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
+    public byte pid(PlayerProtocol protocol) {
+        return protocol.getPacketId("BATCH_PACKET");
     }
 
     @Override
-    public void decode() {
+    public void decode(PlayerProtocol protocol) {
         this.payload = this.get();
     }
 
     @Override
-    public void encode() {
+    public void encode(PlayerProtocol protocol) {
 
     }
 }

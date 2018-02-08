@@ -16,6 +16,7 @@ import cn.nukkit.level.generator.Generator;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.PlayerProtocol;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.*;
 import org.iq80.leveldb.DB;
@@ -161,56 +162,61 @@ public class LevelDB implements LevelProvider {
             throw new ChunkException("Invalid Chunk sent");
         }
 
-        byte[] tiles = new byte[0];
+        HashMap<PlayerProtocol, byte[]> bytes = new HashMap<>();
 
-        if (!chunk.getBlockEntities().isEmpty()) {
-            List<CompoundTag> tagList = new ArrayList<>();
+        for (PlayerProtocol protocol : PlayerProtocol.values()){
+            byte[] tiles = new byte[0];
 
-            for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-                if (blockEntity instanceof BlockEntitySpawnable) {
-                    tagList.add(((BlockEntitySpawnable) blockEntity).getSpawnCompound());
+            if (!chunk.getBlockEntities().isEmpty()) {
+                List<CompoundTag> tagList = new ArrayList<>();
+
+                for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
+                    if (blockEntity instanceof BlockEntitySpawnable) {
+                        tagList.add(((BlockEntitySpawnable) blockEntity).getSpawnCompound(protocol));
+                    }
+                }
+
+                try {
+                    tiles = NBTIO.write(tagList, ByteOrder.LITTLE_ENDIAN);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
 
-            try {
-                tiles = NBTIO.write(tagList, ByteOrder.LITTLE_ENDIAN);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            Map<Integer, Integer> extra = chunk.getBlockExtraDataArray();
+            BinaryStream extraData;
+            if (!extra.isEmpty()) {
+                extraData = new BinaryStream();
+                extraData.putLInt(extra.size());
+                for (Integer key : extra.values()) {
+                    extraData.putLInt(key);
+                    extraData.putLShort(extra.get(key));
+                }
+            } else {
+                extraData = null;
             }
-        }
 
-        Map<Integer, Integer> extra = chunk.getBlockExtraDataArray();
-        BinaryStream extraData;
-        if (!extra.isEmpty()) {
-            extraData = new BinaryStream();
-            extraData.putLInt(extra.size());
-            for (Integer key : extra.values()) {
-                extraData.putLInt(key);
-                extraData.putLShort(extra.get(key));
+            BinaryStream stream = new BinaryStream();
+            stream.put(chunk.getBlockIdArray());
+            stream.put(chunk.getBlockDataArray());
+            stream.put(chunk.getBlockSkyLightArray());
+            stream.put(chunk.getBlockLightArray());
+            for (int height : chunk.getHeightMapArray()) {
+                stream.putByte((byte) height);
             }
-        } else {
-            extraData = null;
+            for (int color : chunk.getBiomeColorArray()) {
+                stream.put(Binary.writeInt(color));
+            }
+            if (extraData != null) {
+                stream.put(extraData.getBuffer());
+            } else {
+                stream.putLInt(0);
+            }
+            stream.put(tiles);
+            bytes.put(protocol, stream.getBuffer());
         }
 
-        BinaryStream stream = new BinaryStream();
-        stream.put(chunk.getBlockIdArray());
-        stream.put(chunk.getBlockDataArray());
-        stream.put(chunk.getBlockSkyLightArray());
-        stream.put(chunk.getBlockLightArray());
-        for (int height : chunk.getHeightMapArray()) {
-            stream.putByte((byte) height);
-        }
-        for (int color : chunk.getBiomeColorArray()) {
-            stream.put(Binary.writeInt(color));
-        }
-        if (extraData != null) {
-            stream.put(extraData.getBuffer());
-        } else {
-            stream.putLInt(0);
-        }
-        stream.put(tiles);
-
-        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer());
+        this.getLevel().chunkRequestCallback(x, z, bytes);
 
         return null;
     }

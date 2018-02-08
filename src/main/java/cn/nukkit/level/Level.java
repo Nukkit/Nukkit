@@ -109,11 +109,7 @@ public class Level implements ChunkManager, Metadatable {
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .build().asMap();
 
-    // Use a weak map to avoid OOM
-    private final ConcurrentMap<Object, Object> chunkCache = CacheBuilder.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .build().asMap();
+    private final HashMap<PlayerProtocol, ConcurrentMap<Object, Object>> chunkCache = new HashMap<>();
 
     private boolean cacheChunks = false;
 
@@ -411,14 +407,14 @@ public class Level implements ChunkManager, Metadatable {
     public void registerGenerator() {
         int size = this.server.getScheduler().getAsyncTaskPoolSize();
         for (int i = 0; i < size; ++i) {
-            this.server.getScheduler().scheduleAsyncTask(new GeneratorRegisterTask(this, this.generatorInstance));
+            this.server.getScheduler().scheduleAsyncTask(null, new GeneratorRegisterTask(this, this.generatorInstance));
         }
     }
 
     public void unregisterGenerator() {
         int size = this.server.getScheduler().getAsyncTaskPoolSize();
         for (int i = 0; i < size; ++i) {
-            this.server.getScheduler().scheduleAsyncTask(new GeneratorUnregisterTask(this));
+            this.server.getScheduler().scheduleAsyncTask(null, new GeneratorUnregisterTask(this));
         }
     }
 
@@ -1034,10 +1030,11 @@ public class Level implements ChunkManager, Metadatable {
             this.chunkCache.clear();
             this.blockCache.clear();
         } else {
-            if (this.chunkCache.size() > 2048) {
-                this.chunkCache.clear();
+            Iterator<PlayerProtocol> chunkIterator = this.chunkCache.keySet().iterator();
+            while (chunkIterator.hasNext()){
+                PlayerProtocol protocol = chunkIterator.next();
+                if (this.chunkCache.get(protocol).size() > 2048) chunkIterator.remove();
             }
-
             if (this.blockCache.size() > 2048) {
                 this.blockCache.clear();
             }
@@ -2452,7 +2449,7 @@ public class Level implements ChunkManager, Metadatable {
         if (this.chunkSendTasks.containsKey(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
-                    player.sendChunk(x, z, (DataPacket) this.chunkCache.get(index));
+                    player.sendChunk(x, z, (DataPacket) this.chunkCache.get(player.getProtocol()).get(index));
                 }
             }
 
@@ -2471,14 +2468,22 @@ public class Level implements ChunkManager, Metadatable {
                 int x = getHashX(index);
                 int z = getHashZ(index);
                 this.chunkSendTasks.put(index, true);
-                if (this.chunkCache.containsKey(index)) {
+                //Check if we cached chunk for all protocols
+                boolean wasInterrupted = false;
+                for (PlayerProtocol protocol : this.chunkCache.keySet()){
+                    if (!this.chunkCache.get(protocol).containsKey(index)) {
+                        wasInterrupted = true;
+                        break;
+                    }
+                }
+                if (!wasInterrupted && !this.chunkCache.isEmpty()) {
                     this.sendChunkFromCache(x, z);
                     continue;
                 }
                 this.timings.syncChunkSendPrepareTimer.startTiming();
                 AsyncTask task = this.provider.requestChunkTask(x, z);
                 if (task != null) {
-                    this.server.getScheduler().scheduleAsyncTask(task);
+                    this.server.getScheduler().scheduleAsyncTask(null, task);
                 }
                 this.timings.syncChunkSendPrepareTimer.stopTiming();
             }
@@ -2486,17 +2491,24 @@ public class Level implements ChunkManager, Metadatable {
         }
     }
 
-    public void chunkRequestCallback(int x, int z, byte[] payload) {
+    public void chunkRequestCallback(int x, int z, HashMap<PlayerProtocol, byte[]> payload) {
         this.timings.syncChunkSendTimer.startTiming();
         Long index = Level.chunkHash(x, z);
 
-        if (this.cacheChunks && !this.chunkCache.containsKey(index)) {
-            this.chunkCache.put(index, Player.getChunkCacheFromData(x, z, payload));
+        payload.forEach((protocol, chunkCache) -> {
+            if (!this.chunkCache.containsKey(protocol)) this.chunkCache.put(protocol, CacheBuilder.newBuilder()
+                    .maximumSize(1000)
+                    .expireAfterWrite(10, TimeUnit.MINUTES)
+                    .build().asMap());
+            if (this.cacheChunks && !this.chunkCache.get(protocol).containsKey(index)) {
+                this.chunkCache.get(protocol).put(index, Player.getChunkCacheFromData(x, z, chunkCache, protocol));
+            }
+        });
+        if (this.cacheChunks) {
             this.sendChunkFromCache(x, z);
             this.timings.syncChunkSendTimer.stopTiming();
             return;
         }
-
         if (this.chunkSendTasks.containsKey(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
@@ -2595,7 +2607,7 @@ public class Level implements ChunkManager, Metadatable {
 
         if (!chunk.isLightPopulated() && chunk.isPopulated()
                 && (boolean) this.getServer().getConfig("chunk-ticking.light-updates", false)) {
-            this.getServer().getScheduler().scheduleAsyncTask(new LightPopulationTask(this, chunk));
+            this.getServer().getScheduler().scheduleAsyncTask(null, new LightPopulationTask(this, chunk));
         }
 
         if (this.isChunkInUse(x, z)) {
@@ -2840,7 +2852,7 @@ public class Level implements ChunkManager, Metadatable {
                     }
 
                     PopulationTask task = new PopulationTask(this, chunk);
-                    this.server.getScheduler().scheduleAsyncTask(task);
+                    this.server.getScheduler().scheduleAsyncTask(null, task);
                 }
             }
             Timings.populationTimer.stopTiming();
@@ -2864,7 +2876,7 @@ public class Level implements ChunkManager, Metadatable {
             Timings.generationTimer.startTiming();
             this.chunkGenerationQueue.put(index, true);
             GenerationTask task = new GenerationTask(this, this.getChunk(x, z, true));
-            this.server.getScheduler().scheduleAsyncTask(task);
+            this.server.getScheduler().scheduleAsyncTask(null, task);
             Timings.generationTimer.stopTiming();
         }
     }

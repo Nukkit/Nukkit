@@ -6,6 +6,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.Vector3f;
+import cn.nukkit.network.protocol.PlayerProtocol;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -240,12 +241,12 @@ public class BinaryStream {
         }
     }
 
-    public void putUUID(UUID uuid) {
-        this.put(Binary.writeUUID(uuid));
+    public void putUUID(UUID uuid, PlayerProtocol protocol) {
+        this.put(Binary.writeUUID(uuid, protocol));
     }
 
-    public UUID getUUID() {
-        return Binary.readUUID(this.get(16));
+    public UUID getUUID(PlayerProtocol protocol) {
+        return Binary.readUUID(this.get(16), protocol);
     }
 
     public void putSkin(Skin skin) {
@@ -308,6 +309,23 @@ public class BinaryStream {
         this.putVarInt(item.getId());
         int auxValue = (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8) | item.getCount();
         this.putVarInt(auxValue);
+        byte[] nbt = item.getCompoundTag();
+        this.putLShort(nbt.length);
+        this.put(nbt);
+        this.putVarInt(0); //TODO CanPlaceOn entry count
+        this.putVarInt(0); //TODO CanDestroy entry count
+    }
+
+    public void putSlot2(Item item) {
+        if (item == null || item.getId() == 0) {
+            this.putVarInt(0);
+            return;
+        }
+
+        this.putVarInt(item.getId());
+        int metadata = item.hasMeta() ? item.getDamage() : Short.MAX_VALUE;
+
+        this.putVarInt((metadata << 8) + (item.getCount() & 0xff));
         byte[] nbt = item.getCompoundTag();
         this.putLShort(nbt.length);
         this.put(nbt);

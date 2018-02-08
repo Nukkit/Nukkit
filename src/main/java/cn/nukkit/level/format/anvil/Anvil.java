@@ -8,6 +8,7 @@ import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.PlayerProtocol;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
@@ -101,21 +102,24 @@ public class Anvil extends BaseLevelProvider {
             throw new ChunkException("Invalid Chunk Set");
         }
 
-        byte[] blockEntities = new byte[0];
+        HashMap<PlayerProtocol, byte[]> blockEntities = new HashMap<>();
 
-        if (!chunk.getBlockEntities().isEmpty()) {
-            List<CompoundTag> tagList = new ArrayList<>();
+        for (PlayerProtocol protocol : PlayerProtocol.values()){
+            if (!blockEntities.containsKey(protocol)) blockEntities.put(protocol, new byte[0]);
+            if (!chunk.getBlockEntities().isEmpty()) {
+                List<CompoundTag> tagList = new ArrayList<>();
 
-            for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-                if (blockEntity instanceof BlockEntitySpawnable) {
-                    tagList.add(((BlockEntitySpawnable) blockEntity).getSpawnCompound());
+                for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
+                    if (blockEntity instanceof BlockEntitySpawnable) {
+                        tagList.add(((BlockEntitySpawnable) blockEntity).getSpawnCompound(protocol));
+                    }
                 }
-            }
 
-            try {
-                blockEntities = NBTIO.write(tagList, ByteOrder.LITTLE_ENDIAN, true);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                try {
+                    blockEntities.put(protocol, NBTIO.write(tagList, ByteOrder.LITTLE_ENDIAN, true));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
@@ -132,34 +136,39 @@ public class Anvil extends BaseLevelProvider {
             extraData = null;
         }
 
-        BinaryStream stream = new BinaryStream();
-        int count = 0;
-        cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
-        for (int i = sections.length - 1; i >= 0; i--) {
-            if (!sections[i].isEmpty()) {
-                count = i + 1;
-                break;
-            }
-        }
-        stream.putByte((byte) count);
-        for (int i = 0; i < count; i++) {
-            stream.putByte((byte) 0);
-            stream.put(sections[i].getBytes());
-        }
-        for (int height : chunk.getHeightMapArray()) {
-            stream.putByte((byte) height);
-        }
-        stream.put(new byte[256]);
-        stream.put(chunk.getBiomeIdArray());
-        stream.putByte((byte) 0);
-        if (extraData != null) {
-            stream.put(extraData.getBuffer());
-        } else {
-            stream.putVarInt(0);
-        }
-        stream.put(blockEntities);
+        HashMap<PlayerProtocol, byte[]> bytes = new HashMap<>();
 
-        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer());
+        for (PlayerProtocol protocol : PlayerProtocol.values()){
+            BinaryStream stream = new BinaryStream();
+            int count = 0;
+            cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
+            for (int i = sections.length - 1; i >= 0; i--) {
+                if (!sections[i].isEmpty()) {
+                    count = i + 1;
+                    break;
+                }
+            }
+            stream.putByte((byte) count);
+            for (int i = 0; i < count; i++) {
+                stream.putByte((byte) 0);
+                stream.put(sections[i].getBytes(protocol));
+            }
+            for (int height : chunk.getHeightMapArray()) {
+                stream.putByte((byte) height);
+            }
+            stream.put(new byte[256]);
+            stream.put(chunk.getBiomeIdArray());
+            stream.putByte((byte) 0);
+            if (extraData != null) {
+                stream.put(extraData.getBuffer());
+            } else {
+                stream.putVarInt(0);
+            }
+            stream.put(blockEntities.get(protocol));
+            bytes.put(protocol, stream.getBuffer());
+        }
+
+        this.getLevel().chunkRequestCallback(x, z, bytes);
 
         return null;
     }

@@ -24,10 +24,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -503,6 +500,7 @@ public class Item implements Cloneable {
     public static final int CARROT_ON_A_STICK = 398;
     public static final int NETHER_STAR = 399;
     public static final int PUMPKIN_PIE = 400;
+    public static final int FIREWORKS = 401;
 
     public static final int ENCHANTED_BOOK = 403;
     public static final int ENCHANT_BOOK = 403;
@@ -612,6 +610,10 @@ public class Item implements Cloneable {
 
     public boolean hasMeta() {
         return hasMeta;
+    }
+
+    public boolean hasAnyDamageValue() {
+        return this.meta == -1;
     }
 
     public boolean canBeActivated() {
@@ -764,6 +766,7 @@ public class Item implements Cloneable {
             list[CARROT_ON_A_STICK] = ItemCarrotOnAStick.class; //398
             list[NETHER_STAR] = ItemNetherStar.class; //399
             list[PUMPKIN_PIE] = ItemPumpkinPie.class; //400
+            list[FIREWORKS] = ItemFireworks.class; //401
 
             list[ENCHANTED_BOOK] = ItemBookEnchanted.class; //403
             list[COMPARATOR] = ItemRedstoneComparator.class; //404
@@ -967,6 +970,13 @@ public class Item implements Cloneable {
         return get(id, meta);
     }
 
+    public static Item fromJson(Map<String, Object> data) {
+        String nbt = (String) data.getOrDefault("nbt_hex", "");
+        return get(Utils.toInt(data.get("id")), Utils.toInt(data.getOrDefault("damage", 0)),
+                Utils.toInt(data.getOrDefault("count", 1)), nbt.isEmpty() ? new byte[0] :
+                        DatatypeConverter.parseHexBinary(nbt));
+    }
+
     public static Item[] fromStringMultiple(String str) {
         String[] b = str.split(",");
         Item[] items = new Item[b.length - 1];
@@ -993,6 +1003,12 @@ public class Item implements Cloneable {
 
     public boolean hasCompoundTag() {
         return this.tags != null && this.tags.length > 0;
+    }
+
+    public void encodeCompoundTag() {
+        if (cachedNBT != null) {
+            this.tags = this.writeCompoundTag(this.cachedNBT);
+        }
     }
 
     public boolean hasCustomBlockData() {
@@ -1526,21 +1542,6 @@ public class Item implements Cloneable {
      */
     public final boolean equalsExact(Item other) {
         return this.equals(other, true, true) && this.count == other.count;
-    }
-
-    @Deprecated
-    public final boolean deepEquals(Item item) {
-        return equals(item, true);
-    }
-
-    @Deprecated
-    public final boolean deepEquals(Item item, boolean checkDamage) {
-        return equals(item, checkDamage, true);
-    }
-
-    @Deprecated
-    public final boolean deepEquals(Item item, boolean checkDamage, boolean checkCompound) {
-        return equals(item, checkDamage, checkCompound);
     }
 
     @Override

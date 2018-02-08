@@ -5,9 +5,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.player.PlayerCreationEvent;
 import cn.nukkit.event.server.QueryRegenerateEvent;
-import cn.nukkit.network.protocol.BatchPacket;
-import cn.nukkit.network.protocol.DataPacket;
-import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.network.protocol.*;
 import cn.nukkit.raknet.RakNet;
 import cn.nukkit.raknet.protocol.EncapsulatedPacket;
 import cn.nukkit.raknet.protocol.packet.PING_DataPacket;
@@ -153,7 +151,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
 
                     pk = this.getPacket(packet.buffer);
                     if (pk != null) {
-                        pk.decode();
+                        pk.decode(this.players.get(identifier).getProtocol());
                         this.players.get(identifier).handleDataPacket(pk);
                     }
                 }
@@ -248,14 +246,14 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     public Integer putPacket(Player player, DataPacket packet, boolean needACK, boolean immediate) {
         if (this.identifiers.containsKey(player.rawHashCode())) {
             byte[] buffer;
-            if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
+            if (packet.getClass().getSimpleName().equals("BatchPacket")) {
                 buffer = ((BatchPacket) packet).payload;
             } else if (!needACK) {
                 this.server.batchPackets(new Player[]{player}, new DataPacket[]{packet}, true);
                 return null;
             } else {
                 if (!packet.isEncoded) {
-                    packet.encode();
+                    packet.encode(player.getProtocol());
                     packet.isEncoded = true;
                 }
                 buffer = packet.getBuffer();
@@ -318,7 +316,8 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         if (buffer[0] == (byte) 0xfe) {
             start++;
         }
-        DataPacket data = this.network.getPacket(ProtocolInfo.BATCH_PACKET);
+        DataPacket data = this.network.getPacket(PlayerProtocol.getNewestProtocol().getPacketId("BATCH_PACKET"),
+                PlayerProtocol.getNewestProtocol());
 
         if (data == null) {
             return null;
