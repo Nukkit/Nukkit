@@ -6,11 +6,7 @@
 
 ATTENTION
 -------------
-* If you want to join the Nukkit development, you can send an e-mail with your coding experience to `peratx@itxtech.org`. After we check the mail, you may receive an invitation to join the MCConCN/NukkitDev team (If not passed, we will inform you).
-* Our goal is to make Nukkit Community active again.
-* Changes in the temporary repo can be merged to this repo when they are stable
-* This decision is made by PeratX and MagicDroidX on 2017/12/17 0:11:13
-* The temporary repo is located [here](https://github.com/MCConCN/Nukkit)
+**This repo is inactive. Try [NukkitX](https://github.com/NukkitX/Nukkit)**
 
 Introduction
 -------------
