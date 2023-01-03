@@ -14,20 +14,4 @@ Teyviat
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__Teyviat, a Server Software For Minecraft: Pocket Edition__
-
-
-Introduction
--------------
-
-Teyviat is a server software for Minecraft: Pocket Edition.
-
-* Written in Java, Teyviat is faster and more stable.
-
-Teyviat is **not finished** yet. We welcome contributions.
-
-Build JAR file
--------------
-- `git submodule update --init`
-- `mvn clean`
-- `mvn package`
+__Teyviat, a Server Software For Minecraft: Pocket Edition written in Java__
