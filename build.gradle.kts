@@ -13,19 +13,19 @@ group = "org.teyviat"
 version = "1.0-SNAPSHOT"
 
 dependencies {
-    implementation("org.fusesource.jansi:jansi:1.11")
-    implementation("com.google.code.gson:gson:2.4")
-    implementation("org.yaml:snakeyaml:1.16")
+    implementation("org.fusesource.jansi:jansi:2.4.0")
+    implementation("com.google.code.gson:gson:2.10")
+    implementation("org.yaml:snakeyaml:1.33")
     implementation("jline:jline:2.13")
     implementation("io.netty:netty-all:4.1.76.Final")
     implementation("org.iq80.leveldb:leveldb:0.12")
-    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:4.13.2")
 }
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 
-    withSourcesJar()
+    // withSourcesJar()
 }
 
 tasks {
